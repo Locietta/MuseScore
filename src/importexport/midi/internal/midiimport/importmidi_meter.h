@@ -22,8 +22,8 @@
 #ifndef IMPORTMIDI_METER_H
 #define IMPORTMIDI_METER_H
 
+#include <utility>
 #include <vector>
-#include <QList>
 
 namespace mu::engraving {
 class TDuration;
@@ -75,7 +75,7 @@ std::vector<ReducedFraction> divisionsOfBarForTuplets(const ReducedFraction& bar
 
 // duration and all tuplets should belong to the same voice
 // nested tuplets are not allowed
-QList<std::pair<ReducedFraction, engraving::TDuration> >
+std::vector<std::pair<ReducedFraction, engraving::TDuration> >
 toDurationList(const ReducedFraction& startTickInBar, const ReducedFraction& endTickInBar, const ReducedFraction& barFraction,
                const std::vector<MidiTuplet::TupletData>& tupletsInBar, DurationType durationType, bool useDots,
                bool printRestRemains = true);

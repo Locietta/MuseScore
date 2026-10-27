@@ -22,6 +22,13 @@
 #ifndef IMPORTMIDI_OPERATIONS_H
 #define IMPORTMIDI_OPERATIONS_H
 
+#include <cstdint>
+#include <string>
+#include <vector>
+
+#include "global/types/bytearray.h"
+#include "global/types/string.h"
+
 #include "importmidi_inner.h"
 #include "importmidi_operation.h"
 #include "../midishared/midifile.h"
@@ -34,7 +41,7 @@ namespace mu::iex::midi {
 class ReducedFraction;
 
 namespace MidiCharset {
-QString defaultCharset();
+std::string defaultCharset();
 }
 namespace Quantize {
 MidiOperations::QuantValue defaultQuantValueFromPreferences();
@@ -167,7 +174,7 @@ struct Opers
     // data that cannot be changed by the user
     TrackOp<int> channel = TrackOp<int>(int());
     TrackOp<std::string> staffName = TrackOp<std::string>(std::string());         // will be converted to unicode later
-    TrackOp<QString> midiInstrName = TrackOp<QString>(QString());
+    TrackOp<muse::String> midiInstrName = TrackOp<muse::String>(muse::String());
     TrackOp<std::vector<const engraving::InstrumentTemplate*> > msInstrList
         = TrackOp<std::vector<const engraving::InstrumentTemplate*> >(
               std::vector<const engraving::InstrumentTemplate*>());
@@ -220,22 +227,22 @@ struct HumanBeatData
 struct FileData
 {
     MidiFile midiFile;
-    QList<MTrack> tracks;
+    std::vector<MTrack> tracks;
     int processingsOfOpenedFile = 0;
-    qint64 fileModificationTime = 0;
+    int64_t fileModificationTime = 0;
     bool hasTempoText = false;
-    QByteArray HHeaderData;
-    QByteArray VHeaderData;
+    muse::ByteArray HHeaderData;
+    muse::ByteArray VHeaderData;
     int trackCount = 0;
     Opers trackOpers;
-    QString charset = MidiCharset::defaultCharset();
-    // after the user apply MIDI import operations
-    // this value should be set to false
-    // tracks of <tick, lyric fragment> from karaoke files
-    // QList of lyric tracks - there can be multiple lyric tracks,
-    // lyric track count != MIDI track count in general
-    QList<std::multimap<ReducedFraction, std::string> > lyricTracks;
-    std::multimap<ReducedFraction, QString> chordNames;
+    std::string charset = MidiCharset::defaultCharset();
+    // after the user applies MIDI import operations this value should be set
+    // to false.
+    // tracks of <tick, lyric fragment> from karaoke files: there can be
+    // multiple lyric tracks, and lyric track count != MIDI track count in
+    // general.
+    std::vector<std::multimap<ReducedFraction, std::string> > lyricTracks;
+    std::multimap<ReducedFraction, muse::String> chordNames;
     HumanBeatData humanBeatData;
 };
 
@@ -245,24 +252,30 @@ public:
     FileData* data();
     const FileData* data() const;
 
-    void addNewMidiFile(const QString& fileName);
+    void addNewMidiFile(const std::string& fileName);
     int currentTrack() const;
-    void setMidiFileData(const QString& fileName, const MidiFile& midiFile);
-    void excludeMidiFile(const QString& fileName);
-    bool hasMidiFile(const QString& fileName);
-    const MidiFile* midiFile(const QString& fileName);
-    QStringList allMidiFiles() const;
-    void setOperationsFile(const QString& fileName);
+    void setMidiFileData(const std::string& fileName, const MidiFile& midiFile);
+    void excludeMidiFile(const std::string& fileName);
+    bool hasMidiFile(const std::string& fileName);
+    const MidiFile* midiFile(const std::string& fileName);
+    std::vector<std::string> allMidiFiles() const;
+    void setOperationsFile(const std::string& fileName);
+
+#ifndef NO_QT_SUPPORT
+    // Compatibility for the Qt MIDI configuration module, which keeps passing
+    // a QString.  The Qt-free path only sees the std::string overload.
+    void setOperationsFile(const QString& fileName) { setOperationsFile(fileName.toStdString()); }
+#endif
 
 private:
     friend class CurrentTrackSetter;
     friend class CurrentMidiFileSetter;
 
-    QString _currentMidiFile;
-    QString _midiOperationsFile;
+    std::string _currentMidiFile;
+    std::string _midiOperationsFile;
     int _currentTrack = -1;
 
-    std::map<QString, FileData> _data;      // <file name, tracks data>
+    std::map<std::string, FileData> _data;      // <file name, tracks data>
 };
 
 // scoped setter of current track
@@ -295,7 +308,7 @@ private:
 class CurrentMidiFileSetter
 {
 public:
-    CurrentMidiFileSetter(Data& opers, const QString& fileName)
+    CurrentMidiFileSetter(Data& opers, const std::string& fileName)
         : _opers(opers)
     {
         _oldValue = _opers._currentMidiFile;
@@ -309,7 +322,7 @@ public:
 
 private:
     Data& _opers;
-    QString _oldValue;
+    std::string _oldValue;
     // disallow heap allocation - for stack-only usage
     void* operator new(size_t);                 // standard new
     void* operator new(size_t, void*);          // placement new

@@ -20,6 +20,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "importmidi_lrhand.h"
+
+#include <cstdlib>
+#include <limits>
+#include <vector>
+
 #include "importmidi_inner.h"
 #include "importmidi_fraction.h"
 #include "importmidi_chord.h"
@@ -56,9 +61,9 @@ bool needToSplit(const std::multimap<ReducedFraction, MidiChord>& chords,
     return false;
 }
 
-#ifdef QT_DEBUG
+#ifndef NDEBUG
 
-bool areNotesSortedByPitchInAscOrder(const QList<MidiNote>& notes)
+bool areNotesSortedByPitchInAscOrder(const std::vector<MidiNote>& notes)
 {
     for (int i = 0; i != notes.size() - 1; ++i) {
         if (notes[i].pitch > notes[i + 1].pitch) {
@@ -123,12 +128,12 @@ void splitChords(
 
             oldChord.notes.clear();
             for (int i = splitPoint; i != oldNotes.size(); ++i) {
-                oldChord.notes.append(oldNotes[i]);
+                oldChord.notes.push_back(oldNotes[i]);
             }
 
             newChord.notes.clear();
             for (int i = 0; i != splitPoint; ++i) {
-                newChord.notes.append(oldNotes[i]);
+                newChord.notes.push_back(oldNotes[i]);
             }
 
             leftHandChords.insert({ splits[pos].chord->first, newChord });
@@ -144,15 +149,15 @@ void splitChords(
     }
 }
 
-int findPitchWidthPenalty(const QList<MidiNote>& notes, int splitPoint)
+int findPitchWidthPenalty(const std::vector<MidiNote>& notes, int splitPoint)
 {
     const int octave = 12;
     const int maxPitchWidth = octave + 2;
     int penalty = 0;
 
     if (splitPoint > 0) {
-        const int lowPitchWidth = qAbs(notes[0].pitch
-                                       - notes[splitPoint - 1].pitch);
+        const int lowPitchWidth = std::abs(notes[0].pitch
+                                           - notes[splitPoint - 1].pitch);
         if (lowPitchWidth <= octave) {
             penalty += 0;
         } else if (lowPitchWidth <= maxPitchWidth) {
@@ -163,7 +168,7 @@ int findPitchWidthPenalty(const QList<MidiNote>& notes, int splitPoint)
     }
 
     if (splitPoint < notes.size()) {
-        const int highPitchWidth = qAbs(notes[splitPoint].pitch
+        const int highPitchWidth = std::abs(notes[splitPoint].pitch
                                         - notes[notes.size() - 1].pitch);
         if (highPitchWidth <= octave) {
             penalty += 0;
@@ -177,7 +182,7 @@ int findPitchWidthPenalty(const QList<MidiNote>& notes, int splitPoint)
     return penalty;
 }
 
-bool isOctave(const QList<MidiNote>& notes, int beg, int end)
+bool isOctave(const std::vector<MidiNote>& notes, int beg, int end)
 {
     Q_ASSERT_X(end > 0 && beg >= 0 && end > beg, "LRHand::isOctave", "Invalid note indexes");
 
@@ -186,8 +191,8 @@ bool isOctave(const QList<MidiNote>& notes, int beg, int end)
 }
 
 int findSimilarityPenalty(
-    const QList<MidiNote>& notes,
-    const QList<MidiNote>& prevNotes,
+    const std::vector<MidiNote>& notes,
+    const std::vector<MidiNote>& prevNotes,
     int splitPoint,
     int prevSplitPoint)
 {
@@ -224,7 +229,7 @@ int findSimilarityPenalty(
     return penalty;
 }
 
-bool areOffTimesEqual(const QList<MidiNote>& notes, int beg, int end)
+bool areOffTimesEqual(const std::vector<MidiNote>& notes, int beg, int end)
 {
     Q_ASSERT_X(end > 0 && beg >= 0 && end > beg,
                "LRHand::areOffTimesEqual", "Invalid note indexes");
@@ -240,7 +245,7 @@ bool areOffTimesEqual(const QList<MidiNote>& notes, int beg, int end)
     return areEqual;
 }
 
-int findDurationPenalty(const QList<MidiNote>& notes, int splitPoint)
+int findDurationPenalty(const std::vector<MidiNote>& notes, int splitPoint)
 {
     int penalty = 0;
     if (splitPoint > 0 && areOffTimesEqual(notes, 0, splitPoint)) {
@@ -252,7 +257,7 @@ int findDurationPenalty(const QList<MidiNote>& notes, int splitPoint)
     return penalty;
 }
 
-int findNoteCountPenalty(const QList<MidiNote>& notes, int splitPoint)
+int findNoteCountPenalty(const std::vector<MidiNote>& notes, int splitPoint)
 {
     const int leftHandCount = splitPoint;
     const int rightHandCount = notes.size() - splitPoint;
@@ -323,8 +328,8 @@ std::vector<ChordSplitData> findSplits(std::multimap<ReducedFraction, MidiChord>
 
     for (auto it = chords.begin(); it != chords.end(); ++it) {
         const auto& notes = it->second.notes;
-#ifdef QT_DEBUG
-        Q_ASSERT_X(!notes.isEmpty(),
+#ifndef NDEBUG
+        Q_ASSERT_X(!notes.empty(),
                    "LRHand::findSplits", "Notes are empty");
         Q_ASSERT_X(areNotesSortedByPitchInAscOrder(notes),
                    "LRHand::findSplits",
@@ -416,7 +421,7 @@ void splitStaff(std::multimap<int, MTrack>& tracks, std::multimap<int, MTrack>::
 }
 
 void addNewLeftHandChord(std::multimap<ReducedFraction, MidiChord>& leftHandChords,
-                         const QList<MidiNote>& leftHandNotes,
+                         const std::vector<MidiNote>& leftHandNotes,
                          const std::multimap<ReducedFraction, MidiChord>::iterator& it)
 {
     MidiChord leftHandChord = it->second;

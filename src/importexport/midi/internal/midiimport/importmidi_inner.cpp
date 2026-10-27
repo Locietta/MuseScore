@@ -21,13 +21,20 @@
  */
 #include "importmidi_inner.h"
 
-#include <QTextCodec>
+#include <cctype>
+#include <cstring>
+#include <string>
+#include <string_view>
+
+#include "global/types/string.h"
 
 #include "importmidi_operations.h"
 #include "importmidi_chord.h"
 
 #include "engraving/dom/durationtype.h"
 #include "engraving/dom/sig.h"
+
+#include "log.h"
 
 namespace mu::iex::midi {
 MTrack::MTrack(const MTrack& other)
@@ -244,26 +251,106 @@ bool haveIntersection(
 }
 
 namespace MidiCharset {
-QString convertToCharset(const std::string& text)
+namespace {
+// Windows-1252 differs from ISO-8859-1 only in 0x80..0x9F.  Karaoke and MIDI
+// files written on Windows commonly use this range (smart quotes, dashes,
+// ellipsis, trademark), so decoding it as Latin-1 would silently corrupt the
+// lyric text.  Undefined bytes are preserved as the corresponding C1 control
+// code point instead of being dropped.
+char16_t decodeWindows1252Byte(unsigned char byte)
 {
-    // charset for the current MIDI file
-    QString charset = midiImportOperations.data()->charset;
-    auto* codec = QTextCodec::codecForName(charset.toLatin1());
-    if (codec) {
-        return codec->toUnicode(text.c_str());
-    } else {
-        return QString::fromUtf8(text.data(), int(text.size()));
+    if (byte >= 0x80 && byte <= 0x9F) {
+        static constexpr char16_t map[32] = {
+            0x20AC, 0x0081, 0x201A, 0x0192, 0x201E, 0x2026, 0x2020, 0x2021,
+            0x02C6, 0x2030, 0x0160, 0x2039, 0x0152, 0x008D, 0x017D, 0x008F,
+            0x0090, 0x2018, 0x2019, 0x201C, 0x201D, 0x2022, 0x2013, 0x2014,
+            0x02DC, 0x2122, 0x0161, 0x203A, 0x0153, 0x009D, 0x017E, 0x0178
+        };
+        return map[byte - 0x80];
     }
+    return static_cast<char16_t>(byte);
 }
 
-QString defaultCharset()
+muse::String fromSingleByte(const std::string& text, bool windows1252)
+{
+    std::u16string utf16;
+    utf16.reserve(text.size());
+    for (const char ch: text) {
+        const auto byte = static_cast<unsigned char>(ch);
+        utf16.push_back(windows1252 ? decodeWindows1252Byte(byte)
+                        : static_cast<char16_t>(byte));
+    }
+
+    muse::String result;
+    result.reserve(utf16.size());
+    for (const char16_t ch: utf16) {
+        result.append(muse::Char(ch));
+    }
+    return result;
+}
+
+std::string normalizedCharsetName(const std::string& charset)
+{
+    std::string normalized;
+    normalized.reserve(charset.size());
+    for (const char ch: charset) {
+        if (ch == ' ' || ch == '_') {
+            continue;
+        }
+        normalized.push_back(static_cast<char>(std::tolower(static_cast<unsigned char>(ch))));
+    }
+    return normalized;
+}
+
+muse::String decodeWithFallback(const std::string& text, const std::string& charset)
+{
+    const std::string normalized = normalizedCharsetName(charset);
+
+    if (normalized.empty() || normalized == "utf-8" || normalized == "utf8") {
+        if (muse::UtfCodec::isValidUtf8(text)) {
+            return muse::String::fromUtf8(text);
+        }
+        // MIDI meta events have no encoding marker.  UTF-8 is the declared
+        // default, but a byte sequence that is not valid UTF-8 is far more
+        // likely to be Windows-1252 text than a file that should be rejected.
+        LOGW() << "MIDI import: meta text is not valid UTF-8; falling back to Windows-1252";
+        return fromSingleByte(text, true);
+    }
+
+    if (normalized == "windows-1252" || normalized == "cp1252" || normalized == "win1252") {
+        return fromSingleByte(text, true);
+    }
+    if (normalized == "iso-8859-1" || normalized == "iso8859-1"
+        || normalized == "latin1" || normalized == "latin-1") {
+        return fromSingleByte(text, false);
+    }
+
+    // A real multi-codec backend (ICU or libiconv) is required for the full
+    // QTextCodec surface.  Until then, never guess an arbitrary encoding:
+    // prefer strict UTF-8 and otherwise preserve Latin-1/Windows-1252 bytes.
+    LOGW() << "MIDI import: unsupported charset" << charset
+           << "in the Qt-free build; using UTF-8/Windows-1252 fallback";
+    if (muse::UtfCodec::isValidUtf8(text)) {
+        return muse::String::fromUtf8(text);
+    }
+    return fromSingleByte(text, true);
+}
+} // namespace
+
+muse::String convertToCharset(const std::string& text)
+{
+    const auto* data = midiImportOperations.data();
+    return decodeWithFallback(text, data ? data->charset : defaultCharset());
+}
+
+std::string defaultCharset()
 {
     return "UTF-8";
 }
 
-std::string fromUchar(const uchar* text)
+std::string fromUchar(const unsigned char* text)
 {
-    return reinterpret_cast<const char*>(text);
+    return text ? std::string(reinterpret_cast<const char*>(text)) : std::string();
 }
 } // namespace MidiCharset
 
@@ -276,7 +363,7 @@ ReducedFraction findBarStart(const ReducedFraction& time, const engraving::TimeS
 }
 } // namespace MidiBar
 namespace MidiDuration {
-double durationCount(const QList<std::pair<ReducedFraction, engraving::TDuration> >& durations)
+double durationCount(const std::vector<std::pair<ReducedFraction, engraving::TDuration> >& durations)
 {
     double count = durations.size();
     for (const auto& d: durations) {

@@ -28,7 +28,7 @@
 #include "engraving/dom/chord.h"
 #include "engraving/dom/note.h"
 
-#ifdef QT_DEBUG
+#ifndef NDEBUG
 #include "engraving/dom/staff.h"
 #include "engraving/dom/masterscore.h"
 #include "engraving/dom/measure.h"
@@ -104,7 +104,7 @@ void TieStateMachine::addSeg(const Segment* seg, track_idx_t strack)
     }
 }
 
-#ifdef QT_DEBUG
+#ifndef NDEBUG
 
 static void printInconsistentTieLocation(int measureIndex, staff_idx_t staffIndex)
 {

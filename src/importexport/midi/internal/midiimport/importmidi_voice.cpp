@@ -21,7 +21,12 @@
  */
 #include "importmidi_voice.h"
 
-#include <QSet>
+#include <algorithm>
+#include <cmath>
+#include <cstdlib>
+#include <limits>
+#include <set>
+#include <vector>
 
 #include "importmidi_tuplet.h"
 #include "importmidi_inner.h"
@@ -66,10 +71,10 @@ int voiceLimit()
     return static_cast<int>(allowedVoiceCount);
 }
 
-#ifdef QT_DEBUG
+#ifndef NDEBUG
 
 bool areNotesSortedByOffTimeInAscOrder(
-    const QList<MidiNote>& notes,
+    const std::vector<MidiNote>& notes,
     const std::vector<int>& groupOfIndexes)
 {
     for (size_t i = 0; i != groupOfIndexes.size() - 1; ++i) {
@@ -80,7 +85,7 @@ bool areNotesSortedByOffTimeInAscOrder(
     return true;
 }
 
-bool areNotesSortedByOffTimeInAscOrder(const QList<MidiNote>& notes)
+bool areNotesSortedByOffTimeInAscOrder(const std::vector<MidiNote>& notes)
 {
     for (int i = 0; i != (int)notes.size() - 1; ++i) {
         if (notes[i].offTime > notes[i + 1].offTime) {
@@ -124,7 +129,7 @@ bool areVoicesSame(const std::multimap<ReducedFraction, MidiChord>& chords)
 
 #endif
 
-bool allNotesHaveEqualLength(const QList<MidiNote>& notes)
+bool allNotesHaveEqualLength(const std::vector<MidiNote>& notes)
 {
     const auto& offTime = notes[0].offTime;
     for (int i = 1; i != notes.size(); ++i) {
@@ -137,13 +142,13 @@ bool allNotesHaveEqualLength(const QList<MidiNote>& notes)
 
 int findDurationCountInGroup(
     const ReducedFraction& chordOnTime,
-    const QList<MidiNote>& notes,
+    const std::vector<MidiNote>& notes,
     int voice,
     const std::vector<int>& groupOfIndexes,
     const TimeSigMap* sigmap,
     const std::multimap<ReducedFraction, MidiTuplet::TupletData>& tuplets)
 {
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     Q_ASSERT_X(areNotesSortedByOffTimeInAscOrder(notes, groupOfIndexes),
                "MidiVoice::findDurationCountInGroup",
                "Notes are not sorted by off time in ascending order");
@@ -202,7 +207,7 @@ int findDurationCountInGroup(
 // count of resulting durations in music notation
 
 int findDurationCount(
-    const QList<MidiNote>& notes,
+    const std::vector<MidiNote>& notes,
     int voice,
     int splitPoint,
     const ReducedFraction& chordOnTime,
@@ -236,8 +241,8 @@ int findOptimalSplitPoint(
 {
     const auto& notes = chordIt->second.notes;
 
-#ifdef QT_DEBUG
-    Q_ASSERT_X(!notes.isEmpty(),
+#ifndef NDEBUG
+    Q_ASSERT_X(!notes.empty(),
                "MidiVoice::findOptimalSplitPoint", "Notes are empty");
     Q_ASSERT_X(areNotesSortedByOffTimeInAscOrder(notes),
                "MidiVoice::findOptimalSplitPoint",
@@ -462,7 +467,7 @@ int findPrevPitchDist(
     while (it != chords.begin()) {
         --it;
         if (it->second.voice == voice) {
-            return qAbs(MChord::chordAveragePitch(it->second.notes) - averagePitch);
+            return std::abs(MChord::chordAveragePitch(it->second.notes) - averagePitch);
         }
     }
     return MAX_PITCH_DIST;
@@ -477,7 +482,7 @@ int findNextPitchDist(
     auto it = (chordIt == chords.end()) ? chordIt : std::next(chordIt);
     while (it != chords.end()) {
         if (it->second.voice == voice) {
-            return qAbs(MChord::chordAveragePitch(it->second.notes) - averagePitch);
+            return std::abs(MChord::chordAveragePitch(it->second.notes) - averagePitch);
         }
         ++it;
     }
@@ -505,24 +510,24 @@ int findMinPitchDist(
     return pitchDist;
 }
 
-int findAverageLowPitch(const QList<MidiNote>& notes, int splitPoint)
+int findAverageLowPitch(const std::vector<MidiNote>& notes, int splitPoint)
 {
     int averageLowPitch = 0;
     for (int j = 0; j != splitPoint; ++j) {
         averageLowPitch += notes[j].pitch;
     }
-    averageLowPitch = qRound(averageLowPitch * 1.0 / splitPoint);
+    averageLowPitch = static_cast<int>(std::lround(averageLowPitch * 1.0 / splitPoint));
 
     return averageLowPitch;
 }
 
-int findAverageHighPitch(const QList<MidiNote>& notes, int splitPoint)
+int findAverageHighPitch(const std::vector<MidiNote>& notes, int splitPoint)
 {
     int averageHighPitch = 0;
     for (int j = splitPoint; j != notes.size(); ++j) {
         averageHighPitch += notes[j].pitch;
     }
-    averageHighPitch = qRound(averageHighPitch * 1.0 / (notes.size() - splitPoint));
+    averageHighPitch = static_cast<int>(std::lround(averageHighPitch * 1.0 / (notes.size() - splitPoint)));
 
     return averageHighPitch;
 }
@@ -581,7 +586,7 @@ void insertNewTuplet(
 {
     MidiTuplet::TupletData newTuplet = tuplet->second;
     newTuplet.voice = newVoice;
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     Q_ASSERT_X(!doesTupletAlreadyExist(newTuplet.onTime, newVoice, tuplets),
                "MidiVoice::addOrUpdateTuplet", "Tuplet already exists");
 #endif
@@ -605,7 +610,7 @@ bool canSplitTuplet(
     const std::multimap<ReducedFraction, MidiTuplet::TupletData>::iterator& tuplet,
     int newVoice,
     const ReducedFraction& chordOnTime,
-    const QList<MidiNote>& notes,
+    const std::vector<MidiNote>& notes,
     const std::multimap<ReducedFraction,
                         std::multimap<ReducedFraction, MidiTuplet::TupletData>::iterator>& insertedTuplets,
     const std::multimap<ReducedFraction, MidiChord>& chords,
@@ -638,7 +643,7 @@ void splitTuplet(
     std::multimap<ReducedFraction, MidiTuplet::TupletData>::iterator& tuplet,
     int newVoice,
     const ReducedFraction& chordOnTime,
-    const QList<MidiNote>& notes,
+    const std::vector<MidiNote>& notes,
     bool& isInTuplet,
     std::multimap<ReducedFraction,
                   std::multimap<ReducedFraction, MidiTuplet::TupletData>::iterator>& insertedTuplets,
@@ -787,7 +792,7 @@ int findMaxOccupiedVoiceInBar(
 
 bool splitChordToVoice(
     std::multimap<ReducedFraction, MidiChord>::iterator& chordIt,
-    const QSet<int>& notesToMove,
+    const std::set<int>& notesToMove,
     int newVoice,
     std::multimap<ReducedFraction, MidiChord>& chords,
     std::multimap<ReducedFraction, MidiTuplet::TupletData>& tuplets,
@@ -796,7 +801,7 @@ bool splitChordToVoice(
     const ReducedFraction& maxChordLength,
     bool allowParallelTuplets)
 {
-    if (notesToMove.isEmpty()) {
+    if (notesToMove.empty()) {
         return false;
     }
 
@@ -804,7 +809,7 @@ bool splitChordToVoice(
     const ReducedFraction onTime = chordIt->first;
     MidiChord& chord = chordIt->second;
     auto& notes = chord.notes;
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     Q_ASSERT_X(MidiTuplet::isTupletRangeOk(*chordIt, tuplets),
                "MidiVoice::splitChordToVoice, before split",
                "Tuplet chord/note is outside tuplet "
@@ -826,13 +831,13 @@ bool splitChordToVoice(
         MidiChord newChord(chord);
         newChord.notes.clear();
         newChord.voice = newVoice;
-        QList<MidiNote> updatedOldNotes;
+        std::vector<MidiNote> updatedOldNotes;
 
-        for (int i = 0; i != notes.size(); ++i) {
-            if (notesToMove.contains(i)) {
-                newChord.notes.append(notes[i]);
+        for (int i = 0; i != static_cast<int>(notes.size()); ++i) {
+            if (notesToMove.find(i) != notesToMove.end()) {
+                newChord.notes.push_back(notes[i]);
             } else {
-                updatedOldNotes.append(notes[i]);
+                updatedOldNotes.push_back(notes[i]);
             }
         }
 
@@ -845,9 +850,9 @@ bool splitChordToVoice(
                                                 chords, tuplets, maxChordLength,
                                                 allowParallelTuplets);
         if (success) {
-            Q_ASSERT_X(!notes.isEmpty(),
+            Q_ASSERT_X(!notes.empty(),
                        "MidiVoice::splitChordToVoice", "Old chord notes are empty");
-            Q_ASSERT_X(!newChord.notes.isEmpty(),
+            Q_ASSERT_X(!newChord.notes.empty(),
                        "MidiVoice::splitChordToVoice", "New chord notes are empty");
 
             chordIt = chords.insert({ onTime, newChord });
@@ -856,7 +861,7 @@ bool splitChordToVoice(
             splitDone = false;
         }
     }
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     Q_ASSERT_X(MidiTuplet::isTupletRangeOk(*chordIt, tuplets),
                "MidiVoice::splitChordToVoice, after split",
                "Tuplet chord/note is outside tuplet "
@@ -865,11 +870,11 @@ bool splitChordToVoice(
     return splitDone;
 }
 
-QSet<int> findNotesToMove(const QList<MidiNote>& notes,
+std::set<int> findNotesToMove(const std::vector<MidiNote>& notes,
                           int splitPoint,
                           MovedVoiceGroup splitGroup)
 {
-    QSet<int> notesToMove;
+    std::set<int> notesToMove;
     if (splitPoint == 0 || splitPoint == notes.size()) {
         // don't split chord, just move it to another voice
         for (int i = 0; i != notes.size(); ++i) {
@@ -897,7 +902,7 @@ bool doVoiceSeparation(
     const TimeSigMap* sigmap,
     std::multimap<ReducedFraction, MidiTuplet::TupletData>& tuplets)
 {
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     Q_ASSERT_X(MidiTuplet::areTupletRangesOk(chords, tuplets),
                "MidiVoice::doVoiceSeparation",
                "Tuplet chord/note is outside tuplet "
@@ -935,7 +940,7 @@ bool doVoiceSeparation(
         const VoiceSplit bestSplit = findBestSplit(it, chords, possibleSplits, splitPoint);
         changed = true;
 
-        const QSet<int> notesToMove = findNotesToMove(notes, splitPoint, bestSplit.group);
+        const std::set<int> notesToMove = findNotesToMove(notes, splitPoint, bestSplit.group);
         const bool splitDone = splitChordToVoice(
             it, notesToMove, bestSplit.voice, chords, tuplets,
             insertedTuplets, maxChordLength);
@@ -943,7 +948,7 @@ bool doVoiceSeparation(
             maxVoiceIt->second = bestSplit.voice;
         }
     }
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     Q_ASSERT_X(MidiTuplet::areTupletRangesOk(chords, tuplets),
                "MidiVoice::doVoiceSeparation",
                "Tuplet chord/note is outside tuplet "
@@ -979,7 +984,7 @@ int averagePitchOfChords(
         }
     }
 
-    return qRound(sumPitch * 1.0 / noteCounter);
+    return static_cast<int>(std::lround(sumPitch * 1.0 / noteCounter));
 }
 
 void sortVoicesByPitch(const std::map<int, std::vector<
@@ -1083,7 +1088,7 @@ bool separateVoices(std::multimap<int, MTrack>& tracks, const TimeSigMap* sigmap
         MidiOperations::CurrentTrackSetter setCurrentTrack{ opers, mtrack.indexOfOperation };
 
         if (userVoiceCount > 1 && static_cast<int>(userVoiceCount) <= voiceLimit()) {
-#ifdef QT_DEBUG
+#ifndef NDEBUG
             Q_ASSERT_X(MidiTuplet::areAllTupletsReferenced(mtrack.chords, mtrack.tuplets),
                        "MidiVoice::separateVoices",
                        "Not all tuplets are referenced in chords or notes "
@@ -1095,7 +1100,7 @@ bool separateVoices(std::multimap<int, MTrack>& tracks, const TimeSigMap* sigmap
             if (doVoiceSeparation(mtrack.chords, sigmap, mtrack.tuplets)) {
                 changed = true;
             }
-#ifdef QT_DEBUG
+#ifndef NDEBUG
             Q_ASSERT_X(MidiTuplet::areAllTupletsReferenced(mtrack.chords, mtrack.tuplets),
                        "MidiVoice::separateVoices",
                        "Not all tuplets are referenced in chords or notes "
@@ -1105,7 +1110,7 @@ bool separateVoices(std::multimap<int, MTrack>& tracks, const TimeSigMap* sigmap
                                                     "after voice separation, before voice sort");
 #endif
             sortVoices(mtrack.chords, sigmap);
-#ifdef QT_DEBUG
+#ifndef NDEBUG
             Q_ASSERT_X(MidiTuplet::areAllTupletsReferenced(mtrack.chords, mtrack.tuplets),
                        "MidiVoice::separateVoices",
                        "Not all tuplets are referenced in chords or notes "

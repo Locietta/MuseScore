@@ -21,6 +21,8 @@
  */
 #include "importmidi_tempo.h"
 
+#include <cmath>
+
 #include "importmidi_inner.h"
 #include "importmidi_beat.h"
 #include "engraving/dom/masterscore.h"
@@ -81,7 +83,7 @@ static void setTempoToScore(Score* score, int tick, double beatsPerSecond, const
 
     auto* data = midiImportOperations.data();
     if (data->trackOpers.showTempoText.value()) {
-        const double tempoInBpm = roundTempo ? qRound(beatsPerSecond * 60.0) : (beatsPerSecond * 60.0);
+        const double tempoInBpm = roundTempo ? static_cast<int>(std::lround(beatsPerSecond * 60.0)) : (beatsPerSecond * 60.0);
 
         Measure* measure = score->tick2measure(Fraction::fromTicks(tick));
         if (!measure) {
@@ -102,7 +104,7 @@ static void setTempoToScore(Score* score, int tick, double beatsPerSecond, const
 
 static inline double roundToBpm(double beatsPerSecond)
 {
-    return qRound(beatsPerSecond * 60.0) / 60.0;
+    return static_cast<int>(std::lround(beatsPerSecond * 60.0)) / 60.0;
 }
 
 static void applyAllTempoEvents(const std::multimap<int, MTrack>& tracks, Score* score, const bool roundTempo)

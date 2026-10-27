@@ -21,10 +21,30 @@
  */
 #pragma once
 
-#include <vector>
+#include <cassert>
+#include <string>
 #include <utility>
+#include <vector>
+
+#include "global/types/string.h"
 
 #include "importexport/midi/internal/midishared/generalmidi.h"
+
+// The MIDI importer is compiled both by the Qt application and by the Qt-free
+// native host (NO_QT_SUPPORT).  Keep the debug macros local to this module
+// instead of pulling in QtGlobal for the Qt-free build.  Release builds retain
+// the upstream behavior: assertions compile away.
+#ifdef NO_QT_SUPPORT
+#ifndef Q_ASSERT
+#define Q_ASSERT(condition) assert(condition)
+#endif
+#ifndef Q_ASSERT_X
+#define Q_ASSERT_X(condition, where, what) assert(condition)
+#endif
+#ifndef Q_UNUSED
+#define Q_UNUSED(value) (void)(value)
+#endif
+#endif
 
 #include "importmidi_chord.h"
 #include "importmidi_fraction.h"
@@ -99,7 +119,7 @@ public:                 // chords store tuplet iterators, so we need to copy cla
     GM1Program program = GM1Program::AcousticGrandPiano;
     engraving::Staff* staff = nullptr;
     const MidiTrack* mtrack = nullptr;
-    QString name;
+    muse::String name;
     bool hasKey = false;
     int indexOfOperation = 0;
     int division = 0;
@@ -111,12 +131,12 @@ public:                 // chords store tuplet iterators, so we need to copy cla
     std::multimap<ReducedFraction, MidiTuplet::TupletData> tuplets;     // <tupletOnTime, ...>
 
     void createNotes(const ReducedFraction& lastTick);
-    void processPendingNotes(QList<MidiChord>& midiChords, int voice, const ReducedFraction& startChordTickFrac,
+    void processPendingNotes(std::vector<MidiChord>& midiChords, int voice, const ReducedFraction& startChordTickFrac,
                              const ReducedFraction& nextChordTick);
     void processMeta(int tick, const MidiEvent& mm);
     void fillGapWithRests(engraving::Score* score, int voice, const ReducedFraction& startChordTickFrac, const ReducedFraction& restLength,
                           engraving::track_idx_t track);
-    QList<std::pair<ReducedFraction, engraving::TDuration> >
+    std::vector<std::pair<ReducedFraction, engraving::TDuration> >
     toDurationList(const engraving::Measure* measure, int voice, const ReducedFraction& startTick, const ReducedFraction& len,
                    Meter::DurationType durationType);
     void createKeys(engraving::Key defaultKey, const engraving::KeyList& allKeyList);
@@ -150,9 +170,12 @@ bool haveIntersection(const std::pair<ReducedFraction, ReducedFraction>& interva
 } // namespace MidiTuplet
 
 namespace MidiCharset {
-QString convertToCharset(const std::string& text);
-QString defaultCharset();
-std::string fromUchar(const uchar* text);
+// Decodes a NUL-terminated MIDI meta-event payload.  The requested charset comes
+// from the optional MIDI-import operations XML; without one it is UTF-8.
+// See importmidi_inner.cpp for the Qt-free fallback policy.
+muse::String convertToCharset(const std::string& text);
+std::string defaultCharset();
+std::string fromUchar(const unsigned char* text);
 } // namespace MidiCharset
 
 namespace MidiBar {
@@ -160,6 +183,6 @@ ReducedFraction findBarStart(const ReducedFraction& time, const engraving::TimeS
 } // namespace MidiBar
 
 namespace MidiDuration {
-double durationCount(const QList<std::pair<ReducedFraction, engraving::TDuration> >& durations);
+double durationCount(const std::vector<std::pair<ReducedFraction, engraving::TDuration> >& durations);
 } // namespace MidiDuration
 } // namespace mu::iex::midi

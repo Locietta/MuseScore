@@ -62,7 +62,7 @@ std::pair<ReducedFraction, ReducedFraction>
 chordInterval(const std::pair<const ReducedFraction, MidiChord>& chord, const std::multimap<ReducedFraction, MidiChord>& chords,
               const ReducedFraction& basicQuant, const ReducedFraction& barStart);
 
-#ifdef QT_DEBUG
+#ifndef NDEBUG
 
 bool haveOverlappingVoices(
     const std::list<std::multimap<ReducedFraction, MidiChord>::iterator>& nonTuplets, const std::vector<TupletInfo>& tuplets,

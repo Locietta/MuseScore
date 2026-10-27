@@ -203,13 +203,13 @@ const InstrumentTemplate* getPreferredInstrument(const GM1Program sound)
 }
 }
 
-QString instrumentName(GM1Program program, bool isDrumTrack)
+muse::String instrumentName(GM1Program program, bool isDrumTrack)
 {
     if (isDrumTrack) {
-        return "Percussion";
+        return muse::String::fromUtf8("Percussion");
     }
 
-    return QString::fromUtf8(getMidiName(program));
+    return muse::String::fromUtf8(getMidiName(program));
 }
 
 bool isGrandStaff(const MTrack& t1, const MTrack& t2)
@@ -230,7 +230,7 @@ bool is3StaffOrgan(GM1Program program)
            && program <= GM1Program::ReedOrgan;
 }
 
-bool areNext2GrandStaff(int currentTrack, const QList<MTrack>& tracks)
+bool areNext2GrandStaff(int currentTrack, const std::vector<MTrack>& tracks)
 {
     if (currentTrack + 1 >= tracks.size()) {
         return false;
@@ -238,7 +238,7 @@ bool areNext2GrandStaff(int currentTrack, const QList<MTrack>& tracks)
     return isGrandStaff(tracks[currentTrack], tracks[currentTrack + 1]);
 }
 
-bool areNext3OrganStaff(int currentTrack, const QList<MTrack>& tracks)
+bool areNext3OrganStaff(int currentTrack, const std::vector<MTrack>& tracks)
 {
     if (currentTrack + 2 >= tracks.size()) {
         return false;
@@ -251,7 +251,7 @@ bool areNext3OrganStaff(int currentTrack, const QList<MTrack>& tracks)
            && isSameChannel(tracks[currentTrack + 1], tracks[currentTrack + 2]);
 }
 
-QString concatenateWithComma(const QString& left, const QString& right)
+muse::String concatenateWithComma(const muse::String& left, const muse::String& right)
 {
     if (left.isEmpty()) {
         return right;
@@ -259,13 +259,13 @@ QString concatenateWithComma(const QString& left, const QString& right)
     if (right.isEmpty()) {
         return left;
     }
-    return left + ", " + right;
+    return left + u", " + right;
 }
 
 // set program equal to all staves, as it should be
 // often only first stave in Grand Staff have correct program, other - default (piano)
 // also handle track names
-void setGrandStaffProgram(QList<MTrack>& tracks)
+void setGrandStaffProgram(std::vector<MTrack>& tracks)
 {
     for (int i = 0; i < tracks.size(); ++i) {
         MTrack& mt = tracks[i];
@@ -274,16 +274,16 @@ void setGrandStaffProgram(QList<MTrack>& tracks)
             tracks[i + 1].program = mt.program;
             tracks[i + 2].program = mt.program;
 
-            mt.name = concatenateWithComma(mt.name, "Manual");
-            tracks[i + 1].name = "";
-            tracks[i + 2].name = concatenateWithComma(tracks[i + 2].name, "Pedal");
+            mt.name = concatenateWithComma(mt.name, muse::String::fromUtf8("Manual"));
+            tracks[i + 1].name = muse::String();
+            tracks[i + 2].name = concatenateWithComma(tracks[i + 2].name, muse::String::fromUtf8("Pedal"));
 
             i += 2;
         } else if (areNext2GrandStaff(i, tracks)) {
             tracks[i + 1].program = mt.program;
             if (mt.name != tracks[i + 1].name) {
-                mt.name = "";                     // only one name place near bracket is available
-                tracks[i + 1].name = "";          // so instrument name will be used instead
+                mt.name = muse::String();                     // only one name place near bracket is available
+                tracks[i + 1].name = muse::String();          // so instrument name will be used instead
             }
             i += 1;
         }
@@ -583,7 +583,7 @@ std::vector<const InstrumentTemplate*> findSuitableInstruments(const MTrack& tra
     return templates;
 }
 
-void findInstrumentsForAllTracks(const QList<MTrack>& tracks, bool forceReload)
+void findInstrumentsForAllTracks(const std::vector<MTrack>& tracks, bool forceReload)
 {
     auto& opers = midiImportOperations;
     auto& instrListOption = opers.data()->trackOpers.msInstrList;
@@ -607,8 +607,8 @@ void findInstrumentsForAllTracks(const QList<MTrack>& tracks, bool forceReload)
 
 void instrumentTemplatesChanged()
 {
-    QStringList files(midiImportOperations.allMidiFiles());
-    for (const QString& file : std::as_const(files)) {
+    const std::vector<std::string> files = midiImportOperations.allMidiFiles();
+    for (const std::string& file : files) {
         MidiOperations::CurrentMidiFileSetter s(midiImportOperations, file);
         MidiOperations::FileData* data = midiImportOperations.data();
         if (data) {
@@ -617,7 +617,7 @@ void instrumentTemplatesChanged()
     }
 }
 
-void createInstruments(Score* score, QList<MTrack>& tracks)
+void createInstruments(Score* score, std::vector<MTrack>& tracks)
 {
     const auto& opers = midiImportOperations;
     const auto& instrListOption = opers.data()->trackOpers.msInstrList;
@@ -697,7 +697,7 @@ void createInstruments(Score* score, QList<MTrack>& tracks)
     }
 }
 
-QString msInstrName(int trackIndex)
+muse::String msInstrName(int trackIndex)
 {
     const auto& opers = midiImportOperations.data()->trackOpers;
 
@@ -706,7 +706,7 @@ QString msInstrName(int trackIndex)
     const InstrumentTemplate* instr = (trackInstrList.empty())
                                       ? nullptr : trackInstrList[instrIndex];
     if (!instr) {
-        return "";
+        return muse::String();
     }
     if (!instr->longNames.empty()) {
         return instr->longNames.front().name();

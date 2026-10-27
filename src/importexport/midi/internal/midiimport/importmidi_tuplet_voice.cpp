@@ -20,6 +20,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "importmidi_tuplet_voice.h"
+
+#include <cmath>
+#include <cstdlib>
+#include <limits>
+#include <set>
+#include <vector>
+
 #include "importmidi_tuplet.h"
 #include "importmidi_chord.h"
 #include "importmidi_quant.h"
@@ -27,8 +34,6 @@
 #include "importmidi_voice.h"
 #include "importmidi_operations.h"
 #include "engraving/dom/mscore.h"
-
-#include <set>
 
 namespace mu::iex::midi {
 namespace MidiTuplet {
@@ -134,7 +139,7 @@ void setTupletVoices(
 }
 
 int findPitchDist(
-    const QList<MidiNote>& notes,
+    const std::vector<MidiNote>& notes,
     const std::vector<TupletInfo>& tuplets,
     int voice)
 {
@@ -154,7 +159,7 @@ int findPitchDist(
             tupletPitch += MChord::chordAveragePitch(c.notes);
             ++counter;
         }
-        tupletPitch = qRound(tupletPitch * 1.0 / counter);
+        tupletPitch = static_cast<int>(std::lround(tupletPitch * 1.0 / counter));
         break;
     }
 
@@ -163,7 +168,7 @@ int findPitchDist(
     }
 
     const int chordPitch = MChord::chordAveragePitch(notes);
-    pitchDist = qAbs(chordPitch - tupletPitch);
+    pitchDist = std::abs(chordPitch - tupletPitch);
 
     return pitchDist;
 }
@@ -205,7 +210,7 @@ void setNonTupletVoices(
     }
 }
 
-#ifdef QT_DEBUG
+#ifndef NDEBUG
 
 bool areAllElementsUnique(
     const std::list<std::multimap<ReducedFraction, MidiChord>::iterator>& nonTuplets)
@@ -400,7 +405,7 @@ bool excludeExtraVoiceTuplets(
         }
         addedCount = newNonTuplets.size();
     }
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     Q_ASSERT_X(areAllElementsUnique(nonTuplets),
                "MidiTuplet::excludeExtraVoiceTuplets", "Non unique chords in non-tuplets");
 #endif
@@ -878,7 +883,7 @@ void assignVoices(
     const ReducedFraction& barStart,
     int barIndex)
 {
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     Q_ASSERT_X(!haveTupletsEmptyChords(tuplets),
                "MIDI tuplets: assignVoices", "Empty tuplet chords");
 #endif
@@ -908,7 +913,7 @@ void assignVoices(
 
     setNonTupletVoices(pendingNonTuplets, tupletIntervals, tuplets,
                        chords, basicQuant, barStart);
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     Q_ASSERT_X(pendingNonTuplets.empty(),
                "MIDI tuplets: assignVoices", "Unused non-tuplets");
     Q_ASSERT_X(!haveTupletsEmptyChords(tuplets),
