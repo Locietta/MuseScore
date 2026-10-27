@@ -122,7 +122,9 @@ private:
     Items readItems() const;
     void writeValue(const Key& key, const Val& value);
 
+#ifndef NO_QT_SUPPORT
     QString dataPath() const;
+#endif
 
     QSettings* m_settings = nullptr;
     mutable Items m_items;
