@@ -23,7 +23,7 @@
 #define IMPORTMIDI_DRUM_H
 
 #include <map>
-#include <QList>
+#include <vector>
 
 namespace mu::engraving {
 class TimeSigMap;
@@ -35,7 +35,7 @@ class MTrack;
 namespace MidiDrum {
 void splitDrumVoices(std::multimap<int, MTrack>& tracks);
 void splitDrumTracks(std::multimap<int, MTrack>& tracks);
-void setStaffBracketForDrums(QList<MTrack>& tracks);
+void setStaffBracketForDrums(std::vector<MTrack>& tracks);
 } // namespace MidiDrum
 } // namespace mu::iex::midi
 

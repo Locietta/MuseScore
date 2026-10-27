@@ -27,6 +27,7 @@
 #include "importmidi_inner.h"
 #include "engraving/dom/mscore.h"
 
+#include <algorithm>
 #include <set>
 
 namespace mu::iex::midi {
@@ -72,7 +73,7 @@ private:
         if (val1 == val2) {
             return 0;
         }
-        return (val1 - val2) / qMax(val1, val2);
+        return (val1 - val2) / std::max(val1, val2);
     }
 
     double tupletAverageError;
@@ -310,7 +311,7 @@ TupletErrorResult findTupletError(
     };
 }
 
-#ifdef QT_DEBUG
+#ifndef NDEBUG
 
 bool areCommonsDifferent(const std::vector<int>& selectedCommons)
 {
@@ -416,7 +417,7 @@ bool canUseIndex(
     }
     // check tuplets for resulting voice count
     const int voice = findAvailableVoice(indexToCheck, tupletIntervals, voiceIntervals);
-    const int voiceCount = qMax((int)voiceIntervals.size(), voice + 1);       // index + 1 = count
+    const int voiceCount = std::max((int)voiceIntervals.size(), voice + 1);       // index + 1 = count
     if (voiceCount > 1 && (int)tuplet.chords.size()
         < tupletLimits(tuplet.tupletNumber).minNoteCountAddVoice) {
         return false;
@@ -424,7 +425,7 @@ bool canUseIndex(
     return true;
 }
 
-#ifdef QT_DEBUG
+#ifndef NDEBUG
 
 bool areTupletChordsEmpty(const std::vector<TupletInfo>& tuplets)
 {
@@ -595,14 +596,14 @@ void findNextTuplet(
         } else {
             selectedTuplets.push_back(int(index));
         }
-#ifdef QT_DEBUG
+#ifndef NDEBUG
         Q_ASSERT_X(validateSelectedTuplets(selectedTuplets.begin(), selectedTuplets.end(), tuplets),
                    "MIDI tuplets::findNextTuplet", "Tuplets have common chords but they shouldn't");
 #endif
 
         const auto voiceIntervals = prepareVoiceIntervals(selectedTuplets, tupletIntervals);
         const auto usedFirstChords = prepareUsedFirstChords(selectedTuplets, tuplets);
-#ifdef QT_DEBUG
+#ifndef NDEBUG
         Q_ASSERT_X(areCommonsDifferent(selectedTuplets), "MidiTuplet::findNextTuplet",
                    "There are duplicates in selected commons");
         Q_ASSERT_X(areCommonsUncommon(selectedTuplets, tupletCommons),
@@ -750,7 +751,7 @@ void filterTuplets(std::vector<TupletInfo>& tuplets,
     if (tuplets.empty()) {
         return;
     }
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     Q_ASSERT_X(!areTupletChordsEmpty(tuplets),
                "MIDI tuplets: filterTuplets", "Tuplet has no chords but it should");
 #endif
@@ -758,7 +759,7 @@ void filterTuplets(std::vector<TupletInfo>& tuplets,
     removeExtraTuplets(tuplets);
 
     std::set<int> uncommons = findLongestUncommonGroup(tuplets, basicQuant);
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     Q_ASSERT_X(validateSelectedTuplets(uncommons.begin(), uncommons.end(), tuplets),
                "MIDI tuplets: filterTuplets",
                "Uncommon tuplets have common chords but they shouldn't");
@@ -772,7 +773,7 @@ void filterTuplets(std::vector<TupletInfo>& tuplets,
 
     const std::vector<int> bestIndexes = findBestTuplets(tupletCommons, tuplets,
                                                          commonsSize, basicQuant);
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     Q_ASSERT_X(validateSelectedTuplets(bestIndexes.begin(), bestIndexes.end(), tuplets),
                "MIDI tuplets: filterTuplets", "Tuplets have common chords but they shouldn't");
 #endif

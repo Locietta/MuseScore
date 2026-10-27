@@ -40,7 +40,7 @@ void addElementToTuplet(int voice, const ReducedFraction& onTime, const ReducedF
 
 void createTupletNotes(engraving::Staff* staff, const std::multimap<ReducedFraction, TupletData>& tuplets);
 
-#ifdef QT_DEBUG
+#ifndef NDEBUG
 bool haveTupletsEnoughElements(const engraving::Staff* staff);
 #endif
 } // namespace MidiTuplet

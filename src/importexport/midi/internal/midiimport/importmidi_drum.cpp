@@ -22,6 +22,7 @@
 #include "importmidi_drum.h"
 
 #include <set>
+#include <vector>
 
 #include "importmidi_inner.h"
 #include "importmidi_chord.h"
@@ -33,7 +34,7 @@
 
 namespace mu::iex::midi {
 namespace MidiDrum {
-#ifdef QT_DEBUG
+#ifndef NDEBUG
 
 bool haveNonZeroVoices(const std::multimap<ReducedFraction, MidiChord>& chords)
 {
@@ -49,7 +50,7 @@ bool haveNonZeroVoices(const std::multimap<ReducedFraction, MidiChord>& chords)
 
 void splitChord(
     std::multimap<ReducedFraction, MidiChord>::iterator& chordIt,
-    const QSet<int>& notesToMove,
+    const std::set<int>& notesToMove,
     std::multimap<ReducedFraction, MidiChord>& chords)
 {
     MidiChord& chord = chordIt->second;
@@ -61,20 +62,20 @@ void splitChord(
         MidiChord newChord(chord);
         newChord.notes.clear();
         newChord.voice = 1;
-        QList<MidiNote> updatedOldNotes;
+        std::vector<MidiNote> updatedOldNotes;
 
-        for (int i = 0; i != notes.size(); ++i) {
-            if (notesToMove.contains(i)) {
-                newChord.notes.append(notes[i]);
+        for (int i = 0; i != static_cast<int>(notes.size()); ++i) {
+            if (notesToMove.find(i) != notesToMove.end()) {
+                newChord.notes.push_back(notes[i]);
             } else {
-                updatedOldNotes.append(notes[i]);
+                updatedOldNotes.push_back(notes[i]);
             }
         }
         notes = updatedOldNotes;
 
-        Q_ASSERT_X(!notes.isEmpty(),
+        Q_ASSERT_X(!notes.empty(),
                    "MidiDrum::splitChord", "Old chord notes are empty");
-        Q_ASSERT_X(!newChord.notes.isEmpty(),
+        Q_ASSERT_X(!newChord.notes.empty(),
                    "MidiDrum::splitChord", "New chord notes are empty");
 
         chordIt = chords.insert({ chordIt->first, newChord });
@@ -96,7 +97,7 @@ void splitDrumVoices(std::multimap<int, MTrack>& tracks)
         // all chords of drum track should have voice == 0
         // because allowedVoices == V_1 (see MidiImportOperations)
         // also, all chords should have different onTime values
-#ifdef QT_DEBUG
+#ifndef NDEBUG
         Q_ASSERT_X(MChord::areOnTimeValuesDifferent(chords),
                    "MidiDrum::splitDrumVoices",
                    "onTime values of chords are equal but should be different");
@@ -107,14 +108,14 @@ void splitDrumVoices(std::multimap<int, MTrack>& tracks)
         for (auto chordIt = chords.begin(); chordIt != chords.end(); ++chordIt) {
             auto& notes = chordIt->second.notes;
             // search for the drumset pitches with voice = 1
-            QSet<int> notesToMove;
-            for (int i = 0; i != notes.size(); ++i) {
+            std::set<int> notesToMove;
+            for (int i = 0; i != static_cast<int>(notes.size()); ++i) {
                 const int pitch = notes[i].pitch;
                 if (drumset->isValid(pitch) && drumset->voice(pitch) == 1) {
                     notesToMove.insert(i);
                 }
             }
-            if (notesToMove.isEmpty()) {
+            if (notesToMove.empty()) {
                 continue;
             }
 
@@ -198,7 +199,7 @@ void setBracket(engraving::Staff*& staff, int& counter)
     }
 }
 
-void setStaffBracketForDrums(QList<MTrack>& tracks)
+void setStaffBracketForDrums(std::vector<MTrack>& tracks)
 {
     int counter = 0;
     engraving::Staff* firstDrumStaff = nullptr;

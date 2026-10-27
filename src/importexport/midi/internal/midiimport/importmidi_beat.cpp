@@ -23,6 +23,7 @@
 
 #include <functional>
 #include <cmath>
+#include <vector>
 
 #include "importmidi_chord.h"
 #include "importmidi_fraction.h"
@@ -372,7 +373,7 @@ void findBeatLocations(
 }
 
 void scaleOffTimes(
-    QList<MidiNote>& notes,
+    std::vector<MidiNote>& notes,
     const std::set<ReducedFraction>& beats,
     const std::set<ReducedFraction>::const_iterator& onTimeBeatEndIt,
     const ReducedFraction& newOnTimeBeatStart,
@@ -471,7 +472,7 @@ void adjustChordsToBeats(std::multimap<int, MTrack>& tracks)
             }
 
             std::swap(chords, newChords);
-#ifdef QT_DEBUG
+#ifndef NDEBUG
             Q_ASSERT_X(MChord::areNotesLongEnough(chords),
                        "MidiBeat::adjustChordsToBeats", "There are too short notes");
 #endif

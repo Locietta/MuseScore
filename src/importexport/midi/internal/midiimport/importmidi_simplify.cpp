@@ -20,6 +20,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "importmidi_simplify.h"
+
+#include <algorithm>
+#include <vector>
 #include "importmidi_chord.h"
 #include "importmidi_inner.h"
 #include "importmidi_meter.h"
@@ -37,7 +40,7 @@ using namespace mu::engraving;
 
 namespace mu::iex::midi {
 namespace Simplify {
-bool hasComplexBeamedDurations(const QList<std::pair<ReducedFraction, TDuration> >& list)
+bool hasComplexBeamedDurations(const std::vector<std::pair<ReducedFraction, TDuration> >& list)
 {
     for (const auto& d: list) {
         if (d.second == DurationType::V_16TH
@@ -176,7 +179,7 @@ void shortenDrumNote(
                                           // set note off time to be inside that tuplet
         const auto& tuplet = it->second.tuplet->second;
         const auto len = tuplet.len / tuplet.tupletNumber;
-        const auto newOffTime = qMin(it->first + len, tuplet.onTime + tuplet.len);
+        const auto newOffTime = std::min(it->first + len, tuplet.onTime + tuplet.len);
         if (note.offTime > newOffTime) {
             note.offTime = newOffTime;
             note.isInTuplet = true;
@@ -297,7 +300,7 @@ void simplifyDurations(
 
         if (opers.data()->trackOpers.simplifyDurations.value(mtrack.indexOfOperation)) {
             MidiOperations::CurrentTrackSetter setCurrentTrack{ opers, mtrack.indexOfOperation };
-#ifdef QT_DEBUG
+#ifndef NDEBUG
             Q_ASSERT_X(MidiTuplet::areTupletRangesOk(chords, mtrack.tuplets),
                        "Simplify::simplifyDurations", "Tuplet chord/note is outside tuplet "
                                                       "or non-tuplet chord/note is inside tuplet before simplification");
@@ -306,7 +309,7 @@ void simplifyDurations(
             minimizeNumberOfRests(chords, sigmap, mtrack.tuplets, mtrack.mtrack->drumTrack());
             // empty tuplets may appear after simplification
             MidiTuplet::removeEmptyTuplets(mtrack);
-#ifdef QT_DEBUG
+#ifndef NDEBUG
             Q_ASSERT_X(MidiTuplet::areTupletRangesOk(chords, mtrack.tuplets),
                        "Simplify::simplifyDurations", "Tuplet chord/note is outside tuplet "
                                                       "or non-tuplet chord/note is inside tuplet after simplification");

@@ -53,7 +53,7 @@ private:
     State state_ = State::UNTIED;
 };
 
-#ifdef QT_DEBUG
+#ifndef NDEBUG
 bool areTiesConsistent(const engraving::Staff* staff);
 #endif
 } // namespace MidiTie

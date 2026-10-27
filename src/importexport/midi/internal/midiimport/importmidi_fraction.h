@@ -22,6 +22,8 @@
 #ifndef IMPORTMIDI_FRACTION_H
 #define IMPORTMIDI_FRACTION_H
 
+#include <cstdlib>
+
 #include "engraving/types/fraction.h"
 
 namespace mu::iex::midi {
@@ -38,7 +40,7 @@ public:
 
     static ReducedFraction fromTicks(int ticks);
     ReducedFraction reduced() const;
-    ReducedFraction absValue() const { return ReducedFraction(qAbs(numerator_), qAbs(denominator_)); }
+    ReducedFraction absValue() const { return ReducedFraction(std::abs(numerator_), std::abs(denominator_)); }
     double toDouble() const { return numerator_ * 1.0 / denominator_; }
     int ticks() const;
     void reduce();

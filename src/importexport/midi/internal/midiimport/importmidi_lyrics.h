@@ -23,7 +23,7 @@
 #define IMPORTMIDI_LYRICS_H
 
 #include <string>
-#include <QList>
+#include <vector>
 
 namespace mu::iex::midi {
 class MidiFile;
@@ -31,8 +31,8 @@ class MTrack;
 
 namespace MidiLyrics {
 void extractLyricsToMidiData(const MidiFile* mf);
-void setLyricsToScore(QList<MTrack>& tracks);
-QList<std::string> makeLyricsListForUI();
+void setLyricsToScore(std::vector<MTrack>& tracks);
+std::vector<std::string> makeLyricsListForUI();
 } // namespace MidiLyrics
 } // namespace mu::iex::midi
 
