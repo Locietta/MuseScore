@@ -22,13 +22,16 @@
 
 #pragma once
 
-#include <QString>
+#include <string>
 #include <unordered_map>
+
+#include "containers.h"
+#include "types/string.h"
 
 #include "mpe/mpetypes.h"
 
 namespace muse::mpe {
-static const std::unordered_map<ArticulationFamily, QString> ARTICULATION_FAMILY_NAMES {
+static const std::unordered_map<ArticulationFamily, std::string> ARTICULATION_FAMILY_NAMES {
     { ArticulationFamily::Undefined, "Undefined" },
     { ArticulationFamily::Keyboards, "KeyboardsArticulation" },
     { ArticulationFamily::Strings, "StringsArticulation" },
@@ -37,7 +40,7 @@ static const std::unordered_map<ArticulationFamily, QString> ARTICULATION_FAMILY
     { ArticulationFamily::Voices, "VoicesArticulation" },
 };
 
-static const std::unordered_map<ArticulationType, QString> ARTICULATION_TYPE_NAMES {
+static const std::unordered_map<ArticulationType, std::string> ARTICULATION_TYPE_NAMES {
     { ArticulationType::Undefined, "Undefined" },
     { ArticulationType::Standard, "Standard" },
     { ArticulationType::Staccato, "Staccato" },
@@ -165,23 +168,33 @@ static const std::unordered_map<ArticulationType, QString> ARTICULATION_TYPE_NAM
     { ArticulationType::Echo, "Echo" },
 };
 
-inline ArticulationFamily articulationFamilyFromString(const QString& str)
+inline ArticulationFamily articulationFamilyFromString(const muse::String& str)
+{
+    return muse::key(ARTICULATION_FAMILY_NAMES, str.toStdString(), ArticulationFamily::Undefined);
+}
+
+inline ArticulationFamily articulationFamilyFromString(const std::string& str)
 {
     return muse::key(ARTICULATION_FAMILY_NAMES, str, ArticulationFamily::Undefined);
 }
 
-inline const QString articulationFamilyToString(const ArticulationFamily family)
+inline const muse::String articulationFamilyToString(const ArticulationFamily family)
 {
-    return muse::value(ARTICULATION_FAMILY_NAMES, family);
+    return muse::String::fromStdString(muse::value(ARTICULATION_FAMILY_NAMES, family));
 }
 
-inline ArticulationType articulationTypeFromString(const QString& str)
+inline ArticulationType articulationTypeFromString(const muse::String& str)
+{
+    return muse::key(ARTICULATION_TYPE_NAMES, str.toStdString(), ArticulationType::Undefined);
+}
+
+inline ArticulationType articulationTypeFromString(const std::string& str)
 {
     return muse::key(ARTICULATION_TYPE_NAMES, str, ArticulationType::Undefined);
 }
 
-inline const QString articulationTypeToString(const ArticulationType type)
+inline const muse::String articulationTypeToString(const ArticulationType type)
 {
-    return muse::value(ARTICULATION_TYPE_NAMES, type);
+    return muse::String::fromStdString(muse::value(ARTICULATION_TYPE_NAMES, type));
 }
 }
