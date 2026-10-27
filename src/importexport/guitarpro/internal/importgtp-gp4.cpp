@@ -633,6 +633,9 @@ bool GuitarPro4::read(IODevice* io)
     readChannels();
     measures = readInt();
     staves   = readInt();
+    if (measures == 0 || measures > 100000) {
+        return false;
+    }
 
     initDynamics(staves);
 
@@ -830,9 +833,6 @@ bool GuitarPro4::read(IODevice* io)
     bool mixChange = false;
     bool lastSlurAdd = false;
     for (size_t bar = 0; bar < measures; ++bar, measure = measure->nextMeasure()) {
-        if (!f->isReadable()) {
-            break;
-        }
         const GpBar& gpbar = bars[bar];
         if (!gpbar.marker.isEmpty()) {
             Segment* segment = measure->getSegment(SegmentType::ChordRest, measure->tick());
@@ -853,9 +853,6 @@ bool GuitarPro4::read(IODevice* io)
             int beats = readInt();
             track_idx_t track = staffIdx * VOICES;
 
-            if (!f->isReadable()) {
-                break;
-            }
             for (int beat = 0; beat < beats; ++beat) {
                 slide = -1;
                 if (muse::contains(slides, static_cast<int>(track))) {

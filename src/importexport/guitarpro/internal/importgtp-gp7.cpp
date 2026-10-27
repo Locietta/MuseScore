@@ -21,6 +21,8 @@
  */
 #include "importgtp.h"
 
+#include <cstdint>
+
 #include "serialization/zipreader.h"
 
 #include "gtp/gp7dombuilder.h"
@@ -38,6 +40,12 @@ using namespace muse::io;
 using namespace mu::engraving;
 
 namespace mu::iex::guitarpro {
+namespace {
+constexpr uint64_t GP7_MAX_ENTRY_BYTES = 64ull * 1024 * 1024;
+constexpr uint64_t GP7_MAX_TOTAL_BYTES = 128ull * 1024 * 1024;
+constexpr size_t GP7_MAX_ENTRIES = 4096;
+}
+
 //---------------------------------------------------------
 //   read
 //---------------------------------------------------------
@@ -46,16 +54,49 @@ bool GuitarPro7::read(IODevice* io)
 {
     f = io;
     previousTempo = -1;
+    m_gpifRead = false;
 
     ZipReader zip(io);
+    const auto entries = zip.fileInfoList();
+    if (zip.hasError() || entries.empty() || entries.size() > GP7_MAX_ENTRIES) {
+        LOGE() << "Invalid or oversized Guitar Pro 7 archive";
+        return false;
+    }
+
+    uint64_t total = 0;
+    for (const auto& entry : entries) {
+        if (entry.size > GP7_MAX_ENTRY_BYTES || total > GP7_MAX_TOTAL_BYTES - entry.size) {
+            LOGE() << "Guitar Pro 7 archive declares an unsafe uncompressed size";
+            return false;
+        }
+        total += entry.size;
+    }
+
+    if (!zip.fileExists("Content/score.gpif")) {
+        LOGE() << "Guitar Pro 7 archive has no Content/score.gpif";
+        return false;
+    }
+
     ByteArray fileData = zip.fileData("Content/score.gpif");
-    ByteArray partsData = zip.fileData("Content/PartConfiguration");
+    if (zip.hasError() || fileData.empty() || fileData.size() > GP7_MAX_ENTRY_BYTES) {
+        LOGE() << "Invalid Content/score.gpif in Guitar Pro 7 archive";
+        return false;
+    }
+
+    ByteArray partsData;
+    if (zip.fileExists("Content/PartConfiguration")) {
+        partsData = zip.fileData("Content/PartConfiguration");
+        if (partsData.size() > GP7_MAX_ENTRY_BYTES) {
+            LOGE() << "Oversized Content/PartConfiguration in Guitar Pro 7 archive";
+            return false;
+        }
+    }
     zip.close();
 
     m_properties = readProperties(&partsData);
 
     readGpif(&fileData);
-    return true;
+    return m_gpifRead;
 }
 
 //---------------------------------------------------------

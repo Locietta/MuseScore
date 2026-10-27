@@ -22,7 +22,11 @@
 
 #include "importgtp.h"
 
+#include <algorithm>
 #include <cmath>
+#include <cstdint>
+#include <memory>
+#include <stdexcept>
 
 #include "importptb.h"
 #include "internal/guitarprodrumset.h"
@@ -111,10 +115,16 @@ GuitarPro::GuitarPro(MasterScore* s, int v, const modularity::ContextPtr& iocCtx
 
 void GuitarPro::skip(int64_t len)
 {
-    f->seek(f->pos() + len);
-    /*char c;
-    while (len--)
-          read(&c, 1);*/
+    if (len < 0) {
+        throw std::runtime_error("Invalid negative skip in Guitar Pro file");
+    }
+    const size_t pos = f->pos();
+    if (static_cast<uint64_t>(len) > f->size() - pos) {
+        throw std::runtime_error("Unexpected end of Guitar Pro file");
+    }
+    if (!f->seek(pos + static_cast<size_t>(len))) {
+        throw std::runtime_error("Failed to skip Guitar Pro data");
+    }
 }
 
 //---------------------------------------------------------
@@ -155,6 +165,9 @@ bool GuitarPro::createTuningString(int strings, int tuning[])
 
 void GuitarPro::initDynamics(size_t stavesNum)
 {
+    if (stavesNum == 0 || stavesNum > GP_MAX_TRACK_NUMBER * 2) {
+        throw std::runtime_error("Invalid Guitar Pro staff count");
+    }
     previousDynamicByTrack.resize(stavesNum * mu::engraving::VOICES);
     std::fill(previousDynamicByTrack.begin(), previousDynamicByTrack.end(), INVALID_DYNAMIC);
 }
@@ -168,9 +181,12 @@ void GuitarPro::read(void* p, int64_t len)
     if (len == 0) {
         return;
     }
-    int64_t rv = f->read((uint8_t*)p, len);
+    if (len < 0) {
+        throw std::runtime_error("Invalid negative read length in Guitar Pro file");
+    }
+    int64_t rv = static_cast<int64_t>(f->read((uint8_t*)p, static_cast<size_t>(len)));
     if (rv != len) {
-        assert(rv == len);     //to have assert in debug and no warnings from AppVeyor in release
+        throw std::runtime_error("Unexpected end of Guitar Pro file");
     }
     curPos += len;
 }
@@ -204,7 +220,10 @@ uint8_t GuitarPro::readUInt8()
 String GuitarPro::readPascalString(int n)
 {
     uint8_t l = readUInt8();
-    std::vector<char> s(l + 1);
+    if (static_cast<size_t>(l) > f->size() - f->pos()) {
+        throw std::runtime_error("Unexpected end of Guitar Pro string");
+    }
+    std::vector<char> s(static_cast<size_t>(l) + 1);
     read(&s[0], l);
     s[l] = 0;
     if (n - l > 0) {
@@ -224,7 +243,10 @@ String GuitarPro::readPascalString(int n)
 String GuitarPro::readWordPascalString()
 {
     int l = readInt();
-    std::vector<char> c(l + 1);
+    if (l < 0 || static_cast<size_t>(l) > f->size() - f->pos()) {
+        throw std::runtime_error("Invalid Guitar Pro string length");
+    }
+    std::vector<char> c(static_cast<size_t>(l) + 1);
     read(&c[0], l);
     c[l] = 0;
     std::string_view sw(&c[0], l);
@@ -241,7 +263,10 @@ String GuitarPro::readWordPascalString()
 String GuitarPro::readBytePascalString()
 {
     int l = readUInt8();
-    std::vector<char> c(l + 1);
+    if (static_cast<size_t>(l) > f->size() - f->pos()) {
+        throw std::runtime_error("Unexpected end of Guitar Pro string");
+    }
+    std::vector<char> c(static_cast<size_t>(l) + 1);
     read(&c[0], l);
     c[l] = 0;
     std::string_view sw(&c[0], l);
@@ -259,11 +284,16 @@ String GuitarPro::readDelphiString()
 {
     int maxl = readInt();
     int l    = readUInt8();
+    if (maxl < 0) {
+        throw std::runtime_error("Invalid Guitar Pro string length");
+    }
     if (maxl != l + 1 && maxl > 255) {
-        ASSERT_X("readDelphiString: first word doesn't match second byte");
         l = maxl - 1;
     }
-    std::vector<char> c(l + 1);
+    if (l < 0 || static_cast<size_t>(l) > f->size() - f->pos()) {
+        throw std::runtime_error("Invalid Guitar Pro string length");
+    }
+    std::vector<char> c(static_cast<size_t>(l) + 1);
     read(&c[0], l);
     c[l] = 0;
     return String::fromAscii(&c[0]);
@@ -277,14 +307,14 @@ int GuitarPro::readInt()
 {
     uint8_t x;
     read(&x, 1);
-    int r = x;
+    uint32_t r = x;
     read(&x, 1);
-    r += x << 8;
+    r |= static_cast<uint32_t>(x) << 8;
     read(&x, 1);
-    r += x << 16;
+    r |= static_cast<uint32_t>(x) << 16;
     read(&x, 1);
-    r += x << 24;
-    return r;
+    r |= static_cast<uint32_t>(x) << 24;
+    return static_cast<int>(r);
 }
 
 //---------------------------------------------------------
@@ -1058,6 +1088,9 @@ bool GuitarPro1::read(IODevice* io)
     }
 
     measures = readInt();
+    if (measures == 0 || measures > 100000) {
+        return false;
+    }
 
     Fraction ts;
     Fraction tick = { 0, 1 };
@@ -1398,6 +1431,9 @@ bool GuitarPro2::read(IODevice* io)
     }
     measures   = readInt();
     staves = readInt();
+    if (measures == 0 || measures > 100000) {
+        return false;
+    }
     initDynamics(staves);
 
     int tnumerator   = 4;
@@ -2116,6 +2152,9 @@ bool GuitarPro3::read(IODevice* io)
     }
     measures   = readInt();
     staves = readInt();
+    if (measures == 0 || measures > 100000) {
+        return false;
+    }
     initDynamics(staves);
 
     slurs.resize(staves, nullptr);
@@ -2805,120 +2844,136 @@ static void addMetaInfo(MasterScore* score, GuitarPro* gp, bool experimental)
 
 Err importGTP(MasterScore* score, muse::io::IODevice* io, const muse::modularity::ContextPtr& iocCtx, bool experimental)
 {
+    if (!score || !io) {
+        return Err::FileBadFormat;
+    }
     if (!io->open(IODevice::ReadOnly)) {
         return Err::FileOpenError;
     }
 
     score->checkChordList();
-    io->seek(0);
-    char header[5];
-    io->read((uint8_t*)(header), 4);
+
+    if (!io->seek(0)) {
+        return Err::FileBadFormat;
+    }
+    char header[5] = {};
+    if (io->read((uint8_t*)(header), 4) != 4) {
+        return Err::FileBadFormat;
+    }
     header[4] = 0;
-    io->seek(0);
+    if (!io->seek(0)) {
+        return Err::FileBadFormat;
+    }
     if (strcmp(header, "ptab") == 0) {
         PowerTab ptb(io, score);
         return ptb.read();
     }
 
-    GuitarPro* gp = nullptr;
+    std::unique_ptr<GuitarPro> gp;
     bool readResult = false;
     bool isVersionAbove6 = false;
-    // check to see if we are dealing with a GP file via the extension
-    if (strcmp(header, "PK\x3\x4") == 0) {
-        gp = new GuitarPro7(score, iocCtx);
-        readResult = gp->read(io);
-        gp->setTempo(0, 0);
-        isVersionAbove6 = true;
-    }
-    // check to see if we are dealing with a GPX file via the extension
-    else if (strcmp(header, "BCFZ") == 0) {
-        gp = new GuitarPro6(score, iocCtx);
-        drumset::initGuitarProDrumset();
-        readResult = gp->read(io);
-        gp->setTempo(0, 0);
-        isVersionAbove6 = true;
-    }
-    // otherwise it's an older version - check the header
-    else if (strcmp(&header[1], "FIC") == 0) {
-        uint8_t l;
-        io->read((uint8_t*)&l, 1);
-        char ss[30];
-        io->read((uint8_t*)(ss), 30);
-        ss[l] = 0;
-        String s = String::fromUtf8(ss);
-        if (s.startsWith(u"FICHIER GUITAR PRO ")) {
-            s = s.mid(20);
-        } else if (s.startsWith(u"FICHIER GUITARE PRO ")) {
-            s = s.mid(21);
+    try {
+        // check to see if we are dealing with a GP file via the extension
+        if (strcmp(header, "PK\x3\x4") == 0) {
+            gp = std::make_unique<GuitarPro7>(score, iocCtx);
+            readResult = gp->read(io);
+            isVersionAbove6 = true;
+        }
+        // check to see if we are dealing with a GPX file via the extension
+        else if (strcmp(header, "BCFZ") == 0) {
+            gp = std::make_unique<GuitarPro6>(score, iocCtx);
+            drumset::initGuitarProDrumset();
+            readResult = gp->read(io);
+            isVersionAbove6 = true;
+        }
+        // otherwise it's an older version - check the header
+        else if (strcmp(&header[1], "FIC") == 0) {
+            uint8_t l = 0;
+            if (io->read((uint8_t*)&l, 1) != 1) {
+                return Err::FileBadFormat;
+            }
+            char ss[31] = {};
+            if (io->read((uint8_t*)(ss), 30) != 30) {
+                return Err::FileBadFormat;
+            }
+            if (l >= sizeof(ss)) {
+                LOGD("invalid gtp version string length %u", static_cast<unsigned>(l));
+                return Err::FileBadFormat;
+            }
+            ss[l] = 0;
+            String s = String::fromUtf8(ss);
+            if (s.startsWith(u"FICHIER GUITAR PRO ")) {
+                s = s.mid(20);
+            } else if (s.startsWith(u"FICHIER GUITARE PRO ")) {
+                s = s.mid(21);
+            } else {
+                LOGD("unknown gtp format <%s>", ss);
+                return Err::FileBadFormat;
+            }
+            int a = s.left(1).toInt();
+            int b = s.mid(2).toInt();
+            int version = a * 100 + b;
+            if (a == 1) {
+                gp = std::make_unique<GuitarPro1>(score, version, iocCtx);
+            } else if (a == 2) {
+                gp = std::make_unique<GuitarPro2>(score, version, iocCtx);
+            } else if (a == 3) {
+                gp = std::make_unique<GuitarPro3>(score, version, iocCtx);
+            } else if (a == 4) {
+                gp = std::make_unique<GuitarPro4>(score, version, iocCtx);
+            } else if (a == 5) {
+                gp = std::make_unique<GuitarPro5>(score, version, iocCtx);
+            } else {
+                LOGD("unknown gtp format %d", version);
+                return Err::FileBadFormat;
+            }
+            readResult = gp->read(io);
         } else {
-            LOGD("unknown gtp format <%s>", ss);
-            delete gp;
             return Err::FileBadFormat;
         }
-        int a = s.left(1).toInt();
-        int b = s.mid(2).toInt();
-        int version = a * 100 + b;
-        if (a == 1) {
-            gp = new GuitarPro1(score, version, iocCtx);
-        } else if (a == 2) {
-            gp = new GuitarPro2(score, version, iocCtx);
-        } else if (a == 3) {
-            gp = new GuitarPro3(score, version, iocCtx);
-        } else if (a == 4) {
-            gp = new GuitarPro4(score, version, iocCtx);
-        } else if (a == 5) {
-            gp = new GuitarPro5(score, version, iocCtx);
-        } else {
-            LOGD("unknown gtp format %d", version);
-            delete gp;
+
+        if (!readResult) {
+            LOGD("guitar pro import error====");
             return Err::FileBadFormat;
         }
-        readResult = gp->read(io);
         gp->setTempo(0, 0);
-    } else {
-        delete gp;
+
+        if (!isVersionAbove6) {
+            addMetaInfo(score, gp.get(), experimental);
+        }
+
+        int idx = 0;
+
+        for (Measure* m1 = score->firstMeasure(); m1; m1 = m1->nextMeasure(), ++idx) {
+            if (idx >= gp->bars.size()) {
+                break;
+            }
+            const GpBar& bar = gp->bars[idx];
+            if (bar.barLine != BarLineType::NORMAL && bar.barLine != BarLineType::END_REPEAT
+                && bar.barLine != BarLineType::START_REPEAT
+                && bar.barLine != BarLineType::END_START_REPEAT) {
+                m1->setEndBarLineType(bar.barLine, 0);
+            }
+        }
+        if (score->lastMeasure() && score->lastMeasure()->endBarLineType() != BarLineType::NORMAL) {
+            score->lastMeasure()->setEndBarLineType(BarLineType::END, false);
+        }
+
+        for (Part* part : score->parts()) {
+            for (const auto& pair : part->instruments()) {
+                pair.second->updateInstrumentId();
+            }
+        }
+
+        score->setUpTempoMap();
+        for (Part* p : score->parts()) {
+            p->updateHarmonyChannels(false);
+        }
+
+        return Err::NoError;
+    } catch (const std::exception& e) {
+        LOGD("guitar pro import failed: %s", e.what());
         return Err::FileBadFormat;
     }
-    if (readResult == false) {
-        LOGD("guitar pro import error====");
-        // avoid another error message box
-        delete gp;
-        return Err::NoError;
-    }
-
-    if (!isVersionAbove6) {
-        addMetaInfo(score, gp, experimental);
-    }
-
-    int idx = 0;
-
-    for (Measure* m1 = score->firstMeasure(); m1; m1 = m1->nextMeasure(), ++idx) {
-        if (gp->bars.empty()) {
-            break;
-        }
-        const GpBar& bar = gp->bars[idx];
-        if (bar.barLine != BarLineType::NORMAL && bar.barLine != BarLineType::END_REPEAT && bar.barLine != BarLineType::START_REPEAT
-            && bar.barLine != BarLineType::END_START_REPEAT) {
-            m1->setEndBarLineType(bar.barLine, 0);
-        }
-    }
-    if (score->lastMeasure() && score->lastMeasure()->endBarLineType() != BarLineType::NORMAL) {
-        score->lastMeasure()->setEndBarLineType(BarLineType::END, false);
-    }
-
-    for (Part* part : score->parts()) {
-        for (const auto& pair : part->instruments()) {
-            pair.second->updateInstrumentId();
-        }
-    }
-
-    score->setUpTempoMap();
-    for (Part* p : score->parts()) {
-        p->updateHarmonyChannels(false);
-    }
-
-    delete gp;
-
-    return Err::NoError;
 }
 } // namespace mu::iex::guitarpro

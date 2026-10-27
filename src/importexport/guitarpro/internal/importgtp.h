@@ -462,6 +462,7 @@ class GuitarPro6 : public GuitarPro
     int readBit(muse::ByteArray* buffer);
     muse::ByteArray getBytes(muse::ByteArray* buffer, int offset, int length);
     void readGPX(muse::ByteArray* buffer);
+    void readGPX(muse::ByteArray* buffer, int depth);
     int readInteger(muse::ByteArray* buffer, int offset);
     muse::ByteArray readString(muse::ByteArray* buffer, int offset, int length);
     int readBits(muse::ByteArray* buffer, int bitsToRead);
@@ -477,6 +478,7 @@ class GuitarPro6 : public GuitarPro
     std::map<std::pair<int, int>, Note*> slideMap;
 
 protected:
+    bool m_gpifRead = false;
     const static std::map<std::string, std::string> instrumentMapping;
     void readGpif(muse::ByteArray* data);
 
