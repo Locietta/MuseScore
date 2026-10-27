@@ -21,6 +21,8 @@
  */
 #pragma once
 
+#include <optional>
+
 #include "modularity/imoduleinterface.h"
 #include "async/channel.h"
 #include "io/path.h"
