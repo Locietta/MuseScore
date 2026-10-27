@@ -349,6 +349,21 @@ void UndoStack::pushWithoutPerforming(UndoCommand* cmd)
 //   remove
 //---------------------------------------------------------
 
+bool UndoStack::clearHistory()
+{
+    if (m_isLocked || m_activeCommand) {
+        return false;
+    }
+    const bool wasClean = isClean();
+    const int currentState = m_stateList[m_currentIndex];
+    remove(0);
+    m_stateList[0] = currentState;
+    if (wasClean) {
+        m_cleanState = currentState;
+    }
+    return true;
+}
+
 void UndoStack::remove(size_t idx)
 {
     assert(idx <= m_currentIndex);
