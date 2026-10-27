@@ -114,6 +114,10 @@ bool IODevice::seek(size_t pos)
         return true;
     }
 
+    if (!isOpenModeWriteable()) {
+        return false;
+    }
+
     bool ok = resizeData(pos);
     if (ok) {
         m_pos = pos;
