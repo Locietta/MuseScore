@@ -46,14 +46,14 @@ typedef unsigned short int ushort;
 typedef unsigned int uint;
 
 namespace muse {
-static inline uint readUInt(const uint8_t* data)
+static inline uint32_t readUInt(const uint8_t* data)
 {
-    return (data[0]) + (data[1] << 8) + (data[2] << 16) + (data[3] << 24);
+    return uint32_t(data[0]) | (uint32_t(data[1]) << 8) | (uint32_t(data[2]) << 16) | (uint32_t(data[3]) << 24);
 }
 
 static inline ushort readUShort(const uint8_t* data)
 {
-    return (data[0]) + (data[1] << 8);
+    return ushort(data[0]) | ushort(ushort(data[1]) << 8);
 }
 
 static inline void writeUInt(uint8_t* data, uint i)
@@ -112,7 +112,7 @@ static void writeMSDosDate(uint8_t* dest, const std::tm& dt)
 
 static int inflate(Bytef* dest, ulong* destLen, const Bytef* source, ulong sourceLen)
 {
-    z_stream stream;
+    z_stream stream {};
     int err;
 
     stream.next_in = const_cast<Bytef*>(source);
@@ -141,8 +141,15 @@ static int inflate(Bytef* dest, ulong* destLen, const Bytef* source, ulong sourc
         if (err == Z_NEED_DICT || (err == Z_BUF_ERROR && stream.avail_in == 0)) {
             return Z_DATA_ERROR;
         }
-        return err;
+        return err == Z_OK ? Z_BUF_ERROR : err;
     }
+
+    // The declared compressed size is part of the entry; trailing bytes are corrupt.
+    if (stream.avail_in != 0) {
+        inflateEnd(&stream);
+        return Z_DATA_ERROR;
+    }
+
     *destLen = stream.total_out;
 
     err = inflateEnd(&stream);
@@ -291,6 +298,19 @@ enum CompressionMethod {
     CompressionMethodWzAES = 99
 };
 
+// Hard limits for reading a single entry. The central directory is authoritative.
+// 64 MiB for the uncompressed data; the compressed data gets the same baseline plus
+// the bounded worst-case raw-deflate overhead (the same bound used by addEntry).
+static constexpr uint32_t MAX_ENTRY_UNCOMPRESSED_SIZE = 64u * 1024u * 1024u;
+static constexpr uint32_t MAX_ENTRY_COMPRESSED_SIZE = MAX_ENTRY_UNCOMPRESSED_SIZE
+                                                      + (MAX_ENTRY_UNCOMPRESSED_SIZE >> 12)
+                                                      + (MAX_ENTRY_UNCOMPRESSED_SIZE >> 14) + 11u;
+
+static constexpr uint32_t ENCRYPTION_FLAGS = uint32_t(Encrypted) | uint32_t(StrongEncrypted)
+                                             | uint32_t(CentralDirectoryEncrypted);
+
+static constexpr uint64_t MAX_TOTAL_UNCOMPRESSED_SIZE = 256ULL * 1024ULL * 1024ULL;
+
 struct LocalFileHeader
 {
     uint8_t signature[4]; //  0x04034b50
@@ -377,6 +397,7 @@ struct ZipContainer::Impl {
     ByteArray comment;
     uint start_of_directory = 0;
     ZipContainer::Status status = ZipContainer::NoError;
+    uint64_t totalDecompressedBytes = 0;
 
     ZipContainer::CompressionPolicy compressionPolicy = ZipContainer::AlwaysCompress;
 
@@ -403,88 +424,183 @@ void ZipContainer::Impl::scanFiles()
         return;
     }
 
+    if (status != ZipContainer::NoError) {
+        return;
+    }
+
     if (!(device->isOpen() || device->open(IODevice::ReadOnly))) {
         status = ZipContainer::FileOpenError;
+        fileHeaders.clear();
         return;
     }
 
     if ((device->openMode() & IODevice::ReadOnly) == 0) { // only read the index from readable files.
         status = ZipContainer::FileReadError;
+        fileHeaders.clear();
         return;
     }
 
     dirtyFileTree = false;
-    uint8_t tmp[4];
-    device->read(tmp, 4);
-    if (readUInt(tmp) != 0x04034b50) {
-        LOGW("Zip: not a zip file!");
+
+    const auto fail = [this](const char* message) {
+        LOGW() << "Zip: " << message;
+        fileHeaders.clear();
+        comment.clear();
+        status = ZipContainer::FileReadError;
+    };
+
+    const uint64_t fileSize = device->size();
+    if (fileSize < sizeof(EndOfDirectory)) {
+        fail("File is smaller than minimum ZIP size.");
         return;
     }
 
-    // find EndOfDirectory header
-    int i = 0;
-    int start_of_directory_local = -1;
-    int num_dir_entries = 0;
+    if (!device->seek(0)) {
+        fail("Failed to seek to start of ZIP file.");
+        return;
+    }
+
+    uint8_t tmp[4];
+    if (device->read(tmp, sizeof(tmp)) != sizeof(tmp)) {
+        fail("Failed to read ZIP signature.");
+        return;
+    }
+
+    const uint32_t firstSig = readUInt(tmp);
+    if (firstSig != 0x04034b50 && firstSig != 0x06054b50) {
+        fail("Invalid ZIP signature.");
+        return;
+    }
+
     EndOfDirectory eod;
-    while (start_of_directory_local == -1) {
-        const int pos = int(device->size()) - int(sizeof(EndOfDirectory)) - i;
-        if (pos < 0 || i > 65535) {
-            LOGW("Zip: EndOfDirectory not found");
+    std::memset(&eod, 0, sizeof(EndOfDirectory));
+    bool foundEod = false;
+    uint64_t eodOffset = 0;
+    const uint64_t maxComment = std::min<uint64_t>(65535, fileSize - sizeof(EndOfDirectory));
+    for (uint64_t i = 0; i <= maxComment; ++i) {
+        const uint64_t candidatePos = fileSize - sizeof(EndOfDirectory) - i;
+        if (!device->seek(static_cast<size_t>(candidatePos))) {
+            fail("Failed to seek while searching for EndOfDirectory.");
+            return;
+        }
+        if (device->read(reinterpret_cast<uint8_t*>(&eod), sizeof(EndOfDirectory)) != sizeof(EndOfDirectory)) {
+            fail("Failed to read while searching for EndOfDirectory.");
+            return;
+        }
+        if (readUInt(eod.signature) != 0x06054b50) {
+            continue;
+        }
+        // A signature inside the archive comment is not the record. The declared
+        // comment length must exactly span the bytes after this candidate;
+        // otherwise keep scanning backwards for the real record.
+        if (readUShort(eod.comment_length) != i) {
+            continue;
+        }
+        foundEod = true;
+        eodOffset = candidatePos;
+        if (i > 0) {
+            comment = device->read(static_cast<size_t>(i));
+            if (comment.size() != i) {
+                fail("Failed to read archive comment.");
+                return;
+            }
+        }
+        break;
+    }
+
+    if (!foundEod) {
+        fail("EndOfDirectory not found.");
+        return;
+    }
+
+    const uint16_t thisDisk = readUShort(eod.this_disk);
+    const uint16_t directoryDisk = readUShort(eod.start_of_directory_disk);
+    const uint16_t entriesThisDisk = readUShort(eod.num_dir_entries_this_disk);
+    const uint16_t numDirEntries = readUShort(eod.num_dir_entries);
+    if (thisDisk != 0 || directoryDisk != 0 || entriesThisDisk != numDirEntries) {
+        fail("Multi-disk ZIP archives are unsupported.");
+        return;
+    }
+
+    const uint64_t dirStartOffset = readUInt(eod.dir_start_offset);
+    const uint64_t directorySize = readUInt(eod.directory_size);
+
+    if (dirStartOffset + directorySize > eodOffset) {
+        fail("Central directory extends beyond EndOfDirectory offset.");
+        return;
+    }
+
+    if (directorySize < uint64_t(numDirEntries) * sizeof(CentralFileHeader)) {
+        fail("Central directory size too small for declared number of entries.");
+        return;
+    }
+
+    start_of_directory = static_cast<uint>(dirStartOffset);
+    if (!device->seek(static_cast<size_t>(dirStartOffset))) {
+        fail("Failed to seek to central directory.");
+        return;
+    }
+
+    fileHeaders.clear();
+    fileHeaders.reserve(numDirEntries);
+    uint64_t totalUncompressedSize = 0;
+
+    for (uint16_t i = 0; i < numDirEntries; ++i) {
+        FileHeader header;
+        if (device->read(reinterpret_cast<uint8_t*>(&header.h), sizeof(CentralFileHeader)) != sizeof(CentralFileHeader)) {
+            fail("Failed to read complete central directory header.");
             return;
         }
 
-        device->seek(pos);
-        device->read((uint8_t*)&eod, sizeof(EndOfDirectory));
-        if (readUInt(eod.signature) == 0x06054b50) {
-            break;
-        }
-        ++i;
-    }
-
-    // have the eod
-    start_of_directory_local = readUInt(eod.dir_start_offset);
-    num_dir_entries = readUShort(eod.num_dir_entries);
-    ZDEBUG("start_of_directory at %d, num_dir_entries=%d", start_of_directory_local, num_dir_entries);
-    int comment_length = readUShort(eod.comment_length);
-    if (comment_length != i) {
-        LOGW("Zip: failed to parse zip file.");
-    }
-    comment = device->read(std::min(comment_length, i));
-
-    device->seek(start_of_directory_local);
-    for (i = 0; i < num_dir_entries; ++i) {
-        FileHeader header;
-        int read = (int)device->read((uint8_t*)&header.h, sizeof(CentralFileHeader));
-        if (read < (int)sizeof(CentralFileHeader)) {
-            LOGW("Zip: Failed to read complete header, index may be incomplete");
-            break;
-        }
         if (readUInt(header.h.signature) != 0x02014b50) {
-            LOGW("Zip: invalid header signature, index may be incomplete");
-            break;
+            fail("Invalid central directory header signature.");
+            return;
         }
 
-        size_t l = readUShort(header.h.file_name_length);
-        header.file_name = device->read(l);
-        if (header.file_name.size() != l) {
-            LOGW("Zip: Failed to read filename from zip index, index may be incomplete");
-            break;
-        }
-        l = readUShort(header.h.extra_field_length);
-        header.extra_field = device->read(l);
-        if (header.extra_field.size() != l) {
-            LOGW("Zip: Failed to read extra field in zip file, skipping file, index may be incomplete");
-            break;
-        }
-        l = readUShort(header.h.file_comment_length);
-        header.file_comment = device->read(l);
-        if (header.file_comment.size() != l) {
-            LOGW("Zip: Failed to read read file comment, index may be incomplete");
-            break;
+        if (readUShort(header.h.disk_start) != 0) {
+            fail("Central directory entry belongs to another disk.");
+            return;
         }
 
-        ZDEBUG("found file '%s'", header.file_name.data());
-        fileHeaders.push_back(header);
+        const size_t nameLen = readUShort(header.h.file_name_length);
+        header.file_name = device->read(nameLen);
+        if (header.file_name.size() != nameLen) {
+            fail("Failed to read filename from central directory.");
+            return;
+        }
+
+        const size_t extraLen = readUShort(header.h.extra_field_length);
+        header.extra_field = device->read(extraLen);
+        if (header.extra_field.size() != extraLen) {
+            fail("Failed to read extra field from central directory.");
+            return;
+        }
+
+        const size_t commentLen = readUShort(header.h.file_comment_length);
+        header.file_comment = device->read(commentLen);
+        if (header.file_comment.size() != commentLen) {
+            fail("Failed to read file comment from central directory.");
+            return;
+        }
+
+        if (device->pos() > dirStartOffset + directorySize) {
+            fail("Central directory entry extends past declared directory size.");
+            return;
+        }
+
+        const uint32_t entryUncompressedSize = readUInt(header.h.uncompressed_size);
+        if (entryUncompressedSize > MAX_ENTRY_UNCOMPRESSED_SIZE) {
+            fail("Central directory entry uncompressed size exceeds limit.");
+            return;
+        }
+
+        totalUncompressedSize += entryUncompressedSize;
+        if (totalUncompressedSize > MAX_TOTAL_UNCOMPRESSED_SIZE) {
+            fail("Aggregate uncompressed size across entries exceeds limit.");
+            return;
+        }
+
+        fileHeaders.push_back(std::move(header));
     }
 }
 
@@ -747,7 +863,15 @@ bool ZipContainer::fileExists(const std::string& fileName) const
 
 ByteArray ZipContainer::fileData(const std::string& fileName) const
 {
+    if (p->status != ZipContainer::NoError) {
+        return ByteArray();
+    }
+
     p->scanFiles();
+
+    if (p->status != ZipContainer::NoError) {
+        return ByteArray();
+    }
 
     size_t i = 0;
     for (i = 0; i < p->fileHeaders.size(); ++i) {
@@ -761,71 +885,171 @@ ByteArray ZipContainer::fileData(const std::string& fileName) const
         return ByteArray();
     }
 
-    FileHeader header = p->fileHeaders.at(i);
+    const auto fail = [this](const char* message) -> ByteArray {
+        LOGW() << "Zip: " << message;
+        p->status = ZipContainer::FileReadError;
+        return ByteArray();
+    };
 
-    ushort version_needed = readUShort(header.h.version_needed);
-    if (version_needed > ZIP_VERSION) {
-        LOGW("Zip: .ZIP specification version %d implementation is needed to extract the data.", version_needed);
+    const FileHeader& header = p->fileHeaders.at(i);
+
+    const uint32_t central_version = readUShort(header.h.version_needed);
+    if (central_version > ZIP_VERSION) {
+        LOGW() << "Zip: .ZIP specification version " << central_version
+               << " implementation is needed to extract the data.";
+        p->status = ZipContainer::FileReadError;
         return ByteArray();
     }
 
-    ushort general_purpose_bits = readUShort(header.h.general_purpose_bits);
-    int compressed_size = readUInt(header.h.compressed_size);
-    int uncompressed_size = readUInt(header.h.uncompressed_size);
-    int start = readUInt(header.h.offset_local_header);
+    const uint32_t central_flags = readUShort(header.h.general_purpose_bits);
+    if ((central_flags & ENCRYPTION_FLAGS) != 0) {
+        return fail("Unsupported encryption method is needed to extract the data.");
+    }
 
-    p->device->seek(start);
+    const uint32_t central_method = readUShort(header.h.compression_method);
+    if (central_method != CompressionMethodStored && central_method != CompressionMethodDeflated) {
+        LOGW() << "Zip: Unsupported compression method " << central_method
+               << " is needed to extract the data.";
+        p->status = ZipContainer::FileReadError;
+        return ByteArray();
+    }
+
+    const uint32_t central_crc = readUInt(header.h.crc_32);
+    const uint32_t compressed_size = readUInt(header.h.compressed_size);
+    const uint32_t uncompressed_size = readUInt(header.h.uncompressed_size);
+    const uint32_t local_offset = readUInt(header.h.offset_local_header);
+
+    if (uncompressed_size > MAX_ENTRY_UNCOMPRESSED_SIZE) {
+        return fail("Uncompressed entry exceeds the supported size limit.");
+    }
+
+    if (p->totalDecompressedBytes + uncompressed_size > MAX_TOTAL_UNCOMPRESSED_SIZE) {
+        return fail("Aggregate decompressed size exceeds limit.");
+    }
+
+    if (compressed_size > MAX_ENTRY_COMPRESSED_SIZE) {
+        return fail("Compressed entry exceeds the supported size limit.");
+    }
+
+    if (central_method == CompressionMethodStored && compressed_size != uncompressed_size) {
+        return fail("Stored entry has different compressed and uncompressed sizes.");
+    }
+
+    IODevice* device = p->device;
+    const uint64_t file_size = device->size();
+    if (uint64_t(local_offset) > file_size
+        || file_size - uint64_t(local_offset) < sizeof(LocalFileHeader)) {
+        return fail("Local file header offset is outside the file.");
+    }
+
+    if (!device->seek(static_cast<size_t>(local_offset))) {
+        return fail("Failed to seek to the local file header.");
+    }
+
     LocalFileHeader lh;
-    p->device->read((uint8_t*)&lh, sizeof(LocalFileHeader));
-    uint skip = readUShort(lh.file_name_length) + readUShort(lh.extra_field_length);
-    p->device->seek(p->device->pos() + skip);
+    std::memset(&lh, 0, sizeof(lh));
+    if (device->read(reinterpret_cast<uint8_t*>(&lh), sizeof(lh)) != sizeof(lh)) {
+        return fail("Failed to read the complete local file header.");
+    }
 
-    int compression_method = readUShort(lh.compression_method);
+    if (readUInt(lh.signature) != 0x04034b50) {
+        return fail("Invalid local file header signature.");
+    }
 
-    if ((general_purpose_bits & Encrypted) != 0) {
-        LOGW("Zip: Unsupported encryption method is needed to extract the data.");
+    const uint32_t local_version = readUShort(lh.version_needed);
+    if (local_version > ZIP_VERSION) {
+        LOGW() << "Zip: .ZIP specification version " << local_version
+               << " implementation is needed to extract the data.";
+        p->status = ZipContainer::FileReadError;
         return ByteArray();
     }
 
-    ByteArray compressed = p->device->read(compressed_size);
-    if (compression_method == CompressionMethodStored) {
-        // no compression
-        compressed.truncate(uncompressed_size);
-        return compressed;
-    } else if (compression_method == CompressionMethodDeflated) {
-        // Deflate
-        //qDebug("compressed=%d", compressed.size());
-        compressed.truncate(compressed_size);
-        ByteArray baunzip;
-        ulong len = std::max(uncompressed_size,  1);
-        int res;
-        do {
-            baunzip.resize(len);
-            res = inflate((uint8_t*)baunzip.data(), &len,
-                          (const uint8_t*)compressed.constData(), compressed_size);
-
-            switch (res) {
-            case Z_OK:
-                if ((size_t)len != baunzip.size()) {
-                    baunzip.resize(len);
-                }
-                break;
-            case Z_MEM_ERROR:
-                LOGW("Zip: Z_MEM_ERROR: Not enough memory");
-                break;
-            case Z_BUF_ERROR:
-                len *= 2;
-                break;
-            case Z_DATA_ERROR:
-                LOGW("Zip: Z_DATA_ERROR: Input data is corrupted");
-                break;
-            }
-        } while (res == Z_BUF_ERROR);
-        return baunzip;
+    const uint32_t local_flags = readUShort(lh.general_purpose_bits);
+    if ((local_flags & ENCRYPTION_FLAGS) != 0) {
+        return fail("Unsupported encryption method is needed to extract the data.");
     }
 
-    LOGW("Zip: Unsupported compression method %d is needed to extract the data.", compression_method);
-    return ByteArray();
+    const uint32_t flag_mask = ENCRYPTION_FLAGS | uint32_t(HasDataDescriptor);
+    if ((central_flags & flag_mask) != (local_flags & flag_mask)) {
+        return fail("Local and central general purpose flags are inconsistent.");
+    }
+
+    const uint32_t local_method = readUShort(lh.compression_method);
+    if (local_method != central_method) {
+        return fail("Local and central compression methods are inconsistent.");
+    }
+
+    if (local_method != CompressionMethodStored && local_method != CompressionMethodDeflated) {
+        LOGW() << "Zip: Unsupported compression method " << local_method
+               << " is needed to extract the data.";
+        p->status = ZipContainer::FileReadError;
+        return ByteArray();
+    }
+
+    // With a data descriptor, the central directory is authoritative and the local
+    // CRC/sizes may be zero. Without one, the local header must match the central one.
+    if ((central_flags & HasDataDescriptor) == 0) {
+        if (readUInt(lh.crc_32) != central_crc
+            || readUInt(lh.compressed_size) != compressed_size
+            || readUInt(lh.uncompressed_size) != uncompressed_size) {
+            return fail("Local file header CRC or sizes do not match the central directory.");
+        }
+    }
+
+    const uint32_t local_name_length = readUShort(lh.file_name_length);
+    const uint32_t local_extra_length = readUShort(lh.extra_field_length);
+    const uint64_t data_offset = uint64_t(local_offset) + sizeof(LocalFileHeader)
+                                 + local_name_length + local_extra_length;
+    if (data_offset > file_size || compressed_size > file_size - data_offset) {
+        return fail("Compressed data extends past the end of the file.");
+    }
+
+    if (!device->seek(static_cast<size_t>(data_offset))) {
+        return fail("Failed to seek to the compressed data.");
+    }
+
+    ByteArray compressed = device->read(static_cast<size_t>(compressed_size));
+    if (compressed.size() != compressed_size) {
+        return fail("Failed to read the complete compressed data.");
+    }
+
+    ByteArray result;
+    if (central_method == CompressionMethodStored) {
+        result = compressed;
+    } else {
+        // Allocate exactly the declared output size; an empty entry still needs a
+        // valid one-byte destination for zlib. Inflate once with no retry growth.
+        const size_t output_capacity = uncompressed_size > 0 ? uncompressed_size : 1;
+        result.resize(output_capacity);
+        ulong output_len = static_cast<ulong>(output_capacity);
+        const int res = inflate(result.data(), &output_len, compressed.constData(),
+                                static_cast<ulong>(compressed_size));
+        if (res != Z_OK) {
+            LOGW() << "Zip: inflate failed with error " << res << ".";
+            p->status = ZipContainer::FileReadError;
+            return ByteArray();
+        }
+
+        if (output_len != uncompressed_size) {
+            return fail("Inflated data size does not match the central directory.");
+        }
+
+        result.resize(static_cast<size_t>(output_len));
+    }
+
+    uint32_t actual_crc = static_cast<uint32_t>(::crc32(0, Z_NULL, 0));
+    if (!result.empty()) {
+        actual_crc = static_cast<uint32_t>(::crc32(actual_crc, result.constData(),
+                                                   static_cast<uInt>(result.size())));
+    }
+
+    if (actual_crc != central_crc) {
+        return fail("CRC does not match the central directory.");
+    }
+
+    p->totalDecompressedBytes += result.size();
+
+    return result;
 }
 
 ZipContainer::Status ZipContainer::status() const
