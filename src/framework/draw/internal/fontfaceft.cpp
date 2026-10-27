@@ -20,6 +20,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "fontfaceft.h"
+#include "fontfaceutils.h"
 
 #include <unordered_map>
 
@@ -128,8 +129,8 @@ bool FontFaceFT::load(const FaceKey& key, const io::path_t& path, bool isSymbolM
         m_data->fontData = file.readAll();
     }
 
-    int rval = FT_New_Memory_Face(ftlib, (FT_Byte*)m_data->fontData.constData(),
-                                  (FT_Long)m_data->fontData.size(), 0, &m_data->face);
+    int rval = newMatchingMemoryFace(ftlib, (FT_Byte*)m_data->fontData.constData(),
+                                    (FT_Long)m_data->fontData.size(), key.dataKey, &m_data->face);
     if (rval) {
         LOGE() << "freetype: cannot create face: " << m_key.dataKey.family().id() << ", rval: " << rval;
         return false;
