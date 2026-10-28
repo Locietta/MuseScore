@@ -60,6 +60,14 @@ Steps 20-26 are the second hardening round (A-G of the follow-up review):
   step 26  (G) an interruption between `git rm --cached` and the worktree removal is
            replayed: no lost report entry, no leftover file
 
+Steps 27-29 are the third hardening round:
+
+  step 27  (1) an ignored local file at a path upstream adds is refused, file intact
+  step 28  (3) a crash right after a merge outcome is persisted is resumable: both
+           merges, `continue` and `abort`
+  step 29  (4) abort finishes the persisted removal plan instead of leaving a half
+           removed trimmed file untracked
+
 Requirements: python 3.10+, git 2.40+ (ort merge strategy, `-Xsubtree`), and a
 clone that carries the mirrors `origin/upstream/musescore` and
 `origin/upstream/muse-framework` plus the framework commits the pins name. The
@@ -1734,6 +1742,152 @@ def step_removal_audit(ctx: Context) -> None:
     ctx.require_clean_end("step 26")
 
 
+def step_ignored_incoming(ctx: Context) -> None:
+    """(1) an ignored local file at a path upstream adds is refused, not overwritten."""
+    sb = ctx.sb
+    before = (sb.rev("HEAD"), sb.tree("HEAD"), sb.git("ls-files", "-s", "-z"))
+    precious = "src/extra/ignored-incoming.txt"
+    target = ctx.upstream_commit({precious: "upstream replacement\n"},
+                                 message="test: upstream adds a path we keep ignored")
+    sb.path(precious).parent.mkdir(parents=True, exist_ok=True)
+    sb.path(precious).write_bytes(b"PRECIOUS ignored local file\n")
+    exclude = sb.git_dir / "info" / "exclude"
+    exclude.parent.mkdir(exist_ok=True)
+    exclude.write_bytes(b"src/extra/ignored-incoming.txt\n")
+    ctx.expect_eq(sb.status_all(), "", "step 27: the ignore rule did not hide the file")
+    _rc, _out, err = ctx.sync_synthetic(target, expect=1)
+    ctx.expect("not clean" in err and "ignored files count too" in err and precious in err,
+               "step 27: sync did not refuse the ignored incoming path", err)
+    expect_refused(ctx, "step 27", before)
+    ctx.expect_eq(sb.path(precious).read_bytes(), b"PRECIOUS ignored local file\n",
+                  "step 27: the refused sync overwrote the ignored local file")
+    ctx.expect_eq(sb.sync_branches(), [], "step 27: a temporary branch was created")
+    ctx.expect(not sb.state_file().exists(), "step 27: a state file was written")
+    sb.path(precious).unlink()
+    exclude.write_bytes(b"")
+    ctx.require_clean_end("step 27")
+
+
+def step_merge_outcome_recovery(ctx: Context) -> None:
+    """(3) a crash right after a merge outcome is persisted is resumable.
+
+    Both merges persist the outcome together with the worktree snapshot and unmerged
+    paths, so `continue` and `abort` recognise the merge's own staged changes.
+    """
+    sb = ctx.sb
+
+    # (a) upstream merge: outcome, staged changes, then `abort` and `continue`.
+    before = sb.rev("HEAD")
+    target = ctx.upstream_commit({"src/extra/outcome-crash.txt": "upstream change\n"},
+                                 message="test: target for the merge outcome crash")
+    temp = f"sync/{target[:12]}"
+    _rc, _out, err = ctx.sync_synthetic(target, expect=1, stop_after="upstream-merge-outcome")
+    ctx.expect("[test] stopped after upstream-merge-outcome" in err,
+               "step 28: the upstream outcome hook did not fire", err)
+    state = sb.state()
+    ctx.expect(state["mergeOutcome"] in ("ready", "conflicts"),
+               "step 28: the upstream merge outcome was not persisted",
+               f"mergeOutcome: {state['mergeOutcome']!r}")
+    ctx.expect(state["status"],
+               "step 28: no worktree snapshot was persisted with the upstream outcome")
+    ctx.expect_eq(sb.branch(), temp, "step 28: the crash left the wrong branch")
+    _rc, out, _err = ctx.sync("abort", expect=0)
+    ctx.expect("discarded the in-progress merge, including any resolution work" in out,
+               "step 28: abort does not say what it discards", out)
+    ctx.expect_eq(sb.rev("HEAD"), before, "step 28: abort did not return to the branch tip")
+    ctx.require_clean_end("step 28 (upstream abort)")
+
+    _rc, _out, _err = ctx.sync_synthetic(target, expect=1, stop_after="upstream-merge-outcome")
+    _rc, _out, _err = ctx.sync("continue", expect=0)
+    ctx.expect_eq(sb.parents(), [before, target],
+                  "step 28: continue did not finish the upstream merge")
+    ctx.require_clean_end("step 28 (upstream continue)")
+
+    # (b) framework merge: seed a framework file, edit it locally, then move it upstream
+    # so the framework merge conflicts; stop right after its outcome.
+    seed = ctx.framework_commit({"extra/collide.txt": "one\n"},
+                                message="test: framework file for the outcome crash")
+    target = ctx.upstream_commit({"src/extra/outcome-seed.txt": "seed\n"}, framework=seed,
+                                 message="test: bring the framework file in")
+    ctx.sync_synthetic(target, "extra/framework", expect=0)
+    ctx.framework_tip = seed
+    sb.path("muse/extra/collide.txt").write_bytes(b"local framework edit\n")
+    sb.git("add", "--", "muse/extra/collide.txt")
+    sb.git("commit", "--quiet", "-m", "test: local edit of the framework file")
+    local = sb.rev("HEAD")
+    moved = ctx.framework_commit({"extra/collide.txt": "two\n"}, parent=seed,
+                                 message="test: framework change that collides")
+    target = ctx.upstream_commit({"src/extra/outcome-moved.txt": "moved\n"}, framework=moved,
+                                 message="test: pin the colliding framework commit")
+
+    _rc, _out, err = ctx.sync_synthetic(target, "extra/framework", expect=1,
+                                        stop_after="framework-merge-outcome")
+    ctx.expect("[test] stopped after framework-merge-outcome" in err,
+               "step 28: the framework outcome hook did not fire", err)
+    state = sb.state()
+    ctx.expect_eq(state["mergeOutcome"], "conflicts",
+                  "step 28: the framework merge did not record its conflicts")
+    ctx.expect("muse/extra/collide.txt" in state["conflicts"],
+               "step 28: the unmerged framework path was not persisted with the outcome",
+               f"conflicts: {state['conflicts']}")
+    ctx.expect(state["preResolutionTree"],
+               "step 28: the pre-resolution snapshot is missing")
+    _rc, out, _err = ctx.sync("abort", expect=0)
+    ctx.expect("discarded the in-progress merge" in out,
+               "step 28: abort does not say what it discards", out)
+    ctx.expect_eq(sb.rev("HEAD"), local, "step 28: abort did not return to the branch tip")
+    ctx.require_clean_end("step 28 (framework abort)")
+
+    # The same crash, then continue: the conflict is reported, the human resolves it.
+    _rc, _out, _err = ctx.sync_synthetic(target, "extra/framework", expect=1,
+                                         stop_after="framework-merge-outcome")
+    _rc, out, _err = ctx.sync("continue", expect=2)
+    ctx.expect("framework conflicts in muse/" in out,
+               "step 28: continue did not report the framework conflict", out)
+    ctx.expect_eq(sorted(sb.unmerged()), ["muse/extra/collide.txt"],
+                  "step 28: the resumed framework merge lost its conflict")
+    sb.path("muse/extra/collide.txt").write_bytes(b"resolved by hand\n")
+    sb.git("add", "--", "muse/extra/collide.txt")
+    _rc, out, _err = ctx.sync("continue", expect=0)
+    ctx.expect_eq(sb.read("muse/extra/collide.txt"), "resolved by hand\n",
+                  "step 28: the resolution is not in the framework merge commit")
+    report = parse_report(out)
+    ctx.expect("muse/extra/collide.txt" in report["resolutions"],
+               "step 28: the resolution is not listed in the report", f"{report}")
+    ctx.framework_tip = moved
+    ctx.require_clean_end("step 28 (framework continue)")
+
+
+def step_removal_abort(ctx: Context) -> None:
+    """(4) abort finishes the persisted removal plan, leaving a clean worktree."""
+    sb = ctx.sb
+    before = (sb.rev("HEAD"), sb.tree("HEAD"), sb.git("ls-files", "-s", "-z"))
+    first = "src/appshell/audit-abort/one.txt"
+    second = "src/appshell/audit-abort/two.txt"
+    target = ctx.upstream_commit({first: "one\n", second: "two\n"},
+                                 message="test: target for the abort of a partial removal")
+    _rc, _out, err = ctx.sync_synthetic(
+        target, expect=1, env_overrides={"SYNC_UPSTREAM_TEST_STOP_AFTER_RM": "2"})
+    ctx.expect("stopped after removing index entry 2" in err,
+               "step 29: the removal stop hook did not fire", err)
+    ctx.expect(sb.exists(first), "step 29: the interruption did not leave the file behind")
+    ctx.expect_eq(sb.ls_files("--", "src/appshell/audit-abort"), [second],
+                  "step 29: the interrupted removal left the wrong index entries")
+    state = sb.state()
+    ctx.expect(state["removals"], "step 29: the removal plan was not persisted")
+    _rc, out, _err = ctx.sync("abort", expect=0)
+    ctx.expect("discarded the in-progress merge" in out,
+               "step 29: abort does not say what it discards", out)
+    ctx.expect_eq(sb.rev("HEAD"), before[0], "step 29: abort did not return to the branch tip")
+    ctx.expect_eq(sb.status_all(), "", "step 29: abort left the worktree dirty")
+    ctx.expect(not sb.exists(first),
+               "step 29: abort left the partially removed trimmed file behind")
+    ctx.expect(not sb.path("src/appshell/audit-abort").exists(),
+               "step 29: abort left the emptied directory behind")
+    ctx.expect(not sb.state_file().exists(), "step 29: abort left the state file behind")
+    ctx.require_clean_end("step 29")
+
+
 STEPS = [
     ("absorb: test TRIM + framework absorbed at muse/", step_absorb),
     ("link bump 7b2d005464: two merges and the trimmed-edit report", step_link_bump),
@@ -1761,6 +1915,9 @@ STEPS = [
     ("a real muse~... gitlink is a conflict (E)", step_link_name_provenance),
     ("abort and continue work at every recorded state (F)", step_recovery_windows),
     ("an interrupted removal is replayed from the plan (G)", step_removal_audit),
+    ("an ignored incoming file is refused, not overwritten (1)", step_ignored_incoming),
+    ("a crash after a merge outcome is resumable (3)", step_merge_outcome_recovery),
+    ("abort finishes a partially removed trimmed path (4)", step_removal_abort),
 ]
 
 
