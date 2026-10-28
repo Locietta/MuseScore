@@ -182,12 +182,12 @@ enum class AudioResourceType {
     AudioUnit,
 };
 
-static const std::map<AudioResourceType, QString> RESOURCE_TYPE_MAP = {
-    { AudioResourceType::Undefined, "undefined" },
-    { AudioResourceType::MuseSamplerSoundPack, "muse_sampler_sound_pack" },
-    { AudioResourceType::FluidSoundfont, "fluid_soundfont" },
-    { AudioResourceType::VstPlugin, "vst_plugin" },
-    { AudioResourceType::MusePlugin, "muse_plugin" },
+static const std::map<AudioResourceType, String> RESOURCE_TYPE_MAP = {
+    { AudioResourceType::Undefined, u"undefined" },
+    { AudioResourceType::MuseSamplerSoundPack, u"muse_sampler_sound_pack" },
+    { AudioResourceType::FluidSoundfont, u"fluid_soundfont" },
+    { AudioResourceType::VstPlugin, u"vst_plugin" },
+    { AudioResourceType::MusePlugin, u"muse_plugin" },
 };
 
 struct AudioResourceMeta {
