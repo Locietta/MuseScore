@@ -1,0 +1,114 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * MuseScore-CLA-applies
+ *
+ * MuseScore Studio
+ * Music Composition & Notation
+ *
+ * Copyright (C) 2024 MuseScore Limited and others
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+#pragma once
+
+#include <vector>
+#include <functional>
+
+#include "ifontsengine.h"
+
+#include "global/modularity/ioc.h"
+#include "global/async/asyncable.h"
+#include "ifontsdatabase.h"
+
+#include "fontrendercache.h"
+
+namespace muse::draw {
+class IFontFace;
+class FontsEngine : public IFontsEngine, public Contextable, public async::Asyncable
+{
+    GlobalInject<IFontsDatabase> fontsDatabase;
+
+public:
+    FontsEngine(const modularity::ContextPtr& iocCtx)
+        : Contextable(iocCtx) {}
+    ~FontsEngine();
+
+    void init();
+    void setRenderCacheDirPath(const io::path_t& path, const std::string& revision = std::string()) override;
+    void clearLoadedFaces() override;
+
+    double lineSpacing(const Font& f) const override;
+    double xHeight(const Font& f) const override;
+    double height(const Font& f) const override;
+    double capHeight(const Font& f) const override;
+    double ascent(const Font& f) const override;
+    double descent(const Font& f) const override;
+
+    double underlinePos(const Font& f) const override;
+    double lineWidth(const Font& f) const override;
+    double strikeOutPos(const Font& f) const override;
+
+    bool inFont(const Font& f, char32_t ucs4) const override;
+
+    double horizontalAdvance(const Font& f, const char32_t& ch) const override;
+    double horizontalAdvance(const Font& f, const std::u32string& text) const override;
+
+    RectF boundingRect(const Font& f, const char32_t& ch) const override;
+    RectF boundingRect(const Font& f, const std::u32string& text) const override;
+    RectF tightBoundingRect(const Font& f, const std::u32string& text) const override;
+
+    // For draw
+    std::vector<GlyphImage> render(const Font& f, const std::u32string& text) const override;
+
+    // For dev
+    using FontFaceFactory = std::function<IFontFace* (const FontDataKey& dataKey, Font::Type type)>;
+    void setFontFaceFactory(const FontFaceFactory& f);
+
+private:
+
+    struct TextBlock {
+        const char32_t* text = nullptr;
+        int lenght = 0;
+    };
+
+    struct FontFaceTextBlock {
+        TextBlock text;
+        const IFontFace* face = nullptr;
+    };
+
+    struct RequireFace {
+        IFontFace* face = nullptr;   // real loaded face
+        std::vector<IFontFace*> subtitutionFaces;
+        FaceKey requireKey;          // require face
+        FontDataKey actualDataKey;   // resolved face
+
+        bool isSymbolMode() const;
+        double pixelScale() const;
+        double pixelScaleFor(const IFontFace* loadedFace) const;
+    };
+
+    IFontFace* createFontFace(const FontData& fontData, Font::Type type) const;
+    RequireFace* fontFace(const Font& f, bool isSymbolMode = false) const;
+    IFontFace* fontFaceByActualDataKey(const FontDataKey& actualDataKey, Font::Type type, int loadedPixelSize, bool isSymbolMode) const;
+    IFontFace* sdfFontFaceFor(const IFontFace* layoutFace) const;
+
+    std::vector<FontFaceTextBlock> splitTextByFontFaces(const RequireFace* rf, const TextBlock& text) const;
+
+    FontFaceFactory m_fontFaceFactory;
+
+    mutable std::vector<IFontFace*> m_loadedFaces;
+    mutable std::vector<RequireFace*> m_requiredFaces;
+
+    mutable FontRenderCache m_renderCache;
+};
+}

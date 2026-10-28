@@ -1,0 +1,70 @@
+require_dep(zlib)
+
+if (MUSE_MODULE_VST)
+    require_source_dep(vst3sdk)
+endif()
+
+if (MUSE_MODULE_DRAW)
+    if (MUSE_MODULE_DRAW_USE_FONTFACE_XT)
+        require_source_dep(lodepng)
+    endif()
+
+    if (MUSE_MODULE_DRAW_USE_FONTFACE_FT)
+        if (MUSE_MODULE_DRAW_USE_STATIC_DEPS)
+            require_dep(freetype STATIC)
+            require_dep(harfbuzz STATIC)
+        else()
+            require_dep(libpng) # freetype links against libpng
+            require_dep(freetype)
+            require_dep(harfbuzz)
+        endif()
+
+        if (NOT MUSE_MODULE_DRAW_USE_QTTEXTDRAW)
+            if (MUSE_MODULE_DRAW_USE_STATIC_DEPS)
+                require_dep(msdfgen STATIC)
+            else()
+                require_dep(msdfgen)
+            endif()
+        endif()
+    endif()
+endif()
+
+if (MUSE_MODULE_DOCKWINDOW AND MUSE_MODULE_DOCKWINDOW_KDDOCKWIDGETS_V2)
+    require_source_dep(kddockwidgets)
+endif()
+
+if (OS_IS_WIN AND MUSE_MODULE_AUDIO)
+    require_source_dep(asiosdk)
+endif()
+
+if (MUSE_MODULE_AUDIO AND MUSE_MODULE_AUDIO_EXPORT)
+    require_dep(ogg) # flac and opusenc link against ogg
+    require_dep(fdk-aac)
+    require_dep(flac)
+    require_dep(lame)
+    require_dep(opus)
+    require_dep(opusenc)
+endif()
+
+if (MUSE_MODULE_AUDIO AND MUSE_MODULE_AUDIO_PIPEWIRE)
+    require_dep(pipewire)
+endif()
+
+require_source_dep(picojson)
+require_source_dep(pugixml)
+require_source_dep(utfcpp)
+
+if (MUSE_ENABLE_UNIT_TESTS)
+    require_source_dep(googletest)
+endif()
+
+if (MUSE_MODULE_DIAGNOSTICS_CRASHPAD_CLIENT)
+    require_tool(crashpad_handler)
+    require_source_dep(crashpad_client)
+    get_property(_crashpad_handler_bin GLOBAL PROPERTY crashpad_handler_BIN_DIR)
+    if (OS_IS_WIN)
+        set(MUSE_MODULE_DIAGNOSTICS_CRASHPAD_HANDLER_PATH "${_crashpad_handler_bin}/crashpad_handler.exe" CACHE FILEPATH "" FORCE)
+    else()
+        set(MUSE_MODULE_DIAGNOSTICS_CRASHPAD_HANDLER_PATH "${_crashpad_handler_bin}/crashpad_handler" CACHE FILEPATH "" FORCE)
+    endif()
+endif()

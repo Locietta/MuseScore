@@ -1,0 +1,67 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * MuseScore-CLA-applies
+ *
+ * MuseScore Studio
+ * Music Composition & Notation
+ *
+ * Copyright (C) 2021 MuseScore Limited and others
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+#ifndef MUSE_DIAGNOSTICS_DIAGNOSTICSCONFIGURATION_H
+#define MUSE_DIAGNOSTICS_DIAGNOSTICSCONFIGURATION_H
+
+#include <optional>
+
+#include "../idiagnosticsconfiguration.h"
+
+#include "modularity/ioc.h"
+#include "iglobalconfiguration.h"
+
+namespace muse::diagnostics {
+class DiagnosticsConfiguration : public IDiagnosticsConfiguration, public Contextable
+{
+    GlobalInject<muse::IGlobalConfiguration> globalConfiguration;
+
+public:
+    DiagnosticsConfiguration(const modularity::ContextPtr& iocCtx)
+        : Contextable(iocCtx) {}
+
+    void init();
+
+    bool isDumpUploadAllowed() const override;
+    void setIsDumpUploadAllowed(bool val) override;
+
+    bool shouldWarnBeforeSavingDiagnosticFiles() const override;
+    void setShouldWarnBeforeSavingDiagnosticFiles(bool val) override;
+
+    muse::io::path_t diagnosticFilesDefaultSavingPath() const override;
+
+    CrashDumpConfig crashDumpConfig() const override;
+    void setCrashDumpConfig(const CrashDumpConfig& config) override;
+
+    std::map<String, String> crashReportTags() const override;
+    void setCrashReportTags(std::map<String, String> tags) override;
+
+    bool systemCrashReporterForwardingEnabled() const override;
+    void setSystemCrashReporterForwardingEnabled(bool val) override;
+
+private:
+    std::optional<CrashDumpConfig> m_crashDumpConfig;
+    std::map<String, String> m_crashReportTags;
+    bool m_systemCrashReporterForwardingEnabled = true;
+};
+}
+
+#endif // MUSE_DIAGNOSTICS_DIAGNOSTICSCONFIGURATION_H

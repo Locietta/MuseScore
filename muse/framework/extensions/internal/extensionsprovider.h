@@ -1,0 +1,71 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * MuseScore-CLA-applies
+ *
+ * MuseScore Studio
+ * Music Composition & Notation
+ *
+ * Copyright (C) 2024 MuseScore Limited and others
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#pragma once
+
+#include "global/async/asyncable.h"
+
+#include "modularity/ioc.h"
+#include "../iextensionsconfiguration.h"
+#include "../iextensionsregister.h"
+#include "../iextensionsprovider.h"
+#include "../iextensionsuiengine.h"
+#include "interactive/iinteractive.h"
+#include "io/ifilesystem.h"
+
+namespace muse::extensions {
+class ExtensionsProvider : public IExtensionsProvider, public Contextable, public async::Asyncable
+{
+    GlobalInject<IExtensionsConfiguration> configuration;
+    GlobalInject<IExtensionsRegister> extensionsRegister;
+    GlobalInject<io::IFileSystem> fileSystem;
+    ContextInject<IExtensionsUiEngine> extensionsUiEngine = { this };
+    ContextInject<IInteractive> interactive = { this };
+
+public:
+    ExtensionsProvider(const modularity::ContextPtr& iocCtx)
+        : Contextable(iocCtx) {}
+
+    void reloadExtensions() override;
+
+    ManifestList manifestList(Filter filter = Filter::All) const override;
+    async::Notification manifestListChanged() const override;
+
+    bool exists(const ExtensionUri& uri) const override;
+    const Manifest& manifest(const ExtensionUri& uri) const override;
+
+    void setEnabled(const ExtensionUri& uri, bool enabled) override;
+    bool isEnabled(const ExtensionUri& uri) const override;
+    async::Channel<ExtensionUri> enabledChanged() const override;
+
+    Ret perform(const ExtensionUri& uri, const ExtensionActionCode& action) override;
+    async::Channel<ExtensionUri, ExtensionActionCode> dockRequested() const override;
+    Ret run(const ExtensionUri& uri, const ExtensionActionCode& action) override;
+
+    std::unique_ptr<IExtensionSession> newSession(const ExtensionUri& uri, const io::path_t& relativeScriptPath) const override;
+
+private:
+    async::Channel<ExtensionUri, ExtensionActionCode> m_dockRequested;
+    Ret run(const Action& action, const Manifest& manifest);
+    std::unique_ptr<IExtensionSession> newSession(const Manifest& manifest, const io::path_t& scriptPath) const;
+};
+}

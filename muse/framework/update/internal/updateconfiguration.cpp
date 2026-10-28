@@ -1,0 +1,177 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * MuseScore-CLA-applies
+ *
+ * MuseScore Studio
+ * Music Composition & Notation
+ *
+ * Copyright (C) 2021 MuseScore Limited and others
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+#include "updateconfiguration.h"
+
+#include "global/configreader.h"
+
+#include "settings.h"
+
+using namespace muse;
+using namespace muse::update;
+
+static const std::string module_name("update");
+
+static const Settings::Key CHECK_FOR_UPDATE_KEY(module_name, "application/checkForUpdate");
+static const Settings::Key ALLOW_UPDATE_ON_PRERELEASE(module_name, "application/allowUpdateOnPreRelease");
+static const Settings::Key SKIPPED_VERSION_KEY(module_name, "application/skippedVersion");
+static const Settings::Key INSTALLING_VERSION_KEY(module_name, "application/installingVersion");
+static const Settings::Key LAST_DOWNLOADED_PACKAGE_KEY(module_name, "application/lastDownloadedPackage");
+static const Settings::Key AUTO_UPDATE_KEY(module_name, "application/autoUpdate");
+
+void UpdateConfiguration::init()
+{
+    m_config = ConfigReader::read(":/configs/update.cfg");
+
+    settings()->setDefaultValue(CHECK_FOR_UPDATE_KEY, Val(isAppUpdatable()));
+    settings()->valueChanged(CHECK_FOR_UPDATE_KEY).onReceive(this, [this](const Val&) {
+        m_needCheckForUpdateChanged.notify();
+    });
+
+    bool allowUpdateOnPreRelease = false;
+#ifdef MUSESCORE_ALLOW_UPDATE_ON_PRERELEASE
+    allowUpdateOnPreRelease = true;
+#else
+    allowUpdateOnPreRelease = false;
+#endif
+    settings()->setDefaultValue(ALLOW_UPDATE_ON_PRERELEASE, Val(allowUpdateOnPreRelease));
+
+    settings()->setDefaultValue(AUTO_UPDATE_KEY, Val(true));
+}
+
+bool UpdateConfiguration::isAppUpdatable() const
+{
+    return true;
+}
+
+bool UpdateConfiguration::allowUpdateOnPreRelease() const
+{
+    return settings()->value(ALLOW_UPDATE_ON_PRERELEASE).toBool();
+}
+
+void UpdateConfiguration::setAllowUpdateOnPreRelease(bool allow)
+{
+    settings()->setSharedValue(ALLOW_UPDATE_ON_PRERELEASE, Val(allow));
+}
+
+bool UpdateConfiguration::needCheckForUpdate() const
+{
+    return settings()->value(CHECK_FOR_UPDATE_KEY).toBool();
+}
+
+void UpdateConfiguration::setNeedCheckForUpdate(bool needCheck)
+{
+    settings()->setSharedValue(CHECK_FOR_UPDATE_KEY, Val(needCheck));
+}
+
+async::Notification UpdateConfiguration::needCheckForUpdateChanged() const
+{
+    return m_needCheckForUpdateChanged;
+}
+
+bool UpdateConfiguration::autoUpdateEnabled() const
+{
+    return settings()->value(AUTO_UPDATE_KEY).toBool();
+}
+
+void UpdateConfiguration::setAutoUpdateEnabled(bool enabled)
+{
+    settings()->setSharedValue(AUTO_UPDATE_KEY, Val(enabled));
+}
+
+std::string UpdateConfiguration::skippedReleaseVersion() const
+{
+    return settings()->value(SKIPPED_VERSION_KEY).toString();
+}
+
+void UpdateConfiguration::setSkippedReleaseVersion(const std::string& version)
+{
+    settings()->setSharedValue(SKIPPED_VERSION_KEY, Val(version));
+}
+
+std::string UpdateConfiguration::installingReleaseVersion() const
+{
+    return settings()->value(INSTALLING_VERSION_KEY).toString();
+}
+
+void UpdateConfiguration::setInstallingReleaseVersion(const std::string& version)
+{
+    settings()->setSharedValue(INSTALLING_VERSION_KEY, Val(version));
+}
+
+muse::io::path_t UpdateConfiguration::lastDownloadedPackagePath() const
+{
+    return settings()->value(LAST_DOWNLOADED_PACKAGE_KEY).toPath();
+}
+
+void UpdateConfiguration::setLastDownloadedPackagePath(const muse::io::path_t& path)
+{
+    settings()->setSharedValue(LAST_DOWNLOADED_PACKAGE_KEY, Val(path));
+}
+
+std::string UpdateConfiguration::checkForAppUpdateUrl() const
+{
+    return !allowUpdateOnPreRelease()
+           ? m_config.value("latest").toString()
+           : m_config.value("latest.test").toString();
+}
+
+std::string UpdateConfiguration::previousAppReleasesNotesUrl() const
+{
+    return !allowUpdateOnPreRelease()
+           ? m_config.value("all").toString()
+           : m_config.value("all.test").toString();
+}
+
+muse::network::RequestHeaders UpdateConfiguration::updateHeaders() const
+{
+    return networkConfiguration()->defaultHeaders();
+}
+
+std::string UpdateConfiguration::appWebSiteUrl() const
+{
+    return m_config.value("app_website_url").toString();
+}
+
+std::string UpdateConfiguration::privacyPolicyUrl() const
+{
+    return m_config.value("privacy_policy_url").toString();
+}
+
+muse::io::path_t UpdateConfiguration::updateDataPath() const
+{
+    return globalConfiguration()->userAppDataPath() + "/update";
+}
+
+muse::io::path_t UpdateConfiguration::downloadsPath() const
+{
+    return globalConfiguration()->downloadsPath();
+}
+
+muse::io::path_t UpdateConfiguration::updateRequestHistoryJsonPath() const
+{
+    return globalConfiguration()->userAppDataPath() + "/update_request_history.json";
+}
+
+muse::io::path_t UpdateConfiguration::helperLogPath() const
+{
+    return globalConfiguration()->userAppDataPath() + "/logs/museupdater.log";
+}

@@ -1,0 +1,465 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * MuseScore-CLA-applies
+ *
+ * MuseScore Studio
+ * Music Composition & Notation
+ *
+ * Copyright (C) 2022 MuseScore Limited and others
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#include "fluidsequencer.h"
+
+#include <set>
+
+#include "global/interpolation.h"
+
+#include "log.h"
+
+using namespace muse;
+using namespace muse::audio;
+using namespace muse::audio::synth;
+using namespace muse::midi;
+using namespace muse::mpe;
+
+static constexpr uint32_t CTRL_ON = 127;
+static constexpr uint32_t CTRL_OFF = 0;
+
+void FluidSequencer::init(const PlaybackSetupData& setupData, const std::optional<midi::Program>& programOverride,
+                          bool useDynamicEvents, const channel_t maxChannels)
+{
+    TRACEFUNC;
+
+    m_channels.init(setupData, programOverride, maxChannels);
+    m_useDynamicEvents = useDynamicEvents;
+}
+
+bool FluidSequencer::usesDynamicEvents() const
+{
+    return m_useDynamicEvents;
+}
+
+std::vector<FluidSequencer::ChannelExpressionLevel> FluidSequencer::currentExpressionLevels() const
+{
+    std::vector<ChannelExpressionLevel> result;
+
+    if (!m_useDynamicEvents) {
+        return result;
+    }
+
+    for (const auto& [layerIdx, curve] : m_playbackData.dynamics) {
+        if (curve.empty()) {
+            continue;
+        }
+
+        auto voiceIt = m_channels.data().find(layerIdx);
+        if (voiceIt == m_channels.data().cend()) {
+            continue;
+        }
+
+        const int level = expressionLevel(mpe::dynamicLevelFromNormalized(mpe::evaluateCurveAt(curve, m_playbackPosition)));
+        for (const auto& [_, mapping] : voiceIt->second) {
+            result.push_back({ mapping.first, level });
+        }
+    }
+
+    return result;
+}
+
+int FluidSequencer::naturalExpressionLevel() const
+{
+    static const int NATURAL_EXP_LVL = expressionLevel(dynamicLevelFromType(DynamicType::Natural));
+    return NATURAL_EXP_LVL;
+}
+
+void FluidSequencer::updateMainStreamEvents(const mpe::PlaybackEventsMap& events, const mpe::DynamicAutomationLayers& dynamics)
+{
+    m_mainStreamEvents.clear();
+
+    if (m_onMainStreamFlushed) {
+        m_onMainStreamFlushed();
+    }
+
+    addPlaybackEvents(m_mainStreamEvents, events, true /*isMainStream*/);
+
+    if (m_useDynamicEvents) {
+        addDynamicEvents(m_mainStreamEvents, dynamics);
+    }
+
+    updateMainSequenceIterator();
+}
+
+void FluidSequencer::updateOffStreamEvents(const mpe::PlaybackEventsMap& events)
+{
+    addPlaybackEvents(m_offStreamEvents, events, false /*isMainStream*/);
+    updateOffSequenceIterator();
+}
+
+muse::async::Channel<channel_t, Program> FluidSequencer::channelAdded() const
+{
+    return m_channels.channelAdded;
+}
+
+const ChannelMap& FluidSequencer::channels() const
+{
+    return m_channels;
+}
+
+int FluidSequencer::lastStaff() const
+{
+    return m_lastStaff;
+}
+
+void FluidSequencer::addPlaybackEvents(EventSequenceMap& destination, const mpe::PlaybackEventsMap& events, const bool isMainStream)
+{
+    SostenutoTimeAndDurations sostenutoTimeAndDurations;
+
+    for (const auto& pair : events) {
+        for (const mpe::PlaybackEvent& event : pair.second) {
+            if (std::holds_alternative<mpe::NoteEvent>(event)) {
+                addNoteEvent(destination, std::get<mpe::NoteEvent>(event), sostenutoTimeAndDurations, isMainStream);
+            } else if (std::holds_alternative<mpe::ControllerChangeEvent>(event)) {
+                addControlChangeEvent(destination, pair.first, std::get<mpe::ControllerChangeEvent>(event));
+            }
+        }
+    }
+
+    addSostenutoEvents(destination, sostenutoTimeAndDurations);
+}
+
+void FluidSequencer::addDynamicEvents(EventSequenceMap& destination, const mpe::DynamicAutomationLayers& layers)
+{
+    constexpr mpe::timestamp_t STEP_INTERVAL_US = 30000;
+
+    for (const auto& [layerIdx, curve] : layers) {
+        auto voiceIt = m_channels.data().find(layerIdx);
+        if (voiceIt == m_channels.data().cend()) {
+            continue;
+        }
+
+        std::set<channel_t> channels;
+        for (const auto& [_, mapping] : voiceIt->second) {
+            channels.insert(mapping.first);
+        }
+
+        std::optional<int> lastLevel;
+
+        mpe::resampleCurve(curve, STEP_INTERVAL_US, [&](mpe::timestamp_t t, muse::real_t normalized) {
+            const int level = expressionLevel(mpe::dynamicLevelFromNormalized(normalized));
+            if (lastLevel == level) {
+                return;
+            }
+            lastLevel = level;
+
+            for (const channel_t channelIdx : channels) {
+                midi::Event event(Event::Opcode::ControlChange, Event::MessageType::ChannelVoice10);
+                event.setChannel(channelIdx);
+                event.setIndex(midi::EXPRESSION_CONTROLLER);
+                event.setData(level);
+                destination[t].emplace_back(event);
+            }
+        });
+    }
+}
+
+void FluidSequencer::addNoteEvent(EventSequenceMap& destination, const mpe::NoteEvent& noteEvent,
+                                  SostenutoTimeAndDurations& sostenutoTimeAndDurations, const bool isMainStream)
+{
+    const ArrangementContext& arrangementCtx = noteEvent.arrangementCtx();
+    const channel_t channelIdx = resolveChannel(noteEvent);
+    const note_idx_t noteIdx = noteIndex(noteEvent.pitchCtx().nominalPitchLevel);
+    const velocity_t velocity = noteVelocity(noteEvent);
+    const tuning_t tuning = noteTuning(noteEvent, noteIdx);
+
+    // Assumption: 1:1 mapping between staff and instrument and FluidSynth and FluidSequencer instances.
+    // So staffLayerIndex is constant. It changes only when moving staffs.
+    m_lastStaff = noteEvent.arrangementCtx().staffLayerIndex;
+
+    if (arrangementCtx.hasStart()) {
+        if (m_useDynamicEvents && !isMainStream) {
+            midi::Event expressionEvent(Event::Opcode::ControlChange, Event::MessageType::ChannelVoice10);
+            expressionEvent.setChannel(channelIdx);
+            expressionEvent.setIndex(midi::EXPRESSION_CONTROLLER);
+            expressionEvent.setData(expressionLevel(noteEvent.expressionCtx().nominalDynamicLevel));
+            destination[arrangementCtx.actualTimestamp].emplace_back(std::move(expressionEvent));
+        }
+
+        midi::Event noteOn(Event::Opcode::NoteOn, Event::MessageType::ChannelVoice20);
+        noteOn.setChannel(channelIdx);
+        noteOn.setNote(noteIdx);
+        noteOn.setVelocity16(velocity);
+        noteOn.setPitchNote(noteIdx, tuning);
+
+        destination[arrangementCtx.actualTimestamp].emplace_back(std::move(noteOn));
+    }
+
+    if (arrangementCtx.hasEnd()) {
+        midi::Event noteOff(Event::Opcode::NoteOff, Event::MessageType::ChannelVoice20);
+        noteOff.setChannel(channelIdx);
+        noteOff.setNote(noteIdx);
+        noteOff.setPitchNote(noteIdx, tuning);
+
+        const timestamp_t timestampTo = arrangementCtx.actualTimestamp + noteEvent.arrangementCtx().actualDuration;
+        destination[timestampTo].emplace_back(std::move(noteOff));
+    }
+
+    for (const auto& artPair : noteEvent.expressionCtx().articulations) {
+        if (artPair.first == ArticulationType::Standard) {
+            continue;
+        }
+
+        const mpe::ArticulationMeta& meta = artPair.second.meta;
+
+        if (!noteEvent.pitchCtx().pitchCurve.empty() && muse::contains(BEND_SUPPORTED_TYPES, meta.type)) {
+            addPitchCurve(destination, noteEvent, meta, channelIdx);
+            continue;
+        }
+
+        if (muse::contains(SUSTAIN_PEDAL_CC_SUPPORTED_TYPES, meta.type)) {
+            addPedalEvent(destination, meta, channelIdx);
+            continue;
+        }
+
+        if (muse::contains(SOSTENUTO_PEDAL_CC_SUPPORTED_TYPES, meta.type)) {
+            const mpe::timestamp_t timestamp = arrangementCtx.actualTimestamp + arrangementCtx.actualDuration * 0.1; // add offset for Sostenuto to take effect
+            sostenutoTimeAndDurations[channelIdx].push_back(TimestampAndDuration { timestamp, meta.overallDuration });
+            continue;
+        }
+    }
+}
+
+void FluidSequencer::addPedalEvent(EventSequenceMap& destination, const mpe::ArticulationMeta& meta,
+                                   const channel_t channelIdx)
+{
+    //! NOTE: Endless pedals are not currently supported by SND instrument
+    //! Otherwise, we will get infinite sustain
+    if (m_useDynamicEvents && meta.hasStart() && !meta.hasEnd()) {
+        return;
+    }
+
+    if (meta.hasStart()) {
+        addControlChange(destination, meta.timestamp, midi::SUSTAIN_PEDAL_CONTROLLER, channelIdx, CTRL_ON);
+    }
+
+    if (meta.hasEnd()) {
+        addControlChange(destination, meta.timestamp + meta.overallDuration,
+                         midi::SUSTAIN_PEDAL_CONTROLLER, channelIdx, CTRL_OFF);
+    }
+}
+
+void FluidSequencer::addControlChangeEvent(EventSequenceMap& destination, const mpe::timestamp_t timestamp,
+                                           const mpe::ControllerChangeEvent& event)
+{
+    const channel_t lastChannelIdx = m_channels.channelCount();
+
+    for (channel_t channelIdx = 0; channelIdx < lastChannelIdx; ++channelIdx) {
+        switch (event.type) {
+        case mpe::ControllerChangeEvent::Modulation:
+            addControlChange(destination, timestamp, midi::MODWHEEL_CONTROLLER, channelIdx,
+                             static_cast<uint32_t>(event.val * 127.f));
+            break;
+        case mpe::ControllerChangeEvent::SustainPedalOnOff:
+            addControlChange(destination, timestamp, midi::SUSTAIN_PEDAL_CONTROLLER, channelIdx,
+                             static_cast<uint32_t>(event.val * 127.f));
+            break;
+        case mpe::ControllerChangeEvent::PitchBend:
+            addPitchBend(destination, timestamp, channelIdx,
+                         static_cast<uint32_t>(event.val * 16383.f));
+            break;
+        case mpe::ControllerChangeEvent::Undefined:
+            break;
+        }
+    }
+}
+
+void FluidSequencer::addControlChange(EventSequenceMap& destination, const mpe::timestamp_t timestamp,
+                                      const int midiControlIdx, const channel_t channelIdx, const uint32_t value)
+{
+    EventSequence& events = destination[timestamp];
+    for (const EventType& e : events) {
+        const midi::Event& midiEvent = std::get<midi::Event>(e);
+        if (midiEvent.opcode() == Event::Opcode::ControlChange
+            && midiEvent.channel() == channelIdx
+            && midiEvent.index() == static_cast<uint8_t>(midiControlIdx)
+            && midiEvent.data() == value) {
+            return;
+        }
+    }
+
+    midi::Event cc(Event::Opcode::ControlChange, Event::MessageType::ChannelVoice10);
+    cc.setIndex(midiControlIdx);
+    cc.setChannel(channelIdx);
+    cc.setData(value);
+
+    events.emplace_back(cc);
+}
+
+void FluidSequencer::addPitchCurve(EventSequenceMap& destination, const mpe::NoteEvent& noteEvent,
+                                   const mpe::ArticulationMeta& artMeta, const channel_t channelIdx)
+{
+    const timestamp_t noteTimestampTo = noteEvent.arrangementCtx().actualTimestamp + noteEvent.arrangementCtx().actualDuration;
+    const timestamp_t pitchBendTimestampTo = std::min(artMeta.timestamp + artMeta.overallDuration, noteTimestampTo);
+
+    addPitchBend(destination, pitchBendTimestampTo, channelIdx, 8192);
+
+    auto currIt = noteEvent.pitchCtx().pitchCurve.cbegin();
+    auto nextIt = std::next(currIt);
+    auto endIt = noteEvent.pitchCtx().pitchCurve.cend();
+
+    int prevBendValue = -1;
+
+    for (; nextIt != endIt; currIt = nextIt, nextIt = std::next(currIt)) {
+        const int currValue = pitchBendLevel(currIt->second);
+        const int nextValue = pitchBendLevel(nextIt->second);
+
+        const timestamp_t currTime = artMeta.timestamp + artMeta.overallDuration * percentageToFactor(currIt->first);
+        const timestamp_t nextTime = artMeta.timestamp + artMeta.overallDuration * percentageToFactor(nextIt->first);
+
+        using namespace muse::interpolation;
+        const Point currPoint { static_cast<double>(currTime), static_cast<double>(currValue) };
+        const Point nextPoint { static_cast<double>(nextTime), static_cast<double>(nextValue) };
+
+        //! NOTE: Increasing this number results in fewer points being interpolated
+        constexpr mpe::pitch_level_t POINT_WEIGHT = mpe::PITCH_LEVEL_STEP / 25;
+        size_t pointCount = std::abs(nextIt->second - currIt->second) / POINT_WEIGHT;
+        pointCount = std::max(pointCount, size_t(1));
+
+        const std::vector<Point> points = lerp(currPoint, nextPoint, pointCount);
+
+        for (const Point& point : points) {
+            const timestamp_t time = static_cast<timestamp_t>(std::round(point.x));
+            const int bendValue = static_cast<int>(std::round(point.y));
+
+            if (time < pitchBendTimestampTo && bendValue != prevBendValue) {
+                addPitchBend(destination, time, channelIdx, bendValue);
+            }
+
+            prevBendValue = bendValue;
+        }
+    }
+}
+
+void FluidSequencer::addPitchBend(EventSequenceMap& destination, const mpe::timestamp_t timestamp,
+                                  const midi::channel_t channelIdx, const uint32_t value)
+{
+    midi::Event event(Event::Opcode::PitchBend, Event::MessageType::ChannelVoice10);
+    event.setChannel(channelIdx);
+    event.setData(value);
+    destination[timestamp].push_back(event);
+}
+
+void FluidSequencer::addSostenutoEvents(EventSequenceMap& destination, const SostenutoTimeAndDurations& sostenutoTimeAndDurations)
+{
+    for (const auto& channelPair : sostenutoTimeAndDurations) {
+        for (size_t i = 0; i < channelPair.second.size(); ++i) {
+            const TimestampAndDuration& currentTnD = channelPair.second.at(i);
+            const timestamp_t timestampTo = currentTnD.timestamp + currentTnD.duration;
+
+            addControlChange(destination, currentTnD.timestamp, midi::SOSTENUTO_PEDAL_CONTROLLER, channelPair.first, CTRL_ON);
+
+            if (i == channelPair.second.size() - 1) {
+                addControlChange(destination, timestampTo, midi::SOSTENUTO_PEDAL_CONTROLLER, channelPair.first, CTRL_OFF);
+                continue;
+            }
+
+            const TimestampAndDuration& nextTnD = channelPair.second.at(i + 1);
+            if (timestampTo <= nextTnD.timestamp) { // handle potential overlap
+                addControlChange(destination, timestampTo, midi::SOSTENUTO_PEDAL_CONTROLLER, channelPair.first, CTRL_OFF);
+            }
+        }
+    }
+}
+
+channel_t FluidSequencer::resolveChannel(const mpe::NoteEvent& noteEvent) const
+{
+    return m_channels.resolveChannelForEvent(noteEvent);
+}
+
+note_idx_t FluidSequencer::noteIndex(const mpe::pitch_level_t pitchLevel) const
+{
+    float stepCount = mpe::ZERO_PITCH_LEVEL_MIDI_EQUIVALENT + pitchLevel / static_cast<float>(mpe::PITCH_LEVEL_STEP);
+
+    return std::clamp(stepCount, 0.f, 127.f);
+}
+
+tuning_t FluidSequencer::noteTuning(const mpe::NoteEvent& noteEvent, const int noteIdx) const
+{
+    int semitonesCount = noteIdx - mpe::ZERO_PITCH_LEVEL_MIDI_EQUIVALENT;
+
+    mpe::pitch_level_t tuningPitchLevel = noteEvent.pitchCtx().nominalPitchLevel - semitonesCount * mpe::PITCH_LEVEL_STEP;
+
+    return tuningPitchLevel / static_cast<float>(mpe::PITCH_LEVEL_STEP);
+}
+
+velocity_t FluidSequencer::noteVelocity(const mpe::NoteEvent& noteEvent) const
+{
+    static constexpr midi::velocity_t MAX_SUPPORTED_VELOCITY = std::numeric_limits<midi::velocity_t>::max();
+
+    const mpe::ExpressionContext& expressionCtx = noteEvent.expressionCtx();
+
+    if (expressionCtx.velocityOverride.has_value()) {
+        velocity_t velocity = RealRound(expressionCtx.velocityOverride.value() * MAX_SUPPORTED_VELOCITY, 0);
+        return std::clamp<velocity_t>(velocity, 0, MAX_SUPPORTED_VELOCITY);
+    }
+
+    if (m_useDynamicEvents) {
+        float fraction = expressionCtx.expressionCurve.empty() ? 0.5f : expressionCtx.expressionCurve.velocityFraction();
+        velocity_t result = RealRound(fraction * MAX_SUPPORTED_VELOCITY, 0);
+        return std::clamp<velocity_t>(result, 0, MAX_SUPPORTED_VELOCITY);
+    }
+
+    dynamic_level_t dynamicLevel = expressionCtx.expressionCurve.empty()
+                                   ? expressionCtx.nominalDynamicLevel : expressionCtx.expressionCurve.maxAmplitudeLevel();
+    return expressionLevel(dynamicLevel) << 9; // midi::Event::scaleUp(7,16)
+}
+
+int FluidSequencer::expressionLevel(const mpe::dynamic_level_t dynamicLevel) const
+{
+    static constexpr mpe::dynamic_level_t MIN_SUPPORTED_DYNAMICS_LEVEL = mpe::dynamicLevelFromType(DynamicType::ppp);
+    static constexpr mpe::dynamic_level_t MAX_SUPPORTED_DYNAMICS_LEVEL = mpe::dynamicLevelFromType(DynamicType::fff);
+    static constexpr int MIN_SUPPORTED_VOLUME = 16; // MIDI equivalent for PPP
+    static constexpr int MAX_SUPPORTED_VOLUME = 127; // MIDI equivalent for FFF
+    static constexpr int VOLUME_STEP = 16;
+
+    if (dynamicLevel <= MIN_SUPPORTED_DYNAMICS_LEVEL) {
+        return MIN_SUPPORTED_VOLUME;
+    }
+
+    if (dynamicLevel >= MAX_SUPPORTED_DYNAMICS_LEVEL) {
+        return MAX_SUPPORTED_VOLUME;
+    }
+
+    float stepCount = ((dynamicLevel - MIN_SUPPORTED_DYNAMICS_LEVEL)
+                       / static_cast<float>(mpe::DYNAMIC_LEVEL_STEP));
+
+    if (dynamicLevel == mpe::dynamicLevelFromType(DynamicType::Natural)) {
+        stepCount -= 0.5;
+    }
+
+    dynamic_level_t result = RealRound(MIN_SUPPORTED_VOLUME + (stepCount * VOLUME_STEP), 0);
+
+    return std::clamp((int)result, MIN_SUPPORTED_VOLUME, MAX_SUPPORTED_VOLUME);
+}
+
+int FluidSequencer::pitchBendLevel(const mpe::pitch_level_t pitchLevel) const
+{
+    static constexpr int PITCH_BEND_SEMITONE_STEP = 4096 / 12;
+
+    float pitchLevelSteps = pitchLevel / static_cast<float>(mpe::PITCH_LEVEL_STEP);
+
+    int offset = pitchLevelSteps * PITCH_BEND_SEMITONE_STEP;
+
+    return std::clamp(8192 + offset, 0, 16383);
+}

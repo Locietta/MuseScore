@@ -1,0 +1,196 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-only
+# MuseScore-Studio-CLA-applies
+#
+# MuseScore Studio
+# Music Composition & Notation
+#
+# Copyright (C) 2021 MuseScore Limited and others
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+echo "Setup Linux build environment"
+trap 'echo Setup failed; exit 1' ERR
+
+df -h .
+
+BUILD_TOOLS=$HOME/build_tools
+ENV_FILE=$BUILD_TOOLS/environment.sh
+PACKARCH="x86_64" # x86_64, aarch64, wasm
+COMPILER="gcc" # gcc, clang
+EMSDK_VERSION="4.0.7" # for Qt 6.10
+BUILD_PIPEWIRE=false
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --arch) PACKARCH="$2"; shift ;;
+        --compiler) COMPILER="$2"; shift ;;
+        --build-pipewire) BUILD_PIPEWIRE=true ;;
+        *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    esac
+    shift
+done
+
+mkdir -p $BUILD_TOOLS
+
+# Let's remove the file with environment variables to recreate it
+rm -f $ENV_FILE
+
+echo "echo 'Setup build environment'" >> $ENV_FILE
+
+if false; then # Use this when running in a Docker container
+  SUDO=""
+  export DEBIAN_FRONTEND="noninteractive" TZ="Europe/London"
+else
+  SUDO="sudo"
+fi
+
+##########################################################################
+# GET DEPENDENCIES
+##########################################################################
+
+apt_packages_tools=(
+  # Alphabetical order please!
+  curl
+  desktop-file-utils # installs `desktop-file-validate` for appimagetool
+  lcov
+  libgpgme-dev # install for appimagetool
+  p7zip-full
+  unzip
+  wget
+  zsync # installs `zsyncmake` for appimagetool
+  )
+
+# Qt dependencies are already installed by the "Install Qt" step
+apt_packages_deps=(
+  libasound2-dev
+  libcups2-dev
+  libsndfile1-dev
+  libvulkan-dev
+)
+
+apt_packages_ffmpeg=(
+  ffmpeg
+  libavcodec-dev
+  libavformat-dev
+  libswscale-dev
+  )
+
+if $BUILD_PIPEWIRE ; then
+  apt_packages_deps+=(
+    libdbus-1-dev
+    libudev-dev
+    )
+fi
+
+$SUDO apt-get install -y --no-install-recommends \
+  "${apt_packages_tools[@]}" \
+  "${apt_packages_deps[@]}" \
+  "${apt_packages_ffmpeg[@]}"
+
+##########################################################################
+# GET TOOLS
+##########################################################################
+
+# COMPILER
+if [ "$COMPILER" == "gcc" ]; then
+
+  gcc_version="14"
+  $SUDO apt install -y --no-install-recommends "g++-${gcc_version}"
+
+  for alt in gcc g++ gcov; do
+    if update-alternatives --query "$alt" >/dev/null 2>&1; then
+      $SUDO update-alternatives --remove-all "$alt"
+    fi
+    $SUDO update-alternatives --install "/usr/bin/$alt" "$alt" "/usr/bin/${alt}-${gcc_version}" 100
+  done
+  echo export CC="/usr/bin/gcc" >> "${ENV_FILE}"
+  echo export CXX="/usr/bin/g++" >> "${ENV_FILE}"
+
+  gcc --version
+  g++ --version
+
+elif [ "$COMPILER" == "clang" ]; then
+
+  clang_version="20"
+  $SUDO apt install -y --no-install-recommends "clang-${clang_version}"
+  $SUDO apt install -y --no-install-recommends "clang-tools-${clang_version}"
+
+  for alt in clang clang++ clang-scan-deps; do
+    if update-alternatives --query "$alt" >/dev/null 2>&1; then
+      $SUDO update-alternatives --remove-all "$alt"
+    fi
+    $SUDO update-alternatives --install "/usr/bin/$alt" "$alt" "/usr/bin/${alt}-${clang_version}" 100
+  done
+
+  echo export CC="/usr/bin/clang" >> "${ENV_FILE}"
+  echo export CXX="/usr/bin/clang++" >> "${ENV_FILE}"
+
+  clang --version
+  clang++ --version
+
+else
+  echo "Unknown compiler: $COMPILER"
+fi
+
+# CMake
+if ! command -v cmake &>/dev/null; then
+  $SUDO apt-get install -y --no-install-recommends cmake
+fi
+echo "cmake version"
+cmake --version
+
+# Ninja
+if ! command -v ninja &>/dev/null; then
+  $SUDO apt-get install -y --no-install-recommends ninja-build
+fi
+echo "ninja version"
+ninja --version
+
+# Qt
+# QT_ROOT_DIR - set by the Qt installation action (jurplel/install-qt-action@v4)
+# QT_DIR - used by the build environment
+echo export QT_DIR="${QT_ROOT_DIR}" >> ${ENV_FILE}
+
+# Emscripten
+if [[ "$PACKARCH" == "wasm" ]]; then
+  git clone https://github.com/emscripten-core/emsdk.git $BUILD_TOOLS/emsdk
+  origin_dir=$(pwd)
+  cd $BUILD_TOOLS/emsdk
+  git pull
+  ./emsdk install $EMSDK_VERSION
+  ./emsdk activate $EMSDK_VERSION
+  echo "source $BUILD_TOOLS/emsdk/emsdk_env.sh" >> ${ENV_FILE}
+  cd $origin_dir
+fi
+
+##########################################################################
+# Old ssl for crashpad
+##########################################################################
+if [[ "$PACKARCH" == "x86_64" ]]; then
+  origin_dir=$(pwd)
+  mkdir -p $BUILD_TOOLS/ssl1
+  cd $BUILD_TOOLS/ssl1
+  wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.24_amd64.deb
+  sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2.24_amd64.deb
+  cd $origin_dir
+fi
+
+##########################################################################
+# POST INSTALL
+##########################################################################
+
+chmod +x "$ENV_FILE"
+
+df -h .
+echo "Setup script done"

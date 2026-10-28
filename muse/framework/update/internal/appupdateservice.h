@@ -1,0 +1,116 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-only
+ * MuseScore-CLA-applies
+ *
+ * MuseScore Studio
+ * Music Composition & Notation
+ *
+ * Copyright (C) 2025 MuseScore Limited and others
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#pragma once
+
+#include "update/iappupdateservice.h"
+#include "global/modularity/ioc.h"
+#include "global/async/asyncable.h"
+
+#include "global/io/ifilesystem.h"
+#include "global/iapplication.h"
+#include "global/isysteminfo.h"
+
+#include "network/inetworkmanagercreator.h"
+#include "ui/iuiconfiguration.h"
+#include "update/iupdateconfiguration.h"
+#include "update/iupdaterequestparamsprovider.h"
+#include "update/iupdateinstaller.h"
+
+namespace muse::update {
+class AppUpdateService : public IAppUpdateService, public Contextable, public async::Asyncable
+{
+    GlobalInject<io::IFileSystem> fileSystem;
+    GlobalInject<ISystemInfo> systemInfo;
+    GlobalInject<IUpdateConfiguration> configuration;
+    GlobalInject<IUpdateRequestParamsProvider> requestParamsProvider;
+    GlobalInject<network::INetworkManagerCreator> networkManagerCreator;
+    GlobalInject<IApplication> application;
+    GlobalInject<IUpdateInstaller> updateInstaller;
+    GlobalInject<muse::ui::IUiConfiguration> uiConfiguration;
+
+public:
+    AppUpdateService(const modularity::ContextPtr& iocCtx)
+        : Contextable(iocCtx) {}
+
+    void init();
+
+    async::Promise<RetVal<ReleaseInfo> > checkForUpdate() override;
+    const RetVal<ReleaseInfo>& lastCheckResult() const override;
+    RetVal<Progress> downloadRelease() override;
+
+    bool canAutoInstall() const override;
+    Ret installUpdate() override;
+
+    bool isReleaseReadyToInstall() const override;
+    muse::io::path_t downloadedReleasePath() const override;
+    void removeDownloadedRelease() override;
+
+private:
+    friend class AppUpdateServiceTests;
+
+    struct UpdateRequestHistory {
+        QDate installedWeekBeginning;
+        QDate previousRequestDay;
+        bool isValid() const { return installedWeekBeginning.isValid() && previousRequestDay.isValid(); }
+    };
+
+    network::RequestHeaders prepareHeaders(const UpdateRequestHistory& history) const;
+    RetVal<UpdateRequestHistory> readUpdateRequestHistory(const io::path_t& path) const;
+    Ret writeUpdateRequestHistory(const io::path_t& path, const UpdateRequestHistory& updateRequestHistory);
+
+    RetVal<ReleaseInfo> parseRelease(const QByteArray& json) const;
+
+    enum class DiskSpaceFor {
+        Download,   //!< package (minus already downloaded bytes) + unpack room if auto-install
+        Unpack      //!< staging of an already downloaded package
+    };
+    Ret checkDiskSpace(DiskSpaceFor purpose, uint64_t packageSize, uint64_t downloadedBytes = 0) const;
+
+    void prepareUpdate(const muse::io::path_t& packagePath);
+    muse::io::path_t preparedUpdatePath() const;
+    void resetPreparedUpdate();
+
+    InstallProgressUi makeInstallProgressUi() const;
+
+    //! Ordered list of acceptable asset suffixes for this platform, most
+    //! preferred first.
+    std::vector<std::string> platformFileSuffixes() const;
+    QJsonObject resolveReleaseAsset(const QJsonObject& release) const;
+
+    void cleanupStalePackages(const std::string& keepFileName);
+    muse::io::path_t packagesDir() const;
+
+    using PrevReleaseNotesCallback = std::function<void (const PrevReleasesNotesList&)>;
+    void downloadPreviousReleasesNotes(const Version& updateVersion, const PrevReleaseNotesCallback& finished);
+
+    void clear();
+
+    RetVal<ReleaseInfo> m_lastCheckResult;
+    network::INetworkManagerPtr m_networkManager;
+    Progress m_updateProgress;
+
+    bool m_downloadInProgress = false;
+    muse::io::path_t m_preparedPackagePath;
+    muse::io::path_t m_preparedPath;
+};
+}
