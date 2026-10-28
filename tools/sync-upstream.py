@@ -16,14 +16,20 @@ Subcommands:
 
 Threat model: this tool runs only in a dedicated fork clone, operated by the
 orchestrator. It is not defended against a concurrent editor of the same clone. What
-it does guarantee: `absorb` and `sync` refuse to start unless the worktree is
-completely clean (`git status --porcelain --untracked-files=all` is empty), no ignored
-file sits under a path the run removes, and the gitlink directories it replaces
-(`muse`, `muse_deps`) are empty - `git status` does not look inside a gitlink, so a
-stray file there would otherwise be deleted without notice. It never uses
+it does guarantee: `absorb` and `sync` refuse to start unless
+`git status --porcelain --ignored=matching --untracked-files=all` is empty - staged,
+unstaged, untracked *and ignored* files all count, because a merge overwrites an
+untracked or ignored file at the same path without a word. They also refuse a gitlink
+directory that already holds files (`git status` does not look inside a gitlink, so a
+stray file in `muse/` or `muse_deps/` would be deleted without notice). It never uses
 `git checkout -f`, and `continue`/`abort` refuse to mutate anything when the worktree
 holds changes the sync did not leave behind (a stopped conflict's own paths are the
 only exception).
+
+Abort semantics: `abort` discards *everything* the sync and the human did since the
+sync started - the temporary branch, the in-progress merge and any resolution work the
+human already staged or committed - and restores the branch the sync started from. It
+says so in its output. `continue` is the command that keeps a resolution.
 
 A sync runs on a temporary branch `sync/<sha>` and fast-forwards the branch only after
 both merges and the tree checks pass, so the branch only ever moves forward (by that
@@ -38,8 +44,11 @@ os.replace) *before* the mutation of the next stage and records what the sync ex
   stage            the last stage that finished
   merging          the commit the next `git merge` will merge (persisted before the
                    command runs, so `abort` can tell our merge from someone else's)
-  mergeOutcome     null (command not run or crashed) / ready / conflicts / failed
-  removals         planned trimmed-path removals (index entries and report entries)
+  mergeOutcome     null (command not run or crashed) / ready / conflicts / failed;
+                   saved together with the worktree snapshot and unmerged paths the
+                   merge left behind, so a crash right after it is recognised
+  removals         planned trimmed-path removals (index entries and report entries);
+                   `abort` deletes the planned paths the restored branch does not track
   conflicts        paths left unmerged for a human by the current stop
   status           the worktree state the tool leaves behind at that stop
   preResolutionTree  index snapshot taken before the first human resolution
@@ -47,11 +56,17 @@ os.replace) *before* the mutation of the next stage and records what the sync ex
 
 Every stage is idempotent and verifies branch and commit identity before it acts.
 `continue` resumes at any boundary, including "state saved, temporary branch not yet
-created" and "fast-forward done, state not yet updated". `abort` follows one rule:
-when the branch still points at the recorded start it undoes our own merge (only if
-`MERGE_HEAD` is the commit `merging` recorded) and returns; when the branch already
-points at the recorded final head it just cleans up; anything else is refused with the
-exact commands to repair the repository by hand.
+created", "merge command finished, outcome just saved" and "fast-forward done, state
+not yet updated". `abort` follows one rule: when the branch still points at the recorded
+start it undoes our own merge (only if `MERGE_HEAD` is the commit `merging` recorded),
+returns, and deletes the untracked leftovers of the removal plan; when the branch
+already points at the recorded final head it just cleans up; anything else is refused
+with the exact commands to repair the repository by hand.
+
+The test hook `SYNC_UPSTREAM_TEST_STOP_AFTER` accepts the stage names above plus
+`upstream-merge-outcome` and `framework-merge-outcome` (right after each merge outcome
+is persisted); `SYNC_UPSTREAM_TEST_STOP_AFTER_RM=<n>` stops between the index and
+worktree half of the n-th planned removal.
 
 Merge commits are made by the tool, with a provenance trailer: `Sync-Upstream: <target>`
 on the upstream merge and `Framework-Commit: <framework>` on the framework merge. A
@@ -238,9 +253,14 @@ def unmerged_entries(repo: Repo) -> dict[str, dict[int, tuple[str, str]]]:
     return entries
 
 
-def status_entries(repo: Repo) -> list[tuple[str, str]]:
-    """(code, path) for staged, unstaged and untracked changes, NUL-delimited."""
-    raw = split_z(repo.git("status", "--porcelain", "-z", "--untracked-files=all"))
+def status_entries(repo: Repo, include_ignored: bool = False) -> list[tuple[str, str]]:
+    """(code, path) for staged, unstaged, untracked (and ignored) changes.
+
+    `include_ignored` adds `--ignored=matching`, so a dedicated clone can also refuse
+    ignored files, which a merge would overwrite without notice.
+    """
+    extra = ["--ignored=matching"] if include_ignored else []
+    raw = split_z(repo.git("status", "--porcelain", "-z", "--untracked-files=all", *extra))
     entries = []
     renamed = False
     for record in raw:
@@ -344,21 +364,11 @@ def leftover_hint(repo: Repo) -> str:
 
 # --- preconditions --------------------------------------------------------------
 
-def ignored_under_removed_paths(repo: Repo, trim: list[str]) -> list[str]:
-    """Ignored files that sit where a run deletes whole trees or trimmed paths."""
-    found = []
-    for path in split_z(repo.git("ls-files", "-z", "--others", "--ignored",
-                                 "--exclude-standard")):
-        if path.startswith(FRAMEWORK_PATH + "/") or trimmed(path, trim):
-            found.append(path)
-    return found
-
-
 def filled_gitlink_dirs(repo: Repo) -> list[str]:
     """Gitlink directories that already hold files, which a run would delete.
 
     `git status` does not descend into a gitlink, so a file inside `muse/` or
-    `muse_deps/` (the directories a run removes) is invisible to it.
+    `muse_deps/` (the directories a run removes) is invisible even with `--ignored`.
     """
     found = []
     for mode, path in index_entries(repo):
@@ -370,27 +380,30 @@ def filled_gitlink_dirs(repo: Repo) -> list[str]:
     return found
 
 
-def require_clean(repo: Repo, trim: list[str]) -> None:
-    """Refuse to start unless nothing in the clone can be lost (item A)."""
-    dirty = status_entries(repo)
+def require_clean(repo: Repo) -> None:
+    """Refuse to start unless nothing in the clone can be lost.
+
+    The clone is dedicated to this tool and never builds, so *any* staged, unstaged,
+    untracked or ignored file is refused: a merge overwrites untracked and ignored files
+    at the same path without a word. `git status` does not look inside a gitlink either,
+    hence the explicit check for non-empty `muse`/`muse_deps` directories.
+    """
+    dirty = status_entries(repo, include_ignored=True)
     if dirty:
         shown = ", ".join(f"{code} {path}" for code, path in dirty[:6])
         more = f", ... ({len(dirty)} paths)" if len(dirty) > 6 else ""
-        raise SyncError(f"the worktree is not clean: {shown}{more}. Commit or discard those "
-                        f"changes first; this tool only runs in a dedicated clone and never "
-                        f"overwrites work it did not make")
+        ignored = any(code == "!!" for code, _path in dirty)
+        hint = (" (ignored files count too: a merge overwrites them without notice)"
+                if ignored else "")
+        raise SyncError(f"the worktree is not clean: {shown}{more}{hint}. Commit, discard or "
+                        f"move those files first; this tool only runs in a dedicated clone "
+                        f"and never overwrites work it did not make")
     filled = filled_gitlink_dirs(repo)
     if filled:
         raise SyncError(f"the gitlink director{'ies' if len(filled) > 1 else 'y'} "
                         f"{', '.join(f'{p}/' for p in filled)} already holds files; this run "
                         f"would delete them (a dedicated clone keeps its submodules "
                         f"unchecked-out). Move them away first")
-    ignored = ignored_under_removed_paths(repo, trim)
-    if ignored:
-        shown = ", ".join(ignored[:6])
-        more = f", ... ({len(ignored)} paths)" if len(ignored) > 6 else ""
-        raise SyncError(f"ignored files exist under paths this run removes: {shown}{more}. "
-                        f"Move or delete them first")
 
 
 def require_only_expected_changes(repo: Repo, state: dict, action: str) -> None:
@@ -431,6 +444,24 @@ def abort_by_hand(repo: Repo, state: dict) -> str:
 
 # --- abort ----------------------------------------------------------------------
 
+def drop_planned_removals(repo: Repo, state: dict) -> list[str]:
+    """Finish the recorded removal plan in the worktree; returns what is still dirty.
+
+    `abort` restores the branch, but the sync may have removed part of a trimmed path
+    from the index only - which leaves it as an untracked file that the branch does not
+    have. Deleting every planned path that the restored branch does not track makes the
+    worktree clean again. A planned path that *is* tracked is never touched.
+    """
+    plan = [entry["path"] for entry in state.get("removals") or []]
+    if not plan:
+        return []
+    tracked = {path for _mode, path in index_entries(repo)}
+    for path in plan:
+        if path not in tracked:
+            remove_worktree_path(repo, path)
+    return [f"{code} {path}" for code, path in status_entries(repo, include_ignored=True)]
+
+
 def abort_sync(repo: Repo, state: dict) -> None:
     """Drop the recorded sync. One rule: the branch must be at the start or at the head."""
     branch, temp, start = state["branch"], state["temp"], state["start"]
@@ -447,6 +478,10 @@ def abort_sync(repo: Repo, state: dict) -> None:
         if repo.branch_exists(temp) and repo.rev(f"refs/heads/{temp}") != head:
             raise SyncError(f"{temp} is not at the recorded head {head[:12]}"
                             + abort_by_hand(repo, state))
+        leftover = drop_planned_removals(repo, state)
+        if leftover:
+            raise SyncError(f"the sync left the worktree dirty: {', '.join(leftover[:6])}. "
+                            f"The state is kept; clean that up and run `abort` again")
         if repo.branch_exists(temp):
             repo.git("branch", "-q", "-D", temp)
         state_path(repo).unlink(missing_ok=True)
@@ -472,6 +507,11 @@ def abort_sync(repo: Repo, state: dict) -> None:
             raise SyncError(f"HEAD is on {current}, which is neither {branch} nor {temp}"
                             + abort_by_hand(repo, state))
         repo.git("checkout", "-q", branch)  # never forced
+    leftover = drop_planned_removals(repo, state)
+    if leftover:
+        raise SyncError(f"the sync removed part of a trimmed path and the worktree is still "
+                        f"dirty afterwards: {', '.join(leftover[:6])}. The state is kept; "
+                        f"clean that up and run `abort` again")
     if repo.branch_exists(temp):
         repo.git("branch", "-q", "-D", temp)
     state_path(repo).unlink(missing_ok=True)
@@ -879,8 +919,14 @@ def stage_upstream_merge(repo: Repo, state: dict) -> bool:
         result = repo.run("merge", "-q", "--no-commit", "--no-ff", "-s", "ort", "-Xno-renames",
                           target)
         outcome = merge_outcome(repo, result)
+        # The outcome, the worktree it left behind and its unmerged paths are written in
+        # one save: a crash right after it must not look like foreign changes.
         state["mergeOutcome"] = outcome
+        state["status"] = [[code, path] for code, path in status_entries(repo)]
+        state["conflicts"] = sorted(set(state.get("conflicts") or [])
+                                    | set(unmerged_entries(repo)))
         save_state(repo, state)
+        stop_for_test("upstream-merge-outcome")
         if outcome == "failed":
             raise SyncError(merge_failure(result))
         if repo.merge_head() != target:
@@ -1007,17 +1053,18 @@ def stage_framework_merge(repo: Repo, state: dict) -> bool:
         result = repo.run("merge", "-q", "--no-ff", "-s", "ort", f"-Xsubtree={FRAMEWORK_PATH}",
                           "-m", framework_merge_message(state), framework)
         outcome = merge_outcome(repo, result)
+        # As for the upstream merge: outcome, worktree state and unmerged paths in one save.
         state["mergeOutcome"] = outcome
+        state["status"] = [[code, path] for code, path in status_entries(repo)]
+        state["conflicts"] = sorted(set(state.get("conflicts") or [])
+                                    | set(unmerged_entries(repo)))
+        if outcome == "conflicts" and not state.get("preResolutionTree"):
+            state["preResolutionTree"] = capture_index_tree(repo, unmerged_entries(repo))
         save_state(repo, state)
+        stop_for_test("framework-merge-outcome")
         if outcome == "failed":
             raise SyncError(merge_failure(result))
         if outcome == "conflicts":
-            state["conflicts"] = sorted(set(state.get("conflicts") or [])
-                                        | set(unmerged_entries(repo)))
-            state["status"] = [[code, path] for code, path in status_entries(repo)]
-            if not state.get("preResolutionTree"):
-                state["preResolutionTree"] = capture_index_tree(repo, unmerged_entries(repo))
-            save_state(repo, state)
             print(f"framework conflicts in {FRAMEWORK_PATH}/ (resolve, `git add`, then "
                   f"`continue`; the tool makes the merge commit):")
             for path in sorted(unmerged_entries(repo)):
@@ -1198,7 +1245,7 @@ def summary(state: dict) -> str:
 
 def cmd_absorb(repo: Repo, args) -> int:
     trim = load_trim(repo)
-    require_clean(repo, trim)
+    require_clean(repo)
     if repo.merging():
         raise SyncError("a merge is in progress; finish or abort it first")
     framework = args.framework or repo.gitlink("HEAD", FRAMEWORK_PATH)
@@ -1242,7 +1289,7 @@ def cmd_sync(repo: Repo, args) -> int:
     if branch.startswith("sync/"):
         raise SyncError(f"HEAD is on the temporary branch {branch}, which has no sync state; "
                         f"check out your branch and delete it, then run `sync` again")
-    require_clean(repo, load_trim(repo))
+    require_clean(repo)
     start = repo.rev("HEAD")
     target = repo.rev(args.target or args.upstream_ref)
     if not repo.ok("merge-base", "--is-ancestor", target, args.upstream_ref):
@@ -1295,7 +1342,7 @@ def cmd_abort(repo: Repo, args) -> int:
     if not state:
         raise SyncError("no sync in progress" + leftover_hint(repo))
     abort_sync(repo, state)
-    print("sync aborted")
+    print("sync aborted (discarded the in-progress merge, including any resolution work)")
     return 0
 
 
