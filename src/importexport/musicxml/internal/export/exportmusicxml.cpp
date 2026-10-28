@@ -6006,7 +6006,7 @@ void ExportMusicXml::dynamic(Dynamic const* const dyn, staff_idx_t staff)
     if (muse::contains(validMusicXmlDynamics, dynTypeName) && !hasCustomText) {
         m_xml.tagRaw(dynTypeName);
     } else if (!dynTypeName.empty()) {
-        static const std::map<ushort, Char> map = {
+        static const std::map<unsigned short, Char> map = {
             { 0xE520, u'p' },
             { 0xE521, u'm' },
             { 0xE522, u'f' },
