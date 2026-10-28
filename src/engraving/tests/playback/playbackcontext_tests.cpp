@@ -38,7 +38,7 @@ using namespace mu::engraving;
 using namespace muse::mpe;
 using namespace muse;
 
-static const muse::String PLAYBACK_CONTEXT_TEST_FILES_DIR("playback/playbackcontext_data/");
+static const muse::String PLAYBACK_CONTEXT_TEST_FILES_DIR(u"playback/playbackcontext_data/");
 
 static constexpr int HAIRPIN_STEPS = 24;
 static constexpr int COMPOUND_DYNAMIC_STEPS = 6;
@@ -54,7 +54,7 @@ class Engraving_PlaybackContextTests : public ::testing::Test
 TEST_F(Engraving_PlaybackContextTests, Hairpins_Repeats)
 {
     // [GIVEN] Score with hairpins and repeats
-    Score* score = ScoreRW::readScore(PLAYBACK_CONTEXT_TEST_FILES_DIR + "dynamics/hairpins_and_repeats.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_CONTEXT_TEST_FILES_DIR + u"dynamics/hairpins_and_repeats.mscx");
 
     const std::vector<Part*>& parts = score->parts();
     ASSERT_FALSE(parts.empty());
@@ -139,7 +139,7 @@ TEST_F(Engraving_PlaybackContextTests, Dynamics_MeasureRepeats)
 {
     // [GIVEN] Score with 5 measures and 2 instruments. There is a measure repeat on the last 2 measures of the 1st instrument
     // (so the previous 2 measures will be repeated)
-    Score* score = ScoreRW::readScore(PLAYBACK_CONTEXT_TEST_FILES_DIR + "dynamics/dynamics_and_measure_repeats.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_CONTEXT_TEST_FILES_DIR + u"dynamics/dynamics_and_measure_repeats.mscx");
 
     const std::vector<Part*>& parts = score->parts();
     ASSERT_EQ(parts.size(), 2);
@@ -208,7 +208,7 @@ TEST_F(Engraving_PlaybackContextTests, Dynamics_MeasureRepeats)
 TEST_F(Engraving_PlaybackContextTests, Dynamics_OnDifferentVoices)
 {
     // [GIVEN]
-    Score* score = ScoreRW::readScore(PLAYBACK_CONTEXT_TEST_FILES_DIR + "dynamics/dynamics_on_voices.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_CONTEXT_TEST_FILES_DIR + u"dynamics/dynamics_on_voices.mscx");
 
     const std::vector<Part*>& parts = score->parts();
     ASSERT_FALSE(parts.empty());
@@ -272,7 +272,7 @@ TEST_F(Engraving_PlaybackContextTests, Dynamics_OnDifferentVoices)
 TEST_F(Engraving_PlaybackContextTests, Dynamics_Overlap)
 {
     // [GIVEN]
-    Score* score = ScoreRW::readScore(PLAYBACK_CONTEXT_TEST_FILES_DIR + "dynamics/dynamics_overlap.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_CONTEXT_TEST_FILES_DIR + u"dynamics/dynamics_overlap.mscx");
 
     const std::vector<Part*>& parts = score->parts();
     ASSERT_FALSE(parts.empty());
@@ -314,7 +314,7 @@ TEST_F(Engraving_PlaybackContextTests, Dynamics_Overlap)
 TEST_F(Engraving_PlaybackContextTests, Dynamics_Niente)
 {
     // [GIVEN]
-    Score* score = ScoreRW::readScore(PLAYBACK_CONTEXT_TEST_FILES_DIR + "dynamics/dynamics_niente.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_CONTEXT_TEST_FILES_DIR + u"dynamics/dynamics_niente.mscx");
 
     const std::vector<Part*>& parts = score->parts();
     ASSERT_FALSE(parts.empty());
@@ -372,7 +372,7 @@ TEST_F(Engraving_PlaybackContextTests, Dynamics_Niente)
 TEST_F(Engraving_PlaybackContextTests, Dynamics_HairpinWithCompound)
 {
     // [GIVEN]
-    Score* score = ScoreRW::readScore(PLAYBACK_CONTEXT_TEST_FILES_DIR + "dynamics/dynamics_compound.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_CONTEXT_TEST_FILES_DIR + u"dynamics/dynamics_compound.mscx");
 
     const std::vector<Part*>& parts = score->parts();
     ASSERT_FALSE(parts.empty());
@@ -479,7 +479,7 @@ TEST_F(Engraving_PlaybackContextTests, Dynamics_HairpinWithCompound)
 TEST_F(Engraving_PlaybackContextTests, PlayTechniques)
 {
     // [GIVEN] Score with playing technique annotations
-    Score* score = ScoreRW::readScore(PLAYBACK_CONTEXT_TEST_FILES_DIR + "play_techniques/play_tech_annotations.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_CONTEXT_TEST_FILES_DIR + u"play_techniques/play_tech_annotations.mscx");
 
     const std::vector<Part*>& parts = score->parts();
     ASSERT_FALSE(parts.empty());
@@ -567,7 +567,7 @@ TEST_F(Engraving_PlaybackContextTests, PlayTechniques_MeasureRepeats)
 {
     // [GIVEN] Score with 5 measures. The 1st measure is repeated. There also is a measure repeat on the last 2 measures
     // (so the previous 2 measures will be repeated)
-    Score* score = ScoreRW::readScore(PLAYBACK_CONTEXT_TEST_FILES_DIR + "play_techniques/play_techniques_measure_repeats.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_CONTEXT_TEST_FILES_DIR + u"play_techniques/play_techniques_measure_repeats.mscx");
 
     const std::vector<Part*>& parts = score->parts();
     ASSERT_FALSE(parts.empty());
@@ -609,7 +609,7 @@ TEST_F(Engraving_PlaybackContextTests, PlayTechniques_MeasureRepeats)
 TEST_F(Engraving_PlaybackContextTests, SoundFlags_TextArticulations)
 {
     // [GIVEN] Score (piano with 2 staves) with sound flags
-    Score* score = ScoreRW::readScore(PLAYBACK_CONTEXT_TEST_FILES_DIR + "sound_flags/sound_flags.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_CONTEXT_TEST_FILES_DIR + u"sound_flags/sound_flags.mscx");
 
     const std::vector<Part*>& parts = score->parts();
     ASSERT_FALSE(parts.empty());
@@ -703,7 +703,7 @@ TEST_F(Engraving_PlaybackContextTests, SoundFlags_MeasureRepeats)
 {
     // [GIVEN] Score with 5 measures. There is a measure repeat on the last 2 measures
     // (so the previous 2 measures will be repeated)
-    Score* score = ScoreRW::readScore(PLAYBACK_CONTEXT_TEST_FILES_DIR + "sound_flags/sound_flags_measure_repeats.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_CONTEXT_TEST_FILES_DIR + u"sound_flags/sound_flags_measure_repeats.mscx");
 
     const std::vector<Part*>& parts = score->parts();
     ASSERT_FALSE(parts.empty());
@@ -738,7 +738,7 @@ TEST_F(Engraving_PlaybackContextTests, SoundFlags_MeasureRepeats)
 TEST_F(Engraving_PlaybackContextTests, SoundFlags_CancelPlayingTechniques)
 {
     // [GIVEN] Score (violin + brass) with sound flags & playing techniques
-    Score* score = ScoreRW::readScore(PLAYBACK_CONTEXT_TEST_FILES_DIR + "sound_flags/cancel_playing_technique.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_CONTEXT_TEST_FILES_DIR + u"sound_flags/cancel_playing_technique.mscx");
 
     const std::vector<Part*>& parts = score->parts();
     ASSERT_EQ(parts.size(), 2);
@@ -826,7 +826,7 @@ TEST_F(Engraving_PlaybackContextTests, SoundFlags_CancelPlayingTechniques)
 TEST_F(Engraving_PlaybackContextTests, Lyrics_Multiverses)
 {
     // Score with two verses
-    Score* score = ScoreRW::readScore(PLAYBACK_CONTEXT_TEST_FILES_DIR + "lyrics_multiverses.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_CONTEXT_TEST_FILES_DIR + u"lyrics_multiverses.mscx");
     ASSERT_TRUE(score);
     ASSERT_EQ(score->parts().size(), 1);
 

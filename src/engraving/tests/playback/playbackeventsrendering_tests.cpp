@@ -41,7 +41,7 @@ using namespace mu::engraving;
 using namespace muse;
 using namespace muse::mpe;
 
-static const String PLAYBACK_EVENTS_RENDERING_DIR("playback/playbackeventsrenderer_data/");
+static const String PLAYBACK_EVENTS_RENDERING_DIR(u"playback/playbackeventsrenderer_data/");
 static constexpr duration_t QUARTER_NOTE_DURATION = 500000; // duration in microseconds for 4/4 120BPM
 static constexpr duration_t QUAVER_NOTE_DURATION = QUARTER_NOTE_DURATION / 2; // duration in microseconds for 4/4 120BPM
 static constexpr duration_t SEMI_QUAVER_NOTE_DURATION = QUAVER_NOTE_DURATION / 2; // duration in microseconds for 4/4 120BPM
@@ -95,7 +95,7 @@ protected:
 TEST_F(Engraving_PlaybackEventsRendererTests, SingleNote_TenutoAccent)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
-    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + "single_note_tenuto_accent/tenuto_accent.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + u"single_note_tenuto_accent/tenuto_accent.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -144,7 +144,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, SingleNote_TenutoAccent)
 TEST_F(Engraving_PlaybackEventsRendererTests, SingleNote_NoArticulations)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
-    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + "single_note_no_articulations/no_articulations.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + u"single_note_no_articulations/no_articulations.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -192,7 +192,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, SingleNote_Trill_Modern)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
     Score* score = ScoreRW::readScore(
-        PLAYBACK_EVENTS_RENDERING_DIR + "single_note_trill_default_tempo/single_note_trill_default_tempo.mscx");
+        PLAYBACK_EVENTS_RENDERING_DIR + u"single_note_trill_default_tempo/single_note_trill_default_tempo.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -252,7 +252,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, SingleNote_Unexpandable_Trill)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
     Score* score = ScoreRW::readScore(
-        PLAYBACK_EVENTS_RENDERING_DIR + "single_note_unexpandable_trill/single_note_unexpandable_trill.mscx");
+        PLAYBACK_EVENTS_RENDERING_DIR + u"single_note_unexpandable_trill/single_note_unexpandable_trill.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -290,7 +290,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, SingleNote_Trill_Baroque)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
     Score* score = ScoreRW::readScore(
-        PLAYBACK_EVENTS_RENDERING_DIR + "single_note_trill_baroque/single_note_trill_baroque.mscx");
+        PLAYBACK_EVENTS_RENDERING_DIR + u"single_note_trill_baroque/single_note_trill_baroque.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -359,7 +359,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, SingleNote_Turn_Regular)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
     Score* score = ScoreRW::readScore(
-        PLAYBACK_EVENTS_RENDERING_DIR + "single_note_regular_turn/single_note_regular_turn.mscx");
+        PLAYBACK_EVENTS_RENDERING_DIR + u"single_note_regular_turn/single_note_regular_turn.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -433,7 +433,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, SingleNote_Turn_Inverted)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
     Score* score = ScoreRW::readScore(
-        PLAYBACK_EVENTS_RENDERING_DIR + "single_note_inverted_turn/single_note_inverted_turn.mscx");
+        PLAYBACK_EVENTS_RENDERING_DIR + u"single_note_inverted_turn/single_note_inverted_turn.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -508,7 +508,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, SingleNote_Turn_Inverted_Slash_Var
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
     Score* score = ScoreRW::readScore(
-        PLAYBACK_EVENTS_RENDERING_DIR + "single_note_inverted_turn_slash_variation/single_note_inverted_turn_slash_variation.mscx");
+        PLAYBACK_EVENTS_RENDERING_DIR + u"single_note_inverted_turn_slash_variation/single_note_inverted_turn_slash_variation.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -582,7 +582,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, SingleNote_Upper_Mordent)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
     Score* score = ScoreRW::readScore(
-        PLAYBACK_EVENTS_RENDERING_DIR + "single_note_upper_mordent/single_note_upper_mordent.mscx");
+        PLAYBACK_EVENTS_RENDERING_DIR + u"single_note_upper_mordent/single_note_upper_mordent.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -657,7 +657,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, SingleNote_Lower_Mordent)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
     Score* score = ScoreRW::readScore(
-        PLAYBACK_EVENTS_RENDERING_DIR + "single_note_lower_mordent/single_note_lower_mordent.mscx");
+        PLAYBACK_EVENTS_RENDERING_DIR + u"single_note_lower_mordent/single_note_lower_mordent.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -732,7 +732,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, TwoNotes_Discrete_Glissando)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
     Score* score = ScoreRW::readScore(
-        PLAYBACK_EVENTS_RENDERING_DIR + "two_notes_discrete_glissando/two_notes_discrete_glissando.mscx");
+        PLAYBACK_EVENTS_RENDERING_DIR + u"two_notes_discrete_glissando/two_notes_discrete_glissando.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -796,7 +796,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, TwoNotes_Continuous_Glissando)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
     Score* score
-        = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + "two_notes_continuous_glissando/two_notes_continuous_glissando.mscx");
+        = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + u"two_notes_continuous_glissando/two_notes_continuous_glissando.mscx");
 
     ASSERT_TRUE(score);
     ASSERT_EQ(score->repeatList().size(), 2);
@@ -888,7 +888,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, TwoNotes_Glissando_NoPlay)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
     Score* score = ScoreRW::readScore(
-        PLAYBACK_EVENTS_RENDERING_DIR + "two_notes_continuous_glissando_no_play/two_notes_continuous_glissando_no_play.mscx");
+        PLAYBACK_EVENTS_RENDERING_DIR + u"two_notes_continuous_glissando_no_play/two_notes_continuous_glissando_no_play.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -951,7 +951,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, TwoNotes_Glissando_NoPlay)
 TEST_F(Engraving_PlaybackEventsRendererTests, TwoNotes_Discrete_Harp_Glissando) {
     // [GIVEN]
     Score* score = ScoreRW::readScore(
-        PLAYBACK_EVENTS_RENDERING_DIR + "TwoNotes_Discrete_Harp_Glissando/TwoNotes_Discrete_Harp_Glissando.mscx");
+        PLAYBACK_EVENTS_RENDERING_DIR + u"TwoNotes_Discrete_Harp_Glissando/TwoNotes_Discrete_Harp_Glissando.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -1063,7 +1063,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, Glissando_on_tied_notes)
 {
     // [GIVEN]
     Score* score = ScoreRW::readScore(
-        PLAYBACK_EVENTS_RENDERING_DIR + "glissando_on_tied_notes/glissando_on_tied_notes.mscx");
+        PLAYBACK_EVENTS_RENDERING_DIR + u"glissando_on_tied_notes/glissando_on_tied_notes.mscx");
 
     // [GIVEN] Fulfill articulations profile with dummy patterns
     m_defaultProfile->setPattern(ArticulationType::DiscreteGlissando, m_dummyPattern);
@@ -1191,7 +1191,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, SingleNote_Acciaccatura)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
     Score* score = ScoreRW::readScore(
-        PLAYBACK_EVENTS_RENDERING_DIR + "single_note_acciaccatura/single_note_acciaccatura.mscx");
+        PLAYBACK_EVENTS_RENDERING_DIR + u"single_note_acciaccatura/single_note_acciaccatura.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -1265,7 +1265,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, SingleNote_AcciaccaturaChord)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
     Score* score = ScoreRW::readScore(
-        PLAYBACK_EVENTS_RENDERING_DIR + "single_note_acciaccatura_chord/single_note_acciaccatura_chord.mscx");
+        PLAYBACK_EVENTS_RENDERING_DIR + u"single_note_acciaccatura_chord/single_note_acciaccatura_chord.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -1351,7 +1351,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, SingleNote_MultiAcciaccatura)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
     Score* score = ScoreRW::readScore(
-        PLAYBACK_EVENTS_RENDERING_DIR + "single_note_multi_acciaccatura/single_note_multi_acciaccatura.mscx");
+        PLAYBACK_EVENTS_RENDERING_DIR + u"single_note_multi_acciaccatura/single_note_multi_acciaccatura.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -1429,7 +1429,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, GraceNoteWithTiedNotes)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
     Score* score = ScoreRW::readScore(
-        PLAYBACK_EVENTS_RENDERING_DIR + "grace_note_with_tied_notes/grace_note_with_tied_notes.mscx");
+        PLAYBACK_EVENTS_RENDERING_DIR + u"grace_note_with_tied_notes/grace_note_with_tied_notes.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -1508,7 +1508,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, SingleNote_Appoggiatura_Post)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
     Score* score
-        = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + "single_note_appoggiatura_post/single_note_appoggiatura_post.mscx");
+        = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + u"single_note_appoggiatura_post/single_note_appoggiatura_post.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -1582,7 +1582,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, SingleNote_AppoggiaturaChord_Post)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
     Score* score = ScoreRW::readScore(
-        PLAYBACK_EVENTS_RENDERING_DIR + "single_note_appoggiatura_chord_post/single_note_appoggiatura_chord_post.mscx");
+        PLAYBACK_EVENTS_RENDERING_DIR + u"single_note_appoggiatura_chord_post/single_note_appoggiatura_chord_post.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -1668,7 +1668,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, SingleNote_MultiAppoggiatura_Post)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
     Score* score = ScoreRW::readScore(
-        PLAYBACK_EVENTS_RENDERING_DIR + "single_note_multi_appoggiatura_post/single_note_multi_appoggiatura_post.mscx");
+        PLAYBACK_EVENTS_RENDERING_DIR + u"single_note_multi_appoggiatura_post/single_note_multi_appoggiatura_post.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -1745,7 +1745,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, SingleNote_MultiAppoggiatura_Post)
 TEST_F(Engraving_PlaybackEventsRendererTests, Chord_Arpeggio)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
-    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + "chord_arpeggio/chord_arpeggio.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + u"chord_arpeggio/chord_arpeggio.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -1819,7 +1819,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, Chord_Arpeggio)
 TEST_F(Engraving_PlaybackEventsRendererTests, Chord_Arpeggio_Grace)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
-    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + "chord_arpeggio_grace/chord_arpeggio_grace.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + u"chord_arpeggio_grace/chord_arpeggio_grace.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -1871,7 +1871,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, Chord_Arpeggio_Grace)
 TEST_F(Engraving_PlaybackEventsRendererTests, Chord_Arpeggio_Up)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
-    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + "chord_arpeggio_up/chord_arpeggio_up.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + u"chord_arpeggio_up/chord_arpeggio_up.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -1944,7 +1944,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, Chord_Arpeggio_Up)
 TEST_F(Engraving_PlaybackEventsRendererTests, Chord_Arpeggio_Up_TiedNotes)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
-    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + "chord_arpeggio_with_tied_notes/chord_arpeggio_with_tied_notes.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + u"chord_arpeggio_with_tied_notes/chord_arpeggio_with_tied_notes.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -2014,7 +2014,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, Chord_Arpeggio_Up_TiedNotes)
 TEST_F(Engraving_PlaybackEventsRendererTests, Chord_Arpeggio_Down)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
-    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + "chord_arpeggio_down/chord_arpeggio_down.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + u"chord_arpeggio_down/chord_arpeggio_down.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -2087,7 +2087,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, Chord_Arpeggio_Straight_Down)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
     Score* score = ScoreRW::readScore(
-        PLAYBACK_EVENTS_RENDERING_DIR + "chord_arpeggio_straight_down/chord_arpeggio_straight_down.mscx");
+        PLAYBACK_EVENTS_RENDERING_DIR + u"chord_arpeggio_straight_down/chord_arpeggio_straight_down.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -2160,7 +2160,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, Chord_Arpeggio_Straight_Up)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
     Score* score = ScoreRW::readScore(
-        PLAYBACK_EVENTS_RENDERING_DIR + "chord_arpeggio_straight_up/chord_arpeggio_straight_up.mscx");
+        PLAYBACK_EVENTS_RENDERING_DIR + u"chord_arpeggio_straight_up/chord_arpeggio_straight_up.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -2233,7 +2233,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, Chord_Arpeggio_Straight_Up)
 TEST_F(Engraving_PlaybackEventsRendererTests, Chord_Arpeggio_Bracket)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
-    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + "chord_arpeggio_bracket/chord_arpeggio_bracket.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + u"chord_arpeggio_bracket/chord_arpeggio_bracket.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -2296,7 +2296,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, PartiallyTiedArpeggio)
 {
     // [GIVEN] Simple piece of score (violin, 4/4, 120 bpm, Treble Cleff)
     Score* score
-        = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + "partially_tied_arpeggio.mscx");
+        = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + u"partially_tied_arpeggio.mscx");
     ASSERT_TRUE(score);
 
     // [GIVEN] Fulfill articulations profile with dummy patterns
@@ -2376,7 +2376,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, PartiallyTiedArpeggio)
 TEST_F(Engraving_PlaybackEventsRendererTests, Single_Note_Tremolo)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
-    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + "single_note_tremolo/single_note_tremolo.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + u"single_note_tremolo/single_note_tremolo.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -2443,7 +2443,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, Single_Note_Tremolo_OnTiedNote)
 {
     // [GIVEN] Simple piece of score (violin, 4/4, 120 bpm, Treble Cleff)
     Score* score = ScoreRW::readScore(
-        PLAYBACK_EVENTS_RENDERING_DIR + "single_note_tremolo_on_tied_note/single_note_tremolo_on_tied_note.mscx");
+        PLAYBACK_EVENTS_RENDERING_DIR + u"single_note_tremolo_on_tied_note/single_note_tremolo_on_tied_note.mscx");
     ASSERT_TRUE(score);
 
     // [GIVEN] Fulfill articulations profile with dummy patterns
@@ -2521,7 +2521,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, Single_Note_Tremolo_OnTiedNote_Pla
 {
     // [GIVEN] Simple piece of score (violin, 4/4, 120 bpm, Treble Cleff)
     Score* score = ScoreRW::readScore(
-        PLAYBACK_EVENTS_RENDERING_DIR + "single_note_tremolo_on_tied_note/single_note_tremolo_on_tied_note.mscx");
+        PLAYBACK_EVENTS_RENDERING_DIR + u"single_note_tremolo_on_tied_note/single_note_tremolo_on_tied_note.mscx");
     ASSERT_TRUE(score);
 
     // [GIVEN] Find the chord with tremolo and disable tremolo playback
@@ -2590,7 +2590,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, Single_Note_Tremolo_OnTiedNote_Pla
 TEST_F(Engraving_PlaybackEventsRendererTests, Single_Chord_Tremolo)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
-    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + "single_chord_tremolo/single_chord_tremolo.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + u"single_chord_tremolo/single_chord_tremolo.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -2662,7 +2662,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, Single_Chord_Tremolo_TiedNotes)
 {
     // [GIVEN] Simple piece of score (violin, 4/4, 120 bpm, Treble Cleff)
     Score* score
-        = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + "single_chord_tremolo_tied_notes/single_chord_tremolo_tied_notes.mscx");
+        = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + u"single_chord_tremolo_tied_notes/single_chord_tremolo_tied_notes.mscx");
 
     // [GIVEN] Fulfill articulations profile with dummy patterns
     m_defaultProfile->setPattern(ArticulationType::Tremolo32nd, m_dummyPattern);
@@ -2756,7 +2756,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, PartiallyTiedTremolo)
 {
     // [GIVEN] Simple piece of score (violin, 4/4, 120 bpm, Treble Cleff)
     Score* score
-        = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + "partially_tied_tremolo.mscx");
+        = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + u"partially_tied_tremolo.mscx");
     ASSERT_TRUE(score);
 
     // [GIVEN] Fulfill articulations profile with dummy patterns
@@ -2869,7 +2869,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, PartiallyTiedTremolo)
 TEST_F(Engraving_PlaybackEventsRendererTests, Two_Chords_Tremolo)
 {
     // [GIVEN] Simple piece of score (piano, 4/4, 120 bpm, Treble Cleff)
-    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + "two_chords_tremolo/two_chords_tremolo.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + u"two_chords_tremolo/two_chords_tremolo.mscx");
 
     Measure* firstMeasure = score->firstMeasure();
     ASSERT_TRUE(firstMeasure);
@@ -2943,7 +2943,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, Two_Chords_Tremolo)
  */
 TEST_F(Engraving_PlaybackEventsRendererTests, Pauses)
 {
-    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + "pauses/pauses.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + u"pauses/pauses.mscx");
 
     // [GIVEN] Fulfill articulations profile with dummy patterns
     m_defaultProfile->setPattern(ArticulationType::Standard, m_dummyPattern);
@@ -3029,7 +3029,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, Pauses)
  */
 TEST_F(Engraving_PlaybackEventsRendererTests, TiedNotesAndRepeats)
 {
-    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + "tied_notes_and_repeats.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + u"tied_notes_and_repeats.mscx");
     ASSERT_TRUE(score);
 
     // [GIVEN] Fulfill articulations profile with dummy patterns
@@ -3136,7 +3136,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, TiedNotesAndRepeats)
  */
 TEST_F(Engraving_PlaybackEventsRendererTests, PartialTie)
 {
-    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + "partial_tie.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + u"partial_tie.mscx");
 
     // [GIVEN] Fulfill articulations profile with dummy patterns
     m_defaultProfile->setPattern(ArticulationType::Standard, m_dummyPattern);
@@ -3248,7 +3248,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, TrillLine_TiedNotes)
 {
     // [GIVEN] Simple piece of score (violin, 4/4, 120 bpm, Treble Cleff)
     Score* score
-        = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + "trill_line_on_tied_notes.mscx");
+        = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + u"trill_line_on_tied_notes.mscx");
 
     // [GIVEN] Fulfill articulations profile with dummy patterns
     m_defaultProfile->setPattern(ArticulationType::Standard, m_dummyPattern);
@@ -3348,7 +3348,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, Trill_TiedNotes)
 {
     // [GIVEN] Simple piece of score (violin, 4/4, 120 bpm, Treble Cleff)
     Score* score
-        = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + "trill_on_tied_notes.mscx");
+        = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + u"trill_on_tied_notes.mscx");
 
     ASSERT_TRUE(score);
     ASSERT_EQ(score->repeatList().size(), 2);
@@ -3449,7 +3449,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, Trill_TiedNotes)
 
 TEST_F(Engraving_PlaybackEventsRendererTests, CountIn)
 {
-    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + "count_in.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + u"count_in.mscx");
     ASSERT_TRUE(score);
 
     // [GIVEN] Fulfill articulations profile with dummy patterns
@@ -3604,7 +3604,7 @@ TEST_F(Engraving_PlaybackEventsRendererTests, CountIn)
 TEST_F(Engraving_PlaybackEventsRendererTests, HandbellsLetVibrate)
 {
     // [GIVEN] Score with LV & Damp techniques
-    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + "handbells_let_vibrate.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_EVENTS_RENDERING_DIR + u"handbells_let_vibrate.mscx");
     ASSERT_TRUE(score);
     ASSERT_EQ(score->parts().size(), 1);
 
