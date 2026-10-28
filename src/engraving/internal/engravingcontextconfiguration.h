@@ -25,14 +25,22 @@
 #include "../iengravingcontextconfiguration.h"
 
 #include "modularity/ioc.h"
+#ifndef NO_QT_SUPPORT
 #include "ui/iuicontextconfiguration.h"
+#endif
+#ifndef ENGRAVING_NO_ACCESSIBILITY
 #include "accessibility/iaccessibilitycontroller.h"
+#endif
 
 namespace mu::engraving {
 class EngravingContextConfiguration : public IEngravingContextConfiguration, public muse::Contextable
 {
+#ifndef NO_QT_SUPPORT
     muse::ContextInject<muse::ui::IUiContextConfiguration> uiConfiguration = { this };
+#endif
+#ifndef ENGRAVING_NO_ACCESSIBILITY
     muse::ContextInject<muse::accessibility::IAccessibilityController> accessibilityController = { this };
+#endif
 
 public:
     EngravingContextConfiguration(const muse::modularity::ContextPtr& iocCtx)

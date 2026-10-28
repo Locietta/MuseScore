@@ -26,18 +26,26 @@ using namespace mu::engraving;
 
 double EngravingContextConfiguration::guiScaling() const
 {
+#ifndef NO_QT_SUPPORT
     if (!uiConfiguration()) {
         return 1.0;
     }
 
     return uiConfiguration()->guiScaling();
+#else
+    return 1.0;
+#endif
 }
 
 bool EngravingContextConfiguration::isAccessibleEnabled() const
 {
+#ifndef ENGRAVING_NO_ACCESSIBILITY
     if (!accessibilityController()) {
         return false;
     }
 
     return accessibilityController()->isEnabled();
+#else
+    return false;
+#endif
 }

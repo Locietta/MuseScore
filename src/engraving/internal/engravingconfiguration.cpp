@@ -206,7 +206,7 @@ void EngravingConfiguration::init()
 
 muse::io::path_t EngravingConfiguration::appDataPath() const
 {
-    return globalConfiguration()->appDataPath();
+    return globalConfiguration() ? globalConfiguration()->appDataPath() : muse::io::path_t();
 }
 
 muse::io::path_t EngravingConfiguration::defaultStyleFilePath() const

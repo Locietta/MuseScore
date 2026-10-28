@@ -26,6 +26,7 @@
 
 #include "modularity/ioc.h"
 #include "global/iglobalconfiguration.h"
+#include "global/types/retval.h"
 #ifndef NO_QT_SUPPORT
 #include "ui/iuiconfiguration.h"
 #endif
