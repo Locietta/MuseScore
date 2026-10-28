@@ -21,12 +21,30 @@
  */
 #pragma once
 
+#include <cstdint>
+#include <map>
 #include <vector>
+
+#ifdef NO_QT_SUPPORT
+#include "io/iodevice.h"
+
+//! NOTE: midievent.h still uses the Qt typedef `uchar`; provide the same
+//! type without pulling Qt into the MIDI core. Redefining it is harmless if
+//! the typedef is already visible.
+using uchar = unsigned char;
+#else
 #include <QIODevice>
+#endif
 
 #include "../midishared/midievent.h"
 
 namespace mu::iex::midi {
+#ifdef NO_QT_SUPPORT
+using MidiIODevice = muse::io::IODevice;
+#else
+using MidiIODevice = QIODevice;
+#endif
+
 class MidiTrack
 {
     std::multimap<int, MidiEvent> _events;
@@ -59,7 +77,7 @@ public:
 
 class MidiFile
 {
-    QIODevice* fp;
+    MidiIODevice* fp;
     std::vector<MidiTrack> _tracks;
     int _division;
     bool _isDivisionInTps;         ///< ticks per second, alternative - ticks per beat
@@ -70,13 +88,17 @@ class MidiFile
     int status;                  ///< running status
     int sstatus;                 ///< running status (not reset after meta or sysex events)
     int click;                   ///< current tick position in file
-    qint64 curPos;               ///< current file byte position
+    int64_t curPos;               ///< current file byte position
+
+    //! Set when a low-level write() fails. The per-event helpers cannot return
+    //! a status, so the top-level write() surfaces the error instead.
+    bool _writeError = false;
 
     void writeEvent(const MidiEvent& event);
 
 protected:
     // write
-    bool write(const void*, qint64);
+    bool write(const void*, int64_t);
     void writeShort(int);
     void writeLong(int);
     bool writeTrack(const MidiTrack&);
@@ -85,7 +107,7 @@ protected:
     void writeStatus(int type, int channel);
 
     // read
-    void read(void*, qint64);
+    void read(void*, int64_t);
     int getvl();
     int readShort();
     int readLong();
@@ -96,8 +118,8 @@ protected:
 
 public:
     MidiFile();
-    bool read(QIODevice*);
-    bool write(QIODevice*);
+    bool read(MidiIODevice*);
+    bool write(MidiIODevice*);
 
     std::vector<MidiTrack>& tracks() { return _tracks; }
     const std::vector<MidiTrack>& tracks() const { return _tracks; }
