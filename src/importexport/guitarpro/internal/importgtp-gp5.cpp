@@ -241,7 +241,7 @@ Fraction GuitarPro5::readBeat(const Fraction& tick, int voice, Measure* measure,
         {
             uint8_t charsCount = readUInt8();
             char c[21];
-            f->read((uint8_t*)(c), 21);
+            GuitarPro::read(c, 21);
             // Just in case
             if (charsCount <= 20) {
                 c[charsCount] = '\0';
@@ -917,6 +917,9 @@ bool GuitarPro5::read(IODevice* io)
 
     measures = readInt();
     staves  = readInt();
+    if (measures == 0 || measures > 100000) {
+        return false;
+    }
     initDynamics(staves);
 
     for (size_t str = 0; str < 7; ++str) {
