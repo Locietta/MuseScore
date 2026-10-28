@@ -39,7 +39,7 @@ void EngravingFontsProvider::deinit()
 
 void EngravingFontsProvider::addInternalFont(const std::string& name, const std::string& family, const muse::io::path_t& filePath)
 {
-    muse::io::path_t basePath = muse::io::dirpath(filePath.toQString());
+    muse::io::path_t basePath = muse::io::dirpath(filePath);
     muse::io::path_t metadataPath = basePath + "/metadata.json";
     std::shared_ptr<EngravingFont> f = std::make_shared<EngravingFont>(name, family, filePath, metadataPath);
     m_symbolFonts.push_back(f);

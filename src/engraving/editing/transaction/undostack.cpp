@@ -131,6 +131,30 @@ void UndoStack::beginTransaction(Score* score, const TranslatableString& actionN
     m_activeTransaction = new UndoableTransaction(score, actionName);
 }
 
+//---------------------------------------------------------
+//   clearHistory
+//---------------------------------------------------------
+
+bool UndoStack::clearHistory()
+{
+    if (m_isLocked || m_activeTransaction) {
+        return false;
+    }
+    const bool wasClean = isClean();
+    const int currentState = m_states[m_currentIndex];
+    remove(0);
+    // Note: m_states is always one longer than m_transactions (initial state at index 0).
+    // After remove(0), m_transactions is empty and m_states has size 1 (m_currentIndex == 0).
+    // Preserve the current document state at index 0 and keep isClean() semantics intact:
+    // if the document was clean before clearing history, it remains clean (m_cleanState = currentState);
+    // if it was dirty, it remains dirty (currentState != m_cleanState).
+    m_states[0] = currentState;
+    if (wasClean) {
+        m_cleanState = currentState;
+    }
+    return true;
+}
+
 void UndoStack::remove(size_t idx)
 {
     assert(idx <= m_currentIndex);

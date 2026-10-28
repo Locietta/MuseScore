@@ -154,6 +154,9 @@ public:
     void mergeTransactions(size_t startIdx);
     void cleanRedoStack() { remove(m_currentIndex); }
 
+    // Retire history without changing the currently applied score state.
+    bool clearHistory();
+
 private:
     void remove(size_t idx);
 
