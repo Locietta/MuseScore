@@ -43,10 +43,16 @@ kors::modularity::ModulesGlobalIoC* kors::modularity::globalIoc()
 
 kors::modularity::ModulesContextIoC* kors::modularity::ioc(const ContextPtr& ctx)
 {
+#ifndef NO_QT_SUPPORT
     assert(ctx && ctx->id > 0);
     if (!(ctx && ctx->id > 0)) {
         return nullptr;
     }
+#else
+    if (!ctx) {
+        return nullptr;
+    }
+#endif
 
     auto it = s_contexts.find(ctx->id);
     if (it != s_contexts.end()) {
@@ -84,9 +90,15 @@ kors::modularity::ModulesIoCBase* kors::modularity::ioc(const ContextPtr& ctx)
 
 void kors::modularity::removeIoC(const ContextPtr& ctx)
 {
+#ifndef NO_QT_SUPPORT
     if (!(ctx && ctx->id > 0)) {
         return;
     }
+#else
+    if (!ctx) {
+        return;
+    }
+#endif
 
     auto it = s_contexts.find(ctx->id);
     if (it != s_contexts.end()) {

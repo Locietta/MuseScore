@@ -116,6 +116,11 @@ protected:
     template<class C>
     void doResolve(const C& ioc) const
     {
+#ifdef NO_QT_SUPPORT
+        if (!ioc) {
+            return;
+        }
+#endif
         static std::string_view module = "";
         m_i = ioc->template resolve<I>(module);
         if (m_i) {
