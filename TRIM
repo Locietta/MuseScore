@@ -1,0 +1,9 @@
+# Paths engrave deletes from upstream MuseScore; tools/sync-upstream.py keeps them deleted.
+# One path per line. A trailing / marks a directory prefix, otherwise an exact file. No globs.
+# Every upstream change discarded here and every new upstream file under a listed prefix is
+# reported by each sync.
+
+# Submodules: the framework is absorbed at muse/ (subtree of upstream/muse-framework);
+# prebuilt dependency recipes are not used (dependencies come from xmake packages).
+.gitmodules
+muse_deps
