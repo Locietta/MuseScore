@@ -1,4 +1,4 @@
-/*
+﻿/*
  * SPDX-License-Identifier: GPL-3.0-only
  * MuseScore-Studio-CLA-applies
  *
@@ -887,7 +887,7 @@ void ScoreAutomationController::addHairpinPoints(const Hairpin* hairpin, int tic
         const Dynamic* startDynamic = startSegment
                                       ? toDynamic(startSegment->findAnnotation(ElementType::DYNAMIC, trackIdx, trackIdx))
                                       : nullptr;
-        if (startDynamic && muse::contains(COMPOUND_DYNAMIC_VALUES, startDynamic->dynamicType())) {
+        if (startDynamic && startDynamic->playDynamic() && muse::contains(COMPOUND_DYNAMIC_VALUES, startDynamic->dynamicType())) {
             // The hairpin starts with a compound dynamic; we should start the hairpin after the transition is complete
             // This solution should be replaced once we have better infrastructure to see relations between Dynamics and Hairpins.
             const BeatsPerSecond tempo = denormalizeTempo(currentTempoAt(*ctx.tempoCurve, info.from)) * ctx.tempoMultiplier;
