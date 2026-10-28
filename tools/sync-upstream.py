@@ -106,6 +106,14 @@ def remove_worktree_path(repo: Repo, path: str) -> None:
         shutil.rmtree(target, ignore_errors=True)
     elif target.exists() or target.is_symlink():
         target.unlink()
+    # Drop directories the removal left empty (git does not track them).
+    parent = target.parent
+    while parent != repo.root and repo.root in parent.parents:
+        try:
+            parent.rmdir()
+        except OSError:
+            break
+        parent = parent.parent
 
 
 def unmerged_paths(repo: Repo) -> dict[str, set[int]]:
