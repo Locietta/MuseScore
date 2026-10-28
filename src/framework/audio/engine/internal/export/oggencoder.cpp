@@ -84,6 +84,10 @@ bool OggEncoder::openDestination(const io::path_t& path)
     }
 
     ope_encoder_ctl(m_opusEncoder, OPUS_SET_BITRATE(m_format.bitRate * 1000));
+    // libopusenc otherwise draws the Ogg stream serial from the process-global rand(),
+    // which makes identical exports differ by page headers. A single-stream file only
+    // needs a serial that is constant within the file.
+    ope_encoder_ctl(m_opusEncoder, OPE_SET_SERIALNO(0x4D757365));
 
     return true;
 }
