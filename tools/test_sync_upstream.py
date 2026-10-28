@@ -20,6 +20,29 @@ checks exit codes, commit parents, the discarded/dropped report and the tree:
   step 7  sync --target 0ea613f              final upstream commit
   step 8  sync --target 0ea613f              idempotent rerun
 
+Steps 9-19 build their own history with plumbing (`make_commit`, see below): a
+synthetic commit on top of the pinned upstream commit, published as the branch
+test/extra/upstream, and synthetic framework commits on the framework mirror. They
+cover the hardening findings:
+
+  step 9   a target that adds a root TRIM file is refused
+  step 10  an upstream path with spaces and non-ASCII under a trimmed prefix is
+           dropped and reported verbatim (NUL-delimited path handling)
+  step 11  a colliding regular file named like the `muse~<sha>` link conflict is
+           not silently dropped, it stops for a human
+  step 12  a framework commit merged in through a side parent does not change the
+           recorded framework base, and the wrong merge base is refused
+  step 13  a rewritten framework mirror is refused
+  step 14  a fatal `git merge` failure (untracked file) stops, keeps the state, and
+           `continue` retries after the cause is fixed
+  step 15  a manual `git merge --abort` before `continue` is not treated as solved
+  step 16  `abort` refuses to touch a foreign merge or another branch
+  step 17  `continue` resumes from every stage boundary, including a completed
+           fast-forward that has not been cleaned up
+  step 18  a leftover `sync/<sha>` branch without state is reported, not guessed at
+  step 19  rerunning `sync` after a completed fast-forward cleans up and reports
+           "already contains"
+
 Requirements: python 3.10+, git 2.40+ (ort merge strategy, `-Xsubtree`), and a
 clone that carries the mirrors `origin/upstream/musescore` and
 `origin/upstream/muse-framework` plus the framework commits the pins name. The
@@ -37,6 +60,8 @@ exits 1 if any step failed.
 from __future__ import annotations
 
 import argparse
+import importlib.util
+import json
 import os
 import shutil
 import stat
@@ -64,6 +89,8 @@ FW_CONFLICT = "3cae2ca17031dced34785f1ae42b2819195391d1"
 FW_FINAL = "ecdc6e7ef87b41c3fd2ce4e9df39343640862c4f"
 # Pinned by TARGET_MISSING_FRAMEWORK but never pushed to the mirror.
 FW_MISSING = "353f5f612a057205ecea635d21216edd86325699"
+# The absorbed framework commit on main, recorded without a trailer (fallback path).
+ABSORB_COMMIT = "7150f2b05ec4a19dafb3075513bca2ebcd970989"
 
 UPSTREAM_REF = "origin/upstream/musescore"
 FRAMEWORK_REF = "origin/upstream/muse-framework"
@@ -164,6 +191,7 @@ REPORT_HEADERS = {
 }
 
 SYNC_TIMEOUT = 1800
+TEST_IDENTITY = "sync-upstream-test@example.invalid"
 
 
 class Failure(Exception):
@@ -183,9 +211,9 @@ def build_env(tmp: Path) -> dict:
         "GIT_CONFIG_GLOBAL": str(empty_config),
         "GIT_TERMINAL_PROMPT": "0",
         "GIT_AUTHOR_NAME": "Sync Upstream Test",
-        "GIT_AUTHOR_EMAIL": "sync-upstream-test@example.invalid",
+        "GIT_AUTHOR_EMAIL": TEST_IDENTITY,
         "GIT_COMMITTER_NAME": "Sync Upstream Test",
-        "GIT_COMMITTER_EMAIL": "sync-upstream-test@example.invalid",
+        "GIT_COMMITTER_EMAIL": TEST_IDENTITY,
         "PYTHONIOENCODING": "utf-8",
         "PYTHONUTF8": "1",
     })
@@ -218,6 +246,9 @@ class Sandbox:
 
     def git(self, *args: str, check: bool = True, timeout: int | None = None) -> str:
         return run(["git", *args], self.work, self.env, check=check, timeout=timeout).stdout
+
+    def ok(self, *args: str) -> bool:
+        return run(["git", *args], self.work, self.env, check=False).returncode == 0
 
     def rev(self, ref: str) -> str:
         return self.git("rev-parse", "--verify", f"{ref}^{{commit}}").strip()
@@ -276,6 +307,38 @@ class Sandbox:
     def blob(self, ref: str) -> str:
         return self.git("cat-file", "blob", ref)
 
+    def make_commit(self, parent: str | None, files: dict[str, str], message: str,
+                    gitlink: str | None = None, tree_of: str | None = None) -> str:
+        """A commit built with plumbing, leaving HEAD, the index and the worktree alone.
+
+        `files` (path -> text) is written on top of `parent` (or of `tree_of` when given,
+        which makes an unrelated root commit with that tree). `gitlink` sets the `muse`
+        gitlink, i.e. the framework pin of a synthetic upstream commit.
+        """
+        index = self.work.parent / "test-index"
+        index.unlink(missing_ok=True)
+        env = dict(self.env, GIT_INDEX_FILE=str(index))
+
+        def plumbing(*args: str, stdin: bytes | None = None) -> str:
+            result = subprocess.run(["git", *args], cwd=str(self.work), env=env, input=stdin,
+                                    capture_output=True)
+            if result.returncode != 0:
+                raise Failure(f"git {' '.join(args)} failed: "
+                              f"{result.stderr.decode('utf-8', 'replace').strip()}")
+            return result.stdout.decode("utf-8", "replace")
+
+        plumbing("read-tree", tree_of or parent or "--empty")
+        for path, content in files.items():
+            blob = plumbing("hash-object", "-w", "--stdin", stdin=content.encode("utf-8")).strip()
+            plumbing("update-index", "--add", "--cacheinfo", "100644", blob, path)
+        if gitlink:
+            plumbing("update-index", "--add", "--cacheinfo", "160000", gitlink, "muse")
+        tree = plumbing("write-tree").strip()
+        args = ["commit-tree", tree, "-m", message]
+        if parent:
+            args += ["-p", parent]
+        return plumbing(*args).strip()
+
     @property
     def git_dir(self) -> Path:
         if self._git_dir is None:
@@ -286,8 +349,9 @@ class Sandbox:
         return self.git_dir / "sync-upstream.json"
 
     def sync_branches(self) -> list[str]:
-        return [line[2:] for line in self.git("branch", "--list", "--format=%(refname:short)",
-                                              "sync/*").splitlines() if line]
+        # `--format` prints no leading indent, so strip the whole short ref name.
+        return [line.strip() for line in self.git("branch", "--list", "--format=%(refname:short)",
+                                                 "sync/*").splitlines() if line.strip()]
 
     def path(self, relative: str) -> Path:
         return self.work / relative
@@ -298,6 +362,9 @@ class Sandbox:
     def read(self, relative: str) -> str:
         return self.git("cat-file", "blob", f"HEAD:{relative}")
 
+    def state(self) -> dict:
+        return json.loads(self.state_file().read_text(encoding="utf-8"))
+
 
 class Context:
     def __init__(self, script: Path, work: Path, env: dict):
@@ -305,6 +372,8 @@ class Context:
         self.sb = Sandbox(work, env)
         self.base = ""
         self.local_edit_commit = ""
+        # The framework commit the branch has incorporated; synthetic pins descend from it.
+        self.framework_tip = FW_FINAL
 
     # -- assertions ----------------------------------------------------------
     def expect(self, condition: bool, what: str, detail: str = "") -> None:
@@ -315,7 +384,41 @@ class Context:
         if actual != expected:
             raise Failure(f"{what}\n  expected: {expected}\n  actual:   {actual}")
 
+    # -- synthetic history ---------------------------------------------------
+    def upstream_commit(self, files: dict[str, str] | None = None, framework: str | None = None,
+                        message: str = "test: synthetic upstream commit",
+                        ref: str = "extra/upstream") -> str:
+        """A synthetic upstream commit on top of the pinned final upstream commit.
+
+        Only the given files (and optionally the `muse` gitlink) change, so merging it
+        into the branch brings exactly those changes. The branch `ref` makes it a
+        target the script accepts as `--upstream-ref`.
+        """
+        sha = self.sb.make_commit(TARGET_FINAL, files or {}, message,
+                                  gitlink=framework or self.framework_tip)
+        self.sb.git("update-ref", f"refs/heads/{ref}", sha)
+        return sha
+
+    def framework_commit(self, files: dict[str, str], message: str = "test: synthetic framework",
+                         parent: str | None = None) -> str:
+        """A synthetic framework commit `parent` (default: the incorporated framework)."""
+        sha = self.sb.make_commit(parent or self.framework_tip, files, message)
+        self.sb.git("update-ref", "refs/heads/extra/framework", sha)
+        return sha
+
     # -- driving the script under test ---------------------------------------
+    def sync_synthetic(self, target: str, framework_ref: str | None = None, *,
+                       expect: int = 0, stop_after: str | None = None):
+        """Run a sync against a synthetic upstream commit (`extra/upstream`).
+
+        The framework mirror is `extra/framework`, pinned to the framework commit the
+        branch has incorporated, so synthetic framework pins are reachable from it.
+        """
+        if framework_ref is None:
+            self.sb.git("update-ref", "refs/heads/extra/framework", self.framework_tip)
+            framework_ref = "extra/framework"
+        return self.sync("--upstream-ref", "extra/upstream", "--framework-ref", framework_ref,
+                         "sync", "--target", target, expect=expect, stop_after=stop_after)
     def sync(self, *args: str, expect: int = 0, stop_after: str | None = None):
         env = dict(self.sb.env)
         if stop_after:
@@ -429,6 +532,48 @@ def describe_script(repo: Path, script: Path, env: dict) -> str:
     return f"blob {worktree_hash[:12]}, DIFFERS from HEAD ({committed[:12]})"
 
 
+def load_script(script: Path):
+    """Import tools/sync-upstream.py as a module (it only defines things at import)."""
+    spec = importlib.util.spec_from_file_location("sync_upstream_under_test", script)
+    module = importlib.util.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(module)
+    except Exception as error:  # noqa: BLE001 - a broken script is a preflight failure
+        raise Failure(f"cannot import {script}: {error}") from error
+    return module
+
+
+def check_framework_metadata(repo: Path, script: Path, env: dict) -> None:
+    """The `Framework-Commit` trailer parser, including the pre-trailer absorb commit."""
+    module = load_script(script)
+    cases = [
+        (f"Merge upstream/muse-framework {FW_FINAL} into muse/\n\nFramework-Commit: "
+         f"{FW_FINAL}\n", FW_FINAL, "trailer"),
+        (f"Absorb muse_framework {FW_FINAL} at muse/ (subtree)", FW_FINAL, "legacy subject"),
+        (f"Absorb muse_framework {FW_FINAL} at muse/ (subtree)\n\nFramework-Commit: "
+         f"{FW_LINK_BUMP}", FW_LINK_BUMP, "trailer wins over the subject"),
+        ("Merge upstream/musescore 7b2d005464\n\nno trailer here", None, "no metadata"),
+    ]
+    for message, expected, label in cases:
+        actual = module.framework_from_message(message)
+        if actual != expected:
+            raise Failure(f"framework metadata parser ({label}): expected {expected}, got "
+                          f"{actual} for {message!r}")
+    # main's first absorb commit 7150f2b05e predates the trailer; its subject must parse.
+    if run(["git", "-C", str(repo), "cat-file", "-e", f"{ABSORB_COMMIT}^{{commit}}"],
+           None, env, check=False).returncode == 0:
+        message = git_read(repo, env, "log", "-1", "--format=%B", ABSORB_COMMIT)
+        if not message.startswith("Absorb muse_framework "):
+            raise Failure(f"{ABSORB_COMMIT[:12]} is not the absorb commit this fallback expects")
+        if module.framework_from_message(message) != FW_FINAL:
+            raise Failure(f"the legacy absorb commit {ABSORB_COMMIT[:12]} does not parse to "
+                          f"{FW_FINAL}")
+        legacy = "legacy absorb 7150f2b05e parsed"
+    else:
+        legacy = "legacy absorb commit absent (fallback covered by the unit cases)"
+    print(f"  preflight: framework metadata parser ok ({legacy})")
+
+
 def preflight(repo: Path, script: Path, env: dict) -> None:
     """Check the pinned history this test relies on, before building anything."""
     if not script.is_file():
@@ -521,6 +666,7 @@ def preflight(repo: Path, script: Path, env: dict) -> None:
     if problems:
         raise Failure("pinned history does not match this test's expectations:\n  "
                       + "\n  ".join(problems))
+    check_framework_metadata(repo, script, env)
     print(f"  preflight: {len(PINNED)} pins verified on {UPSTREAM_REF}/{FRAMEWORK_REF}, "
           f"{FW_MISSING[:12]} absent, report expectations match history")
 
@@ -830,6 +976,385 @@ def step_idempotent(ctx: Context) -> None:
     ctx.require_clean_end("step 8")
 
 
+# --- steps on synthetic history -------------------------------------------------
+
+UNICODE_ADDED = [
+    "src/appshell/odd dir/caf\u00e9 \u2713.txt",
+    "src/appshell/odd dir/\u00f1and\u00fa \u03c0.txt",
+]
+COLLIDING_LINK_NAME = "muse~deadbeef"
+BOUNDARIES = ["start", "temp-branch", "upstream-merge", "upstream-commit",
+              "framework-merge", "check", "fast-forward"]
+
+
+def expect_refused(ctx: Context, step: str, before: tuple[str, str, str]) -> None:
+    """A refused command must not touch the branch, the tree or the index."""
+    sb = ctx.sb
+    head, tree, index = before
+    ctx.expect_eq(sb.rev("HEAD"), head, f"{step}: a refused command moved the branch")
+    ctx.expect_eq(sb.tree("HEAD"), tree, f"{step}: a refused command changed the tree")
+    ctx.expect_eq(sb.git("ls-files", "-s", "-z"), index,
+                  f"{step}: a refused command touched the index")
+
+
+def step_trim_policy(ctx: Context) -> None:
+    """A target that adds the root TRIM file is refused before anything is created."""
+    sb = ctx.sb
+    before = (sb.rev("HEAD"), sb.tree("HEAD"), sb.git("ls-files", "-s", "-z"))
+    target = ctx.upstream_commit({"TRIM": "# upstream must not own this file\n"},
+                                 message="test: upstream adds a TRIM file")
+    _rc, _out, err = ctx.sync_synthetic(target, expect=1)
+    ctx.expect(f"{target[:12]} adds a root TRIM" in err,
+               "step 9: the refusal does not report the upstream TRIM addition", err)
+    expect_refused(ctx, "step 9", before)
+    ctx.expect_eq(sb.sync_branches(), [], "step 9: a temporary branch was created")
+    ctx.expect(not sb.state_file().exists(), "step 9: a state file was written")
+    ctx.require_clean_end("step 9")
+
+
+def step_trimmed_unicode(ctx: Context) -> None:
+    """Paths with spaces and non-ASCII under a trimmed prefix are dropped and reported."""
+    sb = ctx.sb
+    previous = sb.rev("HEAD")
+    target = ctx.upstream_commit({path: f"upstream content of {path}\n" for path in UNICODE_ADDED},
+                                 message="test: upstream adds trimmed-prefix files")
+    _rc, out, _err = ctx.sync_synthetic(target, expect=0)
+    report = parse_report(out)
+    ctx.expect_eq(report["droppedAdditions"], sorted(UNICODE_ADDED),
+                  "step 10: trimmed additions are not reported verbatim (quoting or -z bug)")
+    ctx.expect_eq(report["discardedChanges"], [],
+                  "step 10: unexpected discarded changes")
+    for path in UNICODE_ADDED:
+        ctx.expect(path.encode("utf-8").decode("utf-8") in report["droppedAdditions"],
+                   f"step 10: {path!r} is missing from the report")
+        ctx.expect(not sb.exists(path), f"step 10: dropped addition {path!r} is still on disk")
+    ctx.expect_eq(sb.ls_files("--", "src/appshell"), [],
+                  "step 10: dropped additions are still in the index")
+    ctx.expect_eq(sb.parents(sb.rev("HEAD")), [previous, target],
+                  "step 10: the sync did not produce a single upstream merge")
+    ctx.require_no_trimmed("step 10")
+    ctx.require_clean_end("step 10")
+
+
+def step_link_name_collision(ctx: Context) -> None:
+    """A regular file at a `muse~...` name is a conflict for a human, never dropped."""
+    sb = ctx.sb
+    before = sb.rev("HEAD")
+    sb.path(COLLIDING_LINK_NAME).write_bytes(b"local file that looks like the link conflict\n")
+    sb.git("add", "--", COLLIDING_LINK_NAME)
+    sb.git("commit", "--quiet", "-m", "test: local file named like the muse~ link conflict")
+    local = sb.rev("HEAD")
+    target = ctx.upstream_commit({COLLIDING_LINK_NAME: "upstream file with the same name\n"},
+                                 message="test: upstream adds a muse~ file")
+    _rc, out, _err = ctx.sync_synthetic(target, expect=2)
+    ctx.expect_eq(sorted(sb.unmerged()), [COLLIDING_LINK_NAME],
+                  "step 11: the colliding file was dropped from the index instead of conflicting")
+    printed = parse_list_after(out, "conflicts that need a human")
+    ctx.expect_eq(printed, [COLLIDING_LINK_NAME],
+                  "step 11: the reported conflict list differs from the index")
+    ctx.expect(sb.state_file().exists(), "step 11: no state while the conflict is open")
+    ctx.expect_eq(sb.branch(), f"sync/{target[:12]}",
+                  "step 11: the sync is not on its temporary branch")
+    _rc, _out, _err = ctx.sync("abort", expect=0)
+    ctx.expect_eq(sb.rev("HEAD"), local, "step 11: abort did not return to the branch tip")
+    ctx.expect(sb.exists(COLLIDING_LINK_NAME),
+               "step 11: abort lost the local file the branch had")
+    # Roll the test's own commit back so later steps start from the synced tree.
+    sb.git("reset", "--quiet", "--hard", before)
+    ctx.expect(not sb.exists(COLLIDING_LINK_NAME), "step 11: the rollback kept the file")
+    ctx.require_clean_end("step 11")
+
+
+def step_framework_side_parent(ctx: Context) -> None:
+    """A framework commit merged through a side parent must not become the merge base."""
+    sb = ctx.sb
+    before = sb.rev("HEAD")
+    recorded = ctx.framework_tip
+    side_framework = ctx.framework_commit(
+        {"extra/side-reachable.txt": "merged into the branch from a side parent\n"},
+        message="test: framework commit merged elsewhere")
+    sb.git("merge", "--quiet", "--no-ff", "-s", "ort", "-Xsubtree=muse", "-m",
+           f"test: side merge of {side_framework}", side_framework)
+    side = sb.rev("HEAD")
+    ctx.expect_eq(sb.parents(), [before, side_framework],
+                  "step 12: the side merge is not a merge of the synthetic framework")
+    ctx.expect_eq(sb.git("merge-base", "HEAD", side_framework, check=False).strip(),
+                  side_framework,
+                  "step 12: git no longer sees the side-merged framework as the merge base")
+    pinned = ctx.framework_commit({"extra/after-side.txt": "a later framework commit\n"},
+                                  message="test: framework commit after the side merge",
+                                  parent=side_framework)
+    target = ctx.upstream_commit({"src/extra/after-side.txt": "upstream change\n"},
+                                 framework=pinned,
+                                 message="test: pin the framework commit after the side merge")
+    _rc, _out, err = ctx.sync_synthetic(target, "extra/framework", expect=1)
+    ctx.expect("Framework-Commit" in err and "merge base" in err,
+               "step 12: the refusal does not explain the framework merge base", err)
+    ctx.expect(f"{recorded[:12]}" in err and f"{side_framework[:12]}" in err,
+               "step 12: the refusal does not name the recorded base and the wrong base", err)
+    state = sb.state()
+    ctx.expect_eq(state["previousFramework"], recorded,
+                  "step 12: side-parent reachability changed the recorded framework base")
+    ctx.expect_eq(state["framework"], pinned, "step 12: the state lost the pinned framework")
+    ctx.expect(sb.state_file().exists(), "step 12: no state after the refusal")
+    _rc, _out, _err = ctx.sync("abort", expect=0)
+    ctx.expect_eq(sb.rev("HEAD"), side, "step 12: abort did not return to the branch")
+    sb.git("reset", "--quiet", "--hard", before)
+    sb.git("update-ref", "-d", "refs/heads/extra/framework")
+    ctx.framework_tip = recorded
+    ctx.require_clean_end("step 12")
+
+
+def step_framework_rewritten(ctx: Context) -> None:
+    """A mirror that no longer contains the recorded framework commit is refused."""
+    sb = ctx.sb
+    before = (sb.rev("HEAD"), sb.tree("HEAD"), sb.git("ls-files", "-s", "-z"))
+    recorded = ctx.framework_tip
+    # Same content, but no ancestry: a rewritten (force-pushed) mirror.
+    rewritten = sb.make_commit(None, {}, "test: rewritten framework history",
+                               tree_of=recorded)
+    sb.git("update-ref", "refs/heads/extra/rewritten-framework", rewritten)
+    target = ctx.upstream_commit({"src/extra/rewritten.txt": "pinned a rewritten framework\n"},
+                                 framework=rewritten,
+                                 message="test: pin a framework commit from a rewritten mirror")
+    _rc, _out, err = ctx.sync_synthetic(target, "extra/rewritten-framework", expect=1)
+    ctx.expect("rewritten or diverged" in err,
+               "step 13: the rewritten mirror is not reported as rewritten", err)
+    ctx.expect(f"{recorded[:12]}" in err and f"{rewritten[:12]}" in err,
+               "step 13: the refusal does not name both framework commits", err)
+    expect_refused(ctx, "step 13", before)
+    ctx.expect_eq(sb.sync_branches(), [], "step 13: a temporary branch was created")
+    ctx.require_clean_end("step 13")
+
+
+def step_fatal_merge(ctx: Context) -> None:
+    """A fatal merge error stops, keeps the state, and `continue` can retry it."""
+    sb = ctx.sb
+    before = sb.rev("HEAD")
+    collision = "src/extra/untracked-collision.txt"
+    target = ctx.upstream_commit({collision: "upstream wants this path\n"},
+                                 message="test: upstream adds a path we keep untracked")
+    sb.path(collision).parent.mkdir(parents=True, exist_ok=True)
+    sb.path(collision).write_bytes(b"local untracked file in the way\n")
+    _rc, _out, err = ctx.sync_synthetic(target, expect=1)
+    ctx.expect("git merge failed" in err,
+               "step 14: the fatal merge error was not reported", err)
+    ctx.expect("continue" in err and "abort" in err,
+               "step 14: the error does not say how to recover", err)
+    ctx.expect("overwritten by merge" in err or "untracked" in err,
+               "step 14: the error does not carry git's own message", err)
+    ctx.expect(sb.state_file().exists(), "step 14: the state was dropped after a fatal merge")
+    ctx.expect_eq(sb.branch(), f"sync/{target[:12]}",
+                  "step 14: a fatal merge left the wrong branch checked out")
+    ctx.expect_eq(sb.rev("HEAD"), before, "step 14: a fatal merge moved the temp branch")
+    ctx.expect(not (sb.git_dir / "MERGE_HEAD").exists(),
+               "step 14: a fatal merge left a merge in progress")
+    ctx.expect(sb.state()["stage"] == "temp-branch",
+               "step 14: the state advanced past the failed merge")
+    ctx.expect(sb.path(collision).exists(), "step 14: the untracked file disappeared")
+    # The obstruction is gone: `continue` retries the merge and finishes.
+    sb.path(collision).unlink()
+    _rc, out, _err = ctx.sync("continue", expect=0)
+    ctx.expect(sb.rev("HEAD") != before, "step 14: continue did not merge anything")
+    ctx.expect_eq(sb.parents(), [before, target],
+                  "step 14: the retried merge is not an upstream merge")
+    ctx.expect(sb.read(collision) == "upstream wants this path\n",
+               "step 14: the merged file is not upstream's version")
+    ctx.require_clean_end("step 14")
+
+
+def step_manual_merge_abort(ctx: Context) -> None:
+    """A manual `git merge --abort` before `continue` must not be taken as resolved."""
+    sb = ctx.sb
+    before = sb.rev("HEAD")
+    target = ctx.upstream_commit({"src/extra/manual-abort.txt": "upstream change\n"},
+                                 message="test: target for the manual abort")
+    _rc, _out, _err = ctx.sync_synthetic(target, expect=1, stop_after="upstream-merge")
+    ctx.expect(sb.state_file().exists(), "step 15: no state after the interruption")
+    ctx.expect((sb.git_dir / "MERGE_HEAD").exists(),
+               "step 15: the interruption did not leave the merge in progress")
+    sb.git("merge", "--abort")
+    ctx.expect(not (sb.git_dir / "MERGE_HEAD").exists(), "step 15: git merge --abort failed")
+    _rc, _out, err = ctx.sync("continue", expect=1)
+    ctx.expect("no longer in progress" in err,
+               "step 15: continue did not notice the aborted merge", err)
+    ctx.expect_eq(sb.rev("HEAD"), before,
+                  "step 15: continue committed after a manual `git merge --abort`")
+    ctx.expect_eq(sb.count(f"{before}..HEAD"), 0,
+                  "step 15: continue created a commit after a manual abort")
+    ctx.expect(sb.state_file().exists(), "step 15: the state was dropped by the refusal")
+    _rc, _out, _err = ctx.sync("abort", expect=0)
+    ctx.expect_eq(sb.rev("HEAD"), before, "step 15: abort did not return to the branch tip")
+    ctx.require_clean_end("step 15")
+
+
+def step_abort_refusals(ctx: Context) -> None:
+    """`abort` only touches the merge this sync started."""
+    sb = ctx.sb
+    before = sb.rev("HEAD")
+    target = ctx.upstream_commit({"src/extra/abort-guard.txt": "upstream change\n"},
+                                 message="test: target for the abort guard")
+    temp = f"sync/{target[:12]}"
+    _rc, _out, _err = ctx.sync_synthetic(target, expect=1, stop_after="temp-branch")
+    ctx.expect_eq(sb.branch(), temp, "step 16: the interruption did not leave the temp branch")
+    ctx.expect(sb.state_file().exists(), "step 16: no state after the interruption")
+
+    # (a) somebody checked out another branch while the state file is around
+    sb.git("checkout", "--quiet", "test/base")
+    _rc, _out, err = ctx.sync("abort", expect=1)
+    ctx.expect("HEAD is on test/base" in err and "refusing" in err,
+               "step 16: abort did not refuse to run on another branch", err)
+    ctx.expect(sb.state_file().exists(), "step 16: the refused abort dropped the state")
+    ctx.expect_eq(sb.branch(), "test/base", "step 16: the refused abort changed the branch")
+    sb.git("checkout", "--quiet", temp)
+
+    # (b) a merge this sync did not start is in progress on the temporary branch
+    other = ctx.upstream_commit({"src/extra/somebody-else.txt": "another merge\n"},
+                                 message="test: commit for somebody else's merge",
+                                 ref="extra/unrelated")
+    sb.git("merge", "--quiet", "--no-commit", "--no-ff", "extra/unrelated")
+    ctx.expect_eq((sb.git_dir / "MERGE_HEAD").read_text(encoding="utf-8").split()[0], other,
+                  "step 16: the foreign merge did not start")
+    staged = sb.git("diff", "--cached", "--name-only", "-z")
+    _rc, _out, err = ctx.sync("abort", expect=1)
+    ctx.expect("refusing to abort your merge" in err,
+               "step 16: abort did not refuse the foreign merge", err)
+    ctx.expect(f"{other[:12]}" in err, "step 16: the refusal does not name the foreign commit", err)
+    ctx.expect((sb.git_dir / "MERGE_HEAD").exists(),
+               "step 16: abort removed somebody else's merge")
+    ctx.expect_eq((sb.git_dir / "MERGE_HEAD").read_text(encoding="utf-8").split()[0], other,
+                  "step 16: abort changed MERGE_HEAD")
+    ctx.expect_eq(sb.git("diff", "--cached", "--name-only", "-z"), staged,
+                  "step 16: abort changed the staged merge result")
+    ctx.expect_eq(sb.rev("HEAD"), before, "step 16: the refused abort moved HEAD")
+    # The user aborts their own merge; then `abort` works.
+    sb.git("merge", "--abort")
+    _rc, out, _err = ctx.sync("abort", expect=0)
+    ctx.expect("sync aborted" in out, "step 16: abort did not report success")
+    ctx.expect_eq(sb.rev("HEAD"), before, "step 16: abort did not return to the branch tip")
+    ctx.require_clean_end("step 16")
+
+
+def step_resume_boundaries(ctx: Context) -> None:
+    """`continue` resumes from every stage boundary of the sync state machine."""
+    sb = ctx.sb
+    sb.git("update-ref", "refs/heads/extra/framework", ctx.framework_tip)
+    for number, boundary in enumerate(BOUNDARIES):
+        previous = sb.rev("HEAD")
+        if boundary == "framework-merge":
+            pinned = ctx.framework_commit(
+                {f"extra/boundary-{number}.txt": f"framework change {number}\n"},
+                message=f"test: framework move for the {boundary} boundary")
+            target = ctx.upstream_commit({f"src/extra/boundary-{number}.txt": "upstream\n"},
+                                         framework=pinned,
+                                         message=f"test: pin for the {boundary} boundary")
+        else:
+            pinned = None
+            target = ctx.upstream_commit({f"src/extra/boundary-{number}.txt": "upstream\n"},
+                                         message=f"test: target for the {boundary} boundary")
+        temp = f"sync/{target[:12]}"
+        _rc, _out, err = ctx.sync_synthetic(target, "extra/framework", expect=1,
+                                            stop_after=boundary)
+        ctx.expect(f"[test] stopped after {boundary}" in err,
+                   f"step 17: the {boundary} stop hook did not fire", err)
+        ctx.expect(sb.state_file().exists(), f"step 17: no state at the {boundary} boundary")
+        state = sb.state()
+        ctx.expect_eq(state["stage"], boundary, f"step 17: wrong stage at {boundary}")
+        ctx.expect_eq(state["target"], target, f"step 17: wrong target at {boundary}")
+        if boundary == "start":
+            ctx.expect_eq(sb.branch(), "test/base", "step 17: start left the branch")
+            ctx.expect_eq(sb.sync_branches(), [], "step 17: start created a temp branch")
+            ctx.expect_eq(sb.rev("HEAD"), state["start"], "step 17: start moved HEAD")
+        elif boundary == "temp-branch":
+            ctx.expect_eq(sb.branch(), temp, "step 17: temp-branch left the branch")
+            ctx.expect_eq(sb.rev("HEAD"), state["start"], "step 17: temp-branch moved HEAD")
+        elif boundary == "upstream-merge":
+            ctx.expect_eq(sb.branch(), temp, "step 17: upstream-merge left the branch")
+            ctx.expect_eq((sb.git_dir / "MERGE_HEAD").exists(), True,
+                          "step 17: upstream-merge did not leave the merge open")
+            ctx.expect_eq(sb.rev("HEAD"), state["start"],
+                          "step 17: upstream-merge moved HEAD")
+        elif boundary == "upstream-commit":
+            ctx.expect_eq(sb.parents(), [state["start"], target],
+                          "step 17: upstream-commit is not the expected merge")
+            ctx.expect_eq(state["upstreamMerge"], sb.rev("HEAD"),
+                          "step 17: the state does not record the upstream merge")
+        elif boundary == "framework-merge":
+            ctx.expect_eq(sb.parents(), [state["upstreamMerge"], pinned],
+                          "step 17: framework-merge is not the expected merge")
+            ctx.expect_eq(state["frameworkMerge"], sb.rev("HEAD"),
+                          "step 17: the state does not record the framework merge")
+            message = sb.git("log", "-1", "--format=%B", sb.rev("HEAD"))
+            ctx.expect(f"Framework-Commit: {pinned}" in message,
+                       "step 17: the framework merge lost its Framework-Commit trailer", message)
+        elif boundary == "check":
+            ctx.expect_eq(sb.branch(), temp, "step 17: check left the branch")
+            ctx.expect_eq(state["head"], sb.rev("HEAD"),
+                          "step 17: the state does not record the verified tip")
+        elif boundary == "fast-forward":
+            # The completed fast-forward that was not cleaned up yet.
+            ctx.expect_eq(sb.branch(), "test/base", "step 17: fast-forward left the branch")
+            ctx.expect_eq(sb.rev("HEAD"), sb.rev(f"refs/heads/{temp}"),
+                          "step 17: the branch did not reach the sync tip")
+            ctx.expect_eq(state["head"], sb.rev("HEAD"),
+                          "step 17: the branch is not at the recorded tip")
+            ctx.expect_eq(sb.sync_branches(), [temp],
+                          "step 17: the temporary branch is already gone")
+        _rc, out, _err = ctx.sync("continue", expect=0)
+        head = sb.rev("HEAD")
+        expected = 2 if pinned else 1
+        ctx.expect_eq(sb.count(f"{previous}..{head}", first_parent=True), expected,
+                      f"step 17: resuming at {boundary} produced the wrong first-parent "
+                      f"history")
+        ctx.expect(sb.ok("merge-base", "--is-ancestor", target, head),
+                   f"step 17: the target is not contained after resuming at {boundary}")
+        if pinned:
+            ctx.framework_tip = pinned
+        ctx.require_clean_end(f"step 17 ({boundary})")
+
+
+def step_leftover_temp_branch(ctx: Context) -> None:
+    """A `sync/<sha>` branch without a state file is reported, not guessed at."""
+    sb = ctx.sb
+    before = (sb.rev("HEAD"), sb.tree("HEAD"), sb.git("ls-files", "-s", "-z"))
+    leftover = "sync/0123456789ab"
+    sb.git("branch", leftover, "HEAD")
+    _rc, _out, err = ctx.sync("sync", "--target", TARGET_FINAL, expect=1)
+    ctx.expect("no sync state file" in err and leftover in err,
+               "step 18: a leftover temp branch without state is not reported", err)
+    ctx.expect("git branch -D" in err, "step 18: the guidance does not say how to clean up", err)
+    expect_refused(ctx, "step 18", before)
+    ctx.expect_eq(sb.sync_branches(), [leftover],
+                  "step 18: the leftover branch was deleted or another one appeared")
+    _rc, _out, err = ctx.sync("abort", expect=1)
+    ctx.expect(leftover in err, "step 18: abort does not mention the leftover branch", err)
+    ctx.expect_eq(sb.sync_branches(), [leftover], "step 18: abort deleted the leftover branch")
+    sb.git("branch", "--delete", leftover)
+    ctx.require_clean_end("step 18")
+
+
+def step_rerun_after_fast_forward(ctx: Context) -> None:
+    """Rerunning `sync` after a completed fast-forward cleans up and does nothing else."""
+    sb = ctx.sb
+    previous = sb.rev("HEAD")
+    target = ctx.upstream_commit({"src/extra/completed-ff.txt": "upstream change\n"},
+                                 message="test: target for the completed fast-forward")
+    temp = f"sync/{target[:12]}"
+    _rc, _out, _err = ctx.sync_synthetic(target, expect=1, stop_after="fast-forward")
+    ctx.expect_eq(sb.sync_branches(), [temp],
+                  "step 19: the fast-forward boundary left no temporary branch")
+    synced = sb.rev("HEAD")
+    _rc, out, err = ctx.sync_synthetic(target, expect=0)
+    ctx.expect("found an unfinished sync; aborting it first" in out,
+               "step 19: the rerun did not abort the leftover sync", out)
+    ctx.expect(f"already contains {target}" in out,
+               "step 19: the rerun did not report that the target is contained", out)
+    ctx.expect_eq(sb.rev("HEAD"), synced, "step 19: the rerun moved the branch")
+    ctx.expect_eq(sb.count(f"{previous}..{synced}", first_parent=True), 1,
+                  "step 19: the completed sync is not a single upstream merge")
+    ctx.require_clean_end("step 19")
+
+
 STEPS = [
     ("absorb: test TRIM + framework absorbed at muse/", step_absorb),
     ("link bump 7b2d005464: two merges and the trimmed-edit report", step_link_bump),
@@ -839,6 +1364,17 @@ STEPS = [
     ("missing framework pin 9625e32ad4: refused, branch untouched", step_missing_framework),
     ("final upstream 0ea613f: tree equals upstream plus TRIM", step_final),
     ("idempotence: second sync of 0ea613f changes nothing", step_idempotent),
+    ("TRIM policy: an upstream TRIM file is refused", step_trim_policy),
+    ("trimmed paths with spaces and non-ASCII are dropped verbatim", step_trimmed_unicode),
+    ("a colliding muse~ file stops for a human", step_link_name_collision),
+    ("side-parent framework reachability keeps the recorded base", step_framework_side_parent),
+    ("a rewritten framework mirror is refused", step_framework_rewritten),
+    ("a fatal merge error keeps the state and `continue` retries", step_fatal_merge),
+    ("a manual merge --abort is not treated as resolved", step_manual_merge_abort),
+    ("abort refuses a foreign merge or another branch", step_abort_refusals),
+    ("continue resumes from every stage boundary", step_resume_boundaries),
+    ("a leftover sync branch without state is reported", step_leftover_temp_branch),
+    ("rerunning sync after a completed fast-forward cleans up", step_rerun_after_fast_forward),
 ]
 
 
@@ -856,16 +1392,30 @@ def caller_snapshot(repo: Path, env: dict) -> tuple[str, str, dict[str, str]]:
     return head, branch, refs
 
 
-def check_caller_untouched(before: tuple[str, str, dict[str, str]],
+def check_caller_untouched(repo: Path, env: dict,
+                           before: tuple[str, str, dict[str, str]],
                            after: tuple[str, str, dict[str, str]]) -> None:
-    """Branches that existed must still exist at the same commits (new ones are fine)."""
+    """Branch heads that existed must still point at the same commits.
+
+    The source repository is shared with other worktrees, so a branch pushed forward by
+    someone else while the test runs is only reported. A branch that moved to a commit
+    the test identity wrote is a real failure: the test never commits to the source.
+    """
     before_head, before_branch, before_refs = before
     after_head, after_branch, after_refs = after
     if (after_head, after_branch) != (before_head, before_branch):
         raise Failure(f"source repository HEAD moved: {before_branch}@{before_head[:12]} -> "
                       f"{after_branch}@{after_head[:12]}")
-    moved = [f"{name}: {sha[:12]} -> {after_refs.get(name, '<deleted>')[:12]}"
-             for name, sha in before_refs.items() if after_refs.get(name) != sha]
+    moved = []
+    for name, sha in before_refs.items():
+        new = after_refs.get(name)
+        if new == sha:
+            continue
+        if new and git_read(repo, env, "log", "-1", "--format=%ce", new).strip() == TEST_IDENTITY:
+            moved.append(f"{name}: {sha[:12]} -> {new[:12]} (written by this test)")
+        else:
+            print(f"  note: {name} moved outside this test "
+                  f"({sha[:12]} -> {new[:12] if new else '<deleted>'}); ignoring")
     if moved:
         raise Failure("the test moved branches in the source repository:\n  " + "\n  ".join(moved))
 
@@ -895,6 +1445,13 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # Paths in the report are printed verbatim (non-ASCII included) and the Windows
+    # console defaults to a legacy code page; pin the streams to UTF-8.
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     options = parse_args(argv)
     here = Path(__file__).resolve()
     repo_hint = options.repo or here.parent.parent
@@ -943,7 +1500,7 @@ def main(argv: list[str] | None = None) -> int:
 
         after = caller_snapshot(repo, env)
         try:
-            check_caller_untouched(before, after)
+            check_caller_untouched(repo, env, before, after)
         except Failure as error:
             print(f"FAIL source repository was modified\n{indent(str(error))}")
             failed_at = failed_at or len(STEPS) + 1
