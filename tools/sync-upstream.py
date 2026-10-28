@@ -95,11 +95,11 @@ class Repo:
         return subprocess.run(["git", *args], cwd=self.root, capture_output=True, text=True,
                               encoding="utf-8")
 
-    def git(self, *args: str, check: bool = True, quiet: bool = False) -> str:
+    def git(self, *args: str, check: bool = True) -> str:
         result = self.run(*args)
         if check and result.returncode != 0:
             raise SyncError(f"git {' '.join(args)} failed:\n{result.stderr.strip()}")
-        if not quiet and result.stderr.strip() and os.environ.get("SYNC_UPSTREAM_VERBOSE"):
+        if result.stderr.strip() and os.environ.get("SYNC_UPSTREAM_VERBOSE"):
             print(result.stderr.strip(), file=sys.stderr)
         return result.stdout
 
@@ -190,7 +190,7 @@ def classify_merge(repo: Repo, result: subprocess.CompletedProcess) -> str:
         return "pending" if repo.merging() else "clean"
     if result.returncode == 1 and repo.merging() and unmerged_entries(repo):
         return "conflicts"
-    detail = (result.stderr.strip() or result.stdout.strip())
+    detail = result.stderr.strip() or result.stdout.strip()
     raise SyncError(f"git merge failed (exit {result.returncode}):\n{indent(detail)}\n"
                     f"Nothing was committed. The sync state is kept: fix the cause and run "
                     f"`continue` to retry, or `abort` to return to the branch.")
@@ -385,8 +385,13 @@ def validate_framework_record(repo: Repo, commit: str, framework: str) -> None:
         return
     # The recorded tree is the base the subtree merge started from, so every path where
     # it differs from muse/ at `commit` must already differ from the first parent's muse/.
+    ours = repo.obj(f"{commit}^1:{FRAMEWORK_PATH}")
+    if ours is None:
+        raise SyncError(f"{commit[:12]} records framework {framework[:12]}, but has no "
+                        f"{FRAMEWORK_PATH}/ on its first parent, so its "
+                        f"{FRAMEWORK_PATH}/ cannot come from that framework tree")
     from_base = set(repo.diff_paths(tree, merged))
-    from_ours = set(repo.diff_paths(tree, f"{commit}^1:{FRAMEWORK_PATH}"))
+    from_ours = set(repo.diff_paths(tree, ours))
     if not from_base <= from_ours:
         unexpected = sorted(from_base - from_ours)[:3]
         raise SyncError(f"{commit[:12]} records framework {framework[:12]}, but its "
@@ -459,7 +464,11 @@ def resolve_upstream_merge(repo: Repo, trim: list[str], target: str,
     if len(candidates) == 1 and expected_link and \
             entries[candidates[0]].get(3) == (GITLINK, expected_link):
         accepted.add(candidates[0])
-        drop_path(repo, candidates[0])
+        repo.git("rm", "-q", "--cached", "--", candidates[0])
+        # `muse` itself is our subtree; only a materialised conflict directory
+        # (`muse~<sha>`) may be removed from the worktree.
+        if not (candidates[0] == FRAMEWORK_PATH and (repo.root / candidates[0]).is_dir()):
+            remove_worktree_path(repo, candidates[0])
     for path in candidates:
         if path not in accepted:
             unresolved.append(path)

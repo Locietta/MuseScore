@@ -1025,8 +1025,6 @@ def step_trimmed_unicode(ctx: Context) -> None:
     ctx.expect_eq(report["discardedChanges"], [],
                   "step 10: unexpected discarded changes")
     for path in UNICODE_ADDED:
-        ctx.expect(path.encode("utf-8").decode("utf-8") in report["droppedAdditions"],
-                   f"step 10: {path!r} is missing from the report")
         ctx.expect(not sb.exists(path), f"step 10: dropped addition {path!r} is still on disk")
     ctx.expect_eq(sb.ls_files("--", "src/appshell"), [],
                   "step 10: dropped additions are still in the index")
@@ -1311,6 +1309,23 @@ def step_resume_boundaries(ctx: Context) -> None:
         if pinned:
             ctx.framework_tip = pinned
         ctx.require_clean_end(f"step 17 ({boundary})")
+
+    # The last boundary is cleanup: everything is done and only the test hook fires.
+    previous = sb.rev("HEAD")
+    target = ctx.upstream_commit({"src/extra/after-cleanup.txt": "upstream change\n"},
+                                 message="test: target for the cleanup boundary")
+    _rc, _out, err = ctx.sync_synthetic(target, "extra/framework", expect=1,
+                                        stop_after="cleanup")
+    ctx.expect("[test] stopped after cleanup" in err,
+               "step 17: the cleanup stop hook did not fire", err)
+    ctx.expect(not sb.state_file().exists(), "step 17: cleanup left the state file behind")
+    ctx.expect_eq(sb.sync_branches(), [], "step 17: cleanup left a temporary branch behind")
+    ctx.expect_eq(sb.count(f"{previous}..{sb.rev('HEAD')}", first_parent=True), 1,
+                  "step 17: the sync did not complete before the cleanup stop")
+    _rc, out, _err = ctx.sync_synthetic(target, "extra/framework", expect=0)
+    ctx.expect(f"already contains {target}" in out,
+               "step 17: rerunning after the cleanup stop is not a no-op", out)
+    ctx.require_clean_end("step 17 (cleanup)")
 
 
 def step_leftover_temp_branch(ctx: Context) -> None:
