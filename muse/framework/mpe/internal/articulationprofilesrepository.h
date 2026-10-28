@@ -26,6 +26,7 @@
 #include "modularity/ioc.h"
 #include "io/ifilesystem.h"
 #include "async/asyncable.h"
+#include "serialization/json.h"
 
 #include "iarticulationprofilesrepository.h"
 
@@ -45,20 +46,20 @@ public:
     async::Channel<io::path_t> profileChanged() const override;
 
 private:
-    std::vector<ArticulationFamily> supportedFamiliesFromJson(const QJsonArray& array) const;
-    QJsonArray supportedFamiliesToJson(const std::vector<ArticulationFamily>& families) const;
+    std::vector<ArticulationFamily> supportedFamiliesFromJson(const JsonArray& array) const;
+    JsonArray supportedFamiliesToJson(const std::vector<ArticulationFamily>& families) const;
 
-    ArticulationPattern patternsScopeFromJson(const QJsonArray& array) const;
-    QJsonArray patternsScopeToJson(const ArticulationPattern& scope) const;
+    ArticulationPattern patternsScopeFromJson(const JsonArray& array) const;
+    JsonArray patternsScopeToJson(const ArticulationPattern& scope) const;
 
-    ArrangementPattern arrangementPatternFromJson(const QJsonObject& obj) const;
-    QJsonObject arrangementPatternToJson(const ArrangementPattern& pattern) const;
+    ArrangementPattern arrangementPatternFromJson(const JsonObject& obj) const;
+    JsonObject arrangementPatternToJson(const ArrangementPattern& pattern) const;
 
-    PitchPattern pitchPatternFromJson(const QJsonObject& obj) const;
-    QJsonObject pitchPatternToJson(const PitchPattern& pattern) const;
+    PitchPattern pitchPatternFromJson(const JsonObject& obj) const;
+    JsonObject pitchPatternToJson(const PitchPattern& pattern) const;
 
-    ExpressionPattern expressionPatternFromJson(const QJsonObject& obj) const;
-    QJsonObject expressionPatternToJson(const ExpressionPattern& pattern) const;
+    ExpressionPattern expressionPatternFromJson(const JsonObject& obj) const;
+    JsonObject expressionPatternToJson(const ExpressionPattern& pattern) const;
 
     mutable std::unordered_map<ArticulationFamily, ArticulationsProfilePtr> m_defaultProfiles;
 
