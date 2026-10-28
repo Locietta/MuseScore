@@ -20,6 +20,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "importmidi_key.h"
+
+#include <algorithm>
+#include <cstdlib>
+#include <vector>
+
 #include "importmidi_fraction.h"
 #include "importmidi_chord.h"
 #include "importmidi_inner.h"
@@ -60,7 +65,7 @@ public:
             return false;
         }
         // if equal - prefer key with less accitential count
-        return qAbs((int)key_) < qAbs((int)second.key_);
+        return std::abs((int)key_) < std::abs((int)second.key_);
     }
 
 private:
@@ -95,7 +100,7 @@ void assignKeyListToStaff(const KeyList& kl, Staff* staff)
     }
 }
 
-Key findKey(const QList<MTrack>& tracks)
+Key findKey(const std::vector<MTrack>& tracks)
 {
     const int octave = 12;
     std::vector<int> counts(octave);
@@ -112,8 +117,8 @@ Key findKey(const QList<MTrack>& tracks)
 
             for (const auto& note1: it->second.notes) {
                 for (const auto& note2: next->second.notes) {
-                    if (qAbs(note1.pitch - note2.pitch) == 1) {
-                        ++counts[qMin(note1.pitch, note2.pitch) % octave];
+                    if (std::abs(note1.pitch - note2.pitch) == 1) {
+                        ++counts[std::min(note1.pitch, note2.pitch) % octave];
                     }
                 }
             }
@@ -143,7 +148,7 @@ Key findKey(const QList<MTrack>& tracks)
     return keys[0].key();
 }
 
-void recognizeMainKeySig(QList<MTrack>& tracks)
+void recognizeMainKeySig(std::vector<MTrack>& tracks)
 {
     bool needToFindKey = false;
 

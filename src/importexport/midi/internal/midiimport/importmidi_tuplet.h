@@ -22,6 +22,8 @@
 #ifndef IMPORTMIDI_TUPLET_H
 #define IMPORTMIDI_TUPLET_H
 
+#include <vector>
+
 #include "importmidi_fraction.h"
 
 namespace mu::engraving {
@@ -62,7 +64,7 @@ const TupletLimits& tupletLimits(int tupletNumber);
 void removeEmptyTuplets(MTrack& track);
 
 bool hasNonTrivialChord(
-    const ReducedFraction& chordOnTime, const QList<MidiNote>& notes, const ReducedFraction& tupletOnTime,
+    const ReducedFraction& chordOnTime, const std::vector<MidiNote>& notes, const ReducedFraction& tupletOnTime,
     const ReducedFraction& tupletLen);
 
 bool isTupletUseless(
@@ -111,7 +113,7 @@ ReducedFraction findOnTimeBetweenChords(
     const std::pair<const ReducedFraction, MidiChord>& chord, const std::multimap<ReducedFraction, MidiChord>& chords,
     const ReducedFraction& basicQuant, const ReducedFraction& barStart);
 
-#ifdef QT_DEBUG
+#ifndef NDEBUG
 
 bool areAllTupletsReferenced(
     const std::multimap<ReducedFraction, MidiChord>& chords, const std::multimap<ReducedFraction, TupletData>& tupletEvents);

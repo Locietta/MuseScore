@@ -21,7 +21,8 @@
  */
 #include "importmidi_meter.h"
 
-#include <QQueue>
+#include <algorithm>
+#include <deque>
 
 #include "importmidi_fraction.h"
 #include "engraving/dom/durationtype.h"
@@ -317,8 +318,8 @@ bool isSimpleNoteDuration(const ReducedFraction& duration)
     auto div = (duration > division) ? duration / division : division / duration;
     if (div > ReducedFraction(0, 1)) {
         div.reduce();
-        int minVal = qMin(div.numerator(), div.denominator());
-        int maxVal = qMax(div.numerator(), div.denominator());
+        int minVal = std::min(div.numerator(), div.denominator());
+        int maxVal = std::max(div.numerator(), div.denominator());
         return minVal == 1 && isPowerOfTwo((unsigned int)maxVal);
     }
     return false;
@@ -400,13 +401,13 @@ ReducedFraction findTupletRatio(const ReducedFraction& startPos,
     return tupletRatio;
 }
 
-QList<std::pair<ReducedFraction, engraving::TDuration> >
+std::vector<std::pair<ReducedFraction, engraving::TDuration> >
 collectDurations(const std::map<ReducedFraction, Node>& nodes,
                  const std::vector<MidiTuplet::TupletData>& tupletsInBar,
                  bool useDots,
                  bool printRestRemains)
 {
-    QList<std::pair<ReducedFraction, engraving::TDuration> > resultDurations;
+    std::vector<std::pair<ReducedFraction, engraving::TDuration> > resultDurations;
 
     for (auto it1 = nodes.begin(); it1 != nodes.end(); ++it1) {
         auto it2 = it1;
@@ -505,7 +506,7 @@ int adjustEdgeLevelIfTuplet(const Meter::MaxLevel& splitPoint,
 // tol - max allowed difference between start/end level of duration and split point level
 //    1 for notes, 0 for rests
 
-QList<std::pair<ReducedFraction, engraving::TDuration> >
+std::vector<std::pair<ReducedFraction, engraving::TDuration> >
 toDurationList(const ReducedFraction& startTickInBar,
                const ReducedFraction& endTickInBar,
                const ReducedFraction& barFraction,
@@ -516,7 +517,7 @@ toDurationList(const ReducedFraction& startTickInBar,
 {
     if (startTickInBar < ReducedFraction(0, 1)
         || endTickInBar <= startTickInBar || endTickInBar > barFraction) {
-        return QList<std::pair<ReducedFraction, engraving::TDuration> >();
+        return std::vector<std::pair<ReducedFraction, engraving::TDuration> >();
     }
 
     const auto divInfo = divisionInfo(barFraction, tupletsInBar);    // metric structure of bar
@@ -530,11 +531,12 @@ toDurationList(const ReducedFraction& startTickInBar,
         nodes.insert({ endTickInBar, Node(level, level) });
     }
 
-    QQueue<std::pair<ReducedFraction, ReducedFraction> > gapsToProcess;
-    gapsToProcess.enqueue({ startTickInBar, endTickInBar });
+    std::deque<std::pair<ReducedFraction, ReducedFraction> > gapsToProcess;
+    gapsToProcess.push_back({ startTickInBar, endTickInBar });
 
-    while (!gapsToProcess.isEmpty()) {
-        const auto gap = gapsToProcess.dequeue();
+    while (!gapsToProcess.empty()) {
+        const auto gap = gapsToProcess.front();
+        gapsToProcess.pop_front();
         // don't split gap if its duration is less than minDuration
         if (gap.second - gap.first < minDuration) {
             continue;
@@ -557,8 +559,8 @@ toDurationList(const ReducedFraction& startTickInBar,
             const int edgeLevel = adjustEdgeLevelIfTuplet(splitPoint, divInfo);
             // split gap in splitPoint position
             nodes.insert({ splitPoint.pos, Node(edgeLevel, effectiveLevel) });
-            gapsToProcess.enqueue({ gap.first, splitPoint.pos });
-            gapsToProcess.enqueue({ splitPoint.pos, gap.second });
+            gapsToProcess.push_back({ gap.first, splitPoint.pos });
+            gapsToProcess.push_back({ splitPoint.pos, gap.second });
         }
     }
 

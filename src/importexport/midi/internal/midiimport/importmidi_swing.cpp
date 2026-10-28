@@ -214,15 +214,15 @@ bool SwingDetector::areAllNonTuplets() const
 
 // ---------------------------------------------------------------
 
-QString swingCaption(MidiOperations::Swing swingType)
+muse::String swingCaption(MidiOperations::Swing swingType)
 {
-    QString caption;
+    muse::String caption;
     switch (swingType) {
     case MidiOperations::Swing::SWING:
-        caption = "Swing";
+        caption = u"Swing";
         break;
     case MidiOperations::Swing::SHUFFLE:
-        caption = "Shuffle";
+        caption = u"Shuffle";
         break;
     case MidiOperations::Swing::NONE:
         break;

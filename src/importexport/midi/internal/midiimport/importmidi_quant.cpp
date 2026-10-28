@@ -21,8 +21,12 @@
  */
 #include "importmidi_quant.h"
 
+#include <algorithm>
+#include <cmath>
+#include <cstdlib>
 #include <set>
 #include <deque>
+#include <vector>
 
 #include "engraving/dom/sig.h"
 #include "importmidi_fraction.h"
@@ -411,7 +415,7 @@ bool isHumanPerformance(
     std::set<ReducedFraction> usedOnTimes;
 
     for (const auto& chord: chords) {
-        const auto quant = qMin(basicQuant,
+        const auto quant = std::min(basicQuant,
                                 quantForLen(MChord::maxNoteLen(chord), basicQuant));
         const auto onTime = quantizeValue(chord.first, quant);
         int barIndex, beat, tick;
@@ -621,7 +625,7 @@ struct QuantData
     std::vector<QuantPos> positions;
 };
 
-#ifdef QT_DEBUG
+#ifndef NDEBUG
 
 bool areAllVoicesSame(
     const std::deque<std::multimap<ReducedFraction, MidiChord>::const_iterator>& chords)
@@ -972,7 +976,7 @@ void findChordRangeStarts(
             }
             break;
         }
-#ifdef QT_DEBUG
+#ifndef NDEBUG
         Q_ASSERT_X(notLessThanPrev(it, data),
                    "Quantize::findChordRangeStarts",
                    "chordRangeStart is less than previous chordRangeStart");
@@ -1024,7 +1028,7 @@ void findQuants(
                 maxQuant *= 2;
             }
             d.quantForLen = quantForLen(
-                qMin(MChord::minNoteLen(*chordIt), rangeEnd - rangeStart), maxQuant);
+                std::min(MChord::minNoteLen(*chordIt), rangeEnd - rangeStart), maxQuant);
         }
 
         Q_ASSERT_X(d.quant <= rangeEnd - rangeStart,
@@ -1105,7 +1109,7 @@ void applyDynamicProgramming(std::vector<QuantData>& quantData)
             QuantPos& p = d.positions[pos];
 
             const auto timePenalty = (d.chord->first - p.time).absValue().toDouble();
-            const double levelDiff = qAbs(d.metricalLevelForLen - p.metricalLevel);
+            const double levelDiff = std::abs(d.metricalLevelForLen - p.metricalLevel);
 
             if (isHuman) {
                 if (p.metricalLevel <= d.metricalLevelForLen) {
@@ -1167,7 +1171,7 @@ void quantizeOnTimesInRange(
     const ReducedFraction& barStart,
     const ReducedFraction& barFraction)
 {
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     Q_ASSERT_X(!chords.empty(), "Quantize::quantizeOnTimesInRange", "Empty chords");
     Q_ASSERT_X(areAllVoicesSame(chords),
                "Quantize::quantizeOnTimesInRange", "Chord voices are not the same");
@@ -1262,7 +1266,7 @@ void quantizeOffTimes(
                                                               quantizedChords, basicQuant);
             note.offTime = result.first;
             note.offTimeQuant = result.second;
-#ifdef QT_DEBUG
+#ifndef NDEBUG
             checkOffTime(note, chordIt, quantizedChords);
 #endif
         }
@@ -1406,7 +1410,7 @@ void quantizeOnTimes(
 void moveOffTimes(
     const ReducedFraction& oldOnTime,
     const ReducedFraction& newOnTime,
-    QList<MidiNote>& notes)
+    std::vector<MidiNote>& notes)
 {
     for (auto& note: notes) {
         if (newOnTime >= note.offTime) {
@@ -1439,14 +1443,14 @@ findQuantizedChords(
         }
         if (found != quantizedChords.end()) {
             MidiChord& fc = found->second;
-            fc.notes.append(chord.notes);           // merge chords with equal on times
+            fc.notes.insert(fc.notes.end(), chord.notes.begin(), chord.notes.end());           // merge chords with equal on times
             moveOffTimes(i.chord->first, i.onTime, fc.notes);
             if (chord.isInTuplet) {
                 if (!fc.isInTuplet) {
                     fc.isInTuplet = true;
                     fc.tuplet = chord.tuplet;
                 }
-#ifdef QT_DEBUG
+#ifndef NDEBUG
                 else {
                     Q_ASSERT_X(fc.tuplet == chord.tuplet,
                                "Quantize::findQuantizedChords",
@@ -1489,7 +1493,7 @@ void quantizeChords(
     const TimeSigMap* sigmap,
     const ReducedFraction& basicQuant)
 {
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     Q_ASSERT_X(MidiTuplet::areTupletReferencesValid(chords), "Quantize::quantizeChords",
                "Some tuplet references are invalid");
     Q_ASSERT_X(areOnTimeValuesDifferent(chords), "Quantize::quantizeChords",
@@ -1505,7 +1509,7 @@ void quantizeChords(
     std::map<const std::pair<const ReducedFraction, MidiChord>*, QuantInfo> foundOnTimes;
     quantizeOnTimes(chords, foundOnTimes, basicQuant, sigmap);
     auto quantizedChords = findQuantizedChords(foundOnTimes);
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     Q_ASSERT_X(MidiTuplet::areTupletReferencesValid(quantizedChords), "Quantize::quantizeChords",
                "Some tuplet references are invalid");
 #endif

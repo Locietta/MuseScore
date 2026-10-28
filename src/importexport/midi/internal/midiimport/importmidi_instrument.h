@@ -21,11 +21,11 @@
  */
 #pragma once
 
-#include <QList>
+#include <vector>
+
+#include "global/types/string.h"
 
 #include "internal/midishared/generalmidi.h"
-
-class QString;
 
 namespace mu::engraving {
 class Score;
@@ -35,13 +35,13 @@ namespace mu::iex::midi {
 class MTrack;
 
 namespace MidiInstr {
-QString instrumentName(GM1Program, bool isDrumTrack);
-QString msInstrName(int trackIndex);
-QString concatenateWithComma(const QString& left, const QString& right);
+muse::String instrumentName(GM1Program, bool isDrumTrack);
+muse::String msInstrName(int trackIndex);
+muse::String concatenateWithComma(const muse::String& left, const muse::String& right);
 bool isGrandStaff(const MTrack& t1, const MTrack& t2);
-void setGrandStaffProgram(QList<MTrack>& tracks);
-void findInstrumentsForAllTracks(const QList<MTrack>& tracks, bool forceReload = false);
-void createInstruments(engraving::Score* score, QList<MTrack>& tracks);
+void setGrandStaffProgram(std::vector<MTrack>& tracks);
+void findInstrumentsForAllTracks(const std::vector<MTrack>& tracks, bool forceReload = false);
+void createInstruments(engraving::Score* score, std::vector<MTrack>& tracks);
 
 extern void instrumentTemplatesChanged();
 } // namespace MidiInstr

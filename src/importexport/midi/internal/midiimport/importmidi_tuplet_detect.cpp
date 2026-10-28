@@ -27,6 +27,7 @@
 #include "importmidi_inner.h"
 #include "importmidi_operations.h"
 
+#include <algorithm>
 #include <set>
 
 namespace mu::iex::midi {
@@ -376,7 +377,7 @@ std::vector<TupletInfo> detectTuplets(
             const auto endDivTime = startBarTick + divLen * (i + 1);
             // check which chords can be inside tuplet period
             // [startDivTime - tol, endDivTime]
-            const auto startDivTimeWithTol = qMax(startBarTick, startDivTime - tol);
+            const auto startDivTimeWithTol = std::max(startBarTick, startDivTime - tol);
             auto startDivChordIt = MChord::findFirstChordInRange(startDivTimeWithTol, endDivTime,
                                                                  startBarChordIt, endBarChordIt);
             if (startDivChordIt == endBarChordIt) {

@@ -22,7 +22,7 @@
 #ifndef IMPORTMIDI_KEY_H
 #define IMPORTMIDI_KEY_H
 
-#include <QList>
+#include <vector>
 
 namespace mu::engraving {
 class KeyList;
@@ -34,7 +34,7 @@ class MTrack;
 
 namespace MidiKey {
 void assignKeyListToStaff(const engraving::KeyList& kl, engraving::Staff* staff);
-void recognizeMainKeySig(QList<MTrack>& tracks);
+void recognizeMainKeySig(std::vector<MTrack>& tracks);
 } // namespace MidiKey
 } // namespace mu::iex::midi
 

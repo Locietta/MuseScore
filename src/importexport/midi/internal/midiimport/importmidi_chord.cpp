@@ -21,7 +21,12 @@
  */
 #include "importmidi_chord.h"
 
+#include <algorithm>
 #include <array>
+#include <cmath>
+#include <list>
+#include <utility>
+#include <vector>
 
 #include "global/containers.h"
 
@@ -108,9 +113,9 @@ const ReducedFraction& minAllowedDuration()
     return minDuration;
 }
 
-ReducedFraction minNoteOffTime(const QList<MidiNote>& notes)
+ReducedFraction minNoteOffTime(const std::vector<MidiNote>& notes)
 {
-    if (notes.isEmpty()) {
+    if (notes.empty()) {
         return { 0, 1 };
     }
     auto it = notes.begin();
@@ -123,7 +128,7 @@ ReducedFraction minNoteOffTime(const QList<MidiNote>& notes)
     return minOffTime;
 }
 
-ReducedFraction maxNoteOffTime(const QList<MidiNote>& notes)
+ReducedFraction maxNoteOffTime(const std::vector<MidiNote>& notes)
 {
     ReducedFraction maxOffTime(0, 1);
     for (const auto& note: notes) {
@@ -146,7 +151,7 @@ ReducedFraction maxNoteLen(const std::pair<const ReducedFraction, MidiChord>& ch
     return maxOffTime - chord.first;
 }
 
-void removeOverlappingNotes(QList<MidiNote>& notes)
+void removeOverlappingNotes(std::vector<MidiNote>& notes)
 {
     std::list<MidiNote> tempNotes;
     for (const auto& note: notes) {
@@ -169,7 +174,7 @@ void removeOverlappingNotes(QList<MidiNote>& notes)
     }
     notes.clear();
     for (const auto& note: tempNotes) {
-        notes.append(note);
+        notes.push_back(note);
     }
 }
 
@@ -182,7 +187,7 @@ void removeOverlappingNotes(std::multimap<int, MTrack>& tracks)
         if (chords.empty()) {
             continue;
         }
-#ifdef QT_DEBUG
+#ifndef NDEBUG
         Q_ASSERT_X(MidiTuplet::areTupletRangesOk(chords, track.second.tuplets),
                    "MChord::removeOverlappingNotes", "Tuplet chord/note is outside tuplet "
                                                      "or non-tuplet chord/note is inside tuplet before overlaps remove");
@@ -230,7 +235,7 @@ void removeOverlappingNotes(std::multimap<int, MTrack>& tracks)
                 }
                 ++note1It;
             }
-            if (chord1.notes.isEmpty()) {
+            if (chord1.notes.empty()) {
                 i1 = chords.erase(i1);
                 continue;
             }
@@ -238,7 +243,7 @@ void removeOverlappingNotes(std::multimap<int, MTrack>& tracks)
         }
 
         MidiTuplet::removeEmptyTuplets(track.second);
-#ifdef QT_DEBUG
+#ifndef NDEBUG
         Q_ASSERT_X(MidiTuplet::areTupletRangesOk(chords, track.second.tuplets),
                    "MChord::removeOverlappingNotes", "Tuplet chord/note is outside tuplet "
                                                      "or non-tuplet chord/note is inside tuplet after overlaps remove");
@@ -246,7 +251,7 @@ void removeOverlappingNotes(std::multimap<int, MTrack>& tracks)
     }
 }
 
-#ifdef QT_DEBUG
+#ifndef NDEBUG
 
 // check for equal on time values with the same voice that is invalid
 bool areOnTimeValuesDifferent(const std::multimap<ReducedFraction, MidiChord>& chords)
@@ -387,7 +392,7 @@ void collectChords(
     if (chords.empty()) {
         return;
     }
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     Q_ASSERT_X(areNotesLongEnough(chords),
                "MChord::collectChords", "There are too short notes");
 #endif
@@ -454,7 +459,7 @@ void collectChords(
         curThreshTime = threshTime;
         ++it;
     }
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     Q_ASSERT_X(areOnTimeValuesDifferent(chords),
                "MChord: collectChords",
                "onTime values of chords are equal but should be different");
@@ -536,7 +541,7 @@ void splitUnequalChords(std::multimap<int, MTrack>& tracks)
 }
 
 ReducedFraction findMinDuration(const ReducedFraction& onTime,
-                                const QList<MidiChord>& midiChords,
+                                const std::vector<MidiChord>& midiChords,
                                 const ReducedFraction& length)
 {
     ReducedFraction len = length;
@@ -571,7 +576,7 @@ void mergeChordsWithEqualOnTimeAndVoice(std::multimap<int, MTrack>& tracks)
             } else {
                 auto& oldNotes = fit->second->second.notes;
                 auto& newNotes = it->second.notes;
-                oldNotes.append(newNotes);
+                oldNotes.insert(oldNotes.end(), newNotes.begin(), newNotes.end());
                 it = chords.erase(it);
                 continue;
             }
@@ -580,9 +585,9 @@ void mergeChordsWithEqualOnTimeAndVoice(std::multimap<int, MTrack>& tracks)
     }
 }
 
-int chordAveragePitch(const QList<MidiNote>& notes, int beg, int end)
+int chordAveragePitch(const std::vector<MidiNote>& notes, int beg, int end)
 {
-    Q_ASSERT_X(!notes.isEmpty(), "MChord::chordAveragePitch", "Empty notes");
+    Q_ASSERT_X(!notes.empty(), "MChord::chordAveragePitch", "Empty notes");
     Q_ASSERT_X(end > 0 && beg >= 0 && end > beg,
                "MChord::chordAveragePitch", "Invalid note indexes");
 
@@ -590,12 +595,12 @@ int chordAveragePitch(const QList<MidiNote>& notes, int beg, int end)
     for (int i = beg; i != end; ++i) {
         sum += notes[i].pitch;
     }
-    return qRound(sum * 1.0 / (end - beg));
+    return static_cast<int>(std::lround(sum * 1.0 / (end - beg)));
 }
 
-int chordAveragePitch(const QList<MidiNote>& notes)
+int chordAveragePitch(const std::vector<MidiNote>& notes)
 {
-    Q_ASSERT_X(!notes.isEmpty(), "MChord::chordAveragePitch", "Empty notes");
+    Q_ASSERT_X(!notes.empty(), "MChord::chordAveragePitch", "Empty notes");
 
     return chordAveragePitch(notes, 0, notes.size());
 }
@@ -673,7 +678,7 @@ void setBarIndexes(
         }
         for (; it != chords.end(); ++it) {
             const auto onTime = Quantize::findQuantizedChordOnTime(*it, basicQuant);
-#ifdef QT_DEBUG
+#ifndef NDEBUG
             const auto barStart = ReducedFraction::fromTicks(sigmap->bar2tick(barIndex, 0));
             Q_ASSERT_X(!(it->first >= barStart && onTime < barStart),
                        "MChord::setBarIndexes", "quantized on time cannot be in previous bar");
@@ -688,7 +693,7 @@ void setBarIndexes(
             break;
         }
     }
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     Q_ASSERT_X(areBarIndexesSet(chords),
                "MChord::setBarIndexes", "Not all bar indexes were set");
     Q_ASSERT_X(areBarIndexesSuccessive(chords),

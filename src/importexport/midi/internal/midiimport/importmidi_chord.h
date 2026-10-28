@@ -22,6 +22,7 @@
 #pragma once
 
 #include <map>
+#include <vector>
 
 #include "importexport/midi/internal/midishared/generalmidi.h"
 
@@ -55,7 +56,7 @@ class MidiChord
 {
 public:
     int voice = 0;
-    QList<MidiNote> notes;
+    std::vector<MidiNote> notes;
     bool isInTuplet = false;
     int barIndex = -1;
     // for onTime quantization
@@ -117,13 +118,14 @@ Iter findEndChordInRange(const ReducedFraction& endRangeTick,
     return it;
 }
 
-ReducedFraction minNoteOffTime(const QList<MidiNote>& notes);
-ReducedFraction maxNoteOffTime(const QList<MidiNote>& notes);
+ReducedFraction minNoteOffTime(const std::vector<MidiNote>& notes);
+ReducedFraction maxNoteOffTime(const std::vector<MidiNote>& notes);
 ReducedFraction minNoteLen(const std::pair<const ReducedFraction, MidiChord>& chord);
 ReducedFraction maxNoteLen(const std::pair<const ReducedFraction, MidiChord>& chord);
 
 const ReducedFraction& minAllowedDuration();
-ReducedFraction findMinDuration(const ReducedFraction& onTime, const QList<MidiChord>& midiChords, const ReducedFraction& length);
+ReducedFraction findMinDuration(const ReducedFraction& onTime, const std::vector<MidiChord>& midiChords,
+                                const ReducedFraction& length);
 void sortNotesByPitch(std::multimap<ReducedFraction, MidiChord>& chords);
 void sortNotesByLength(std::multimap<ReducedFraction, MidiChord>& chords);
 
@@ -136,8 +138,8 @@ void collectChords(
 void removeOverlappingNotes(std::multimap<int, MTrack>& tracks);
 void mergeChordsWithEqualOnTimeAndVoice(std::multimap<int, MTrack>& tracks);
 void splitUnequalChords(std::multimap<int, MTrack>& tracks);
-int chordAveragePitch(const QList<MidiNote>& notes, int beg, int end);
-int chordAveragePitch(const QList<MidiNote>& notes);
+int chordAveragePitch(const std::vector<MidiNote>& notes, int beg, int end);
+int chordAveragePitch(const std::vector<MidiNote>& notes);
 
 ReducedFraction findMaxChordLength(const std::multimap<ReducedFraction, MidiChord>& chords);
 
@@ -150,7 +152,7 @@ void setBarIndexes(
     std::multimap<ReducedFraction, MidiChord>& chords, const ReducedFraction& basicQuant, const ReducedFraction& lastTick,
     const engraving::TimeSigMap* sigmap);
 
-#ifdef QT_DEBUG
+#ifndef NDEBUG
 
 bool areOnTimeValuesDifferent(const std::multimap<ReducedFraction, MidiChord>& chords);
 bool areBarIndexesSuccessive(const std::multimap<ReducedFraction, MidiChord>& chords);
