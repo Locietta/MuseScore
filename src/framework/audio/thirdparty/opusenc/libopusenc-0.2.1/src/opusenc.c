@@ -84,6 +84,8 @@ OggOpusComments *ope_comments_create() {
   char vendor_str[1024];
   c = malloc(sizeof(*c));
   if (c == NULL) return NULL;
+  /* As released libopusenc 0.2.1 does; the vendored copy passed this buffer uninitialized. */
+  snprintf(vendor_str, sizeof(vendor_str), "%s, libopusenc 0.2.1", opus_get_version_string());
   opeint_comment_init(&c->comment, &c->comment_length, vendor_str);
   c->seen_file_icons = 0;
   if (c->comment == NULL) {
