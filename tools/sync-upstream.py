@@ -14,39 +14,84 @@ Subcommands:
   continue                   resume after resolving a conflict the script stopped on
   abort                      drop an unfinished sync and return to the branch
 
+Threat model: this tool runs only in a dedicated fork clone, operated by the
+orchestrator. It is not defended against a concurrent editor of the same clone. What
+it does guarantee: `absorb` and `sync` refuse to start unless the worktree is
+completely clean (`git status --porcelain --untracked-files=all` is empty), no ignored
+file sits under a path the run removes, and the gitlink directories it replaces
+(`muse`, `muse_deps`) are empty - `git status` does not look inside a gitlink, so a
+stray file there would otherwise be deleted without notice. It never uses
+`git checkout -f`, and `continue`/`abort` refuse to mutate anything when the worktree
+holds changes the sync did not leave behind (a stopped conflict's own paths are the
+only exception).
+
 A sync runs on a temporary branch `sync/<sha>` and fast-forwards the branch only after
-both merges and the tree checks pass, so the branch only ever moves forward. Nothing
-is pushed.
+both merges and the tree checks pass, so the branch only ever moves forward (by that
+single `git merge --ff-only`). Nothing is pushed.
 
 State lives in .git/sync-upstream.json. It is written atomically (temp file +
-os.replace) *before* the mutation of the next stage, records the commits the sync
-expects, and every stage verifies branch and commit identity before it acts, so a
-`continue` after an interruption at any stage boundary is safe:
+os.replace) *before* the mutation of the next stage and records what the sync expects:
 
   start -> temp-branch -> upstream-merge -> upstream-commit
         -> framework-merge -> check -> fast-forward -> cleanup
 
-Each stage is idempotent; a stage that finds its own work already done adopts it
-(a merged commit is verified to have the expected parents, not to be new). A fatal
-`git merge` failure (exit > 1) stops with git's message and keeps the state, so the
-cause can be fixed and `continue` retries; `abort` returns to the branch. A merge that
-is no longer in progress although it was started (a manual `git merge --abort`) is
-not mistaken for a resolved conflict: `continue` refuses.
+  stage            the last stage that finished
+  merging          the commit the next `git merge` will merge (persisted before the
+                   command runs, so `abort` can tell our merge from someone else's)
+  mergeOutcome     null (command not run or crashed) / ready / conflicts / failed
+  removals         planned trimmed-path removals (index entries and report entries)
+  conflicts        paths left unmerged for a human by the current stop
+  status           the worktree state the tool leaves behind at that stop
+  preResolutionTree  index snapshot taken before the first human resolution
+  upstreamMerge / frameworkMerge / head  the commits the sync made
 
-Every absorb and framework merge commit carries a `Framework-Commit: <sha>` trailer.
-The next sync reads the previously incorporated framework commit from the latest such
-commit on the first-parent chain (falling back to the subject of the pre-trailer
-absorb commit 7150f2b05e) instead of inferring it with `merge-base`, which also finds
-framework commits that reached the branch through some other parent. That SHA is the
-explicit merge-base expectation: a mirror that no longer contains it, or a pin that
-does not descend from it, is refused.
+Every stage is idempotent and verifies branch and commit identity before it acts.
+`continue` resumes at any boundary, including "state saved, temporary branch not yet
+created" and "fast-forward done, state not yet updated". `abort` follows one rule:
+when the branch still points at the recorded start it undoes our own merge (only if
+`MERGE_HEAD` is the commit `merging` recorded) and returns; when the branch already
+points at the recorded final head it just cleans up; anything else is refused with the
+exact commands to repair the repository by hand.
 
-TRIM: one path per line, `#` comments; a trailing `/` marks a directory prefix,
-otherwise the entry is an exact file path. No globs. A sync never changes TRIM (only
-normal commits on `main` do) and refuses a target that adds or changes it.
+Merge commits are made by the tool, with a provenance trailer: `Sync-Upstream: <target>`
+on the upstream merge and `Framework-Commit: <framework>` on the framework merge. A
+merge commit with the expected parents but without (or with a wrong) trailer was made
+by someone else and is refused, with instructions, instead of adopted. The framework
+trailer also names the previously incorporated framework commit for the next sync; it
+is read from the newest such commit on the first-parent chain (falling back to the
+subject of the pre-trailer absorb commit 7150f2b05e) rather than inferred with
+`merge-base`, and is used as the explicit merge-base expectation.
 
-Paths are always read from NUL-delimited git output (`-z`), so names with spaces or
-non-ASCII characters are reported and removed verbatim.
+Conflict handling:
+  * The `muse` gitlink bump arrives as ort's displaced `muse~<sha>` entry. It is
+    dropped only when it is a 160000 gitlink whose stage-3 SHA is the target's muse
+    gitlink, and the name exists neither in the target tree nor in ours or the merge
+    base (otherwise it is a real conflict for a human).
+  * Modify/delete conflicts on TRIM paths keep the deletion and are reported; new
+    upstream files under trimmed prefixes are deleted and reported. Both are planned
+    and written to the state file before anything is removed, and the plan is replayed
+    when a run is resumed (so an interruption can neither lose a report entry nor leave
+    a half-removed file behind).
+  * Everything else stops for a human.
+
+TRIM belongs to `main`: a sync never changes it, refuses a target that adds or changes
+it, and asserts the final tree kept it.
+
+Every git command runs with `--literal-pathspecs`, so a trimmed path such as
+`item[ab].txt` is removed as that name and never as a glob. Path listings are read from
+NUL-delimited output (`-z`). stdout/stderr are reconfigured to UTF-8 with
+`errors="backslashreplace"` at startup, so a legacy console code page can neither
+mangle a report nor turn a success into a traceback.
+
+Deliberate limits (not defects):
+  * The tool does not prove that a human conflict resolution kept every other hunk.
+    It prints, in the final report, the paths whose resolution differs from the merge
+    sides (the diff between the pre-resolution index and the final tree, minus the
+    paths the tool itself dropped), so a reviewer can inspect them.
+  * A fast-forwardable upstream target is not supported: upstream never contains our
+    commits, so every sync produces a merge commit.
+  * Framework commits that reached the branch through some other parent are refused
+    (the tool cannot tell whether their content is really in `muse/`), not merged.
 """
 from __future__ import annotations
 
@@ -66,12 +111,18 @@ FRAMEWORK_PATH = "muse"
 TRIM_FILE = "TRIM"
 GITLINK = "160000"
 FRAMEWORK_TRAILER = "Framework-Commit"
-STATE_VERSION = 2
+UPSTREAM_TRAILER = "Sync-Upstream"
+STATE_VERSION = 3
 # Stage names double as the values SYNC_UPSTREAM_TEST_STOP_AFTER accepts.
 STAGES = ("start", "temp-branch", "upstream-merge", "upstream-commit",
           "framework-merge", "check", "fast-forward", "cleanup")
+# Stages whose advance leaves staged worktree changes (a `--no-commit` merge in
+# progress); the worktree state after every other stage is clean.
+DIRTY_STAGES = ("upstream-merge",)
 ABSORB_SUBJECT = re.compile(r"^Absorb muse_framework ([0-9a-f]{40}) at muse/")
 TEMP_BRANCH = re.compile(r"^sync/[0-9a-f]{12}$")
+SHA1 = re.compile(r"[0-9a-f]{40}")
+ISSUE_ENCODING = (AttributeError, ValueError)
 
 
 class SyncError(Exception):
@@ -92,8 +143,9 @@ class Repo:
         self.root = root
 
     def run(self, *args: str) -> subprocess.CompletedProcess:
-        return subprocess.run(["git", *args], cwd=self.root, capture_output=True, text=True,
-                              encoding="utf-8")
+        # Literal pathspecs everywhere: a trimmed path is a name, never a glob.
+        return subprocess.run(["git", "--literal-pathspecs", *args], cwd=self.root,
+                              capture_output=True, text=True, encoding="utf-8")
 
     def git(self, *args: str, check: bool = True) -> str:
         result = self.run(*args)
@@ -146,8 +198,15 @@ class Repo:
     def branch_exists(self, name: str) -> bool:
         return self.ok("rev-parse", "--verify", "--quiet", f"refs/heads/{name}")
 
-    def clean(self) -> bool:
-        return not self.git("status", "--porcelain", "--untracked-files=no").strip()
+
+def run_git_env(repo: Repo, env: dict[str, str], *args: str, stdin: bytes | None = None) -> str:
+    """Run git with a custom environment (a scratch index), returning stdout."""
+    result = subprocess.run(["git", "--literal-pathspecs", *args], cwd=repo.root, env=env,
+                            input=stdin, capture_output=True)
+    if result.returncode != 0:
+        raise SyncError(f"git {' '.join(args)} failed:\n"
+                        f"{result.stderr.decode('utf-8', 'replace').strip()}")
+    return result.stdout.decode("utf-8", "replace")
 
 
 # --- git object helpers ---------------------------------------------------------
@@ -179,21 +238,35 @@ def unmerged_entries(repo: Repo) -> dict[str, dict[int, tuple[str, str]]]:
     return entries
 
 
-def classify_merge(repo: Repo, result: subprocess.CompletedProcess) -> str:
-    """Classify a `git merge` run: 'clean', 'pending' or 'conflicts'.
+def status_entries(repo: Repo) -> list[tuple[str, str]]:
+    """(code, path) for staged, unstaged and untracked changes, NUL-delimited."""
+    raw = split_z(repo.git("status", "--porcelain", "-z", "--untracked-files=all"))
+    entries = []
+    renamed = False
+    for record in raw:
+        if renamed:  # `-z` puts the source path of a rename in its own record
+            renamed = False
+            continue
+        code, path = record[:2], record[3:]
+        entries.append((code, path))
+        renamed = code[:1] in ("R", "C")
+    return entries
 
-    `pending` is a `--no-commit` merge that is ready to be committed, `conflicts` one
-    that left unmerged paths. Anything else (exit > 1, or conflicts without MERGE_HEAD)
-    is a fatal failure and raises with git's own message.
-    """
+
+def merge_outcome(repo: Repo, result: subprocess.CompletedProcess) -> str:
+    """Classify a `git merge` run: clean, ready (--no-commit), conflicts or failed."""
     if result.returncode == 0:
-        return "pending" if repo.merging() else "clean"
+        return "ready" if repo.merging() else "clean"
     if result.returncode == 1 and repo.merging() and unmerged_entries(repo):
         return "conflicts"
+    return "failed"
+
+
+def merge_failure(result: subprocess.CompletedProcess) -> str:
     detail = result.stderr.strip() or result.stdout.strip()
-    raise SyncError(f"git merge failed (exit {result.returncode}):\n{indent(detail)}\n"
-                    f"Nothing was committed. The sync state is kept: fix the cause and run "
-                    f"`continue` to retry, or `abort` to return to the branch.")
+    return (f"git merge failed (exit {result.returncode}):\n{indent(detail)}\n"
+            f"Nothing was committed. The sync state is kept: fix the cause and run "
+            f"`continue` to retry, or `abort` to return to the branch.")
 
 
 # --- state ----------------------------------------------------------------------
@@ -234,6 +307,8 @@ def load_state(repo: Repo) -> dict | None:
 def advance(repo: Repo, state: dict, stage: str) -> None:
     """Record that `stage` finished (its postconditions were verified)."""
     state["stage"] = stage
+    state["status"] = ([[code, path] for code, path in status_entries(repo)]
+                       if stage in DIRTY_STAGES else [])
     save_state(repo, state)
     stop_for_test(stage)
 
@@ -242,6 +317,12 @@ def stop_for_test(stage: str) -> None:
     # Test hook: simulate an interruption right after a stage.
     if os.environ.get("SYNC_UPSTREAM_TEST_STOP_AFTER") == stage:
         raise SystemExit(f"[test] stopped after {stage}")
+
+
+def stop_for_test_after_rm(count: int) -> None:
+    # Test hook: simulate a crash between `git rm --cached` and the worktree removal.
+    if os.environ.get("SYNC_UPSTREAM_TEST_STOP_AFTER_RM") == str(count):
+        raise SystemExit(f"[test] stopped after removing index entry {count}")
 
 
 def temp_branches(repo: Repo) -> list[str]:
@@ -261,59 +342,136 @@ def leftover_hint(repo: Repo) -> str:
               f"`git branch -D {leftovers[0]}` (check out your branch first) and rerun.")
 
 
-def owned_by_sync(repo: Repo, state: dict, commit: str) -> bool:
-    """True when `commit` is one of the commits this sync created or expects."""
-    known = {state.get(key) for key in ("start", "upstreamMerge", "frameworkMerge", "head")}
-    if commit in known:
-        return True
-    upstream = state.get("upstreamMerge")
-    return bool(upstream) and commit_parents(repo, commit) == [upstream, state["framework"]]
+# --- preconditions --------------------------------------------------------------
 
+def ignored_under_removed_paths(repo: Repo, trim: list[str]) -> list[str]:
+    """Ignored files that sit where a run deletes whole trees or trimmed paths."""
+    found = []
+    for path in split_z(repo.git("ls-files", "-z", "--others", "--ignored",
+                                 "--exclude-standard")):
+        if path.startswith(FRAMEWORK_PATH + "/") or trimmed(path, trim):
+            found.append(path)
+    return found
+
+
+def filled_gitlink_dirs(repo: Repo) -> list[str]:
+    """Gitlink directories that already hold files, which a run would delete.
+
+    `git status` does not descend into a gitlink, so a file inside `muse/` or
+    `muse_deps/` (the directories a run removes) is invisible to it.
+    """
+    found = []
+    for mode, path in index_entries(repo):
+        if mode != GITLINK:
+            continue
+        target = repo.root / path
+        if target.is_dir() and any(target.iterdir()):
+            found.append(path)
+    return found
+
+
+def require_clean(repo: Repo, trim: list[str]) -> None:
+    """Refuse to start unless nothing in the clone can be lost (item A)."""
+    dirty = status_entries(repo)
+    if dirty:
+        shown = ", ".join(f"{code} {path}" for code, path in dirty[:6])
+        more = f", ... ({len(dirty)} paths)" if len(dirty) > 6 else ""
+        raise SyncError(f"the worktree is not clean: {shown}{more}. Commit or discard those "
+                        f"changes first; this tool only runs in a dedicated clone and never "
+                        f"overwrites work it did not make")
+    filled = filled_gitlink_dirs(repo)
+    if filled:
+        raise SyncError(f"the gitlink director{'ies' if len(filled) > 1 else 'y'} "
+                        f"{', '.join(f'{p}/' for p in filled)} already holds files; this run "
+                        f"would delete them (a dedicated clone keeps its submodules "
+                        f"unchecked-out). Move them away first")
+    ignored = ignored_under_removed_paths(repo, trim)
+    if ignored:
+        shown = ", ".join(ignored[:6])
+        more = f", ... ({len(ignored)} paths)" if len(ignored) > 6 else ""
+        raise SyncError(f"ignored files exist under paths this run removes: {shown}{more}. "
+                        f"Move or delete them first")
+
+
+def require_only_expected_changes(repo: Repo, state: dict, action: str) -> None:
+    """`continue`/`abort` refuse to touch changes the sync did not leave behind.
+
+    Allowed: the paths a stopped conflict left unresolved (the user's resolution), and
+    whatever the tool itself left behind at the recorded stop. When our own merge is in
+    progress but its outcome was never recorded (the process died inside the merge
+    command), its staged changes are accepted as well - only untracked files are not.
+    """
+    allowed = set(state.get("conflicts") or [])
+    allowed |= {entry["path"] for entry in state.get("removals") or []}
+    baseline = {(code, path) for code, path in state.get("status") or []}
+    merge = repo.merge_head()
+    crashed_merge = bool(merge) and state.get("merging") == merge and \
+        state.get("mergeOutcome") is None
+    unexpected = []
+    for code, path in status_entries(repo):
+        if path in allowed or (code, path) in baseline:
+            continue
+        if crashed_merge and code != "??":
+            continue
+        unexpected.append(f"{code} {path}")
+    if unexpected:
+        shown = ", ".join(unexpected[:6])
+        more = f", ... ({len(unexpected)} paths)" if len(unexpected) > 6 else ""
+        raise SyncError(f"`{action}` refuses: the worktree holds changes this sync did not "
+                        f"make: {shown}{more}. Nothing was changed. Commit, discard or stash "
+                        f"them and run `{action}` again")
+
+
+def abort_by_hand(repo: Repo, state: dict) -> str:
+    return (f"\nNothing was changed. To repair by hand:\n"
+            f"  git checkout {state['branch']}\n"
+            f"  git branch -D {state['temp']}     # if it still exists\n"
+            f"  rm {state_path(repo)}")
+
+
+# --- abort ----------------------------------------------------------------------
 
 def abort_sync(repo: Repo, state: dict) -> None:
-    """Drop the recorded sync. Refuses unless it is provably the sync in progress."""
-    temp, branch = state["temp"], state["branch"]
-    current = repo.current_branch()
-    head = repo.rev("HEAD")
-    merge = repo.merge_head()
-    if not repo.branch_exists(temp):
-        # Cleanup already deleted the temporary branch; only a stale state file is left.
-        if current != branch or head != state.get("head"):
-            raise SyncError(f"the state records a finished sync, but HEAD is {current} at "
-                            f"{head[:12]}; refusing to change anything. Remove "
-                            f"{state_path(repo)} yourself if it is stale.")
-        state_path(repo).unlink(missing_ok=True)
-        return
-    if current == branch and state.get("head"):
+    """Drop the recorded sync. One rule: the branch must be at the start or at the head."""
+    branch, temp, start = state["branch"], state["temp"], state["start"]
+    head = state.get("head")
+    branch_tip = repo.obj(f"refs/heads/{branch}")
+    if branch_tip is None:
+        raise SyncError(f"{branch} does not exist" + abort_by_hand(repo, state))
+    if head and branch_tip == head:
         # The fast-forward already happened; only the cleanup is left.
-        expected = state["head"]
-        if merge or head != expected or repo.rev(f"refs/heads/{temp}") != expected:
-            raise SyncError(f"the state expects {branch} at {str(expected)[:12]} and "
-                            f"{temp} at the same commit, but HEAD is {head[:12]}"
-                            f"{' with a merge in progress' if merge else ''}; refusing to "
-                            f"clean up. Nothing was changed.")
-        repo.git("branch", "-q", "-D", temp)
+        require_only_expected_changes(repo, state, "abort")
+        if repo.current_branch() != branch:
+            raise SyncError(f"the sync already fast-forwarded {branch} to {head[:12]}, but HEAD "
+                            f"is on {repo.current_branch()}" + abort_by_hand(repo, state))
+        if repo.branch_exists(temp) and repo.rev(f"refs/heads/{temp}") != head:
+            raise SyncError(f"{temp} is not at the recorded head {head[:12]}"
+                            + abort_by_hand(repo, state))
+        if repo.branch_exists(temp):
+            repo.git("branch", "-q", "-D", temp)
         state_path(repo).unlink(missing_ok=True)
         return
-    if current != temp:
-        raise SyncError(f"HEAD is on {current}, but this sync runs on {temp}; refusing to "
-                        f"abort. Nothing was changed: finish or abort the other operation "
-                        f"first, then check out {temp} and run `abort` again.")
-    if not owned_by_sync(repo, state, head):
-        raise SyncError(f"{temp} points at {head[:12]}, which this sync did not create; "
-                        f"refusing to abort. Nothing was changed.")
-    if merge and merge not in (state["target"], state["framework"]):
-        raise SyncError(f"a merge of {merge[:12]} is in progress on {temp}, but this sync "
-                        f"merges {state['target'][:12]} (upstream) and "
-                        f"{state['framework'][:12]} (framework); refusing to abort your "
-                        f"merge. It is untouched: finish or abort it yourself, then run "
-                        f"`abort` again.")
+    if branch_tip != start:
+        raise SyncError(f"{branch} is at {branch_tip[:12]}, but this sync started at "
+                        f"{start[:12]} and recorded no fast-forward; it cannot tell what "
+                        f"moved the branch" + abort_by_hand(repo, state))
+    merge = repo.merge_head()
     if merge:
+        if not state.get("merging") or merge != state["merging"]:
+            raise SyncError(f"a merge of {merge[:12]} is in progress on {repo.current_branch()}, "
+                            f"but this sync did not start it (the merge it started is "
+                            f"{state.get('merging') or 'none'}); refusing to abort your merge. "
+                            f"It is untouched: finish or abort it yourself, then run `abort` "
+                            f"again")
+        require_only_expected_changes(repo, state, "abort")
         repo.git("merge", "--abort")
-        if repo.current_branch() != temp:
-            raise SyncError(f"`git merge --abort` left HEAD on {repo.current_branch()}, not "
-                            f"{temp}; inspect the repository, the state file is kept")
-    repo.git("checkout", "-q", "-f", branch)
+    require_only_expected_changes(repo, state, "abort")
+    current = repo.current_branch()
+    if current != branch:
+        if repo.branch_exists(temp) and current != temp:
+            raise SyncError(f"HEAD is on {current}, which is neither {branch} nor {temp}"
+                            + abort_by_hand(repo, state))
+        repo.git("checkout", "-q", branch)  # never forced
     if repo.branch_exists(temp):
         repo.git("branch", "-q", "-D", temp)
     state_path(repo).unlink(missing_ok=True)
@@ -339,7 +497,7 @@ def trimmed(path: str, entries: list[str]) -> bool:
 
 
 def check_trim_policy(repo: Repo, base: str, target: str, branch: str) -> None:
-    """A sync never changes TRIM: upsteam may neither add nor modify it."""
+    """A sync never changes TRIM: upstream may neither add nor modify it."""
     before = repo.obj(f"{base}:{TRIM_FILE}")
     after = repo.obj(f"{target}:{TRIM_FILE}")
     if before == after:
@@ -350,23 +508,62 @@ def check_trim_policy(repo: Repo, base: str, target: str, branch: str) -> None:
                     f"{TRIM_FILE} (only normal commits on {branch} do). Nothing was changed.")
 
 
-# --- framework metadata ---------------------------------------------------------
+# --- merge commit metadata ------------------------------------------------------
+
+def trailer_value(message: str, key: str) -> str | None:
+    """The SHA a `<key>: <sha>` trailer line of a commit message records, if any."""
+    for line in reversed(message.splitlines()):
+        name, sep, value = line.partition(":")
+        if sep and name.strip() == key:
+            value = value.strip()
+            if SHA1.fullmatch(value):
+                return value
+            raise SyncError(f"commit message has a malformed {key} line: {line!r}")
+    return None
+
 
 def framework_from_message(message: str) -> str | None:
-    """The `Framework-Commit` trailer of a commit message, if it records one.
+    """The `Framework-Commit` trailer, or the subject of the pre-trailer absorb commit.
 
     The first absorb commit (7150f2b05e) predates the trailer and names the framework
     commit in its subject; keep reading that so the existing main stays usable.
     """
-    for line in reversed(message.splitlines()):
-        key, sep, value = line.partition(":")
-        if sep and key.strip() == FRAMEWORK_TRAILER:
-            value = value.strip()
-            if re.fullmatch(r"[0-9a-f]{40}", value):
-                return value
-            raise SyncError(f"commit message has a malformed {FRAMEWORK_TRAILER} line: {line!r}")
+    recorded = trailer_value(message, FRAMEWORK_TRAILER)
+    if recorded:
+        return recorded
     match = ABSORB_SUBJECT.match(message)
     return match.group(1) if match else None
+
+
+def commit_message(repo: Repo, commit: str) -> str:
+    return repo.git("log", "-1", "--format=%B", commit)
+
+
+def upstream_merge_message(state: dict) -> str:
+    return (f"Merge upstream/musescore {state['target']}\n\n{summary(state)}\n\n"
+            f"{UPSTREAM_TRAILER}: {state['target']}")
+
+
+def framework_merge_message(state: dict) -> str:
+    return (f"Merge upstream/muse-framework {state['framework']} into {FRAMEWORK_PATH}/\n\n"
+            f"{FRAMEWORK_TRAILER}: {state['framework']}")
+
+
+def refuse_foreign_merge(repo: Repo, state: dict, commit: str, kind: str, key: str,
+                         expected: str, parent: str,
+                         parents: list[str] | None = None) -> None:
+    recorded = trailer_value(commit_message(repo, commit), key)
+    if recorded != expected:
+        why = f"its {key} records {recorded or '<nothing>'}, expected {expected[:12]}"
+    else:
+        why = (f"its parents are [{', '.join(p[:12] for p in parents or [])}], expected "
+               f"{parent[:12]} and {expected[:12]}")
+    raise SyncError(f"{commit[:12]} is a {kind} merge commit this sync did not make: {why}. "
+                    f"The tool commits these merges itself so their provenance is recorded.\n"
+                    f"Nothing else was changed. Either redo it:\n"
+                    f"  git reset --hard {parent[:12]}\n"
+                    f"  git merge ...    # let the tool do it: run `continue`\n"
+                    f"or run `abort` to return to {state['branch']}")
 
 
 def validate_framework_record(repo: Repo, commit: str, framework: str) -> None:
@@ -419,7 +616,7 @@ def recorded_framework(repo: Repo, start: str) -> str:
                     f"first-parent history of {start[:12]}; run `absorb` first")
 
 
-# --- tree helpers ---------------------------------------------------------------
+# --- worktree and index maintenance ---------------------------------------------
 
 def remove_worktree_path(repo: Repo, path: str) -> None:
     target = repo.root / path
@@ -443,54 +640,147 @@ def note(report: dict, key: str, path: str) -> None:
         report[key].append(path)
 
 
-def drop_path(repo: Repo, path: str) -> None:
-    repo.git("rm", "-q", "--cached", "--", path)
-    remove_worktree_path(repo, path)
+def apply_removals(repo: Repo, state: dict) -> None:
+    """Replay the planned removals, then drop the plan.
+
+    The plan (paths plus the report entry each removal produces) is written to the state
+    file before the first removal, so resuming after an interruption between
+    `git rm --cached` and the worktree deletion finishes the job and keeps the report.
+    """
+    plan = state.get("removals") or []
+    if not plan:
+        return
+    present = {path for _mode, path in index_entries(repo)}
+    for number, entry in enumerate(plan, 1):
+        path = entry["path"]
+        if path in present:
+            repo.git("rm", "-q", "--cached", "--", path)
+            stop_for_test_after_rm(number)
+        # `muse` itself is our subtree; only ort's displaced conflict directory may go.
+        if not (entry.get("keepDir") and (repo.root / path).is_dir()):
+            remove_worktree_path(repo, path)
+        if entry.get("report"):
+            note(state["report"], entry["report"], path)
+    state["removals"] = []
+    save_state(repo, state)
 
 
-def resolve_upstream_merge(repo: Repo, trim: list[str], target: str,
-                           report: dict) -> list[str]:
-    """Resolve the conflicts a sync expects; return the paths that need a human."""
-    entries = unmerged_entries(repo)
-    unresolved: list[str] = []
-    # The upstream gitlink bump: upstream changes `muse`, we deleted it when the
-    # framework was absorbed (ort renames the entry to `muse~<sha>`). Only a gitlink from
-    # upstream's side may be dropped, and only one such path; anything else at such a
-    # name is a real conflict for a human.
+def plan_removals(state: dict, plan: list[dict]) -> None:
+    """Persist the removals and their report entries before anything is removed."""
+    for entry in plan:
+        if entry.get("report"):
+            note(state["report"], entry["report"], entry["path"])
+    state["removals"] = plan
+
+
+def capture_index_tree(repo: Repo, entries: dict[str, dict[int, tuple[str, str]]]) -> str:
+    """A tree object for the current index with conflicted paths taken from our side.
+
+    The final report diffs this against the sync tip, so a reviewer sees which paths a
+    human resolution changed relative to the merge sides (the tool does not prove that a
+    resolution kept everything else).
+    """
+    scratch = repo.git_dir / "sync-upstream-index.tmp"
+    shutil.copyfile(repo.git_dir / "index", scratch)
+    env = dict(os.environ, GIT_INDEX_FILE=str(scratch))
+    try:
+        records = []
+        for path in sorted(entries):
+            side = entries[path].get(2) or entries[path].get(3)
+            if side:
+                records.append(f"{side[0]} {side[1]}\t{path}".encode("utf-8"))
+        if records:
+            run_git_env(repo, env, "update-index", "-z", "--index-info",
+                        stdin=b"\0".join(records) + b"\0")
+        return run_git_env(repo, env, "write-tree").strip()
+    finally:
+        scratch.unlink(missing_ok=True)
+
+
+def resolution_paths(repo: Repo, state: dict) -> list[str]:
+    """Paths whose human resolution differs from the merge sides (final report)."""
+    tree = state.get("preResolutionTree")
+    if not tree:
+        return []
+    changed = set(repo.diff_paths(tree, "HEAD"))
+    ignored = set(state["report"]["discardedChanges"])
+    ignored |= set(state["report"]["droppedAdditions"])
+    ignored |= set(state.get("linkDrops") or [])
+    framework_merge = state.get("frameworkMerge")
+    if framework_merge:
+        # The framework merge's own changes are not resolutions.
+        ignored |= (set(repo.diff_paths(f"{framework_merge}^1", framework_merge))
+                    - set(state.get("conflicts") or []))
+    return sorted(changed - ignored)
+
+
+# --- conflict handling ----------------------------------------------------------
+
+def classify_link_conflict(repo: Repo, state: dict,
+                           entries: dict[str, dict[int, tuple[str, str]]]
+                           ) -> tuple[str | None, list[str]]:
+    """The ort-displaced `muse` gitlink entry, if it provably is that, and the rest.
+
+    Only a single `muse`/`muse~*` entry qualifies, and only when its stage 3 is a
+    160000 gitlink carrying the target's `muse` SHA, and the name exists neither in the
+    target tree nor in ours or the merge base - i.e. it is exactly the name ort made up
+    for the displaced gitlink. Anything else is a conflict for a human.
+    """
     candidates = sorted(path for path in entries
                         if path == FRAMEWORK_PATH or path.startswith(FRAMEWORK_PATH + "~"))
-    accepted: set[str] = set()
-    expected_link = repo.gitlink(target, FRAMEWORK_PATH)
-    if len(candidates) == 1 and expected_link and \
-            entries[candidates[0]].get(3) == (GITLINK, expected_link):
-        accepted.add(candidates[0])
-        repo.git("rm", "-q", "--cached", "--", candidates[0])
-        # `muse` itself is our subtree; only a materialised conflict directory
-        # (`muse~<sha>`) may be removed from the worktree.
-        if not (candidates[0] == FRAMEWORK_PATH and (repo.root / candidates[0]).is_dir()):
-            remove_worktree_path(repo, candidates[0])
-    for path in candidates:
-        if path not in accepted:
-            unresolved.append(path)
+    if not candidates:
+        return None, []
+    accepted = None
+    expected = repo.gitlink(state["target"], FRAMEWORK_PATH)
+    if len(candidates) == 1:
+        path = candidates[0]
+        if path != FRAMEWORK_PATH and expected and entries[path].get(3) == (GITLINK, expected):
+            absent = all(repo.obj(f"{ref}:{path}") is None
+                         for ref in (state["target"], state["start"], state["base"]))
+            if absent:
+                accepted = path
+    return accepted, [path for path in candidates if path != accepted]
+
+
+def resolve_upstream_merge(repo: Repo, state: dict) -> list[str]:
+    """Resolve the conflicts a sync expects; return the paths that need a human."""
+    trim = load_trim(repo)
+    apply_removals(repo, state)  # finish a plan an earlier run did not complete
+    entries = unmerged_entries(repo)
+    unresolved: list[str] = []
+    plan: list[dict] = []
+    accepted, refused = classify_link_conflict(repo, state, entries)
+    if accepted:
+        state["linkDrops"] = sorted(set(state.get("linkDrops") or []) | {accepted})
+        plan.append({"path": accepted, "report": None, "keepDir": accepted == FRAMEWORK_PATH})
+    unresolved += refused
     for path, stages in sorted(entries.items()):
-        if path in accepted or path in candidates:
+        if path == accepted or path in refused:
             continue
         if trimmed(path, trim) and 2 not in stages:
             # Deleted by us (trimmed), changed upstream: keep it deleted, but report it.
-            drop_path(repo, path)
-            note(report, "discardedChanges", path)
+            plan.append({"path": path, "report": "discardedChanges", "keepDir": False})
         else:
             unresolved.append(path)
-    # New upstream files under trimmed prefixes merge cleanly; delete and report them.
+    planned = {entry["path"] for entry in plan}
     for path in split_z(repo.git("diff", "--cached", "--no-renames", "--name-only", "-z",
                                  "--diff-filter=A", "HEAD")):
-        if trimmed(path, trim):
-            drop_path(repo, path)
-            note(report, "droppedAdditions", path)
+        if trimmed(path, trim) and path not in planned:
+            plan.append({"path": path, "report": "droppedAdditions", "keepDir": False})
+    if plan:
+        plan_removals(state, plan)
+        save_state(repo, state)  # plan and report entries are durable before any removal
+        apply_removals(repo, state)
+    if unresolved:
+        state["conflicts"] = sorted(set(state.get("conflicts") or []) | set(unresolved))
+        state["status"] = [[code, path] for code, path in status_entries(repo)]
+        if not state.get("preResolutionTree"):
+            state["preResolutionTree"] = capture_index_tree(repo, entries)
+        save_state(repo, state)
     return unresolved
 
 
-def check_tree(repo: Repo, trim: list[str], state: dict) -> list[str]:
+def check_tree(repo: Repo, state: dict, trim: list[str]) -> list[str]:
     problems = []
     for mode, path in index_entries(repo):
         if mode == GITLINK:
@@ -535,7 +825,8 @@ def stage_temp_branch(repo: Repo, state: dict) -> bool:
         if repo.rev(f"refs/heads/{temp}") != start:
             raise SyncError(f"the temporary branch {temp} exists but does not point at the "
                             f"sync start {start[:12]}; delete it and rerun if it is stale")
-        repo.git("checkout", "-q", "-f", temp)
+        if current != temp:
+            repo.git("checkout", "-q", temp)  # never forced: the worktree is verified clean
     else:
         repo.git("checkout", "-q", "-b", temp, start)
     verify_branch(repo, temp)
@@ -553,18 +844,27 @@ def stage_upstream_merge(repo: Repo, state: dict) -> bool:
             raise SyncError(f"a merge of {merge[:12]} is in progress, but this sync merges "
                             f"{target[:12]}; nothing was changed. Finish or abort that merge "
                             f"first")
-        verify_head(repo, start, "the merge base of the in-progress upstream merge")
-        state["mergeStarted"] = True
+        verify_head(repo, start, "the base of the in-progress upstream merge")
+        state["merging"] = target
+        state["mergeOutcome"] = "ready"
         save_state(repo, state)
     else:
-        if commit_parents(repo, "HEAD") == [start, target]:
-            # The merge command ran and was committed before the crash that lost the stage.
-            state["mergeStarted"] = True
+        parents = commit_parents(repo, "HEAD")
+        if parents == [start, target]:
+            recorded = trailer_value(commit_message(repo, "HEAD"), UPSTREAM_TRAILER)
+            if recorded != target:
+                refuse_foreign_merge(repo, state, repo.rev("HEAD"), "upstream",
+                                     UPSTREAM_TRAILER, target, start)
             state["upstreamMerge"] = repo.rev("HEAD")
+            state["merging"] = None
+            state["mergeOutcome"] = None
             advance(repo, state, "upstream-merge")
             return True
+        if len(parents) == 2 and parents[1] == target:
+            refuse_foreign_merge(repo, state, repo.rev("HEAD"), "upstream", UPSTREAM_TRAILER,
+                                 target, start, parents)
         verify_head(repo, start)
-        if state.get("mergeStarted"):
+        if state.get("mergeOutcome") in ("ready", "conflicts"):
             raise SyncError(
                 f"the upstream merge of {target[:12]} is no longer in progress: it was aborted "
                 f"(`git merge --abort`) or reset, so this sync cannot be resumed. Nothing was "
@@ -573,11 +873,16 @@ def stage_upstream_merge(repo: Repo, state: dict) -> bool:
         # trimmed path and "adds" all of muse/, and ort would pair them as bogus renames
         # (observed: a trimmed appshell QML file matched to a framework header). Upstream
         # renames of files we changed then surface as modify/delete conflicts instead.
+        state["merging"] = target
+        state["mergeOutcome"] = None
+        save_state(repo, state)  # intent is durable before the command runs
         result = repo.run("merge", "-q", "--no-commit", "--no-ff", "-s", "ort", "-Xno-renames",
                           target)
-        classify_merge(repo, result)
-        state["mergeStarted"] = True
+        outcome = merge_outcome(repo, result)
+        state["mergeOutcome"] = outcome
         save_state(repo, state)
+        if outcome == "failed":
+            raise SyncError(merge_failure(result))
         if repo.merge_head() != target:
             raise SyncError(f"`git merge {target[:12]}` left no merge to commit; the state is "
                             f"kept, run `abort` and sync again")
@@ -588,32 +893,43 @@ def stage_upstream_merge(repo: Repo, state: dict) -> bool:
 def stage_upstream_commit(repo: Repo, state: dict) -> bool:
     branch, start, target = state["branch"], state["start"], state["target"]
     verify_branch(repo, state["temp"])
-    if commit_parents(repo, "HEAD") == [start, target]:
+    parents = commit_parents(repo, "HEAD")
+    if parents == [start, target]:
+        recorded = trailer_value(commit_message(repo, "HEAD"), UPSTREAM_TRAILER)
+        if recorded != target:
+            refuse_foreign_merge(repo, state, repo.rev("HEAD"), "upstream", UPSTREAM_TRAILER,
+                                 target, start)
         state["upstreamMerge"] = repo.rev("HEAD")
+        state["merging"] = None
+        state["mergeOutcome"] = None
         advance(repo, state, "upstream-commit")
         return True
+    if len(parents) == 2 and parents[1] == target:
+        refuse_foreign_merge(repo, state, repo.rev("HEAD"), "upstream", UPSTREAM_TRAILER,
+                             target, start, parents)
     verify_head(repo, start)
     if repo.merge_head() != target:
         raise SyncError(f"the upstream merge of {target[:12]} is no longer in progress (was it "
                         f"aborted?); the sync cannot be resumed. Run `abort` to return to "
                         f"{branch}, then sync again")
-    trim = load_trim(repo)
-    unresolved = resolve_upstream_merge(repo, trim, target, state["report"])
+    unresolved = resolve_upstream_merge(repo, state)
     save_state(repo, state)
     if unresolved:
         print("conflicts that need a human (resolve, `git add`, then `continue`):")
         for path in unresolved:
             print(f"  {path}")
         return False
-    problems = check_tree(repo, trim, state)
+    problems = check_tree(repo, state, load_trim(repo))
     if problems:
         raise SyncError("the upstream merge does not produce the expected tree:\n  "
                         + "\n  ".join(problems))
-    repo.git("commit", "-q", "-m", f"Merge upstream/musescore {target}\n\n" + summary(state))
+    repo.git("commit", "-q", "-m", upstream_merge_message(state))
     if commit_parents(repo, "HEAD") != [start, target]:
         raise SyncError(f"the upstream merge commit does not have {start[:12]} and "
                         f"{target[:12]} as parents")
     state["upstreamMerge"] = repo.rev("HEAD")
+    state["merging"] = None
+    state["mergeOutcome"] = None
     advance(repo, state, "upstream-commit")
     return True
 
@@ -626,26 +942,54 @@ def stage_framework_merge(repo: Repo, state: dict) -> bool:
         raise SyncError(f"the sync state records no upstream merge commit; run `abort` and "
                         f"sync again")
     verify_branch(repo, state["temp"])
-    if commit_parents(repo, "HEAD") == [upstream_merge, framework]:
-        state["frameworkMerge"] = repo.rev("HEAD")
-        advance(repo, state, "framework-merge")
-        return True
-    verify_head(repo, upstream_merge)
-    merge = repo.merge_head()
-    if merge and merge != framework:
-        raise SyncError(f"a merge of {merge[:12]} is in progress, but this sync merges the "
-                        f"framework {framework[:12]}; nothing was changed. Finish or abort "
-                        f"that merge first")
-    if not merge and framework == previous:
+    if framework == previous:
         state["frameworkMerge"] = None
+        state["merging"] = None
+        state["mergeOutcome"] = None
         advance(repo, state, "framework-merge")
         return True
-    if not merge and state.get("frameworkStarted"):
-        raise SyncError(
-            f"the framework merge of {framework[:12]} is no longer in progress: it was "
-            f"aborted (`git merge --abort`) or reset. Nothing was committed; run `abort` to "
-            f"return to {branch}, then sync again")
-    if not merge:
+    merge = repo.merge_head()
+    if merge:
+        if merge != framework:
+            raise SyncError(f"a merge of {merge[:12]} is in progress, but this sync merges the "
+                            f"framework {framework[:12]}; nothing was changed. Finish or abort "
+                            f"that merge first")
+        if unmerged_entries(repo):
+            state["conflicts"] = sorted(set(state.get("conflicts") or [])
+                                        | set(unmerged_entries(repo)))
+            state["status"] = [[code, path] for code, path in status_entries(repo)]
+            if not state.get("preResolutionTree"):
+                state["preResolutionTree"] = capture_index_tree(repo, unmerged_entries(repo))
+            save_state(repo, state)
+            print(f"framework conflicts in {FRAMEWORK_PATH}/ (resolve, `git add`, then "
+                  f"`continue`; the tool makes the merge commit):")
+            for path in sorted(unmerged_entries(repo)):
+                print(f"  {path}")
+            return False
+        # The human resolved and staged everything; the tool makes the merge commit.
+        require_only_expected_changes(repo, state, "continue")
+        repo.git("commit", "-q", "-m", framework_merge_message(state))
+    else:
+        parents = commit_parents(repo, "HEAD")
+        if parents == [upstream_merge, framework]:
+            recorded = trailer_value(commit_message(repo, "HEAD"), FRAMEWORK_TRAILER)
+            if recorded != framework:
+                refuse_foreign_merge(repo, state, repo.rev("HEAD"), "framework",
+                                     FRAMEWORK_TRAILER, framework, upstream_merge)
+            state["frameworkMerge"] = repo.rev("HEAD")
+            state["merging"] = None
+            state["mergeOutcome"] = None
+            advance(repo, state, "framework-merge")
+            return True
+        if len(parents) == 2 and parents[1] == framework:
+            refuse_foreign_merge(repo, state, repo.rev("HEAD"), "framework",
+                                 FRAMEWORK_TRAILER, framework, upstream_merge, parents)
+        verify_head(repo, upstream_merge)
+        if state.get("mergeOutcome") in ("ready", "conflicts"):
+            raise SyncError(
+                f"the framework merge of {framework[:12]} is no longer in progress: it was "
+                f"aborted (`git merge --abort`) or reset. Nothing was committed; run `abort` "
+                f"to return to {branch}, then sync again")
         base = repo.git("merge-base", upstream_merge, framework).strip()
         if base != previous:
             raise SyncError(
@@ -657,38 +1001,36 @@ def stage_framework_merge(repo: Repo, state: dict) -> bool:
                 f"git's base could drop framework changes. Nothing was committed: land the "
                 f"framework with a normal framework merge first, or pick another target, "
                 f"then sync again (or run `abort`)")
+        state["merging"] = framework
+        state["mergeOutcome"] = None
+        save_state(repo, state)  # intent is durable before the command runs
         result = repo.run("merge", "-q", "--no-ff", "-s", "ort", f"-Xsubtree={FRAMEWORK_PATH}",
-                          "-m", f"Merge upstream/muse-framework {framework} into "
-                                f"{FRAMEWORK_PATH}/\n\n{FRAMEWORK_TRAILER}: {framework}",
-                          framework)
-        if classify_merge(repo, result) == "conflicts":
-            state["frameworkStarted"] = True
+                          "-m", framework_merge_message(state), framework)
+        outcome = merge_outcome(repo, result)
+        state["mergeOutcome"] = outcome
+        save_state(repo, state)
+        if outcome == "failed":
+            raise SyncError(merge_failure(result))
+        if outcome == "conflicts":
+            state["conflicts"] = sorted(set(state.get("conflicts") or [])
+                                        | set(unmerged_entries(repo)))
+            state["status"] = [[code, path] for code, path in status_entries(repo)]
+            if not state.get("preResolutionTree"):
+                state["preResolutionTree"] = capture_index_tree(repo, unmerged_entries(repo))
             save_state(repo, state)
-            print(f"framework conflicts in {FRAMEWORK_PATH}/ (resolve, `git add`, "
-                  f"`git commit`, then `continue`):")
+            print(f"framework conflicts in {FRAMEWORK_PATH}/ (resolve, `git add`, then "
+                  f"`continue`; the tool makes the merge commit):")
             for path in sorted(unmerged_entries(repo)):
                 print(f"  {path}")
             return False
-        if commit_parents(repo, "HEAD") != [upstream_merge, framework]:
-            raise SyncError(f"the framework merge commit does not have {upstream_merge[:12]} "
-                            f"and {framework[:12]} as parents")
-        state["frameworkMerge"] = repo.rev("HEAD")
-        state["frameworkStarted"] = True
-        advance(repo, state, "framework-merge")
-        return True
-    # A merge of the framework is in progress (the stopped conflict a human resumes).
-    if unmerged_entries(repo):
-        print(f"framework conflicts in {FRAMEWORK_PATH}/ (resolve, `git add`, `git commit`, "
-              f"then `continue`):")
-        for path in sorted(unmerged_entries(repo)):
-            print(f"  {path}")
-        return False
-    # Everything is staged, the human only has not committed yet.
-    repo.git("commit", "-q", "--no-edit")
     if commit_parents(repo, "HEAD") != [upstream_merge, framework]:
-        raise SyncError(f"the committed framework merge does not have {upstream_merge[:12]} "
-                        f"and {framework[:12]} as parents")
+        raise SyncError(f"the framework merge commit does not have {upstream_merge[:12]} and "
+                        f"{framework[:12]} as parents")
+    if trailer_value(commit_message(repo, "HEAD"), FRAMEWORK_TRAILER) != framework:
+        raise SyncError(f"the framework merge commit lost its {FRAMEWORK_TRAILER} trailer")
     state["frameworkMerge"] = repo.rev("HEAD")
+    state["merging"] = None
+    state["mergeOutcome"] = None
     advance(repo, state, "framework-merge")
     return True
 
@@ -703,11 +1045,17 @@ def verify_history(repo: Repo, state: dict, head: str) -> list[str]:
     if commit_parents(repo, upstream_merge) != [start, target]:
         problems.append(f"upstream merge {upstream_merge[:12]} does not have the parents "
                         f"{start[:12]} and {target[:12]}")
+    if trailer_value(commit_message(repo, upstream_merge), UPSTREAM_TRAILER) != target:
+        problems.append(f"upstream merge {upstream_merge[:12]} lost its {UPSTREAM_TRAILER} "
+                        f"trailer")
     framework_merge = state.get("frameworkMerge")
     if framework_merge:
         if commit_parents(repo, framework_merge) != [upstream_merge, framework]:
             problems.append(f"framework merge {framework_merge[:12]} does not have the parents "
                             f"{upstream_merge[:12]} and {framework[:12]}")
+        if trailer_value(commit_message(repo, framework_merge), FRAMEWORK_TRAILER) != framework:
+            problems.append(f"framework merge {framework_merge[:12]} lost its "
+                            f"{FRAMEWORK_TRAILER} trailer")
         # muse/ must be the recorded base plus the branch's own delta plus the framework
         # range; that is what a `-Xsubtree` merge produces.
         base_tree = repo.obj(f"{state['previousFramework']}^{{tree}}")
@@ -743,9 +1091,12 @@ def stage_check(repo: Repo, state: dict) -> bool:
     verify_branch(repo, state["temp"])
     head = repo.rev("HEAD")
     state["head"] = head
+    state["report"]["resolutions"] = resolution_paths(repo, state)
     problems = verify_history(repo, state, head)
     trim = load_trim(repo)  # the TRIM of the final tree; check_tree asserts it did not change
-    problems += check_tree(repo, trim, state)
+    problems += check_tree(repo, state, trim)
+    for code, path in status_entries(repo):
+        problems.append(f"the worktree is not clean at the sync tip: {code} {path}")
     local = repo.diff_paths(f"{state['previousFramework']}^{{tree}}",
                             f"{state['start']}:{FRAMEWORK_PATH}")
     # Without a local framework delta, muse/ must equal the framework tree exactly.
@@ -763,18 +1114,33 @@ def stage_check(repo: Repo, state: dict) -> bool:
 
 def stage_fast_forward(repo: Repo, state: dict) -> bool:
     branch, temp, head = state["branch"], state["temp"], state["head"]
-    verify_branch(repo, temp)
-    verify_head(repo, head)
-    current = repo.rev(f"refs/heads/{branch}")
-    if current not in (state["start"], head):
-        raise SyncError(f"{branch} points at {current[:12]}, but the sync started at "
-                        f"{state['start'][:12]}; refusing to fast-forward. Run `abort` to "
-                        f"return to {branch} and sync again")
-    if current != head:
-        repo.git("checkout", "-q", branch)
+    branch_tip = repo.obj(f"refs/heads/{branch}")
+    temp_tip = repo.rev(f"refs/heads/{temp}") if repo.branch_exists(temp) else None
+    if branch_tip == head:
+        # The branch already moved: the fast-forward ran, the state save did not.
+        verify_branch(repo, branch)
+        verify_head(repo, head)
+        if temp_tip not in (None, head):
+            raise SyncError(f"{temp} is at {str(temp_tip)[:12]}, expected {head[:12]}")
+    elif branch_tip == state["start"] and temp_tip == head:
+        current = repo.current_branch()
+        if current == temp:
+            verify_head(repo, head)
+        elif current == branch:
+            verify_head(repo, state["start"])
+        else:
+            raise SyncError(f"HEAD is on {current}, which is neither {branch} nor {temp}; "
+                            f"nothing was changed")
+        if current != branch:
+            repo.git("checkout", "-q", branch)  # never forced: the worktree is verified clean
         repo.git("merge", "-q", "--ff-only", head)
-    verify_branch(repo, branch)
-    verify_head(repo, head)
+        verify_branch(repo, branch)
+        verify_head(repo, head)
+    else:
+        raise SyncError(f"{branch} is at {str(branch_tip)[:12]} and {temp} at "
+                        f"{str(temp_tip)[:12]}, but this sync expects {branch} at "
+                        f"{state['start'][:12]} and {temp} at {head[:12]}; refusing to "
+                        f"fast-forward. Run `abort` to return to {branch}")
     advance(repo, state, "fast-forward")
     return True
 
@@ -822,21 +1188,25 @@ def summary(state: dict) -> str:
     lines.append(f"new upstream files dropped under trimmed prefixes: "
                  f"{len(report['droppedAdditions'])}")
     lines += [f"  {p}" for p in report["droppedAdditions"]]
+    resolutions = report.get("resolutions") or []
+    lines.append(f"conflict resolutions that differ from the merge sides: {len(resolutions)}")
+    lines += [f"  {p}" for p in resolutions]
     return "\n".join(lines)
 
 
 # ---------------------------------------------------------------------------
 
 def cmd_absorb(repo: Repo, args) -> int:
-    if not repo.clean() or repo.merging():
-        raise SyncError("working tree is not clean")
+    trim = load_trim(repo)
+    require_clean(repo, trim)
+    if repo.merging():
+        raise SyncError("a merge is in progress; finish or abort it first")
     framework = args.framework or repo.gitlink("HEAD", FRAMEWORK_PATH)
     if not framework:
         raise SyncError(f"HEAD has no `{FRAMEWORK_PATH}` gitlink; already absorbed?")
     framework = repo.rev(framework)
     if not repo.ok("merge-base", "--is-ancestor", framework, args.framework_ref):
         raise SyncError(f"{framework} is not on {args.framework_ref}")
-    trim = load_trim(repo)
     repo.git("merge", "-q", "-s", "ours", "--no-commit", "--allow-unrelated-histories", framework)
     drop = [FRAMEWORK_PATH]
     drop += [path for mode, path in index_entries(repo)
@@ -863,12 +1233,16 @@ def cmd_sync(repo: Repo, args) -> int:
         abort_sync(repo, state)
     elif temp_branches(repo):
         raise SyncError("no sync state file" + leftover_hint(repo))
-    if not repo.clean() or repo.merging():
-        raise SyncError("working tree is not clean")
+    if repo.merging():
+        raise SyncError("a merge is in progress; finish or abort it first")
     branch = repo.current_branch()
+    if branch == "HEAD":
+        raise SyncError("HEAD is detached; check out the branch to sync (this tool moves the "
+                        "branch with a fast-forward) and rerun")
     if branch.startswith("sync/"):
         raise SyncError(f"HEAD is on the temporary branch {branch}, which has no sync state; "
                         f"check out your branch and delete it, then run `sync` again")
+    require_clean(repo, load_trim(repo))
     start = repo.rev("HEAD")
     target = repo.rev(args.target or args.upstream_ref)
     if not repo.ok("merge-base", "--is-ancestor", target, args.upstream_ref):
@@ -898,10 +1272,11 @@ def cmd_sync(repo: Repo, args) -> int:
                         f"nothing was changed")
     state = {"version": STATE_VERSION, "branch": branch, "temp": f"sync/{target[:12]}",
              "start": start, "target": target, "base": base, "framework": framework,
-             "previousFramework": previous, "stage": "start", "mergeStarted": False,
-             "frameworkStarted": False, "upstreamMerge": None, "frameworkMerge": None,
-             "head": None,
-             "report": {"discardedChanges": [], "droppedAdditions": []}}
+             "previousFramework": previous, "stage": "start", "merging": None,
+             "mergeOutcome": None, "upstreamMerge": None, "frameworkMerge": None,
+             "head": None, "removals": [], "conflicts": [], "status": [],
+             "preResolutionTree": None, "linkDrops": [],
+             "report": {"discardedChanges": [], "droppedAdditions": [], "resolutions": []}}
     save_state(repo, state)  # before the temporary branch exists
     stop_for_test("start")
     return finish(repo, state)
@@ -911,6 +1286,7 @@ def cmd_continue(repo: Repo, args) -> int:
     state = load_state(repo)
     if not state:
         raise SyncError("no sync in progress" + leftover_hint(repo))
+    require_only_expected_changes(repo, state, "continue")
     return finish(repo, state)
 
 
@@ -923,7 +1299,17 @@ def cmd_abort(repo: Repo, args) -> int:
     return 0
 
 
+def configure_output() -> None:
+    """UTF-8 with backslashreplace, whatever code page the console claims (item C)."""
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="backslashreplace")
+        except ISSUE_ENCODING:
+            pass
+
+
 def main() -> int:
+    configure_output()
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("-C", dest="repo", type=Path, default=Path.cwd())
