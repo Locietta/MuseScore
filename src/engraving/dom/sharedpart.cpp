@@ -173,7 +173,7 @@ void SharedPart::computeIsSameInstruments()
 mu::engraving::String mu::engraving::SharedPart::partName() const
 {
     const Instrument* i = instrument();
-    String fullName = i->longName();
+    String fullName = plainPartName(i);
 
     const String& transp = i->transposition();
     if (!transp.empty()) {

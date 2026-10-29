@@ -43,6 +43,7 @@
 #include "staff.h"
 #include "system.h"
 #include "stringtunings.h"
+#include "textbase.h"
 
 #include "log.h"
 
@@ -854,10 +855,52 @@ Fraction Part::currentHarpDiagramTick(const Fraction& tick) const
     return Fraction::fromTicks(i->first);
 }
 
+//---------------------------------------------------------
+//   plainPartName
+//    Upstream 8bba2d2823 ("Group naming") replaced the plain-text
+//    Part::m_partName with a name derived from the instrument label, whose
+//    long name is rich text (<font>/<b>/<sym> markup). Every partName()
+//    caller - mixer track titles, MIDI export, excerpt names,
+//    accessibility - expects plain display text, and the MusicXML exporter
+//    has always stripped such markup from part names
+//    (MScoreTextToMusicXml::toPlainText, documented for MuseScore 1.3 part
+//    names). Convert to plain text here, once, for all of them.
+//    The same commit dropped the fallback to Instrument::trackName() that
+//    read114/read206/read460 applied when no part name was stored
+//    ("if (partName.isEmpty()) partName = instrument()->trackName()"),
+//    which loses the part name of scores without a <longName> element;
+//    keep 4.7's fallback semantics.
+//---------------------------------------------------------
+
+String Part::plainPartName(const Instrument* i)
+{
+    const String richName = i->longName();
+    String name;
+    bool inTag = false;
+    for (size_t idx = 0; idx < richName.size(); ++idx) {
+        const Char c = richName.at(idx);
+        if (c == u'<') {
+            inTag = true;
+        } else if (c == u'>') {
+            inTag = false;
+        } else if (!inTag) {
+            name.append(c);
+        }
+    }
+    name = TextBase::unEscape(name);
+
+    if (name.empty()) {
+        // Legacy scores store the part name in the instrument track name.
+        name = i->trackName();
+    }
+
+    return name;
+}
+
 String Part::partName() const
 {
     const Instrument* i = instrument();
-    String fullName = i->longName();
+    String fullName = plainPartName(i);
 
     const String& transp = i->transposition();
     if (!transp.empty()) {
