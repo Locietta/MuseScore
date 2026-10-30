@@ -323,3 +323,6 @@ src/engraving/tests/transpose_tests.cpp
 src/engraving/tests/tuplet_tests.cpp
 src/engraving/tests/unrollrepeats_tests.cpp
 src/engraving/tests/voiceswitching_tests.cpp
+
+# Batch 5B: SoundFonts (bootstrap downloads the pinned SoundFont asset)
+share/sound/
