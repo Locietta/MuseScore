@@ -2,8 +2,6 @@
 
 #include <format>
 #include <string>
-#include <type_traits>
-#include <utility>
 
 #include "engraving/types/bps.h"
 #include "engraving/types/fraction.h"
