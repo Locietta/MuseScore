@@ -196,6 +196,25 @@ target("engrave_handles_test")
     end
 target_end()
 
+-- Guitar Pro and PowerTab import of upstream's test data: every score file of the
+-- importer's data directory must either open to a score or return an Error.
+target("engrave_gp_import_test")
+    set_kind("binary")
+    add_deps("engrave")
+    add_packages("gtest")
+    add_defines(table.unpack(ENGRAVE_DEFINES))
+    add_defines(table.unpack(ENGRAVE_GLOBAL_DEFINES))
+    add_includedirs(ENGRAVE_ADAPTER_INCLUDES)
+    add_includedirs("$(builddir)/xmake-generated")
+    add_defines('ENGRAVE_TEST_SOURCE_ROOT="' .. source_root:gsub("\\", "/") .. '"')
+    add_files(path.join(tests_dir, "gp_import_test.cpp"))
+    if is_plat("windows") then
+        add_files(utf8_manifest)
+    else
+        add_links("m")
+    end
+target_end()
+
 -- The catalogue's tests: the value codec, the describe tables against live
 -- corpus instances, and the generator diff.  They reach into the engine (P_TYPE,
 -- Pid, MasterScore), so they link the library and its internal headers.

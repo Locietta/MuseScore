@@ -743,27 +743,43 @@ void PowerTab::fillMeasure(tBeatList& elist, Measure* measure, int staff, std::v
                 note->setTpcFromPitch();
             }
 
-            if (hammer) {
-                auto cr1 = hammer;
-                auto cr2 = chord;
-                hammer = nullptr;
+            if (chord->notes().empty()) {
+                // Every note of the beat was skipped (the track carries no string data, or
+                // the note's string index is out of range).  A chord is expected to hold at
+                // least one note: layout reads its first note, so an empty one must not
+                // reach the score.  Keep the beat's position and duration as a rest.
+                LOGE() << "beat has no importable notes, using a rest";
+                segment->remove(chord);
+                delete chord;
+                auto rest = Factory::createRest(segment);
+                cr = rest;
+                rest->setTrack(staff * VOICES);
+                rest->setTicks(l);
+                rest->setDurationType(d);
+                segment->add(rest);
+            } else {
+                if (hammer) {
+                    auto cr1 = hammer;
+                    auto cr2 = chord;
+                    hammer = nullptr;
 
-                Slur* slur = Factory::createSlur(score->dummy());
-                slur->setStartElement(cr1);
-                slur->setEndElement(cr2);
-                slur->setTick(cr1->tick());
-                slur->setTick2(tick);
-                slur->setTrack(staff * VOICES);
-                slur->setTrack2(staff * VOICES);
-                score->addElement(slur);
+                    Slur* slur = Factory::createSlur(score->dummy());
+                    slur->setStartElement(cr1);
+                    slur->setEndElement(cr2);
+                    slur->setTick(cr1->tick());
+                    slur->setTick2(tick);
+                    slur->setTrack(staff * VOICES);
+                    slur->setTrack2(staff * VOICES);
+                    score->addElement(slur);
 
-                Text* st = Factory::createText(chord->notes().front(), TextStyleType::HARMONY_A);
-                st->setXmlText(u"H");
-                st->setTrack(staff * VOICES);
-                cr1->notes().front()->add(st);
-            }
-            if (has_hammer) {
-                hammer = chord;
+                    Text* st = Factory::createText(chord->notes().front(), TextStyleType::HARMONY_A);
+                    st->setXmlText(u"H");
+                    st->setTrack(staff * VOICES);
+                    cr1->notes().front()->add(st);
+                }
+                if (has_hammer) {
+                    hammer = chord;
+                }
             }
         }
 
