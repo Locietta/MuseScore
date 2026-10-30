@@ -1,4 +1,4 @@
-﻿/*
+/*
  * SPDX-License-Identifier: GPL-3.0-only
  * MuseScore-Studio-CLA-applies
  *
@@ -44,9 +44,9 @@
 #include "engraving/dom/spanner.h"
 #include "engraving/dom/staff.h"
 #include "engraving/dom/stem.h"
-#include "engraving/editing/editvisibility.h"
 
 #include "engraving/editing/editmeasurerepeat.h"
+#include "engraving/editing/editvisibility.h"
 #include "engraving/editing/editvoice.h"
 #include "engraving/editing/transaction/transaction.h"
 
@@ -1461,13 +1461,13 @@ static std::vector<Chord*> firstMeasureChords(Score* score, track_idx_t track)
 
 static void setNoteVisibility(Score* score, track_idx_t track, bool visible)
 {
-    score->startCmd(TranslatableString::untranslatable("Engraving parts tests"));
-    for (Chord* chord : firstMeasureChords(score, track)) {
-        for (Note* note : chord->notes()) {
-            EditVisibility::undoChangeVisible(score->transactionManager()->currentOrDummyTransaction(), note, visible);
+    score->transactionManager()->transaction(TranslatableString::untranslatable("Engraving parts tests"), [&](Transaction& tx) {
+        for (Chord* chord : firstMeasureChords(score, track)) {
+            for (Note* note : chord->notes()) {
+                EditVisibility::undoChangeVisible(tx, note, visible);
+            }
         }
-    }
-    score->endCmd();
+    });
 }
 
 static void expectBeamedChordsVisible(Score* score, track_idx_t track, bool visible)
