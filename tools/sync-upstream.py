@@ -51,7 +51,10 @@ os.replace) *before* the mutation of the next stage and records what the sync ex
                    `abort` deletes the planned paths the restored branch does not track
   conflicts        paths left unmerged for a human by the current stop
   status           the worktree state the tool leaves behind at that stop
-  preResolutionTree  index snapshot taken before the first human resolution
+  resolutionSides  for every path a human must resolve, its base, our and their object
+                   (or null for a deletion), recorded while the conflict is open
+  report           the report of each merge (`upstream`, `framework`): discardedChanges,
+                   droppedAdditions and resolutions (path -> ours/theirs/neither/deleted)
   upstreamMerge / frameworkMerge / head  the commits the sync made
 
 Every stage is idempotent and verifies branch and commit identity before it acts.
@@ -70,24 +73,25 @@ merge commit, once the resolutions are recorded); `SYNC_UPSTREAM_TEST_STOP_AFTER
 stops between the index and worktree half of the n-th planned removal.
 
 Merge commits are made by the tool, with a provenance trailer: `Sync-Upstream: <target>`
-on the upstream merge and `Framework-Commit: <framework>` on the framework merge. A
-merge commit with the expected parents but without (or with a wrong) trailer was made
-by someone else and is refused, with instructions, instead of adopted. The framework
-trailer also names the previously incorporated framework commit for the next sync; it
-is read from the newest such commit on the first-parent chain (falling back to the
-subject of the pre-trailer absorb commit 7150f2b05e) rather than inferred with
-`merge-base`, and is used as the explicit merge-base expectation.
+on the upstream merge and `Framework-Commit: <framework>` on the framework merge, and
+each repeats the report sections of its own merge. A merge commit with the expected
+parents but without (or with a wrong) trailer was made by someone else and is refused,
+with instructions, instead of adopted. The framework trailer also names the previously
+incorporated framework commit for the next sync; it is read from the newest such commit
+on the first-parent chain (falling back to the subject of the pre-trailer absorb commit
+7150f2b05e) rather than inferred with `merge-base`, and is used as the explicit
+merge-base expectation.
 
 Conflict handling:
   * The `muse` gitlink bump arrives as ort's displaced `muse~<sha>` entry. It is
     dropped only when it is a 160000 gitlink whose stage-3 SHA is the target's muse
     gitlink, and the name exists neither in the target tree nor in ours or the merge
     base (otherwise it is a real conflict for a human).
-  * Modify/delete conflicts on TRIM paths keep the deletion and are reported; new
-    upstream files under trimmed prefixes are deleted and reported. Both are planned
-    and written to the state file before anything is removed, and the plan is replayed
-    when a run is resumed (so an interruption can neither lose a report entry nor leave
-    a half-removed file behind).
+  * Modify/delete conflicts on TRIM paths keep the deletion and are reported; new files
+    under trimmed prefixes are deleted and reported. Both are planned and written to the
+    state file before anything is removed, and the plan is replayed when a run is resumed
+    (so an interruption can neither lose a report entry nor leave a half-removed file
+    behind).
   * Everything else stops for a human.
 
 TRIM belongs to `main`: a sync never changes it, refuses a target that adds or changes
@@ -100,10 +104,12 @@ NUL-delimited output (`-z`). stdout/stderr are reconfigured to UTF-8 with
 mangle a report nor turn a success into a traceback.
 
 Deliberate limits (not defects):
-  * The tool does not prove that a human conflict resolution kept every other hunk.
-    It prints, in the final report, the paths whose resolution differs from the merge
-    sides (the diff between the pre-resolution index and the final tree, minus the
-    paths the tool itself dropped), so a reviewer can inspect them.
+  * The tool does not prove that a human conflict resolution kept every other hunk. For
+    every path a human had to resolve it records the base, our side and their side while
+    the conflict is open, and reports the resolution as `ours`, `theirs`, `neither` (a new
+    content that is neither side) or `deleted`, in the merge commit and the final report.
+    A resolution that took our side is therefore visible even though it discards the
+    incoming change.
   * A fast-forwardable upstream target is not supported: upstream never contains our
     commits, so every sync produces a merge commit.
   * Framework commits that reached the branch through some other parent are refused
@@ -128,7 +134,7 @@ TRIM_FILE = "TRIM"
 GITLINK = "160000"
 FRAMEWORK_TRAILER = "Framework-Commit"
 UPSTREAM_TRAILER = "Sync-Upstream"
-STATE_VERSION = 3
+STATE_VERSION = 4
 # Stage names double as the values SYNC_UPSTREAM_TEST_STOP_AFTER accepts.
 STAGES = ("start", "temp-branch", "upstream-merge", "upstream-commit",
           "framework-merge", "check", "fast-forward", "cleanup")
@@ -213,16 +219,6 @@ class Repo:
 
     def branch_exists(self, name: str) -> bool:
         return self.ok("rev-parse", "--verify", "--quiet", f"refs/heads/{name}")
-
-
-def run_git_env(repo: Repo, env: dict[str, str], *args: str, stdin: bytes | None = None) -> str:
-    """Run git with a custom environment (a scratch index), returning stdout."""
-    result = subprocess.run(["git", "--literal-pathspecs", *args], cwd=repo.root, env=env,
-                            input=stdin, capture_output=True)
-    if result.returncode != 0:
-        raise SyncError(f"git {' '.join(args)} failed:\n"
-                        f"{result.stderr.decode('utf-8', 'replace').strip()}")
-    return result.stdout.decode("utf-8", "replace")
 
 
 # --- git object helpers ---------------------------------------------------------
@@ -580,24 +576,50 @@ def commit_message(repo: Repo, commit: str) -> str:
     return repo.git("log", "-1", "--format=%B", commit)
 
 
-def resolutions_section(resolutions: list[str]) -> str:
-    """The report block for conflict resolutions, as printed and recorded in commits."""
-    lines = [f"conflict resolutions that differ from the merge sides: {len(resolutions)}"]
-    lines += [f"  {path}" for path in resolutions]
+def empty_merge_report() -> dict:
+    """A fresh report for one merge: what it discarded, dropped and how it was resolved."""
+    return {"discardedChanges": [], "droppedAdditions": [], "resolutions": {}}
+
+
+def report_section(state: dict, merge: str) -> dict:
+    """The report of one merge: discarded changes, dropped additions, resolutions."""
+    return state["report"][merge]
+
+
+def resolutions_section(resolutions: dict[str, str]) -> str:
+    """The report block for conflict resolutions, as printed and recorded in commits.
+
+    Every path a human had to resolve is listed with its classification: `ours` and
+    `theirs` are that merge side byte for byte, `neither` is a new content that is neither
+    side, and `deleted` says the resolution removed the path.
+    """
+    lines = [f"conflict resolutions, classified against the merge sides: {len(resolutions)}"]
+    for path in sorted(resolutions):
+        lines.append(f"  {resolutions[path]:<8}{path}")
+    return "\n".join(lines)
+
+
+def report_sections(report: dict) -> str:
+    """The three report blocks of one merge, in the order the summary prints them."""
+    lines = [f"changes discarded on trimmed paths: {len(report['discardedChanges'])}"]
+    lines += [f"  {path}" for path in report["discardedChanges"]]
+    lines.append(f"new files dropped under trimmed prefixes: {len(report['droppedAdditions'])}")
+    lines += [f"  {path}" for path in report["droppedAdditions"]]
+    lines.append(resolutions_section(report["resolutions"]))
     return "\n".join(lines)
 
 
 def upstream_merge_message(state: dict) -> str:
-    return (f"Merge upstream/musescore {state['target']}\n\n{summary(state)}\n\n"
+    return (f"Merge upstream/musescore {state['target']}\n\n"
+            f"{report_sections(report_section(state, 'upstream'))}\n\n"
             f"{UPSTREAM_TRAILER}: {state['target']}")
 
 
 def framework_merge_message(state: dict) -> str:
-    """The framework merge repeats the resolutions; the trimmed paths stay in the first."""
-    resolutions = state["report"].get("resolutions") or []
-    body = f"{resolutions_section(resolutions)}\n\n" if resolutions else ""
+    """The framework merge carries the report of its own merge, trimmed paths included."""
     return (f"Merge upstream/muse-framework {state['framework']} into {FRAMEWORK_PATH}/\n\n"
-            f"{body}{FRAMEWORK_TRAILER}: {state['framework']}")
+            f"{report_sections(report_section(state, 'framework'))}\n\n"
+            f"{FRAMEWORK_TRAILER}: {state['framework']}")
 
 
 def refuse_foreign_merge(repo: Repo, state: dict, commit: str, kind: str, key: str,
@@ -711,67 +733,84 @@ def apply_removals(repo: Repo, state: dict) -> None:
         if not (entry.get("keepDir") and (repo.root / path).is_dir()):
             remove_worktree_path(repo, path)
         if entry.get("report"):
-            note(state["report"], entry["report"], path)
+            note(report_section(state, entry["merge"]), entry["report"], path)
     state["removals"] = []
     save_state(repo, state)
 
 
 def plan_removals(state: dict, plan: list[dict]) -> None:
-    """Persist the removals and their report entries before anything is removed."""
+    """Persist the removals and their report entries before anything is removed.
+
+    A plan entry is `{path, report, merge, keepDir}`: `report` names the report list the
+    removal is noted in (`discardedChanges`, `droppedAdditions`, or None for a removal
+    that is not reported) and `merge` names the merge whose section that list is.
+    """
     for entry in plan:
         if entry.get("report"):
-            note(state["report"], entry["report"], entry["path"])
+            note(report_section(state, entry["merge"]), entry["report"], entry["path"])
     state["removals"] = plan
 
 
-def capture_index_tree(repo: Repo, entries: dict[str, dict[int, tuple[str, str]]]) -> str:
-    """A tree object for the current index with conflicted paths taken from our side.
+# --- human resolutions ----------------------------------------------------------
 
-    The final report diffs this against the sync tip, so a reviewer sees which paths a
-    human resolution changed relative to the merge sides (the tool does not prove that a
-    resolution kept everything else).
+def index_objects(repo: Repo) -> dict[str, tuple[str, str]]:
+    """path -> (mode, object id) for the fully resolved index."""
+    objects = {}
+    for record in split_z(repo.git("ls-files", "-s", "-z")):
+        meta, path = record.split("\t", 1)
+        mode, sha, _stage = meta.split()
+        objects[path] = (mode, sha)
+    return objects
+
+
+def record_resolution_sides(repo: Repo, state: dict, merge: str,
+                            paths: list[str]) -> None:
+    """Persist each conflicted path with its base, our side and their side.
+
+    The sides are read while the conflict is open. Classifying the resolution later needs
+    the incoming side too: a resolution that took our side discards their change and must
+    still be reported. An absent stage 2 or 3 means that side deleted the path.
     """
-    scratch = repo.git_dir / "sync-upstream-index.tmp"
-    shutil.copyfile(repo.git_dir / "index", scratch)
-    env = dict(os.environ, GIT_INDEX_FILE=str(scratch))
-    try:
-        records = []
-        for path in sorted(entries):
-            side = entries[path].get(2) or entries[path].get(3)
-            if side:
-                records.append(f"{side[0]} {side[1]}\t{path}".encode("utf-8"))
-        if records:
-            run_git_env(repo, env, "update-index", "-z", "--index-info",
-                        stdin=b"\0".join(records) + b"\0")
-        return run_git_env(repo, env, "write-tree").strip()
-    finally:
-        scratch.unlink(missing_ok=True)
+    entries = unmerged_entries(repo)
+    sides = state.setdefault("resolutionSides", {}).setdefault(merge, {})
+    for path in paths:
+        if path in sides:
+            continue
+        stages = entries.get(path) or {}
+        sides[path] = {name: list(stages[stage]) if stage in stages else None
+                       for name, stage in (("base", 1), ("ours", 2), ("theirs", 3))}
 
 
-def index_tree(repo: Repo) -> str:
-    """The tree the next commit records; the index is fully resolved when this runs."""
-    return repo.git("write-tree").strip()
+def classify_resolutions(repo: Repo, state: dict, merge: str) -> dict[str, str]:
+    """path -> ours / theirs / neither / deleted for every path a human resolved.
 
-
-def resolution_paths(repo: Repo, state: dict, tip: str,
-                     merge_changes: set[str] | None = None) -> list[str]:
-    """Paths whose human resolution differs from the merge sides.
-
-    `tip` is the tree-ish to compare the pre-resolution snapshot against: the index the
-    tool is about to commit (so the merge commit message records the resolutions) or the
-    sync tip (the final report). `merge_changes` are the paths the merge that produced
-    `tip` changed by itself; they are not resolutions unless a human resolved that path.
+    `ours` and `theirs` are that merge side byte for byte (same mode and object);
+    `deleted` is a resolution that leaves no index entry; anything else is `neither`, a
+    new content the tool cannot attribute to either side.
     """
-    tree = state.get("preResolutionTree")
-    if not tree:
-        return []
-    changed = set(repo.diff_paths(tree, tip))
-    ignored = set(state["report"]["discardedChanges"])
-    ignored |= set(state["report"]["droppedAdditions"])
-    ignored |= set(state.get("linkDrops") or [])
-    if merge_changes:
-        ignored |= merge_changes - set(state.get("conflicts") or [])
-    return sorted(changed - ignored)
+    sides = (state.get("resolutionSides") or {}).get(merge) or {}
+    objects = index_objects(repo)
+    classified = {}
+    for path, side in sides.items():
+        entry = objects.get(path)
+        if entry is None:
+            kind = "deleted"
+        elif side.get("ours") == list(entry):
+            kind = "ours"
+        elif side.get("theirs") == list(entry):
+            kind = "theirs"
+        else:
+            kind = "neither"
+        classified[path] = kind
+    return classified
+
+
+def stop_for_human(repo: Repo, state: dict, merge: str, unresolved: list[str]) -> None:
+    """Record the paths a human must resolve (with their sides) and save the state."""
+    record_resolution_sides(repo, state, merge, unresolved)
+    state["conflicts"] = sorted(set(state.get("conflicts") or []) | set(unresolved))
+    state["status"] = [[code, path] for code, path in status_entries(repo)]
+    save_state(repo, state)
 
 
 # --- conflict handling ----------------------------------------------------------
@@ -802,42 +841,77 @@ def classify_link_conflict(repo: Repo, state: dict,
     return accepted, [path for path in candidates if path != accepted]
 
 
-def resolve_upstream_merge(repo: Repo, state: dict) -> list[str]:
-    """Resolve the conflicts a sync expects; return the paths that need a human."""
-    trim = load_trim(repo)
-    apply_removals(repo, state)  # finish a plan an earlier run did not complete
-    entries = unmerged_entries(repo)
+def trimmed_merge_paths(repo: Repo, state: dict, merge: str, trim: list[str],
+                        plan: list[dict], skip: set[str]) -> list[str]:
+    """Plan the TRIM removals of an in-progress merge; return the paths for a human.
+
+    A merge lands on the fork tree, so its index paths are already fork-root paths and TRIM
+    entries - which are fork-root paths too - apply to them unchanged: for the framework
+    subtree merge a framework path `framework/media/x` is the index path
+    `muse/framework/media/x`. A modify/delete conflict on a trimmed path keeps our deletion
+    (the path is trimmed, so the tool removed it) and is reported as a discarded change; a
+    path the merge adds under a trimmed prefix is planned as a dropped addition.
+    """
     unresolved: list[str] = []
-    plan: list[dict] = []
-    accepted, refused = classify_link_conflict(repo, state, entries)
-    if accepted:
-        state["linkDrops"] = sorted(set(state.get("linkDrops") or []) | {accepted})
-        plan.append({"path": accepted, "report": None, "keepDir": accepted == FRAMEWORK_PATH})
-    unresolved += refused
-    for path, stages in sorted(entries.items()):
-        if path == accepted or path in refused:
+    for path, stages in sorted(unmerged_entries(repo).items()):
+        if path in skip:
             continue
         if trimmed(path, trim) and 2 not in stages:
-            # Deleted by us (trimmed), changed upstream: keep it deleted, but report it.
-            plan.append({"path": path, "report": "discardedChanges", "keepDir": False})
+            plan.append({"path": path, "report": "discardedChanges", "merge": merge,
+                         "keepDir": False})
         else:
             unresolved.append(path)
     planned = {entry["path"] for entry in plan}
     for path in split_z(repo.git("diff", "--cached", "--no-renames", "--name-only", "-z",
                                  "--diff-filter=A", "HEAD")):
         if trimmed(path, trim) and path not in planned:
-            plan.append({"path": path, "report": "droppedAdditions", "keepDir": False})
+            plan.append({"path": path, "report": "droppedAdditions", "merge": merge,
+                         "keepDir": False})
+    return unresolved
+
+
+def apply_trim_to_merge(repo: Repo, state: dict, merge: str, trim: list[str],
+                        plan: list[dict] | None = None,
+                        skip: set[str] = frozenset()) -> list[str]:
+    """Replay a pending removal plan, then apply TRIM to the merge in progress.
+
+    The plan (paths plus the report entry each removal produces) is written to the state
+    file before the first removal, so resuming after an interruption between
+    `git rm --cached` and the worktree deletion finishes the job and keeps the report.
+    """
+    apply_removals(repo, state)  # finish a plan an earlier run did not complete
+    plan = list(plan or [])
+    unresolved = trimmed_merge_paths(repo, state, merge, trim, plan, skip)
     if plan:
         plan_removals(state, plan)
-        save_state(repo, state)  # plan and report entries are durable before any removal
+        save_state(repo, state)  # the plan and its report entries are durable first
         apply_removals(repo, state)
-    if unresolved:
-        state["conflicts"] = sorted(set(state.get("conflicts") or []) | set(unresolved))
-        state["status"] = [[code, path] for code, path in status_entries(repo)]
-        if not state.get("preResolutionTree"):
-            state["preResolutionTree"] = capture_index_tree(repo, entries)
-        save_state(repo, state)
     return unresolved
+
+
+def resolve_upstream_merge(repo: Repo, state: dict) -> list[str]:
+    """Resolve the conflicts a sync expects; return the paths that need a human."""
+    trim = load_trim(repo)
+    entries = unmerged_entries(repo)
+    accepted, refused = classify_link_conflict(repo, state, entries)
+    plan: list[dict] = []
+    if accepted:
+        state["linkDrops"] = sorted(set(state.get("linkDrops") or []) | {accepted})
+        plan.append({"path": accepted, "report": None, "merge": "upstream",
+                     "keepDir": accepted == FRAMEWORK_PATH})
+    skip = set(refused) | ({accepted} if accepted else set())
+    unresolved = list(refused)
+    unresolved += apply_trim_to_merge(repo, state, "upstream", trim, plan, skip)
+    if unresolved:
+        stop_for_human(repo, state, "upstream", unresolved)
+    return unresolved
+
+
+def report_framework_conflicts(unresolved: list[str]) -> None:
+    print(f"framework conflicts in {FRAMEWORK_PATH}/ (resolve, `git add`, then "
+          f"`continue`; the tool makes the merge commit):")
+    for path in unresolved:
+        print(f"  {path}")
 
 
 def check_tree(repo: Repo, state: dict, trim: list[str]) -> list[str]:
@@ -979,17 +1053,17 @@ def stage_upstream_commit(repo: Repo, state: dict) -> bool:
                         f"aborted?); the sync cannot be resumed. Run `abort` to return to "
                         f"{branch}, then sync again")
     unresolved = resolve_upstream_merge(repo, state)
-    if not unresolved and state.get("preResolutionTree"):
-        # The index now holds the merge the tool is about to commit: record the human's
-        # resolutions in the state, so this merge commit message and a `continue` after an
-        # interruption record the same paths as the final report.
-        state["report"]["resolutions"] = resolution_paths(repo, state, index_tree(repo))
-    save_state(repo, state)
     if unresolved:
         print("conflicts that need a human (resolve, `git add`, then `continue`):")
         for path in unresolved:
             print(f"  {path}")
         return False
+    # The index now holds the merge the tool is about to commit: classify every resolution
+    # against the sides recorded while its conflict was open. Saved before the commit, so
+    # this merge message and a `continue` after an interruption report the same result.
+    report_section(state, "upstream")["resolutions"] = classify_resolutions(
+        repo, state, "upstream")
+    save_state(repo, state)
     problems = check_tree(repo, state, load_trim(repo))
     if problems:
         raise SyncError("the upstream merge does not produce the expected tree:\n  "
@@ -1027,24 +1101,16 @@ def stage_framework_merge(repo: Repo, state: dict) -> bool:
                             f"framework {framework[:12]}; nothing was changed. Finish or abort "
                             f"that merge first")
         if unmerged_entries(repo):
-            state["conflicts"] = sorted(set(state.get("conflicts") or [])
-                                        | set(unmerged_entries(repo)))
-            state["status"] = [[code, path] for code, path in status_entries(repo)]
-            if not state.get("preResolutionTree"):
-                state["preResolutionTree"] = capture_index_tree(repo, unmerged_entries(repo))
-            save_state(repo, state)
-            print(f"framework conflicts in {FRAMEWORK_PATH}/ (resolve, `git add`, then "
-                  f"`continue`; the tool makes the merge commit):")
-            for path in sorted(unmerged_entries(repo)):
-                print(f"  {path}")
+            unresolved = sorted(unmerged_entries(repo))
+            stop_for_human(repo, state, "framework", unresolved)
+            report_framework_conflicts(unresolved)
             return False
         # The human resolved and staged everything; the tool makes the merge commit.
         require_only_expected_changes(repo, state, "continue")
-        tree = index_tree(repo)
-        # What the human resolved is a resolution; what the framework merge brought by
-        # itself is not. Recorded before the commit, so the message matches the report.
-        state["report"]["resolutions"] = resolution_paths(
-            repo, state, tree, set(repo.diff_paths(upstream_merge, tree)))
+        # Record the classification before the commit, so its message and a resumed run's
+        # report agree.
+        report_section(state, "framework")["resolutions"] = classify_resolutions(
+            repo, state, "framework")
         save_state(repo, state)
         repo.git("commit", "-q", "-m", framework_merge_message(state))
     else:
@@ -1090,17 +1156,14 @@ def stage_framework_merge(repo: Repo, state: dict) -> bool:
         state["status"] = [[code, path] for code, path in status_entries(repo)]
         state["conflicts"] = sorted(set(state.get("conflicts") or [])
                                     | set(unmerged_entries(repo)))
-        if outcome == "conflicts" and not state.get("preResolutionTree"):
-            state["preResolutionTree"] = capture_index_tree(repo, unmerged_entries(repo))
         save_state(repo, state)
         stop_for_test("framework-merge-outcome")
         if outcome == "failed":
             raise SyncError(merge_failure(result))
         if outcome == "conflicts":
-            print(f"framework conflicts in {FRAMEWORK_PATH}/ (resolve, `git add`, then "
-                  f"`continue`; the tool makes the merge commit):")
-            for path in sorted(unmerged_entries(repo)):
-                print(f"  {path}")
+            unresolved = sorted(unmerged_entries(repo))
+            stop_for_human(repo, state, "framework", unresolved)
+            report_framework_conflicts(unresolved)
             return False
     if commit_parents(repo, "HEAD") != [upstream_merge, framework]:
         raise SyncError(f"the framework merge commit does not have {upstream_merge[:12]} and "
@@ -1170,10 +1233,6 @@ def stage_check(repo: Repo, state: dict) -> bool:
     verify_branch(repo, state["temp"])
     head = repo.rev("HEAD")
     state["head"] = head
-    framework_merge = state.get("frameworkMerge")
-    own_changes = (set(repo.diff_paths(f"{framework_merge}^1", framework_merge))
-                   if framework_merge else None)
-    state["report"]["resolutions"] = resolution_paths(repo, state, head, own_changes)
     problems = verify_history(repo, state, head)
     trim = load_trim(repo)  # the TRIM of the final tree; check_tree asserts it did not change
     problems += check_tree(repo, state, trim)
@@ -1261,17 +1320,21 @@ def finish(repo: Repo, state: dict) -> int:
     return 0
 
 
+def combined_report(state: dict) -> dict:
+    """Both merges' reports, combined for the final summary (each commit has its own)."""
+    upstream = report_section(state, "upstream")
+    framework = report_section(state, "framework")
+    resolutions = dict(upstream["resolutions"])
+    resolutions.update(framework["resolutions"])
+    return {"discardedChanges": upstream["discardedChanges"] + framework["discardedChanges"],
+            "droppedAdditions": upstream["droppedAdditions"] + framework["droppedAdditions"],
+            "resolutions": resolutions}
+
+
 def summary(state: dict) -> str:
-    report = state["report"]
-    lines = [f"upstream {state['base'][:12]}..{state['target'][:12]}",
-             f"framework {state['previousFramework'][:12]}..{state['framework'][:12]}",
-             f"upstream changes discarded on trimmed paths: {len(report['discardedChanges'])}"]
-    lines += [f"  {p}" for p in report["discardedChanges"]]
-    lines.append(f"new upstream files dropped under trimmed prefixes: "
-                 f"{len(report['droppedAdditions'])}")
-    lines += [f"  {p}" for p in report["droppedAdditions"]]
-    lines.append(resolutions_section(report.get("resolutions") or []))
-    return "\n".join(lines)
+    return "\n".join([f"upstream {state['base'][:12]}..{state['target'][:12]}",
+                      f"framework {state['previousFramework'][:12]}..{state['framework'][:12]}",
+                      report_sections(combined_report(state))])
 
 
 # ---------------------------------------------------------------------------
@@ -1355,8 +1418,8 @@ def cmd_sync(repo: Repo, args) -> int:
              "previousFramework": previous, "stage": "start", "merging": None,
              "mergeOutcome": None, "upstreamMerge": None, "frameworkMerge": None,
              "head": None, "removals": [], "conflicts": [], "status": [],
-             "preResolutionTree": None, "linkDrops": [],
-             "report": {"discardedChanges": [], "droppedAdditions": [], "resolutions": []}}
+             "resolutionSides": {"upstream": {}, "framework": {}}, "linkDrops": [],
+             "report": {"upstream": empty_merge_report(), "framework": empty_merge_report()}}
     save_state(repo, state)  # before the temporary branch exists
     stop_for_test("start")
     return finish(repo, state)
