@@ -1,0 +1,59 @@
+muse framework change: deterministic JSON number output - integers via
+std::to_string, doubles as fixed 6-digit precision with trailing zeros
+trimmed - instead of %.17g, so serialized settings/projects are stable.
+
+diff --color -ruN pa/picojson.h pb/picojson.h
+--- pa/picojson.h	2026-06-12 21:03:47.351780348 +0300
++++ pb/picojson.h	2026-06-12 21:03:47.355038510 +0300
+@@ -31,6 +31,8 @@
+ #include <algorithm>
+ #include <cstdio>
+ #include <cstdlib>
++#include <sstream>
++#include <iomanip>
+ #include <cstring>
+ #include <cstddef>
+ #include <iostream>
+@@ -491,21 +493,31 @@
+   }
+ #endif
+   case number_type: {
+-    char buf[256];
+     double tmp;
+-    SNPRINTF(buf, sizeof(buf), fabs(u_.number_) < (1ULL << 53) && modf(u_.number_, &tmp) == 0 ? "%.f" : "%.17g", u_.number_);
+-#if PICOJSON_USE_LOCALE
+-    char *decimal_point = localeconv()->decimal_point;
+-    if (strcmp(decimal_point, ".") != 0) {
+-      size_t decimal_point_len = strlen(decimal_point);
+-      for (char *p = buf; *p != '\0'; ++p) {
+-        if (strncmp(p, decimal_point, decimal_point_len) == 0) {
+-          return std::string(buf, p) + "." + (p + decimal_point_len);
++    if (fabs(u_.number_) < (1ULL << 53) && modf(u_.number_, &tmp) == 0) {
++      return std::to_string(static_cast<int>(u_.number_));
++    }
++
++    std::stringstream stream;
++    stream << std::fixed << std::setprecision(6) << u_.number_;
++    std::string s = stream.str();
++
++    // remove extra '0'
++    size_t correctedIdx = s.size() - 1;
++    if (s.back() == '0') {
++      for (int i = static_cast<int>(s.size() - 1); i > 0; --i) {
++        if (s.at(i) != '0') {
++          correctedIdx = i;
++          break;
+         }
+       }
+     }
+-#endif
+-    return buf;
++
++    if (s.at(correctedIdx) == '.') {
++      --correctedIdx;
++    }
++
++    return std::string(s.c_str(), correctedIdx + 1);
+   }
+   case string_type:
+     return *u_.string_;
