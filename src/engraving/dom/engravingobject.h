@@ -264,7 +264,7 @@ public:
     virtual String translatedTypeUserName() const;
 
     EID eid() const;
-    void setEID(EID id) const;
+    bool setEID(EID id) const;
     EID assignNewEID() const;
 
     //! The raw tree link, i.e. the inverse of children(): the ownership parent

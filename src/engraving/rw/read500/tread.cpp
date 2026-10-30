@@ -634,7 +634,10 @@ void TRead::readItemEID(EngravingObject* item, XmlReader& xml, ReadContext& ctx)
 {
     AsciiStringView s = xml.readAsciiText();
     EID eid = EID::fromStdString(s);
-    IF_ASSERT_FAILED(eid.isValid()) {
+    if (!eid.isValid()) {
+        // Malformed text: the element keeps no id and gets a fresh one from the
+        // library's walk after loading (engrave: assign_missing_ids).
+        ctx.score()->masterScore()->eidRegister()->noteMalformedEID();
         return;
     }
 
@@ -646,7 +649,11 @@ void TRead::readItemEID(EngravingObject* item, XmlReader& xml, ReadContext& ctx)
         return;
     }
 
-    item->setEID(eid);
+    if (!item->setEID(eid)) {
+        // Another element already has this id, so the file was written by a buggy or
+        // hand-edited tool. Keep both elements addressable: this one gets a new id.
+        item->assignNewEID();
+    }
 }
 
 void TRead::readItemLink(EngravingItem* item, XmlReader& xml, ReadContext& ctx)
