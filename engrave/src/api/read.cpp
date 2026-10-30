@@ -477,7 +477,8 @@ Result<QueryResult> Document::query(const Query& request) {
 
     if (request.limit == 0) return fail(ErrorCode::InvalidArgument, "a query limit is at least 1");
     if (request.limit > max_query_results) {
-        return fail(ErrorCode::ResourceLimit, std::format("a query reports at most {} elements at a time", max_query_results));
+        return fail(ErrorCode::ResourceLimit,
+                    std::format("a query reports at most {} elements at a time", max_query_results));
     }
     for (const std::string& type : request.types) {
         if (!api::has_type(type)) return fail(ErrorCode::InvalidArgument, std::format("no element type '{}'", type));
@@ -492,8 +493,8 @@ Result<QueryResult> Document::query(const Query& request) {
     }
     for (const std::int32_t voice : request.voices) {
         if (voice < 0 || voice >= static_cast<std::int32_t>(mu::engraving::VOICES)) {
-            return fail(ErrorCode::InvalidArgument, std::format("voice {} is not one of the score's 0..{}", voice,
-                                                                mu::engraving::VOICES - 1));
+            return fail(ErrorCode::InvalidArgument,
+                        std::format("voice {} is not in 0..{}", voice, mu::engraving::VOICES - 1));
         }
     }
     if (request.from_tick && request.to_tick && before(*request.to_tick, *request.from_tick)) {
