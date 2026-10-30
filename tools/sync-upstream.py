@@ -72,15 +72,16 @@ is persisted) and `upstream-commit-pending` (right before the tool makes the ups
 merge commit, once the resolutions are recorded); `SYNC_UPSTREAM_TEST_STOP_AFTER_RM=<n>`
 stops between the index and worktree half of the n-th planned removal.
 
-Merge commits are made by the tool, with a provenance trailer: `Sync-Upstream: <target>`
-on the upstream merge and `Framework-Commit: <framework>` on the framework merge, and
-each repeats the report sections of its own merge. A merge commit with the expected
-parents but without (or with a wrong) trailer was made by someone else and is refused,
-with instructions, instead of adopted. The framework trailer also names the previously
-incorporated framework commit for the next sync; it is read from the newest such commit
-on the first-parent chain (falling back to the subject of the pre-trailer absorb commit
-7150f2b05e) rather than inferred with `merge-base`, and is used as the explicit
-merge-base expectation.
+Both merge commands run with `--no-commit`: the tool applies the TRIM policy to the merge
+result, checks the resulting tree and then makes the merge commit itself. Each merge
+commit carries a provenance trailer: `Sync-Upstream: <target>` on the upstream merge and
+`Framework-Commit: <framework>` on the framework merge, and repeats the report sections
+of its own merge. A merge commit with the expected parents but without (or with a wrong)
+trailer was made by someone else and is refused, with instructions, instead of adopted.
+The framework trailer also names the previously incorporated framework commit for the
+next sync; it is read from the newest such commit on the first-parent chain (falling back
+to the subject of the pre-trailer absorb commit 7150f2b05e) rather than inferred with
+`merge-base`, and is used as the explicit merge-base expectation.
 
 Conflict handling:
   * The `muse` gitlink bump arrives as ort's displaced `muse~<sha>` entry. It is
@@ -88,10 +89,12 @@ Conflict handling:
     gitlink, and the name exists neither in the target tree nor in ours or the merge
     base (otherwise it is a real conflict for a human).
   * Modify/delete conflicts on TRIM paths keep the deletion and are reported; new files
-    under trimmed prefixes are deleted and reported. Both are planned and written to the
-    state file before anything is removed, and the plan is replayed when a run is resumed
-    (so an interruption can neither lose a report entry nor leave a half-removed file
-    behind).
+    under trimmed prefixes are deleted and reported. The same rules apply to both merges:
+    the framework subtree merge lands on the fork tree, so its index paths are fork-root
+    paths (`muse/framework/...` for a framework path `framework/...`) and TRIM entries
+    apply to them unchanged. All removals are planned and written to the state file
+    before anything is removed, and the plan is replayed when a run is resumed (so an
+    interruption can neither lose a report entry nor leave a half-removed file behind).
   * Everything else stops for a human.
 
 TRIM belongs to `main`: a sync never changes it, refuses a target that adds or changes
@@ -907,6 +910,14 @@ def resolve_upstream_merge(repo: Repo, state: dict) -> list[str]:
     return unresolved
 
 
+def resolve_framework_merge(repo: Repo, state: dict) -> list[str]:
+    """Apply TRIM to the in-progress framework merge; return the paths for a human."""
+    unresolved = apply_trim_to_merge(repo, state, "framework", load_trim(repo))
+    if unresolved:
+        stop_for_human(repo, state, "framework", unresolved)
+    return unresolved
+
+
 def report_framework_conflicts(unresolved: list[str]) -> None:
     print(f"framework conflicts in {FRAMEWORK_PATH}/ (resolve, `git add`, then "
           f"`continue`; the tool makes the merge commit):")
@@ -1080,6 +1091,31 @@ def stage_upstream_commit(repo: Repo, state: dict) -> bool:
     return True
 
 
+def commit_framework_merge(repo: Repo, state: dict) -> bool:
+    """Check the framework merge's tree and make its commit (the tool commits both merges)."""
+    upstream_merge, framework = state.get("upstreamMerge"), state["framework"]
+    # Classify every human resolution against the sides recorded while it conflicted, and
+    # record it before the commit so the message matches what a resumed run reports.
+    report_section(state, "framework")["resolutions"] = classify_resolutions(
+        repo, state, "framework")
+    save_state(repo, state)
+    problems = check_tree(repo, state, load_trim(repo))
+    if problems:
+        raise SyncError("the framework merge does not produce the expected tree:\n  "
+                        + "\n  ".join(problems))
+    repo.git("commit", "-q", "-m", framework_merge_message(state))
+    if commit_parents(repo, "HEAD") != [upstream_merge, framework]:
+        raise SyncError(f"the framework merge commit does not have {str(upstream_merge)[:12]} "
+                        f"and {framework[:12]} as parents")
+    if trailer_value(commit_message(repo, "HEAD"), FRAMEWORK_TRAILER) != framework:
+        raise SyncError(f"the framework merge commit lost its {FRAMEWORK_TRAILER} trailer")
+    state["frameworkMerge"] = repo.rev("HEAD")
+    state["merging"] = None
+    state["mergeOutcome"] = None
+    advance(repo, state, "framework-merge")
+    return True
+
+
 def stage_framework_merge(repo: Repo, state: dict) -> bool:
     branch = state["branch"]
     upstream_merge = state.get("upstreamMerge")
@@ -1100,19 +1136,15 @@ def stage_framework_merge(repo: Repo, state: dict) -> bool:
             raise SyncError(f"a merge of {merge[:12]} is in progress, but this sync merges the "
                             f"framework {framework[:12]}; nothing was changed. Finish or abort "
                             f"that merge first")
-        if unmerged_entries(repo):
-            unresolved = sorted(unmerged_entries(repo))
-            stop_for_human(repo, state, "framework", unresolved)
+        # A clean merge needs TRIM as much as a conflicted one: a framework addition under a
+        # trimmed prefix must be dropped before the merge commit exists.
+        unresolved = resolve_framework_merge(repo, state)
+        if unresolved:
             report_framework_conflicts(unresolved)
             return False
-        # The human resolved and staged everything; the tool makes the merge commit.
+        # Everything is resolved and staged: the tool makes the merge commit.
         require_only_expected_changes(repo, state, "continue")
-        # Record the classification before the commit, so its message and a resumed run's
-        # report agree.
-        report_section(state, "framework")["resolutions"] = classify_resolutions(
-            repo, state, "framework")
-        save_state(repo, state)
-        repo.git("commit", "-q", "-m", framework_merge_message(state))
+        return commit_framework_merge(repo, state)
     else:
         parents = commit_parents(repo, "HEAD")
         if parents == [upstream_merge, framework]:
@@ -1148,8 +1180,9 @@ def stage_framework_merge(repo: Repo, state: dict) -> bool:
         state["merging"] = framework
         state["mergeOutcome"] = None
         save_state(repo, state)  # intent is durable before the command runs
-        result = repo.run("merge", "-q", "--no-ff", "-s", "ort", f"-Xsubtree={FRAMEWORK_PATH}",
-                          "-m", framework_merge_message(state), framework)
+        # --no-commit: the tool drops the trimmed paths and checks the tree before it commits.
+        result = repo.run("merge", "-q", "--no-commit", "--no-ff", "-s", "ort",
+                          f"-Xsubtree={FRAMEWORK_PATH}", framework)
         outcome = merge_outcome(repo, result)
         # As for the upstream merge: outcome, worktree state and unmerged paths in one save.
         state["mergeOutcome"] = outcome
@@ -1160,21 +1193,14 @@ def stage_framework_merge(repo: Repo, state: dict) -> bool:
         stop_for_test("framework-merge-outcome")
         if outcome == "failed":
             raise SyncError(merge_failure(result))
-        if outcome == "conflicts":
-            unresolved = sorted(unmerged_entries(repo))
-            stop_for_human(repo, state, "framework", unresolved)
-            report_framework_conflicts(unresolved)
-            return False
-    if commit_parents(repo, "HEAD") != [upstream_merge, framework]:
-        raise SyncError(f"the framework merge commit does not have {upstream_merge[:12]} and "
-                        f"{framework[:12]} as parents")
-    if trailer_value(commit_message(repo, "HEAD"), FRAMEWORK_TRAILER) != framework:
-        raise SyncError(f"the framework merge commit lost its {FRAMEWORK_TRAILER} trailer")
-    state["frameworkMerge"] = repo.rev("HEAD")
-    state["merging"] = None
-    state["mergeOutcome"] = None
-    advance(repo, state, "framework-merge")
-    return True
+        if repo.merge_head() != framework:
+            raise SyncError(f"`git merge {framework[:12]}` left no merge to commit; the state "
+                            f"is kept, run `abort` and sync again")
+    unresolved = resolve_framework_merge(repo, state)
+    if unresolved:
+        report_framework_conflicts(unresolved)
+        return False
+    return commit_framework_merge(repo, state)
 
 
 def verify_history(repo: Repo, state: dict, head: str) -> list[str]:
