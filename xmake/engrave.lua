@@ -318,6 +318,10 @@ target("muse_global")
         path.join(source_root, "muse", "framework", "global", "thirdparty", "kors_modularity", "modularity", "*.cpp"),
         path.join(source_root, "muse", "framework", "global", "thirdparty", "kors_profiler", "profiler", "*.cpp")
     )
+    -- The Qt-free implementation of muse::Settings (upstream's settings.cpp is
+    -- trimmed).  engraving and the other modules call it, so it must link with
+    -- muse_global rather than with engrave, which comes first on the link line.
+    add_files(path.join(engrave_src, "runtime", "noqt_settings.cpp"))
     if is_plat("linux") then
         add_syslinks("dl", "pthread", {public = true})
     end
@@ -527,6 +531,8 @@ target("engrave")
     add_defines(table.unpack(ENGRAVE_GLOBAL_DEFINES))
     add_includedirs(ENGRAVE_ADAPTER_INCLUDES)
     add_files(path.join(engrave_src, "**.cpp"))
+    -- Compiled into muse_global, see there.
+    remove_files(path.join(engrave_src, "runtime", "noqt_settings.cpp"))
     -- cairo renders pages (render/); its headers and library directory come
     -- from the including project, like zlib.
     add_links("cairo", {public = true})
