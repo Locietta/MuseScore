@@ -10,6 +10,10 @@
 --   engrave_api_test, example_embedder
 --       the public API's tests and its leak test, an embedder that sees
 --       nothing but engrave/include;
+--   engrave_handles_test, engrave_describe_test, engrave_read_test,
+--   engrave_ops_test, engrave_op_policy_test
+--       the library's tests of handles, the catalogue, reads, edits and the
+--       edit harness, and of the policy table against the harness evidence;
 --   noqt_probe, engine_audio_probe, audio_engine_link_check
 --       dev probes of the runtime, the audio driver and the audio engine link
 --       closure.
@@ -230,6 +234,40 @@ target("engrave_read_test")
     end
 target_end()
 
+-- The edit harness (design §5.3): Document::edit, the snapshot round trip and the
+-- per-operation evidence.  A group of operations adds its cases as a file under
+-- harness/cases/; the folder glob picks it up.
+target("engrave_ops_test")
+    set_kind("binary")
+    add_deps("muse_generated", "engrave")
+    add_packages("gtest")
+    add_defines(table.unpack(ENGRAVE_DEFINES))
+    add_defines(table.unpack(ENGRAVE_GLOBAL_DEFINES))
+    add_defines('ENGRAVE_TEST_SOURCE_ROOT="' .. source_root:gsub("\\", "/") .. '"')
+    add_includedirs(ENGRAVE_ADAPTER_INCLUDES)
+    add_includedirs(ENGRAVE_INTERNAL_INCLUDES)
+    add_includedirs("$(builddir)/xmake-generated")
+    add_files(path.join(tests_dir, "harness", "**.cpp"))
+    if is_plat("windows") then
+        add_files(utf8_manifest)
+    else
+        add_links("m")
+    end
+target_end()
+
+-- The policy table against the checked-in evidence; it needs no score.
+target("engrave_op_policy_test")
+    set_kind("binary")
+    add_deps("engrave")
+    add_packages("gtest")
+    add_includedirs(ENGRAVE_ADAPTER_INCLUDES)
+    add_defines('ENGRAVE_TEST_SOURCE_ROOT="' .. source_root:gsub("\\", "/") .. '"')
+    add_files(path.join(tests_dir, "op_policy_test.cpp"))
+    if is_plat("windows") then
+        add_files(utf8_manifest)
+    end
+target_end()
+
 -- The leak test: an embedder compiled with the public include root as its
 -- only include path and none of the project's defines, so it builds only
 -- while the public headers stay std-only.  The compile is done here rather
@@ -248,7 +286,7 @@ target("example_embedder")
         local objectfile = target:objectfile(sourcefile)
         local headers = {}
         for _, dir in ipairs(public_includes) do
-            table.join2(headers, os.files(path.join(dir, "engrave", "*.h")))
+            table.join2(headers, os.files(path.join(dir, "engrave", "**.h")))
         end
         local compile = {configs = {
             languages = target:get("languages"),

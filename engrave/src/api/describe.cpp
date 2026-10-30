@@ -98,6 +98,14 @@ std::vector<Pid> api::pids_of(std::string_view type) {
     return pids;
 }
 
+std::optional<bool> api::settable(std::string_view type, Pid pid) {
+    const auto row = std::ranges::find(type_pids, type, &TypePids::type);
+    if (row == std::end(type_pids)) return std::nullopt;
+    for (std::size_t i = row->first; i < row->first + row->count; ++i)
+        if (pid_support[i].pid == pid) return pid_support[i].settable;
+    return std::nullopt;
+}
+
 std::vector<TypeInfo> Engine::describe() const {
     impl_->state.check_thread();
     std::vector<TypeInfo> types;

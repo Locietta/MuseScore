@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <string_view>
 #include <vector>
 
@@ -20,5 +21,9 @@ bool has_type(std::string_view type);
 // The properties of an element type, in the catalogue's order (sorted by name).
 // Empty for a type the catalogue does not list.
 std::vector<mu::engraving::Pid> pids_of(std::string_view type);
+
+// Whether an edit may set the property on an element of the type (its MSCX type
+// name); nothing when the catalogue does not list it for the type.
+std::optional<bool> settable(std::string_view type, mu::engraving::Pid pid);
 
 } // namespace engrave::api

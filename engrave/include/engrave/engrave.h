@@ -1,6 +1,7 @@
 #pragma once
 
 #include <engrave/document.h>
+#include <engrave/edit.h>
 #include <engrave/engine.h>
 #include <engrave/error.h>
 #include <engrave/handle.h>

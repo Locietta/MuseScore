@@ -1,6 +1,8 @@
 #pragma once
 
+#include <cstddef>
 #include <expected>
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -19,6 +21,9 @@ enum struct ErrorCode {
     ResourceLimit,     // the input exceeds a size limit
     Unsupported,       // a valid request the engine does not implement
     Io,                // a file exists but cannot be read
+    RevisionConflict,  // an edit expected another revision of the document
+    EditRejected,      // the engine refused an operation; the batch was rolled back
+    Poisoned,          // an earlier failure left the document unusable; close it
 };
 
 std::string_view to_string(ErrorCode code) noexcept;
@@ -26,6 +31,7 @@ std::string_view to_string(ErrorCode code) noexcept;
 struct Error {
     ErrorCode code = ErrorCode::InvalidArgument;
     std::string message;
+    std::optional<std::size_t> op_index; // the failing operation of an edit batch
 };
 
 template <typename T>
