@@ -343,23 +343,22 @@ TEST(Read, MatchesTheSemanticOracle) {
         ++scores;
 
         // The excerpts are separate scores with ids of their own; the dump lists each
-        // one's body under its name.
-        for (const engrave::ExcerptInfo& excerpt : outline->excerpts) {
-            const nlohmann::json* body = nullptr;
-            for (const nlohmann::json& listed : dump.at("excerpts")) {
-                if (listed.at("name").get<std::string>() == excerpt.name && listed.contains("score")) {
-                    body = &listed.at("score");
-                    break;
-                }
-            }
-            if (!body) {
-                ADD_FAILURE() << "the dump has no score for the excerpt '" << excerpt.name << "'";
+        // one's body under its name, in master order.  Two excerpts of one part name are
+        // told apart by their order, which both lists keep.
+        std::size_t next = 0;
+        for (const nlohmann::json& listed : dump.at("excerpts")) {
+            if (!listed.contains("score")) continue;
+            const std::string name = listed.at("name").get<std::string>();
+            while (next < outline->excerpts.size() && outline->excerpts[next].name != name) ++next;
+            if (next == outline->excerpts.size()) {
+                ADD_FAILURE() << "the outline has no excerpt named '" << name << "'";
                 continue;
             }
+            const engrave::ExcerptInfo& excerpt = outline->excerpts[next++];
             const auto excerpt_outline = document->outline(engrave::ScoreSel{excerpt.id});
             ASSERT_TRUE(excerpt_outline) << excerpt_outline.error().message;
             std::multiset<Row> excerpt_expected;
-            oracle_rows(*body, excerpt_expected);
+            oracle_rows(listed.at("score"), excerpt_expected);
             std::multiset<Row> excerpt_actual;
             query_rows(read_all(*document, engrave::ScoreSel{excerpt.id}, excerpt_outline->measures.size()),
                        excerpt_actual);

@@ -31,14 +31,16 @@ struct Document {
     Result<std::vector<std::byte>> export_score(const ExportOptions& options);
 
     // The score's structure: metadata, parts and staves, measures, time, key and
-    // tempo changes, and the excerpts. StaleHandle when the selection names a score
-    // the document no longer has, InvalidArgument when it names something else.
+    // tempo changes, and the excerpts. NotFound when nothing has the excerpt id,
+    // StaleHandle when the score it names is gone, InvalidArgument when it names
+    // something other than a score.
     Result<Outline> outline(const ScoreSel& score = {});
 
-    // The elements that match, in a stable order. NotFound for a type or property
-    // name the catalogue does not know, InvalidArgument for a filter that cannot be
-    // answered (an unknown voice, a measure window out of range or too wide, a
-    // cursor past the end), ResourceLimit when more elements match than one query
+    // The elements that match, in a stable order. NotFound for a property name the
+    // catalogue does not know, InvalidArgument for a type name it does not know and for
+    // a filter that cannot be answered (an unknown staff or voice, a measure window out
+    // of range or too wide, both forms of the window, a reversed tick range, a cursor
+    // past the end, a limit of 0), ResourceLimit when more elements match than one query
     // may report.
     Result<QueryResult> query(const Query& request);
 

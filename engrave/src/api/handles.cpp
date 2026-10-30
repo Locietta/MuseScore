@@ -77,17 +77,21 @@ void for_each_object(MasterScore& master, const Function& func) {
             if (!mb->isMeasure()) continue;
             Measure* measure = mu::engraving::toMeasure(mb);
             if (measure->mmRest()) visit(measure->mmRest());
-            // Every segment and every element of one.  Score::scanElements visits the
-            // elements of a segment through their own scanElements, which a chord does
-            // not answer with itself, and it skips the elements of a hidden staff, which
-            // the writer stores all the same.
+            // Every segment and every element of one, with what it holds.
+            // Score::scanElements reaches the elements of a segment through their own
+            // scanElements, which a chord does not answer with itself, and it skips the
+            // elements of a hidden staff, which the writer stores all the same.
             for (Segment* segment = measure->first(); segment; segment = segment->next()) {
                 visit(segment);
                 for (EngravingItem* element : segment->elist()) {
+                    if (!element) continue;
                     visit(element);
+                    element->scanElements(visit);
                     // A grace chord hangs off its chord rather than off the segment.
-                    if (element && element->isChord()) {
-                        for (mu::engraving::Chord* grace : mu::engraving::toChord(element)->graceNotes()) visit(grace);
+                    if (!element->isChord()) continue;
+                    for (mu::engraving::Chord* grace : mu::engraving::toChord(element)->graceNotes()) {
+                        visit(grace);
+                        grace->scanElements(visit);
                     }
                 }
             }
