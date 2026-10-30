@@ -465,6 +465,28 @@ TEST(Audio, TheEngineSampleRateReachesTheEncoder) {
         << "the 48 kHz render has a different duration";
 }
 
+// An excerpt renders as the master with the parts the excerpt does not have
+// muted (masternotation.cpp:748-770): the same length, the excerpt's parts only.
+TEST(Audio, AnExcerptRendersAsTheMasterWithItsOwnParts) {
+    auto document = detail::open_score("mix_parts.mscz");
+    if (!document) GTEST_SKIP() << "fixtures/audio/mix_parts.mscz is not in the corpus";
+    const auto outline = document->outline();
+    ASSERT_TRUE(outline);
+    ASSERT_GE(outline->excerpts.size(), 2u);
+
+    engrave::AudioOptions master;
+    master.format = engrave::AudioFormat::Wav;
+    engrave::AudioOptions excerpt = master;
+    excerpt.score = engrave::ScoreSel{ outline->excerpts.front().id };
+
+    const detail::Rendered full = detail::render_audio(*document, master);
+    const detail::Rendered part = detail::render_audio(*document, excerpt);
+    ASSERT_FALSE(full.bytes.empty());
+    ASSERT_FALSE(part.bytes.empty());
+    EXPECT_EQ(part.result.frames, full.result.frames) << "the excerpt has a different length";
+    EXPECT_NE(part.bytes, full.bytes) << "the excerpt rendered as the full score";
+}
+
 TEST(Audio, AnEngineWithoutSoundFontsCannotRender) {
     const auto out = detail::temp_file("nosf.wav");
     std::vector<std::string> arguments = { "--assets=" + music::test::g_assets.string(),
