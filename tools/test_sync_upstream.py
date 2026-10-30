@@ -68,6 +68,11 @@ Steps 27-29 are the third hardening round:
   step 29  (4) abort finishes the persisted removal plan instead of leaving a half
            removed trimmed file untracked
 
+Steps 30-31 follow up the A3 sync trial: a resolution that differs from both merge
+sides is recorded in the merge commit message (step 30, upstream merge; step 4 already
+covers the framework merge), and the recorded list survives an interruption between
+staging the resolution and the commit (step 31).
+
 Requirements: python 3.10+, git 2.40+ (ort merge strategy, `-Xsubtree`), and a
 clone that carries the mirrors `origin/upstream/musescore` and
 `origin/upstream/muse-framework` plus the framework commits the pins name. The
@@ -406,6 +411,8 @@ class Context:
         self.sb = Sandbox(work, env)
         self.base = ""
         self.local_edit_commit = ""
+        # The resolutions block step 30 recorded in an upstream merge commit message.
+        self.merge_resolution_block = ""
         # The framework commit the branch has incorporated; synthetic pins descend from it.
         self.framework_tip = FW_FINAL
 
@@ -554,6 +561,27 @@ def parse_report(out: str) -> dict[str, list[str]]:
         if key not in report:
             raise Failure(f"no report block '{header.strip()}' in the sync output")
     return report
+
+
+def resolution_block(paths: list[str]) -> str:
+    """The resolutions report block as `summary()` and the merge messages render it."""
+    return "\n".join([f"{REPORT_HEADERS['resolutions']}{len(paths)}"]
+                     + [f"  {path}" for path in paths])
+
+
+def message_resolution_block(message: str) -> str:
+    """The resolutions block of a commit message, verbatim ('' when it has none)."""
+    lines = message.splitlines()
+    for index, line in enumerate(lines):
+        if not line.startswith(REPORT_HEADERS["resolutions"]):
+            continue
+        block = [line]
+        for item in lines[index + 1:]:
+            if not item.strip():
+                break
+            block.append(item)
+        return "\n".join(block)
+    return ""
 
 
 # --- preflight ------------------------------------------------------------------
@@ -902,6 +930,11 @@ def step_framework_conflict(ctx: Context) -> None:
     ctx.expect(f"Framework-Commit: {FW_CONFLICT}" in message,
                "step 4: the tool's framework merge commit has no Framework-Commit trailer",
                message)
+    ctx.expect_eq(message_resolution_block(message), resolution_block([CONFLICT_FILE]),
+                  "step 4: the framework merge commit does not record the resolution")
+    ctx.expect_eq(message_resolution_block(sb.git("log", "-1", "--format=%B", upstream_merge)),
+                  resolution_block([]),
+                  "step 4: the upstream merge records resolutions it did not make")
     report = parse_report(out)
     ctx.expect_eq(report["discardedChanges"], STEP4_DISCARDED,
                   "step 4: discarded changes are not the trimmed upstream edits")
@@ -1888,6 +1921,99 @@ def step_removal_abort(ctx: Context) -> None:
     ctx.require_clean_end("step 29")
 
 
+# The file the resolution steps change on both sides, so the merge conflicts.
+RESOLUTION_FILE = "src/extra/resolution.txt"
+RESOLUTION_SEED = "alpha\nbeta\ngamma\n"
+RESOLUTION_OURS = "alpha\nour beta\ngamma\n"
+RESOLUTION_THEIRS = "alpha\ntheir beta\ngamma\n"
+RESOLUTION_NEITHER = "alpha\nresolved beta (neither side)\ngamma\n"
+RESOLUTION_OURS_2 = "alpha\nour second beta\ngamma\n"
+RESOLUTION_THEIRS_2 = "alpha\ntheir second beta\ngamma\n"
+RESOLUTION_NEITHER_2 = "alpha\nresolved second beta (neither side)\ngamma\n"
+
+
+def step_resolution_message(ctx: Context) -> None:
+    """A resolution that differs from both merge sides is named in the merge commit."""
+    sb = ctx.sb
+    seed = ctx.upstream_commit({RESOLUTION_FILE: RESOLUTION_SEED},
+                               message="test: seed the file a resolution will touch")
+    ctx.sync_synthetic(seed, expect=0)
+    sb.path(RESOLUTION_FILE).write_bytes(RESOLUTION_OURS.encode("utf-8"))
+    sb.git("add", "--", RESOLUTION_FILE)
+    sb.git("commit", "--quiet", "-m", "test: our side of the resolution")
+    previous = sb.rev("HEAD")
+    target = ctx.upstream_commit({RESOLUTION_FILE: RESOLUTION_THEIRS},
+                                 message="test: their side of the resolution")
+    _rc, out, _err = ctx.sync_synthetic(target, expect=2)
+    ctx.expect_eq(sorted(sb.unmerged()), [RESOLUTION_FILE],
+                  "step 30: the conflict is not the file both sides changed")
+    ctx.expect_eq(parse_list_after(out, "conflicts that need a human"), [RESOLUTION_FILE],
+                  "step 30: the script did not stop on the conflicting path")
+    ctx.expect(RESOLUTION_NEITHER not in (sb.blob(f"{previous}:{RESOLUTION_FILE}"),
+                                         sb.blob(f"{target}:{RESOLUTION_FILE}")),
+               "step 30: the resolution would not differ from the merge sides")
+    sb.path(RESOLUTION_FILE).write_bytes(RESOLUTION_NEITHER.encode("utf-8"))
+    sb.git("add", "--", RESOLUTION_FILE)
+    _rc, out, _err = ctx.sync("continue", expect=0)
+    ctx.expect_eq(sb.parents(), [previous, target],
+                  "step 30: the resolution was not committed as the upstream merge")
+    ctx.expect_eq(sb.read(RESOLUTION_FILE), RESOLUTION_NEITHER,
+                  "step 30: the committed file is not the resolution")
+    message = sb.git("log", "-1", "--format=%B", "HEAD")
+    report = parse_report(out)
+    ctx.expect_eq(report["resolutions"], [RESOLUTION_FILE],
+                  "step 30: the report does not list the path the human resolved")
+    ctx.merge_resolution_block = message_resolution_block(message)
+    ctx.expect_eq(ctx.merge_resolution_block, resolution_block(report["resolutions"]),
+                  "step 30: the merge commit message does not record the resolutions the "
+                  "report lists")
+    ctx.expect(f"Sync-Upstream: {target}" in message,
+               "step 30: the merge commit lost its Sync-Upstream trailer", message)
+    ctx.require_clean_end("step 30")
+
+
+def step_resolution_resume(ctx: Context) -> None:
+    """The resolutions are recorded before the commit, so a resume writes the same one."""
+    sb = ctx.sb
+    sb.path(RESOLUTION_FILE).write_bytes(RESOLUTION_OURS_2.encode("utf-8"))
+    sb.git("add", "--", RESOLUTION_FILE)
+    sb.git("commit", "--quiet", "-m", "test: our side of the resumed resolution")
+    previous = sb.rev("HEAD")
+    target = ctx.upstream_commit({RESOLUTION_FILE: RESOLUTION_THEIRS_2},
+                                 message="test: their side of the resumed resolution")
+    _rc, _out, _err = ctx.sync_synthetic(target, expect=2)
+    ctx.expect_eq(sorted(sb.unmerged()), [RESOLUTION_FILE],
+                  "step 31: the conflict is not the file both sides changed")
+    sb.path(RESOLUTION_FILE).write_bytes(RESOLUTION_NEITHER_2.encode("utf-8"))
+    sb.git("add", "--", RESOLUTION_FILE)
+    # Interrupt once the resolution is staged and the state saved, before the commit.
+    _rc, _out, err = ctx.sync("continue", expect=1, stop_after="upstream-commit-pending")
+    ctx.expect("[test] stopped after upstream-commit-pending" in err,
+               "step 31: the pre-commit stop hook did not fire", err)
+    ctx.expect_eq(sb.rev("HEAD"), previous, "step 31: the interruption committed the merge")
+    ctx.expect_eq(sb.branch(), f"sync/{target[:12]}",
+                  "step 31: the interruption left the wrong branch")
+    ctx.expect_eq(sb.git("rev-parse", "MERGE_HEAD").strip(), target,
+                  "step 31: the interruption left no merge of the target to commit")
+    state = sb.state()
+    ctx.expect_eq(state["stage"], "upstream-merge",
+                  "step 31: the interrupted run moved the stage")
+    ctx.expect_eq(state["report"]["resolutions"], [RESOLUTION_FILE],
+                  "step 31: the resolutions were not persisted before the commit")
+    _rc, out, _err = ctx.sync("continue", expect=0)
+    ctx.expect_eq(sb.parents(), [previous, target],
+                  "step 31: the resumed run did not commit the upstream merge")
+    ctx.expect_eq(sb.read(RESOLUTION_FILE), RESOLUTION_NEITHER_2,
+                  "step 31: the committed file is not the resolution")
+    message = sb.git("log", "-1", "--format=%B", "HEAD")
+    report = parse_report(out)
+    ctx.expect_eq(report["resolutions"], [RESOLUTION_FILE],
+                  "step 31: the report does not list the path the human resolved")
+    ctx.expect_eq(message_resolution_block(message), ctx.merge_resolution_block,
+                  "step 31: the resumed run wrote a different resolutions block")
+    ctx.require_clean_end("step 31")
+
+
 STEPS = [
     ("absorb: test TRIM + framework absorbed at muse/", step_absorb),
     ("link bump 7b2d005464: two merges and the trimmed-edit report", step_link_bump),
@@ -1918,6 +2044,8 @@ STEPS = [
     ("an ignored incoming file is refused, not overwritten (1)", step_ignored_incoming),
     ("a crash after a merge outcome is resumable (3)", step_merge_outcome_recovery),
     ("abort finishes a partially removed trimmed path (4)", step_removal_abort),
+    ("a resolution reaches the upstream merge commit message (A3)", step_resolution_message),
+    ("the recorded resolutions survive an interruption (A3)", step_resolution_resume),
 ]
 
 
