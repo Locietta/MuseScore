@@ -18,6 +18,17 @@
 -- the harness and its runtime sources move next to this file and the hook goes
 -- away.
 
+-- A project-scope xmake script has no raise(); report a broken hook by
+-- defining a target whose on_load raises at configure time.
+local function support_failure(message)
+    target("engrave_tests_check")
+        set_kind("phony")
+        on_load(function ()
+            raise("%s", message)
+        end)
+    target_end()
+end
+
 if not ENGRAVE_TEST_SUPPORT then
     return
 end
@@ -29,10 +40,12 @@ local runtime_target = ENGRAVE_TEST_SUPPORT.runtime_target
 local utf8_manifest = ENGRAVE_TEST_SUPPORT.utf8_manifest
 
 if not harness_dir or not os.isfile(path.join(harness_dir, "gtest_main.cpp")) then
-    raise("ENGRAVE_TEST_SUPPORT.harness_dir must contain gtest_main.cpp")
+    support_failure("ENGRAVE_TEST_SUPPORT.harness_dir must contain gtest_main.cpp")
+    return
 end
 if not runtime_target then
-    raise("ENGRAVE_TEST_SUPPORT.runtime_target is required")
+    support_failure("ENGRAVE_TEST_SUPPORT.runtime_target is required")
+    return
 end
 
 -- gtest comes from xmake-repo: MuseScore 5.0 no longer vendors googletest, and
@@ -46,7 +59,8 @@ local function expand(item)
         if name == "PROJECT_ROOT" or name == "SOURCE_ROOT" then
             return source_root
         end
-        raise("unknown manifest placeholder: " .. name)
+        print("error: unknown manifest placeholder: " .. name)
+        return item
     end))
 end
 
