@@ -14,8 +14,9 @@
 --   * the engine module targets: muse_global, muse_draw, muse_mpe, engraving,
 --     the iex_* import/export modules, native_fluidsynth and
 --     muse_audio_engine, compiled via folder globs;
---   * engrave, the library of Qt-free adapters in engrave/src (runtime, io,
---     render, audio, score), and its tests (xmake/tests.lua).
+--   * engrave, the library: its public API in engrave/include and the Qt-free
+--     adapters behind it in engrave/src (api, runtime, io, render, audio,
+--     score), and its tests (xmake/tests.lua).
 --
 -- The including project may set ENGRAVE_SOURCE_ROOT to build the engine
 -- sources from a checkout other than this one; the fork itself builds from its
@@ -240,6 +241,12 @@ ENGRAVE_INCLUDES = {
 local engrave_src = path.join(source_root, "engrave", "src")
 ENGRAVE_INTERNAL_INCLUDES = {
     source_root,
+}
+
+-- The public API (<engrave/engine.h>, ...): std headers only, so an embedder
+-- needs this include root and nothing else.  engrave exports it publicly.
+ENGRAVE_PUBLIC_INCLUDES = {
+    path.join(source_root, "engrave", "include"),
 }
 
 local fluidsynth_dir = path.join(source_root, "muse", "framework", "audio", "thirdparty", "fluidsynth", "fluidsynth-2.3.3")
@@ -534,6 +541,7 @@ target("engrave")
     add_defines(table.unpack(ENGRAVE_GLOBAL_DEFINES))
     add_includedirs(ENGRAVE_ADAPTER_INCLUDES)
     add_files(path.join(engrave_src, "**.cpp|global/*.cpp"))
+    add_includedirs(ENGRAVE_PUBLIC_INCLUDES, {public = true})
     -- cairo renders pages (render/); its headers and library directory come
     -- from the including project, like zlib.
     add_links("cairo", {public = true})
