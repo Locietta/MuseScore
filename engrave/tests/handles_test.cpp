@@ -584,17 +584,15 @@ TEST(Handles, H4ExportLeavesIdsAndRevisionAlone) {
 // --- H5 -------------------------------------------------------------------
 
 TEST(Handles, H5aLinksAcrossExcerpts) {
-    // Deferred: excerpt generation through the Qt-free library faults on the corpus
-    // (chordline_path.mscx, for one), and a template-built score has no notes for a link
-    // group. See notes/a4/s3/REPORT.md; S7c owns the excerpt op that makes this testable.
-    GTEST_SKIP() << "needs an excerpt op the engine can run headless (notes/a4/s3/REPORT.md)";
+    // Excerpt generation links a part's elements as clones in the excerpt score.  It needs
+    // notes to link, which a template-built score has none of, so the corpus is the source.
     int checked = 0;
-    for (const auto& info : g_engine->templates()) {
-        if (info.id != "SATB_+_Organ" && info.id != "Treble_Clef") continue;
-        auto document = g_engine->create_document({.template_id = info.id});
-        ASSERT_TRUE(document) << info.id << ": " << document.error().message;
-        SCOPED_TRACE(info.id);
-        MasterScore& master = master_of(**document);
+    for (const auto& path : g_corpus) {
+        if (path.extension() != ".mscx") continue;
+        auto document = open_path(path);
+        if (!document) continue;
+        SCOPED_TRACE(path.string());
+        MasterScore& master = master_of(*document);
         if (master.excerpts().empty()) music::generate_score_excerpts(&master);
         if (master.excerpts().empty()) continue;
         engrave::assign_missing_ids(master);
@@ -605,8 +603,9 @@ TEST(Handles, H5aLinksAcrossExcerpts) {
         Note* excerpt_note = nullptr;
         for (const engrave::LiveId& entry : engrave::live_ids(master)) {
             if (master_note || entry.object->type() != ElementType::NOTE) continue;
+            if (entry.object->score() != &master) continue;   // the master's own note, not a clone
             for (EngravingObject* linked : entry.object->linkList()) {
-                if (!linked->isNote() || linked->score() == entry.object->score()) continue;
+                if (!linked->isNote() || linked->score() == &master) continue;
                 master_note = mu::engraving::toNote(entry.object);
                 excerpt_note = mu::engraving::toNote(linked);
                 break;
@@ -629,13 +628,20 @@ TEST(Handles, H5aLinksAcrossExcerpts) {
         EXPECT_EQ(excerpt_note->color(), red) << "the property did not reach the linked element";
         EXPECT_TRUE(live(master, master_id)) << "a property edit lost the element's id";
 
-        // Removing the master element takes the linked one with it.
-        commit(master, [&](MasterScore&) { master.undoRemoveElement(master_note); });
+        // Deleting the master element takes the linked one with it.  The engine's deletion
+        // command is used, not a bare element removal: deleting the last note of a chord
+        // leaves a rest in both scores, because a chord without notes is not a valid model
+        // element (layout reads its first note).
+        commit(master, [&](MasterScore&) {
+            master.select(master_note);
+            master.cmdDeleteSelection();
+        });
         EXPECT_FALSE(live(master, master_id)) << "the removed element still resolves";
         EXPECT_FALSE(live(master, excerpt_id)) << "the linked clone survived the removal";
-        expect_inv(**document);
+        expect_inv(*document);
+        break;   // one linked score is what this test needs; the first with notes is enough
     }
-    EXPECT_GT(checked, 0) << "no template score has a linked note";
+    EXPECT_GT(checked, 0) << "no corpus score has a linked note";
 }
 
 TEST(Handles, H5bRemovingAPartLeavesNoId) {
