@@ -85,6 +85,19 @@ Pid api::pid_of(std::string_view name) {
     return Pid::END;
 }
 
+bool api::has_type(std::string_view type) {
+    return std::ranges::find(type_pids, type, &TypePids::type) != std::end(type_pids);
+}
+
+std::vector<Pid> api::pids_of(std::string_view type) {
+    const auto row = std::ranges::find(type_pids, type, &TypePids::type);
+    if (row == std::end(type_pids)) return {};
+    std::vector<Pid> pids;
+    pids.reserve(row->count);
+    for (std::size_t i = row->first; i < row->first + row->count; ++i) pids.push_back(pid_support[i].pid);
+    return pids;
+}
+
 std::vector<TypeInfo> Engine::describe() const {
     impl_->state.check_thread();
     std::vector<TypeInfo> types;

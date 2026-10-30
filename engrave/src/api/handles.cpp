@@ -9,6 +9,7 @@
 
 #include "engraving/dom/engravingitem.h"
 #include "engraving/dom/beam.h"
+#include "engraving/dom/chord.h"
 #include "engraving/dom/masterscore.h"
 #include "engraving/dom/measure.h"
 #include "engraving/dom/page.h"
@@ -53,18 +54,13 @@ Fraction from_engine_fraction(const mu::engraving::Fraction& value) {
     return {value.numerator(), value.denominator()};
 }
 
-// Every object of the document, each once.  What a measure holds is walked through its
-// segments and their elements rather than through Score::scanElements, which skips the
-// elements of a hidden staff: an element on a hidden staff still has an id.  A spanner
-// and a beam are kept outside the ownership tree, so they are listed explicitly, and a
-// removed element (parked on the dummy, which this walk never enters) is not here at
-// all.
 // Every object of the document, each once: per score (the master first, then the
-// excerpts) the score, its parts, its staves, its spanners and its measures, then what
-// Score::scanElements walks: the elements of the visible staves and the layout objects.
-// A spanner is kept in the score's spanner map rather than in the ownership tree and a
-// measure is not an element, hence the extra lists; an element that an undo command
-// removed is in no segment and no map any more, so it is not here.
+// excerpts) the score, its parts, its staves, its spanners and its measures, then the
+// segments of every measure and what they hold, then what Score::scanElements walks:
+// the layout objects and the beams.  A spanner is kept in the score's spanner map
+// rather than in the ownership tree and a measure is not an element, hence the extra
+// lists; an element that an undo command removed is in no segment and no map any more,
+// so it is not here.
 template <typename Function>
 void for_each_object(MasterScore& master, const Function& func) {
     std::unordered_set<const EngravingObject*> seen;
@@ -78,7 +74,27 @@ void for_each_object(MasterScore& master, const Function& func) {
         for (Spanner* spanner : score->spannerList()) visit(spanner);
         for (mu::engraving::MeasureBase* mb = score->first(); mb; mb = mb->next()) {
             visit(mb);
-            if (mb->isMeasure() && mu::engraving::toMeasure(mb)->mmRest()) visit(mu::engraving::toMeasure(mb)->mmRest());
+            if (!mb->isMeasure()) continue;
+            Measure* measure = mu::engraving::toMeasure(mb);
+            if (measure->mmRest()) visit(measure->mmRest());
+            // Every segment and every element of one, with what it holds.
+            // Score::scanElements reaches the elements of a segment through their own
+            // scanElements, which a chord does not answer with itself, and it skips the
+            // elements of a hidden staff, which the writer stores all the same.
+            for (Segment* segment = measure->first(); segment; segment = segment->next()) {
+                visit(segment);
+                for (EngravingItem* element : segment->elist()) {
+                    if (!element) continue;
+                    visit(element);
+                    element->scanElements(visit);
+                    // A grace chord hangs off its chord rather than off the segment.
+                    if (!element->isChord()) continue;
+                    for (mu::engraving::Chord* grace : mu::engraving::toChord(element)->graceNotes()) {
+                        visit(grace);
+                        grace->scanElements(visit);
+                    }
+                }
+            }
         }
         score->scanElements([&visit](EngravingItem* item) {
             visit(item);
@@ -187,19 +203,6 @@ std::string_view segment_token(SegmentType type) {
     return "Invalid";
 }
 
-ScoreSel score_selection(const Score* score) {
-    ScoreSel selection;
-    if (score && !score->isMaster()) selection.excerpt = from_engine(score->eid());
-    return selection;
-}
-
-Score* selected_score(MasterScore& master, const ScoreSel& selection) {
-    if (!selection.excerpt) return &master;
-    const auto found = resolve(master, *selection.excerpt);
-    if (!found || found->object->type() != ElementType::SCORE) return nullptr;
-    return mu::engraving::toScore(found->object);
-}
-
 template <typename T>
 Result<Resolved> resolve_at(const std::vector<T*>& items, std::int32_t index, std::string_view what) {
     if (index < 0 || static_cast<std::size_t>(index) >= items.size()) {
@@ -240,8 +243,13 @@ IdClass id_class(const EngravingObject& object) {
     default:
         break;
     }
-    // A multi-measure rest is layout's: it replaces a range of measures.
+    // A multi-measure rest is layout's: it replaces a range of measures, and so is
+    // everything it holds.
     if (object.isMeasure() && mu::engraving::toMeasure(&object)->isMMRest()) return IdClass::layout;
+    if (object.isEngravingItem()) {
+        const Measure* measure = static_cast<const EngravingItem&>(object).findMeasure();
+        if (measure && measure->isMMRest()) return IdClass::layout;
+    }
     // A tuplet draws its own number, and layout creates that text.
     if (object.isText() && object.ownershipParent() && object.ownershipParent()->isTuplet()) return IdClass::layout;
     // A spanner is kept in its score's spanner map when it is anchored to a segment. One
@@ -362,6 +370,24 @@ Result<Resolved> resolve(MasterScore& master, const ElementId& id) {
     return Resolved{object, true};
 }
 
+ScoreSel selection_of(const Score& score) {
+    ScoreSel selection;
+    if (!score.isMaster()) selection.excerpt = from_engine(score.eid());
+    return selection;
+}
+
+// The score a selection names.
+Result<Score*> select_score(MasterScore& master, const ScoreSel& selection) {
+    if (!selection.excerpt) return &master;
+    const Result<Resolved> found = resolve(master, *selection.excerpt);
+    if (!found) return std::unexpected(found.error());
+    if (found->object->type() != ElementType::SCORE) {
+        return std::unexpected(Error{ErrorCode::InvalidArgument,
+                                     std::format("the selection names a {}, not a score", found->object->typeName())});
+    }
+    return mu::engraving::toScore(found->object);
+}
+
 Result<Resolved> resolve(MasterScore& master, const Address& address) {
     return std::visit(
         [&master](const auto& value) -> Result<Resolved> {
@@ -384,13 +410,13 @@ Result<Resolved> resolve(MasterScore& master, const Address& address) {
                 }
                 return Resolved{segment, true};
             } else if constexpr (std::is_same_v<T, PageAddress>) {
-                Score* score = selected_score(master, value.score);
-                if (!score) return fail(ErrorCode::StaleHandle, "the score a page address names is gone");
-                return resolve_at(score->pages(), value.index, "page");
+                const Result<Score*> selected = select_score(master, value.score);
+                if (!selected) return fail(ErrorCode::StaleHandle, selected.error().message);
+                return resolve_at((*selected)->pages(), value.index, "page");
             } else if constexpr (std::is_same_v<T, SystemAddress>) {
-                Score* score = selected_score(master, value.score);
-                if (!score) return fail(ErrorCode::StaleHandle, "the score a system address names is gone");
-                const Result<Resolved> page = resolve_at(score->pages(), value.page, "page");
+                const Result<Score*> selected = select_score(master, value.score);
+                if (!selected) return fail(ErrorCode::StaleHandle, selected.error().message);
+                const Result<Resolved> page = resolve_at((*selected)->pages(), value.page, "page");
                 if (!page) return page;
                 return resolve_at(mu::engraving::toPage(page->object)->systems(), value.index, "system");
             } else {
@@ -420,7 +446,7 @@ std::optional<Address> address_of(const EngravingObject& object) {    if (object
         Score* score = page.score();
         if (!score) return std::nullopt;
         PageAddress address;
-        address.score = score_selection(score);
+        address.score = selection_of(*score);
         address.index = static_cast<std::int32_t>(score->pageIdx(&page));
         return Address{address};
     }
@@ -430,7 +456,7 @@ std::optional<Address> address_of(const EngravingObject& object) {    if (object
         const Page* page = system.page();
         if (!score || !page) return std::nullopt;
         SystemAddress address;
-        address.score = score_selection(score);
+        address.score = selection_of(*score);
         address.page = static_cast<std::int32_t>(score->pageIdx(page));
         const auto& systems = page->systems();
         const auto index = std::ranges::find(systems, &system);
