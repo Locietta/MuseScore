@@ -53,18 +53,12 @@ Fraction from_engine_fraction(const mu::engraving::Fraction& value) {
     return {value.numerator(), value.denominator()};
 }
 
-// Every object of the document, each once.  What a measure holds is walked through its
-// segments and their elements rather than through Score::scanElements, which skips the
-// elements of a hidden staff: an element on a hidden staff still has an id.  A spanner
-// and a beam are kept outside the ownership tree, so they are listed explicitly, and a
-// removed element (parked on the dummy, which this walk never enters) is not here at
-// all.
 // Every object of the document, each once: per score (the master first, then the
-// excerpts) the score, its parts, its staves, its spanners and its measures, then what
-// Score::scanElements walks: the elements of the visible staves and the layout objects.
-// A spanner is kept in the score's spanner map rather than in the ownership tree and a
-// measure is not an element, hence the extra lists; an element that an undo command
-// removed is in no segment and no map any more, so it is not here.
+// excerpts) the score, its parts, its staves, its spanners and its measures with
+// what they hold, then what Score::scanElements adds (the layout objects). A spanner
+// is kept in the score's spanner map rather than in the ownership tree and a measure
+// is not an element, hence the extra lists; an element that an undo command removed
+// is in no segment and no map any more, so it is not here.
 template <typename Function>
 void for_each_object(MasterScore& master, const Function& func) {
     std::unordered_set<const EngravingObject*> seen;
@@ -76,15 +70,34 @@ void for_each_object(MasterScore& master, const Function& func) {
         for (Part* part : score->parts()) visit(part);
         for (Staff* staff : score->staves()) visit(staff);
         for (Spanner* spanner : score->spannerList()) visit(spanner);
-        for (mu::engraving::MeasureBase* mb = score->first(); mb; mb = mb->next()) {
-            visit(mb);
-            if (mb->isMeasure() && mu::engraving::toMeasure(mb)->mmRest()) visit(mu::engraving::toMeasure(mb)->mmRest());
-        }
-        score->scanElements([&visit](EngravingItem* item) {
+        // scanElements skips what is on a hidden staff and never hands out a chord
+        // itself (only its notes, stem and the rest), so a measure's own lists and
+        // segments are walked as well, and a chord is reached through its parts.
+        const auto visit_item = [&visit](EngravingItem* item) {
             visit(item);
+            EngravingObject* parent = item->parent();
+            if (parent && parent->isChordRest()) visit(parent);
             // A beam is referred to by the chords it joins, not held by a measure.
             if (item->isChordRest()) visit(mu::engraving::toChordRest(item)->beam());
-        });
+        };
+        const auto visit_tree = [&visit_item](EngravingItem* item) {
+            visit_item(item);
+            item->scanElements(visit_item);
+        };
+        for (mu::engraving::MeasureBase* mb = score->first(); mb; mb = mb->next()) {
+            visit(mb);
+            if (!mb->isMeasure()) continue;
+            Measure* measure = mu::engraving::toMeasure(mb);
+            if (measure->mmRest()) visit(measure->mmRest());
+            for (EngravingItem* item : measure->el()) visit_tree(item);
+            for (Segment* segment = measure->first(); segment; segment = segment->next()) {
+                for (EngravingItem* item : segment->elist()) {
+                    if (item) visit_tree(item);
+                }
+                for (EngravingItem* item : segment->annotations()) visit_tree(item);
+            }
+        }
+        score->scanElements(visit_item);
     }
 }
 
@@ -108,12 +121,6 @@ Placement placement_of(MasterScore& master, const EngravingObject& object) {
     placement.track = static_cast<int>(track);
     return placement;
 }
-
-// Whether an object still hangs off one of the document's scores.  This is the weaker
-// test: an element on a hidden staff is not in the walk (Score::scanElements skips it)
-// but is still in the score, and an element an undo command removed is still in the tree
-// too, which is why resolve() asks the walk and this only serves as a sanity check.
-bool in_score(MasterScore& master, const EngravingObject* object);
 
 // Whether an object is one of the document's.  The walk is what decides: an element
 // that an undo command removed is no longer in a segment's element list, a spanner map
@@ -290,8 +297,10 @@ void assign_missing_ids(MasterScore& master) {
     // An id whose element is no longer part of the document must go as well: a read can
     // replace what it built (an excerpt score's first pass, a tie whose other end is
     // missing), and such an entry would answer for an element no caller can address.
+    // An element the walk does not hand out but that is still in a score (a guitar bend
+    // on its note) keeps the id the file gave it, so that a save writes the same id again.
     for (const auto& [eid, object] : master.eidRegister()->entries()) {
-        if (!document.contains(object)) master.eidRegister()->removeItem(object);
+        if (!document.contains(object) && !in_score(master, object)) master.eidRegister()->removeItem(object);
     }
 }
 

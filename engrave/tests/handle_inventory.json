@@ -7,6 +7,7 @@
     "Beam": "persisted",
     "Bracket": "layout",
     "Breath": "persisted",
+    "Chord": "persisted",
     "ChordLine": "persisted",
     "Clef": "persisted",
     "Dynamic": "persisted",
