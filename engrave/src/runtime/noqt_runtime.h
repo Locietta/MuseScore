@@ -8,6 +8,9 @@ namespace music {
 using ScoreProject = std::shared_ptr<mu::engraving::EngravingProject>;
 void initialize_native_runtime(const std::string& assets);
 ScoreProject load_native_score(const std::string& bytes, const std::string& format);
+// Loads the .mscx of an MSCX directory (score_style.mss and META-INF/ beside
+// it, the layout of the score templates) with load_native_score's post-load steps.
+ScoreProject load_native_score_dir(const std::string& mscx_path);
 // Writer::writeScore stamps the running program's version into the score it
 // writes. A serialize/reload of our own writer output therefore has to restore
 // the source values, or the reloaded score reports the export as an edit.

@@ -120,6 +120,37 @@ void setup_context_modules(const std::vector<modularity::IModuleSetup*>& modules
     for (auto* setup : setups) setup->onInit(runMode);
     for (auto* setup : setups) setup->onAllInited(runMode);
 }
+
+void finish_load(engraving::EngravingProject& project) {
+    auto* score = project.masterScore();
+    score->connectTies();
+    // 5.0 moved the post-load MIDI wiring out of EngravingProject::setupMasterScore
+    // into the MSCX reader (rw/read500/read500.cpp:307-315), so a score that did not
+    // come from MSCX keeps an empty MasterScore::midiMapping(): every InstrChannel
+    // still has channel() == -1 (dom/instrument.cpp:319) and
+    // MasterScore::playbackChannel() indexes m_midiMapping with it
+    // (dom/masterscore.h:185), i.e. reads 72*(channel()+1) bytes out of bounds.
+    // Run the same three steps, in the same order, where every reader converges.
+    for (auto* part : score->parts()) part->updateHarmonyChannels(false);
+    score->rebuildMidiMapping();
+    score->updateChannel();
+    check(project.setupMasterScore(true));
+    // MusicXML import can call Part::setMidiProgram after the MIDI mapping was
+    // built, leaving playback channels on the template program until an MSCZ
+    // reload rebuilds them. Sync now so playback is stable across reloads.
+    for (auto* part : score->parts()) {
+        for (const auto& pair : part->instruments()) {
+            for (auto* channel : pair.second->channel()) {
+                if (auto* playback = score->playbackChannel(channel)) {
+                    playback->setProgram(channel->program());
+                    playback->setBank(channel->bank());
+                }
+            }
+        }
+    }
+    score->setLayoutAll();
+    score->update();
+}
 }
 
 void initialize_native_runtime(const std::string& assets) {
@@ -245,34 +276,23 @@ ScoreProject load_native_score(const std::string& input, const std::string& form
                || format == "gp6" || format == "gp7" || format == "gpx" || format == "gtp" || format == "ptb") {
         import_guitarpro_score(project->masterScore(), input);
     } else throw std::invalid_argument("Unsupported score input format");
-    auto* score = project->masterScore();
-    score->connectTies();
-    // 5.0 moved the post-load MIDI wiring out of EngravingProject::setupMasterScore
-    // into the MSCX reader (rw/read500/read500.cpp:307-315), so a score that did not
-    // come from MSCX keeps an empty MasterScore::midiMapping(): every InstrChannel
-    // still has channel() == -1 (dom/instrument.cpp:319) and
-    // MasterScore::playbackChannel() indexes m_midiMapping with it
-    // (dom/masterscore.h:185), i.e. reads 72*(channel()+1) bytes out of bounds.
-    // Run the same three steps, in the same order, where every reader converges.
-    for (auto* part : score->parts()) part->updateHarmonyChannels(false);
-    score->rebuildMidiMapping();
-    score->updateChannel();
-    check(project->setupMasterScore(true));
-    // MusicXML import can call Part::setMidiProgram after the MIDI mapping was
-    // built, leaving playback channels on the template program until an MSCZ
-    // reload rebuilds them. Sync now so playback is stable across reloads.
-    for (auto* part : score->parts()) {
-        for (const auto& pair : part->instruments()) {
-            for (auto* channel : pair.second->channel()) {
-                if (auto* playback = score->playbackChannel(channel)) {
-                    playback->setProgram(channel->program());
-                    playback->setBank(channel->bank());
-                }
-            }
-        }
-    }
-    score->setLayoutAll();
-    score->update();
+    finish_load(*project);
+    return project;
+}
+
+ScoreProject load_native_score_dir(const std::string& mscx_path) {
+    engraving::ScoreLoad scoreLoad;
+    auto project = engraving::EngravingProject::create(modularity::globalCtx());
+    project->setFileInfoProvider(std::make_shared<engraving::LocalFileInfoProvider>("Untitled.mscz"));
+    engraving::MscReader::Params params;
+    params.filePath = io::path_t(mscx_path);
+    params.mode = engraving::MscIoMode::Dir;
+    engraving::MscReader reader(params);
+    check(reader.open());
+    engraving::rw::ReadInOutData inout;
+    inout.forcePageMode = true;
+    check(project->loadMscz(reader, &inout, false));
+    finish_load(*project);
     return project;
 }
 
