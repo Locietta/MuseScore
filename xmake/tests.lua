@@ -230,6 +230,39 @@ target("engrave_read_test")
     end
 target_end()
 
+-- The output tests: render against the A2 render goldens (render_goldens.json),
+-- page_count and the render limits, plus the audio API: the encoders, the
+-- SoundFont list and the per-track font, the reverb switch, sink chunking and
+-- D4 (a second render in one process equals a fresh-process render, which the
+-- test checks by starting engrave_output_probe).
+target("engrave_output_test")
+    set_kind("binary")
+    add_deps("engrave")
+    add_packages("gtest", "muse-zlib")
+    add_defines('ENGRAVE_TEST_SOURCE_ROOT="' .. source_root:gsub("\\", "/") .. '"')
+    add_files(
+        path.join(tests_dir, "output_test.cpp"),
+        path.join(tests_dir, "audio_test.cpp"),
+        path.join(tests_dir, "digest.cpp")
+    )
+    if is_plat("windows") then
+        add_files(utf8_manifest)
+    else
+        add_links("m")
+    end
+target_end()
+
+-- Renders one score through the public API (SVG/PNG/PDF or an audio file), for
+-- scripts/test_a4_output.py in the superproject and for the D4 test above.
+target("engrave_output_probe")
+    set_kind("binary")
+    add_deps("engrave")
+    add_files(path.join(tests_dir, "output_probe.cpp"))
+    if is_plat("windows") then
+        add_files(utf8_manifest)
+    end
+target_end()
+
 -- The leak test: an embedder compiled with the public include root as its
 -- only include path and none of the project's defines, so it builds only
 -- while the public headers stay std-only.  The compile is done here rather
