@@ -6,8 +6,10 @@
 #include <optional>
 #include <span>
 #include <string>
+#include <string_view>
 #include <vector>
 
+#include <engrave/describe.h>
 #include <engrave/document.h>
 #include <engrave/error.h>
 #include <engrave/output.h>
@@ -85,6 +87,14 @@ struct Engine {
 
     // A new score from a template, at revision 1.
     Result<std::unique_ptr<Document>> create_document(const CreateOptions& options);
+
+    // The catalogue: every element type the engine recognises, sorted by name,
+    // with the properties its class handles, and every style in style id order.
+    // The tables are static; no score is read.  NotFound for a type name the
+    // engine does not know.
+    std::vector<TypeInfo> describe() const;
+    Result<TypeInfo> describe(std::string_view type) const;
+    std::vector<StyleInfo> describe_styles() const;
 
 private:
     struct Impl;
