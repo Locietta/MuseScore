@@ -22,11 +22,30 @@
 
 #include "midifile.h"
 
+#include <cmath>
+#include <cstring>
+#include <stdexcept>
+#include <string>
+
 #include "containers.h"
 
 #include "log.h"
 
 using namespace mu::engraving;
+
+namespace {
+#ifdef NO_QT_SUPPORT
+[[noreturn]] void throwMidiError(const std::string& msg)
+{
+    throw std::runtime_error(msg);
+}
+#else
+[[noreturn]] void throwMidiError(const QString& msg)
+{
+    throw msg;
+}
+#endif
+}
 
 namespace mu::iex::midi {
 MidiFile::MidiFile()
@@ -41,6 +60,7 @@ MidiFile::MidiFile()
     sstatus          = 0;
     click            = 0;
     curPos           = 0;
+    _writeError      = false;
 }
 
 //---------------------------------------------------------
@@ -48,20 +68,21 @@ MidiFile::MidiFile()
 //    returns true on error
 //---------------------------------------------------------
 
-bool MidiFile::write(QIODevice* out)
+bool MidiFile::write(MidiIODevice* out)
 {
     fp = out;
+    _writeError = false;
     write("MThd", 4);
     writeLong(6);                   // header len
     writeShort(_format);            // format
     writeShort(static_cast<int>(_tracks.size()));
     writeShort(_division);
     for (const auto& t: _tracks) {
-        if (writeTrack(t)) {
+        if (writeTrack(t) || _writeError) {
             return true;
         }
     }
-    return false;
+    return _writeError;
 }
 
 //---------------------------------------------------------
@@ -138,7 +159,7 @@ void MidiFile::writeEvent(const MidiEvent& event)
 bool MidiFile::writeTrack(const MidiTrack& t)
 {
     write("MTrk", 4);
-    qint64 lenpos = fp->pos();
+    int64_t lenpos = static_cast<int64_t>(fp->pos());
     writeLong(0);                   // dummy len
 
     status   = -1;
@@ -165,11 +186,19 @@ bool MidiFile::writeTrack(const MidiTrack& t)
     put(0xff);          // Meta
     put(0x2f);          // EOT
     putvl(0);           // len 0
-    qint64 endpos = fp->pos();
+    int64_t endpos = static_cast<int64_t>(fp->pos());
+#ifdef NO_QT_SUPPORT
+    fp->seek(static_cast<size_t>(lenpos));
+#else
     fp->seek(lenpos);
-    writeLong(endpos - lenpos - 4); // tracklen
+#endif
+    writeLong(static_cast<int>(endpos - lenpos - 4)); // tracklen
+#ifdef NO_QT_SUPPORT
+    fp->seek(static_cast<size_t>(endpos));
+#else
     fp->seek(endpos);
-    return false;
+#endif
+    return _writeError;
 }
 
 //---------------------------------------------------------
@@ -193,7 +222,7 @@ void MidiFile::writeStatus(int nstat, int c)
 //    return false on error
 //---------------------------------------------------------
 
-bool MidiFile::read(QIODevice* in)
+bool MidiFile::read(MidiIODevice* in)
 {
     fp = in;
     _tracks.clear();
@@ -227,11 +256,15 @@ bool MidiFile::read(QIODevice* in)
     read(tmp, 4);
     int len = readLong();
     if (memcmp(tmp, "MThd", 4) || len < 6) {
-        throw(QString("bad midifile: MThd expected"));
+        throwMidiError("bad midifile: MThd expected");
     }
 
     if (len > 6) {
-        throw(QString("unsupported MIDI header data size: %1 instead of 6").arg(len));
+#ifdef NO_QT_SUPPORT
+        throwMidiError("unsupported MIDI header data size: " + std::to_string(len) + " instead of 6");
+#else
+        throwMidiError(QString("unsupported MIDI header data size: %1 instead of 6").arg(len));
+#endif
     }
 
     _format     = readShort();
@@ -248,21 +281,21 @@ bool MidiFile::read(QIODevice* in)
     //  |       | 1 |  -frames/second   |   ticks/frame   |
     //  +-------+---+-------------------+-----------------+
 
-    char firstByte;
-    fp->getChar(&firstByte);
-    char secondByte;
-    fp->getChar(&secondByte);
-    const char topBit = (firstByte & 0x80) >> 7;
+    unsigned char firstByte = 0;
+    read(&firstByte, 1);
+    unsigned char secondByte = 0;
+    read(&secondByte, 1);
+    const int topBit = (firstByte & 0x80) >> 7;
 
     if (topBit == 0) {              // ticks per beat
         _isDivisionInTps = false;
         _division = (firstByte << 8) | (secondByte & 0xff);
     } else {                        // ticks per second = fps * ticks per frame
         _isDivisionInTps = true;
-        const int framesPerSecond = -((signed char)firstByte);
+        const int framesPerSecond = -static_cast<signed char>(firstByte);
         const int ticksPerFrame = secondByte;
         if (framesPerSecond == 29) {
-            _division = qRound(29.97 * ticksPerFrame);
+            _division = static_cast<int>(std::lround(29.97 * ticksPerFrame));
         } else {
             _division = framesPerSecond * ticksPerFrame;
         }
@@ -284,7 +317,11 @@ bool MidiFile::read(QIODevice* in)
         }
         break;
     default:
-        throw(QString("midi file format %1 not implemented").arg(_format));
+#ifdef NO_QT_SUPPORT
+        throwMidiError("midi file format " + std::to_string(_format) + " not implemented");
+#else
+        throwMidiError(QString("midi file format %1 not implemented").arg(_format));
+#endif
 
         // Prevent "unreachable code" warning
         // return false;
@@ -302,10 +339,10 @@ bool MidiFile::readTrack()
     char tmp[4];
     read(tmp, 4);
     if (memcmp(tmp, "MTrk", 4)) {
-        throw(QString("bad midifile: MTrk expected"));
+        throwMidiError("bad midifile: MTrk expected");
     }
     int len       = readLong();         // len
-    qint64 endPos = curPos + len;
+    int64_t endPos = curPos + len;
     status        = -1;
     sstatus       = -1;    // running status, will not be reset on meta or sysex
     click         =  0;
@@ -328,10 +365,16 @@ bool MidiFile::readTrack()
         _tracks.back().insert(click, event);
     }
     if (curPos != endPos) {
-        LOGW("bad track len: %lld != %lld, %lld bytes too much\n", endPos, curPos, endPos - curPos);
+        LOGW("bad track len: %lld != %lld, %lld bytes too much\n",
+             static_cast<long long>(endPos), static_cast<long long>(curPos),
+             static_cast<long long>(endPos - curPos));
         if (curPos < endPos) {
-            LOGW("  skip %lld\n", endPos - curPos);
+            LOGW("  skip %lld\n", static_cast<long long>(endPos - curPos));
+#ifdef NO_QT_SUPPORT
+            fp->seek(static_cast<size_t>(endPos));
+#else
             fp->skip(endPos - curPos);
+#endif
         }
     }
     return false;
@@ -342,26 +385,43 @@ bool MidiFile::readTrack()
  *    return false on error
  *---------------------------------------------------------*/
 
-void MidiFile::read(void* p, qint64 len)
+void MidiFile::read(void* p, int64_t len)
 {
     curPos += len;
-    qint64 rv = fp->read((char*)p, len);
-    if (rv != len) {
-        throw(QString("bad midifile: unexpected EOF"));
+#ifdef NO_QT_SUPPORT
+    const size_t rv = fp->read(static_cast<uint8_t*>(p), static_cast<size_t>(len));
+    if (rv != static_cast<size_t>(len)) {
+        throwMidiError("bad midifile: unexpected EOF");
     }
+#else
+    const int64_t rv = fp->read(static_cast<char*>(p), len);
+    if (rv != len) {
+        throwMidiError("bad midifile: unexpected EOF");
+    }
+#endif
 }
 
 //---------------------------------------------------------
 //   write
 //---------------------------------------------------------
 
-bool MidiFile::write(const void* p, qint64 len)
+bool MidiFile::write(const void* p, int64_t len)
 {
-    qint64 rv = fp->write((char*)p, len);
+#ifdef NO_QT_SUPPORT
+    const size_t rv = fp->write(static_cast<const uint8_t*>(p), static_cast<size_t>(len));
+    if (rv == static_cast<size_t>(len)) {
+        return false;
+    }
+    _writeError = true;
+    LOGD("write midifile failed: %s", fp->errorString().c_str());
+#else
+    const int64_t rv = fp->write(static_cast<const char*>(p), len);
     if (rv == len) {
         return false;
     }
+    _writeError = true;
     LOGD("write midifile failed: %s", fp->errorString().toLatin1().data());
+#endif
     return true;
 }
 
@@ -374,7 +434,7 @@ int MidiFile::readShort()
     char c;
     int val = 0;
     for (int i = 0; i < 2; ++i) {
-        fp->getChar(&c);
+        read(&c, 1);
         val <<= 8;
         val += (c & 0xff);
     }
@@ -387,8 +447,8 @@ int MidiFile::readShort()
 
 void MidiFile::writeShort(int i)
 {
-    fp->putChar(i >> 8);
-    fp->putChar(i);
+    put(i >> 8);
+    put(i);
 }
 
 //---------------------------------------------------------
@@ -401,7 +461,7 @@ int MidiFile::readLong()
     char c;
     int val = 0;
     for (int i = 0; i < 4; ++i) {
-        fp->getChar(&c);
+        read(&c, 1);
         val <<= 8;
         val += (c & 0xff);
     }
@@ -414,16 +474,16 @@ int MidiFile::readLong()
 
 void MidiFile::writeLong(int i)
 {
-    fp->putChar(i >> 24);
-    fp->putChar(i >> 16);
-    fp->putChar(i >> 8);
-    fp->putChar(i);
+    put(i >> 24);
+    put(i >> 16);
+    put(i >> 8);
+    put(i);
 }
 
 /*---------------------------------------------------------
  *    getvl
  *    Read variable-length number (7 bits per byte, MSB first)
- *---------------------------------------------------------*/
+ *--------------------------------------------------------*/
 
 int MidiFile::getvl()
 {
@@ -443,7 +503,7 @@ int MidiFile::getvl()
 /*---------------------------------------------------------
  *    putvl
  *    Write variable-length number (7 bits per byte, MSB first)
- *---------------------------------------------------------*/
+ *--------------------------------------------------------*/
 
 void MidiFile::putvl(unsigned val)
 {

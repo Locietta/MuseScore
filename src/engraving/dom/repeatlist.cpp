@@ -839,19 +839,43 @@ void RepeatList::unwind()
             } break;
             case RepeatListElementType::VOLTA_START: {
                 activeVolta = toVolta((*repeatListElementIt)->element);
-                if (!(activeVolta->hasEnding(playbackCount))) {
+                // A volta whose endings all lie beyond the exhausted repeats is played after them.
+                const bool playAfterRepeats = (playbackCount > 1)
+                                              && (playbackCount >= startRepeatReference->getRepeatCount())
+                                              && (activeVolta->firstEnding() > playbackCount);
+                if (!activeVolta->hasEnding(playbackCount) && !playAfterRepeats) {
                     // Should be skipped, remove our measure from rs
                     rs->popMeasure();
                     if (!rs->isEmpty()) {
                         push_back(rs);
                     }
-                    // Skip the volta
+                    // Skip the volta, but only up to the last repeat structure actually passed:
+                    // an open volta's VOLTA_END is deferred to the section end, and skipping that
+                    // would discard the remainder of the score.
+                    Measure const* lastSkippedMeasure = activeVolta->endMeasure();
                     do {
                         ++repeatListElementIt;
+                        const RepeatListElementType skippedType = (*repeatListElementIt)->repeatListElementType;
+                        const bool isRepeatStructure = (skippedType == RepeatListElementType::REPEAT_START)
+                                                       || (skippedType == RepeatListElementType::REPEAT_END)
+                                                       || (skippedType == RepeatListElementType::JUMP);
+                        if (isRepeatStructure
+                            && ((lastSkippedMeasure == nullptr)
+                                || ((*repeatListElementIt)->measure->tick() > lastSkippedMeasure->tick()))) {
+                            lastSkippedMeasure = (*repeatListElementIt)->measure;
+                        }
                     } while ((*repeatListElementIt)->repeatListElementType != RepeatListElementType::VOLTA_END);
+
+                    RepeatListElementList::const_iterator afterVoltaEndIt = repeatListElementIt + 1;
+                    const bool voltaEndedBySectionEnd = (afterVoltaEndIt == sectionIt->cend())
+                                                        || ((*afterVoltaEndIt)->repeatListElementType
+                                                            == RepeatListElementType::SECTION_BREAK);
+                    if (!voltaEndedBySectionEnd || (lastSkippedMeasure == nullptr)) {
+                        lastSkippedMeasure = (*repeatListElementIt)->measure;
+                    }
                     activeVolta = nullptr;
                     // Start next rs on the following measure
-                    Measure const* const possibleNextMeasure = (*repeatListElementIt)->measure->nextMeasureMM();
+                    Measure const* const possibleNextMeasure = lastSkippedMeasure->nextMeasureMM();
                     if (possibleNextMeasure == nullptr) {
                         rs = nullptr;                   // end of score, but will still encounter section break, notify it
                     } else {

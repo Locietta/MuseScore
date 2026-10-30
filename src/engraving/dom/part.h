@@ -193,6 +193,8 @@ public:
 private:
     friend class SharedPart;
 
+    static String plainPartName(const Instrument* instrument);
+
     InstrumentList m_instruments;
     std::vector<Staff*> m_staves;
     muse::ID m_id = INVALID_ID;       ///< used for MusicXML import

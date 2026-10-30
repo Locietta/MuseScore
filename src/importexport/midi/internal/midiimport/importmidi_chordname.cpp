@@ -26,6 +26,11 @@
 #include "importmidi_operations.h"
 #include "../midishared/midifile.h"
 
+#include <string>
+#include <vector>
+
+#include "global/types/string.h"
+
 #include "engraving/dom/masterscore.h"
 #include "engraving/dom/staff.h"
 #include "engraving/dom/measure.h"
@@ -48,33 +53,33 @@ int readSecondHalf(uchar byte)
     return byte & 0xf;
 }
 
-QString readChordRoot(uchar byte)
+muse::String readChordRoot(uchar byte)
 {
-    static const std::vector<QString> inversions = {
+    static const std::vector<std::string> inversions = {
         "bbb", "bb", "b", "", "#", "##", "###"
     };
-    static const std::vector<QString> notes = {
+    static const std::vector<std::string> notes = {
         "", "C", "D", "E", "F", "G", "A", "B"
     };
 
-    QString chordRoot;
+    muse::String chordRoot;
 
     const size_t noteIndex = readSecondHalf(byte);
     if (noteIndex < notes.size()) {
-        chordRoot += notes[noteIndex];
+        chordRoot += muse::String::fromUtf8(notes[noteIndex]);
     }
 
     const size_t inversionIndex = readFirstHalf(byte);
     if (inversionIndex < inversions.size()) {
-        chordRoot += inversions[inversionIndex];
+        chordRoot += muse::String::fromUtf8(inversions[inversionIndex]);
     }
 
     return chordRoot;
 }
 
-QString readChordType(uchar chordTypeIndex)
+muse::String readChordType(uchar chordTypeIndex)
 {
-    static const std::vector<QString> chordTypes = {
+    static const std::vector<std::string> chordTypes = {
         "",           // Maj
         "6",          // Maj6
         "Maj7",
@@ -113,26 +118,26 @@ QString readChordType(uchar chordTypeIndex)
     };
 
     if (chordTypeIndex < chordTypes.size()) {
-        return chordTypes[chordTypeIndex];
+        return muse::String::fromUtf8(chordTypes[chordTypeIndex]);
     }
-    return "";
+    return muse::String();
 }
 
-QString readChordName(const MidiEvent& e)
+muse::String readChordName(const MidiEvent& e)
 {
     if (e.type() != ME_META || e.metaType() != META_SPECIFIC) {
-        return "";
+        return muse::String();
     }
     if (e.len() < 4) {
-        return "";
+        return muse::String();
     }
 
     const uchar* data = e.edata();
     if (data[0] != 0x43 || data[1] != 0x7B || data[2] != 0x01) {
-        return "";
+        return muse::String();
     }
 
-    QString chordName;
+    muse::String chordName;
 
     if (e.len() >= 4) {
         chordName += readChordRoot(data[3]);
@@ -142,16 +147,16 @@ QString readChordName(const MidiEvent& e)
     }
 
     if (e.len() >= 6) {
-        const QString chordRoot = readChordRoot(data[5]);
+        const muse::String chordRoot = readChordRoot(data[5]);
         if (!chordRoot.isEmpty()) {
-            QString chordType;
+            muse::String chordType;
             if (e.len() >= 7) {
                 chordType = readChordType(data[6]);
             }
             if (chordRoot + chordType == chordName) {
-                chordName += "/" + chordRoot;
+                chordName += u"/" + chordRoot;
             } else {
-                chordName += "/" + chordRoot + chordType;
+                chordName += u"/" + chordRoot + chordType;
             }
         }
     }
@@ -159,9 +164,9 @@ QString readChordName(const MidiEvent& e)
     return chordName;
 }
 
-QString findChordName(
-    const QList<MidiNote>& notes,
-    const std::multimap<ReducedFraction, QString>& chordNames)
+muse::String findChordName(
+    const std::vector<MidiNote>& notes,
+    const std::multimap<ReducedFraction, muse::String>& chordNames)
 {
     for (const MidiNote& note: notes) {
         const auto range = chordNames.equal_range(note.origOnTime);
@@ -169,17 +174,17 @@ QString findChordName(
             continue;
         }
         // found chord names (usually only one)
-        QString chordName;
+        muse::String chordName;
         for (auto it = range.first; it != range.second; ++it) {
             if (it != range.first) {
-                chordName += "\n" + it->second;
+                chordName += u"\n" + it->second;
             } else {
                 chordName += it->second;
             }
         }
         return chordName;
     }
-    return "";
+    return muse::String();
 }
 
 void findChordNames(const std::multimap<int, MTrack>& tracks)
@@ -189,7 +194,7 @@ void findChordNames(const std::multimap<int, MTrack>& tracks)
     for (const auto& track: tracks) {
         for (const auto& event: track.second.mtrack->events()) {
             const MidiEvent& e = event.second;
-            const QString chordName = readChordName(e);
+            const muse::String chordName = readChordName(e);
             if (!chordName.isEmpty()) {
                 const auto time = ReducedFraction::fromTicks(event.first);
                 data.chordNames.insert({ time, chordName });
@@ -200,7 +205,7 @@ void findChordNames(const std::multimap<int, MTrack>& tracks)
 
 // all notes should be already placed to the score
 
-void setChordNames(QList<MTrack>& tracks)
+void setChordNames(std::vector<MTrack>& tracks)
 {
     const auto& data = *midiImportOperations.data();
     if (data.chordNames.empty() || !data.trackOpers.showChordNames.value()) {
@@ -219,7 +224,7 @@ void setChordNames(QList<MTrack>& tracks)
             }
 
             const MidiChord& c = chord.second;
-            const QString chordName = findChordName(c.notes, data.chordNames);
+            const muse::String chordName = findChordName(c.notes, data.chordNames);
 
             if (chordName.isEmpty()) {
                 continue;

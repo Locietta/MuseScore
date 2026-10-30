@@ -1,4 +1,4 @@
-/*
+﻿/*
  * SPDX-License-Identifier: GPL-3.0-only
  * MuseScore-Studio-CLA-applies
  *
@@ -54,6 +54,9 @@
 using namespace mu::engraving;
 
 static constexpr real_t DYNAMIC_STEP = real_t::make(0.05);
+
+// Normalized [0.0, 1.0] dynamic level used when no dynamic precedes a hairpin start ("natural").
+static constexpr real_t NATURAL_NORMALIZED_DYNAMIC = real_t::make(0.5);
 
 // Dynamics, measure repeats, fermatas, and tempo texts can only appear on these segment types
 static constexpr SegmentType RELEVANT_SEGMENT_TYPES = SegmentType::ChordRest | SegmentType::TimeTick;
@@ -887,7 +890,7 @@ void ScoreAutomationController::addHairpinPoints(const Hairpin* hairpin, int tic
         const Dynamic* startDynamic = startSegment
                                       ? toDynamic(startSegment->findAnnotation(ElementType::DYNAMIC, trackIdx, trackIdx))
                                       : nullptr;
-        if (startDynamic && muse::contains(COMPOUND_DYNAMIC_VALUES, startDynamic->dynamicType())) {
+        if (startDynamic && startDynamic->playDynamic() && muse::contains(COMPOUND_DYNAMIC_VALUES, startDynamic->dynamicType())) {
             // The hairpin starts with a compound dynamic; we should start the hairpin after the transition is complete
             // This solution should be replaced once we have better infrastructure to see relations between Dynamics and Hairpins.
             const BeatsPerSecond tempo = denormalizeTempo(currentTempoAt(*ctx.tempoCurve, info.from)) * ctx.tempoMultiplier;
@@ -921,7 +924,10 @@ void ScoreAutomationController::addHairpinPoints(const HairpinInfo& info, const 
 
     // --- Determine valueFrom
     const AutomationPoint* prevPoint = activePoint(ctx.curves, key, info.from);
-    const real_t prevOutValue = prevPoint ? prevPoint->value.outValue : real_t(0.0);
+    // A hairpin with no preceding dynamic starts from the natural dynamic level, which is what
+    // activePoint() used to return (MIDPOINT { 0.5, 0.5 }) before 628f484fbf. Defaulting to 0.0 here
+    // made every "crescendo from nothing" start from silence (ppppppppp).
+    const real_t prevOutValue = prevPoint ? prevPoint->value.outValue : NATURAL_NORMALIZED_DYNAMIC;
 
     // If the hairpin has no specific start value, use the currently-applicable value at the start tick of the hairpin
     const real_t valueFrom = info.nominalValueFrom.value_or(prevOutValue);

@@ -21,7 +21,11 @@
  */
 #include "importmidi_tuplet.h"
 
+#include <algorithm>
+#include <cmath>
+#include <list>
 #include <set>
+#include <vector>
 
 #include "importmidi_tuplet_detect.h"
 #include "importmidi_tuplet_filter.h"
@@ -76,7 +80,7 @@ TupletInfo& tupletFromId(int id, std::vector<TupletInfo>& tuplets)
 
 bool hasNonTrivialChord(
     const ReducedFraction& chordOnTime,
-    const QList<MidiNote>& notes,
+    const std::vector<MidiNote>& notes,
     const ReducedFraction& tupletOnTime,
     const ReducedFraction& tupletLen)
 {
@@ -218,7 +222,7 @@ int averagePitch(const std::map<ReducedFraction,
         }
     }
 
-    return qRound(sumPitch * 1.0 / noteCounter);
+    return static_cast<int>(std::lround(sumPitch * 1.0 / noteCounter));
 }
 
 void sortNotesByPitch(const std::multimap<ReducedFraction, MidiChord>::iterator& startBarChordIt,
@@ -414,7 +418,7 @@ void splitTupletChord(const std::vector<TupletInfo>::iterator& lastMatch,
     prevChord.notes.erase(prevChord.notes.begin());
     chordEvent = chords.insert({ onTime, newChord });
 
-    Q_ASSERT_X(!prevChord.notes.isEmpty(),
+    Q_ASSERT_X(!prevChord.notes.empty(),
                "MidiTuplet::splitTupletChord",
                "Tuplets were not filtered correctly: same notes in different tuplets");
 }
@@ -508,7 +512,7 @@ void minimizeOffTimeError(
                 newTupletChord.notes.push_back(notes[i]);
             }
 
-            QList<MidiNote> newNotes;
+            std::vector<MidiNote> newNotes;
             for (int i: removedIndexes) {
                 newNotes.push_back(notes[i]);
             }
@@ -570,7 +574,7 @@ void addChordsBetweenTupletNotes(
     }
 }
 
-#ifdef QT_DEBUG
+#ifndef NDEBUG
 
 bool doTupletsHaveCommonChords(const std::vector<TupletInfo>& tuplets)
 {
@@ -889,12 +893,12 @@ void addTupletEvents(std::multimap<ReducedFraction, TupletData>& tupletEvents,
             if (tiedTuplet.tupletId == tupletInfo.id) {
                 MidiChord& midiChord = tiedTuplet.chord->second;
 
-#ifdef QT_DEBUG
-                QString message = "Tied tuplet and tied chord have different voices, "
-                                  "tuplet voice = ";
-                message += QString::number(tiedTuplet.voice) + ", chord voice = ";
-                message += QString::number(midiChord.voice) + ", bar number (from 1) = ";
-                message += QString::number(midiChord.barIndex + 1);
+#ifndef NDEBUG
+                muse::String message = u"Tied tuplet and tied chord have different voices, "
+                                       "tuplet voice = ";
+                message += muse::String::number(tiedTuplet.voice) + u", chord voice = ";
+                message += muse::String::number(midiChord.voice) + u", bar number (from 1) = ";
+                message += muse::String::number(midiChord.barIndex + 1);
                 Q_ASSERT_X(tiedTuplet.voice == midiChord.voice,
                            "MidiTuplet::addTupletEvents", message.toLatin1().data());
 #endif
@@ -1122,7 +1126,7 @@ void findTuplets(
     if (opers.simplifyDurations.value(currentTrack)) {
         cleanStaccatoOfNonTuplets(nonTuplets);
     }
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     Q_ASSERT_X(!doTupletsHaveCommonChords(tuplets),
                "MIDI tuplets: findTuplets", "Tuplets have common chords but they shouldn't");
 #endif
@@ -1132,7 +1136,7 @@ void findTuplets(
     // backTiedTuplets can be changed here (incompatible are removed)
     assignVoices(tuplets, nonTuplets, backTiedTuplets, chords, basicQuant,
                  startBarTick, barIndex);
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     Q_ASSERT_X(areTupletNonTupletChordsDistinct(tuplets, nonTuplets),
                "MIDI tuplets: findTuplets", "Tuplets have common chords with non-tuplets");
 #endif
@@ -1175,7 +1179,7 @@ void findAllTuplets(
     if (chords.empty()) {
         return;
     }
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     Q_ASSERT_X(MChord::areNotesLongEnough(chords),
                "MidiTuplet::findAllTuplets", "There are too short notes");
     Q_ASSERT_X(MChord::areBarIndexesSet(chords),
@@ -1202,14 +1206,14 @@ void findAllTuplets(
                     // chords at the end of the current bar
                     // may have changed bar index - from next bar to the current bar
                     // because they were included in tuplets
-#ifdef QT_DEBUG
+#ifndef NDEBUG
                     bool nextBarFound = false;
 #endif
                     const auto endBarTick = ReducedFraction::fromTicks(
                         sigmap->bar2tick(currentBarIndex + 1, 0));
                     for (auto it = endBarIt; it != chords.end() && it->first < endBarTick; ++it) {
                         if (it->second.barIndex == currentBarIndex) {
-#ifdef QT_DEBUG
+#ifndef NDEBUG
                             Q_ASSERT_X(!nextBarFound, "MidiTuplet::findAllTuplets",
                                        "Bar indexes become not successive");
 #endif
@@ -1218,7 +1222,7 @@ void findAllTuplets(
 
                             ++endBarIt;
                         }
-#ifdef QT_DEBUG
+#ifndef NDEBUG
                         if (it->second.barIndex > currentBarIndex) {
                             nextBarFound = true;
                         }
@@ -1238,7 +1242,7 @@ void findAllTuplets(
     }
     // check if there are not detected off times inside tuplets
     setAllTupletOffTimes(tuplets, chords, sigmap);
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     Q_ASSERT_X(areAllTupletsReferenced(chords, tuplets),
                "MidiTuplet::findAllTuplets",
                "Not all tuplets are referenced in chords or notes");

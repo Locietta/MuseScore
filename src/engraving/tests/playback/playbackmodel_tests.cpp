@@ -48,7 +48,7 @@ using namespace mu::engraving;
 using namespace muse::mpe;
 using namespace muse;
 
-static const String PLAYBACK_MODEL_TEST_FILES_DIR("playback/playbackmodel_data/");
+static const String PLAYBACK_MODEL_TEST_FILES_DIR(u"playback/playbackmodel_data/");
 static constexpr duration_t QUARTER_NOTE_DURATION = 500000; // duration in microseconds for 4/4 120BPM
 static constexpr duration_t HALF_NOTE_DURATION = QUARTER_NOTE_DURATION * 2; // duration in microseconds for 1/2 120BPM
 static constexpr duration_t WHOLE_NOTE_DURATION = QUARTER_NOTE_DURATION * 4; // duration in microseconds for 4/4 120BPM
@@ -97,7 +97,7 @@ protected:
 TEST_F(Engraving_PlaybackModelTests, SimpleRepeat)
 {
     // [GIVEN] Simple piece of score (Violin, 4/4, 120 bpm, Treble Cleff)
-    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + "repeat_range/repeat_range.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + u"repeat_range/repeat_range.mscx");
 
     ASSERT_TRUE(score);
     ASSERT_EQ(score->parts().size(), 1);
@@ -132,7 +132,7 @@ TEST_F(Engraving_PlaybackModelTests, SimpleRepeat)
 TEST_F(Engraving_PlaybackModelTests, Two_Ending_Repeat)
 {
     // [GIVEN] Simple piece of score (Violin, 4/4, 120 bpm, Treble Cleff)
-    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + "repeat_with_2_voltas/repeat_with_2_voltas.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + u"repeat_with_2_voltas/repeat_with_2_voltas.mscx");
 
     ASSERT_TRUE(score);
     ASSERT_EQ(score->parts().size(), 1);
@@ -165,7 +165,7 @@ TEST_F(Engraving_PlaybackModelTests, Two_Ending_Repeat)
 TEST_F(Engraving_PlaybackModelTests, Repeat_And_Tremolo)
 {
     // [GIVEN] Simple piece of score (Flute, 4/4, 120 bpm)
-    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + "repeat_and_tremolo/repeat_and_tremolo.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + u"repeat_and_tremolo/repeat_and_tremolo.mscx");
 
     ASSERT_TRUE(score);
     ASSERT_EQ(score->parts().size(), 1);
@@ -250,7 +250,7 @@ TEST_F(Engraving_PlaybackModelTests, Repeat_And_Tremolo)
 TEST_F(Engraving_PlaybackModelTests, Repeat_Tempo_Changes_And_Tie)
 {
     // [GIVEN] Score containing some repeated measures, some tempo changes and a tied note
-    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + "repeat_tempo_changes_and_tie/repeat_tempo_changes_and_tie.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + u"repeat_tempo_changes_and_tie/repeat_tempo_changes_and_tie.mscx");
 
     ASSERT_TRUE(score);
     ASSERT_EQ(score->parts().size(), 1);
@@ -297,7 +297,7 @@ TEST_F(Engraving_PlaybackModelTests, Repeat_Tempo_Changes_And_Tie)
 TEST_F(Engraving_PlaybackModelTests, Da_Capo_Al_Fine)
 {
     // [GIVEN] Simple piece of score (Violin, 4/4, 120 bpm, Treble Cleff)
-    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + "da_capo_al_fine/da_capo_al_fine.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + u"da_capo_al_fine/da_capo_al_fine.mscx");
 
     ASSERT_TRUE(score);
     ASSERT_EQ(score->parts().size(), 1);
@@ -333,7 +333,7 @@ TEST_F(Engraving_PlaybackModelTests, Da_Capo_Al_Fine)
 TEST_F(Engraving_PlaybackModelTests, Dal_Segno_Al_Coda)
 {
     // [GIVEN] Simple piece of score (Violin, 4/4, 120 bpm, Treble Cleff)
-    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + "dal_segno_al_coda/dal_segno_al_coda.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + u"dal_segno_al_coda/dal_segno_al_coda.mscx");
 
     ASSERT_TRUE(score);
     ASSERT_EQ(score->parts().size(), 1);
@@ -368,7 +368,7 @@ TEST_F(Engraving_PlaybackModelTests, Dal_Segno_Al_Coda)
 TEST_F(Engraving_PlaybackModelTests, Dal_Segno_Al_Fine)
 {
     // [GIVEN] Simple piece of score (Violin, 4/4, 120 bpm, Treble Cleff)
-    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + "dal_segno_al_fine/dal_segno_al_fine.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + u"dal_segno_al_fine/dal_segno_al_fine.mscx");
 
     ASSERT_TRUE(score);
     ASSERT_EQ(score->parts().size(), 1);
@@ -403,7 +403,7 @@ TEST_F(Engraving_PlaybackModelTests, Dal_Segno_Al_Fine)
 TEST_F(Engraving_PlaybackModelTests, Da_Capo_Al_Coda)
 {
     // [GIVEN] Simple piece of score (Violin, 4/4, 120 bpm, Treble Cleff)
-    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + "da_capo_al_coda/da_capo_al_coda.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + u"da_capo_al_coda/da_capo_al_coda.mscx");
 
     ASSERT_TRUE(score);
     ASSERT_EQ(score->parts().size(), 1);
@@ -437,7 +437,7 @@ TEST_F(Engraving_PlaybackModelTests, Da_Capo_Al_Coda)
 TEST_F(Engraving_PlaybackModelTests, Spanners)
 {
     // [GIVEN] Simple piece of score, where in each measure there is a spanner over the second and third note
-    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + "spanners/spanners.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + u"spanners/spanners.mscx");
 
     ASSERT_TRUE(score);
     ASSERT_EQ(score->parts().size(), 1);
@@ -518,7 +518,7 @@ TEST_F(Engraving_PlaybackModelTests, Dynamics)
 {
     // [GIVEN] Score with piano marking at the start, then crescendo to forte,
     //         then again crescendo, followed by sudden pianissimo
-    MasterScore* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + "dynamics/dynamics.mscx");
+    MasterScore* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + u"dynamics/dynamics.mscx");
 
     ASSERT_TRUE(score);
     ASSERT_EQ(score->parts().size(), 1);
@@ -594,7 +594,7 @@ TEST_F(Engraving_PlaybackModelTests, Dynamics)
 TEST_F(Engraving_PlaybackModelTests, Pizz_To_Arco_Technique)
 {
     // [GIVEN] Simple piece of score (Violin, 4/4, 120 bpm, Treble Cleff)
-    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + "pizz_to_arco/pizz_to_arco.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + u"pizz_to_arco/pizz_to_arco.mscx");
 
     ASSERT_TRUE(score);
     ASSERT_EQ(score->parts().size(), 1);
@@ -656,7 +656,7 @@ TEST_F(Engraving_PlaybackModelTests, Pizz_To_Arco_Technique)
 TEST_F(Engraving_PlaybackModelTests, FallbackToStandardArticulation)
 {
     // [GIVEN] Simple piece of score (Winds + Voice, 4/4, 120 bpm, Treble Cleff)
-    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + "wrong_articulations/wrong_articulations.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + u"wrong_articulations/wrong_articulations.mscx");
 
     ASSERT_TRUE(score);
     ASSERT_EQ(score->parts().size(), 2);
@@ -733,7 +733,7 @@ TEST_F(Engraving_PlaybackModelTests, FallbackToStandardArticulation)
 TEST_F(Engraving_PlaybackModelTests, Single_Measure_Repeat)
 {
     // [GIVEN] Simple piece of score (Violin, 4/4, 120 bpm, Treble Cleff)
-    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + "single_measure_repeat/single_measure_repeat.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + u"single_measure_repeat/single_measure_repeat.mscx");
 
     ASSERT_TRUE(score);
     ASSERT_EQ(score->parts().size(), 1);
@@ -770,7 +770,7 @@ TEST_F(Engraving_PlaybackModelTests, Single_Measure_Repeat)
 TEST_F(Engraving_PlaybackModelTests, Multi_Measure_Repeat)
 {
     // [GIVEN] Simple piece of score (Violin, 4/4, 120 bpm, Treble Cleff)
-    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + "multi_measure_repeat/multi_measure_repeat.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + u"multi_measure_repeat/multi_measure_repeat.mscx");
 
     ASSERT_TRUE(score);
     ASSERT_EQ(score->parts().size(), 1);
@@ -799,7 +799,7 @@ TEST_F(Engraving_PlaybackModelTests, Multi_Measure_Repeat)
 //! See: https://github.com/musescore/MuseScore/issues/29051
 TEST_F(Engraving_PlaybackModelTests, MeasureRepeat_TiedNotes)
 {
-    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + "measure_repeat_tied_notes.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + u"measure_repeat_tied_notes.mscx");
     ASSERT_TRUE(score);
     ASSERT_EQ(score->parts().size(), 1);
 
@@ -871,7 +871,7 @@ TEST_F(Engraving_PlaybackModelTests, MeasureRepeat_TiedNotes)
 TEST_F(Engraving_PlaybackModelTests, SimpleRepeat_Changes_Notification)
 {
     // [GIVEN] Simple piece of score (Violin, 4/4, 120 bpm, Treble Cleff)
-    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + "repeat_range/repeat_range.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + u"repeat_range/repeat_range.mscx");
 
     ASSERT_TRUE(score);
     ASSERT_EQ(score->parts().size(), 1);
@@ -959,7 +959,7 @@ TEST_F(Engraving_PlaybackModelTests, SimpleRepeat_Changes_Notification)
  */
 TEST_F(Engraving_PlaybackModelTests, TempoChangesDuringNotes)
 {
-    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + "tempo_changes_during_notes/tempo_changes_during_notes.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + u"tempo_changes_during_notes/tempo_changes_during_notes.mscx");
 
     ASSERT_TRUE(score);
     ASSERT_EQ(score->parts().size(), 1);
@@ -1086,7 +1086,7 @@ TEST_F(Engraving_PlaybackModelTests, TempoChangesDuringNotes)
 TEST_F(Engraving_PlaybackModelTests, Metronome_4_4)
 {
     // [GIVEN] Simple piece of score (Violin, 4/4, 120 bpm, Treble Cleff)
-    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + "metronome_4_4/metronome_4_4.mscx");
+    Score* score = ScoreRW::readScore(PLAYBACK_MODEL_TEST_FILES_DIR + u"metronome_4_4/metronome_4_4.mscx");
 
     ASSERT_TRUE(score);
     ASSERT_EQ(score->parts().size(), 1);
@@ -1153,7 +1153,7 @@ TEST_F(Engraving_PlaybackModelTests, Metronome_6_4_Repeat)
 {
     // [GIVEN] Simple piece of score (Violin, 6/4, 120 bpm, Treble Cleff)
     Score* score = ScoreRW::readScore(
-        PLAYBACK_MODEL_TEST_FILES_DIR + "metronome_6_4_with_repeat/metronome_6_4_with_repeat.mscx");
+        PLAYBACK_MODEL_TEST_FILES_DIR + u"metronome_6_4_with_repeat/metronome_6_4_with_repeat.mscx");
 
     ASSERT_TRUE(score);
     ASSERT_EQ(score->parts().size(), 1);
@@ -1192,7 +1192,7 @@ TEST_F(Engraving_PlaybackModelTests, Note_Entry_Playback_Note)
 {
     // [GIVEN] Simple piece of score (Violin, 4/4, 120 bpm, Treble Cleff)
     MasterScore* score = ScoreRW::readScore(
-        PLAYBACK_MODEL_TEST_FILES_DIR + "note_entry_playback/note_entry_playback_note.mscx");
+        PLAYBACK_MODEL_TEST_FILES_DIR + u"note_entry_playback/note_entry_playback_note.mscx");
 
     ASSERT_TRUE(score);
     ASSERT_EQ(score->parts().size(), 1);
@@ -1266,7 +1266,7 @@ TEST_F(Engraving_PlaybackModelTests, Note_Entry_Playback_Chord)
 {
     // [GIVEN] Simple piece of score (Violin, 4/4, 120 bpm, Treble Cleff)
     Score* score = ScoreRW::readScore(
-        PLAYBACK_MODEL_TEST_FILES_DIR + "note_entry_playback/note_entry_playback_chord.mscx");
+        PLAYBACK_MODEL_TEST_FILES_DIR + u"note_entry_playback/note_entry_playback_chord.mscx");
 
     ASSERT_TRUE(score);
     ASSERT_EQ(score->parts().size(), 1);
@@ -1347,7 +1347,7 @@ TEST_F(Engraving_PlaybackModelTests, Playback_Setup_Data_MultiInstrument)
 {
     // [GIVEN] Score with 12 instruments
     Score* score = ScoreRW::readScore(
-        PLAYBACK_MODEL_TEST_FILES_DIR + "playback_setup_instruments/playback_setup_instruments.mscx");
+        PLAYBACK_MODEL_TEST_FILES_DIR + u"playback_setup_instruments/playback_setup_instruments.mscx");
 
     ASSERT_TRUE(score);
     ASSERT_EQ(score->parts().size(), 12);
@@ -1408,7 +1408,7 @@ TEST_F(Engraving_PlaybackModelTests, Score_Changes_Track_Range)
 {
     // [GIVEN] Score with multiple instruments
     Score* score = ScoreRW::readScore(
-        PLAYBACK_MODEL_TEST_FILES_DIR + "playback_setup_instruments/playback_setup_instruments.mscx");
+        PLAYBACK_MODEL_TEST_FILES_DIR + u"playback_setup_instruments/playback_setup_instruments.mscx");
 
     ASSERT_TRUE(score);
     ASSERT_GT(score->parts().size(), 1);

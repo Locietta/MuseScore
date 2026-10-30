@@ -20,6 +20,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
+#include <cmath>
 #include <set>
 
 #include "importmidi_clef.h"
@@ -54,7 +56,7 @@ public:
     AveragePitch(int sumPitch, int count)
         : sumPitch_(sumPitch), count_(count) {}
 
-    int pitch() const { return qRound(sumPitch_ * 1.0 / count_); }
+    int pitch() const { return static_cast<int>(std::lround(sumPitch_ * 1.0 / count_)); }
     void addPitch(int pitch)
     {
         sumPitch_ += pitch;
@@ -164,7 +166,7 @@ static MinMaxPitch findMinMaxSegPitch(const Segment* seg, track_idx_t strack)
     return minMaxPitch;
 }
 
-#ifdef QT_DEBUG
+#ifndef NDEBUG
 
 static bool doesClefBreakTie(const Staff* staff)
 {
@@ -250,7 +252,7 @@ static std::pair<ElementType, ReducedFraction> findChordRest(const Segment* seg,
             break;
         } else if (cr->isRest()) {
             elType = ElementType::REST;
-            newRestLen = qMax(newRestLen, ReducedFraction(cr->globalTicks()));
+            newRestLen = std::max(newRestLen, ReducedFraction(cr->globalTicks()));
         }
     }
     return { elType, newRestLen };
@@ -508,7 +510,7 @@ void createClefs(Staff* staff, int indexOfOperation, bool isDrumTrack)
     if (!mainClefWasSet && canChangeClef) {
         createMainClefFromAveragePitch(staff, strack);
     }
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     Q_ASSERT_X(!doesClefBreakTie(staff), "MidiClef::createClefs", "Clef breaks the tie");
 #endif
 }

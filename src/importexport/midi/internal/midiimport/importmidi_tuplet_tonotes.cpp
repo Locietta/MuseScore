@@ -47,7 +47,7 @@ void addElementToTuplet(int voice,
 {
     const auto foundTuplets = findTupletsForTimeRange(voice, onTime, len, tuplets, true);
 
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     if (foundTuplets.size() > 1) {
         LOGD() << "Measure number (from 1):" << el->measure()->measureNumber() + 1
                << ", staff index (from 0):" << el->staff()->idx();
@@ -96,7 +96,7 @@ void createTupletNotes(
     }
 }
 
-#ifdef QT_DEBUG
+#ifndef NDEBUG
 
 static void printInvalidTupletLocation(int measureIndex, staff_idx_t staffIndex)
 {

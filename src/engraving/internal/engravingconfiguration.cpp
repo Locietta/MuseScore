@@ -40,6 +40,24 @@ using namespace muse;
 using namespace muse::draw;
 using namespace mu::engraving;
 
+static Val colorValue(const Color& color)
+{
+#ifndef NO_QT_SUPPORT
+    return Val(color.toQColor());
+#else
+    return Val(color.toString());
+#endif
+}
+
+static Color colorFromValue(const Val& value)
+{
+#ifndef NO_QT_SUPPORT
+    return Color::fromQColor(value.toQColor());
+#else
+    return Color(value.toString().c_str());
+#endif
+}
+
 static const Settings::Key DEFAULT_STYLE_FILE_PATH("engraving", "engraving/style/defaultStyleFile");
 static const Settings::Key PART_STYLE_FILE_PATH("engraving", "engraving/style/partStyleFile");
 
@@ -90,53 +108,57 @@ void EngravingConfiguration::init()
         m_partStyleFilePathChanged.send(val.toPath());
     });
 
-    settings()->setDefaultValue(DISPLAYED_DEFAULT_COLOR, Val(defaultColor().toQColor()));
+    settings()->setDefaultValue(DISPLAYED_DEFAULT_COLOR, colorValue(defaultColor()));
     settings()->setDescription(DISPLAYED_DEFAULT_COLOR, muse::trc("engraving", "Displayed default color"));
     settings()->setCanBeManuallyEdited(DISPLAYED_DEFAULT_COLOR, true);
     settings()->valueChanged(DISPLAYED_DEFAULT_COLOR).onReceive(this, [this](const Val& val) {
-        const Color color = val.toQColor();
+        const Color color = colorFromValue(val);
         m_cachedDisplayedDefaultColor = color;
         m_displayedDefaultColorChanged.send(false, color);
     });
-    m_cachedDisplayedDefaultColor = settings()->value(DISPLAYED_DEFAULT_COLOR).toQColor();
+    m_cachedDisplayedDefaultColor = colorFromValue(settings()->value(DISPLAYED_DEFAULT_COLOR));
 
-    settings()->setDefaultValue(INVERTED_DISPLAYED_DEFAULT_COLOR, Val(Color(DEFAULT_DISPLAYED_INVERTED_COLOR).toQColor()));
+    settings()->setDefaultValue(INVERTED_DISPLAYED_DEFAULT_COLOR, colorValue(Color(DEFAULT_DISPLAYED_INVERTED_COLOR)));
     settings()->setDescription(INVERTED_DISPLAYED_DEFAULT_COLOR,
                                muse::trc("engraving", "Displayed default color when score colors are inverted"));
     settings()->setCanBeManuallyEdited(INVERTED_DISPLAYED_DEFAULT_COLOR, true);
     settings()->valueChanged(INVERTED_DISPLAYED_DEFAULT_COLOR).onReceive(this, [this](const Val& val) {
-        const Color color = val.toQColor();
+        const Color color = colorFromValue(val);
         m_cachedInvertedDisplayedDefaultColor = color;
         m_displayedDefaultColorChanged.send(true, color);
     });
-    m_cachedInvertedDisplayedDefaultColor = settings()->value(INVERTED_DISPLAYED_DEFAULT_COLOR).toQColor();
+    m_cachedInvertedDisplayedDefaultColor = colorFromValue(settings()->value(INVERTED_DISPLAYED_DEFAULT_COLOR));
 
     for (voice_idx_t voice = 0; voice < VOICES; ++voice) {
         Settings::Key key("engraving", "engraving/colors/voice" + std::to_string(voice + 1));
 
-        settings()->setDefaultValue(key, Val(DEFAULT_VOICE_COLORS[voice].toQColor()));
+        settings()->setDefaultValue(key, colorValue(DEFAULT_VOICE_COLORS[voice]));
+#ifndef NO_QT_SUPPORT
         settings()->setDescription(key, muse::qtrc("engraving", "Voice %1 color").arg(voice + 1).toStdString());
+#else
+        settings()->setDescription(key, "Voice " + std::to_string(voice + 1) + " color");
+#endif
         settings()->setCanBeManuallyEdited(key, true);
         settings()->valueChanged(key).onReceive(this, [this, voice](const Val& val) {
-            Color color = val.toQColor();
+            Color color = colorFromValue(val);
             VOICE_COLORS[voice].color = color;
             m_voiceColorChanged.send(voice, color);
         });
 
-        Color currentColor = settings()->value(key).toQColor();
+        Color currentColor = colorFromValue(settings()->value(key));
         VOICE_COLORS[voice] = VoiceColor { std::move(key), currentColor };
     }
 
     static constexpr int ALL_VOICES_IDX = VOICES;
-    settings()->setDefaultValue(ALL_VOICES_COLOR, Val(DEFAULT_VOICE_COLORS[ALL_VOICES_IDX].toQColor()));
+    settings()->setDefaultValue(ALL_VOICES_COLOR, colorValue(DEFAULT_VOICE_COLORS[ALL_VOICES_IDX]));
     settings()->setDescription(ALL_VOICES_COLOR, muse::trc("engraving", "All voices color"));
     settings()->setCanBeManuallyEdited(ALL_VOICES_COLOR, true);
     settings()->valueChanged(ALL_VOICES_COLOR).onReceive(this, [&](const Val& val) {
-        Color color = val.toQColor();
+        Color color = colorFromValue(val);
         VOICE_COLORS[ALL_VOICES_IDX].color = color;
         m_voiceColorChanged.send(ALL_VOICES_IDX, color);
     });
-    Color currentColor = settings()->value(ALL_VOICES_COLOR).toQColor();
+    Color currentColor = colorFromValue(settings()->value(ALL_VOICES_COLOR));
     VOICE_COLORS[ALL_VOICES_IDX] = VoiceColor { std::move(ALL_VOICES_COLOR), currentColor };
 
     settings()->setDefaultValue(DYNAMICS_APPLY_TO_ALL_VOICES, Val(true));
@@ -149,42 +171,42 @@ void EngravingConfiguration::init()
         m_fretboardDiagramsAutoUpdateChanged.send(val.toBool());
     });
 
-    settings()->setDefaultValue(FRAME_COLOR, Val(Color("#A0A0A4").toQColor()));
+    settings()->setDefaultValue(FRAME_COLOR, colorValue(Color("#A0A0A4")));
     settings()->setDescription(FRAME_COLOR, muse::trc("engraving", "Frame color"));
     settings()->setCanBeManuallyEdited(FRAME_COLOR, true);
     settings()->valueChanged(FRAME_COLOR).onReceive(nullptr, [this](const Val& val) {
-        m_frameColorChanged.send(Color::fromQColor(val.toQColor()));
+        m_frameColorChanged.send(colorFromValue(val));
     });
 
-    settings()->setDefaultValue(SCORE_GREY_COLOR, Val(Color("#A0A0A4").toQColor()));
+    settings()->setDefaultValue(SCORE_GREY_COLOR, colorValue(Color("#A0A0A4")));
     settings()->setDescription(SCORE_GREY_COLOR, muse::trc("engraving", "Score grey color"));
     settings()->setCanBeManuallyEdited(SCORE_GREY_COLOR, false);
 
-    settings()->setDefaultValue(FORMATTING_COLOR, Val(Color("#C31989").toQColor()));
+    settings()->setDefaultValue(FORMATTING_COLOR, colorValue(Color("#C31989")));
     settings()->setDescription(FORMATTING_COLOR, muse::trc("engraving", "Formatting color"));
     settings()->setCanBeManuallyEdited(FORMATTING_COLOR, true);
     settings()->valueChanged(FORMATTING_COLOR).onReceive(nullptr, [this](const Val& val) {
-        m_formattingColorChanged.send(Color::fromQColor(val.toQColor()));
+        m_formattingColorChanged.send(colorFromValue(val));
     });
 
-    settings()->setDefaultValue(INVISIBLE_COLOR, Val(Color("#808080").toQColor()));
+    settings()->setDefaultValue(INVISIBLE_COLOR, colorValue(Color("#808080")));
     settings()->setDescription(INVISIBLE_COLOR, muse::trc("engraving", "Invisible color"));
     settings()->setCanBeManuallyEdited(INVISIBLE_COLOR, true);
     settings()->valueChanged(INVISIBLE_COLOR).onReceive(nullptr, [this](const Val& val) {
-        m_invisibleColorChanged.send(Color::fromQColor(val.toQColor()));
+        m_invisibleColorChanged.send(colorFromValue(val));
     });
 
-    settings()->setDefaultValue(UNLINKED_COLOR, Val(Color(UNLINKED_ITEM_COLOR).toQColor()));
+    settings()->setDefaultValue(UNLINKED_COLOR, colorValue(Color(UNLINKED_ITEM_COLOR)));
     settings()->setDescription(UNLINKED_COLOR, muse::trc("engraving", "Desynchronized color"));
     settings()->setCanBeManuallyEdited(UNLINKED_COLOR, true);
     settings()->valueChanged(UNLINKED_COLOR).onReceive(nullptr, [this](const Val& val) {
-        m_unlinkedColorChanged.send(Color::fromQColor(val.toQColor()));
+        m_unlinkedColorChanged.send(colorFromValue(val));
     });
 }
 
 muse::io::path_t EngravingConfiguration::appDataPath() const
 {
-    return globalConfiguration()->appDataPath();
+    return globalConfiguration() ? globalConfiguration()->appDataPath() : muse::io::path_t();
 }
 
 muse::io::path_t EngravingConfiguration::defaultStyleFilePath() const
@@ -249,20 +271,32 @@ static bool defaultPageSizeIsLetter()
 SizeF EngravingConfiguration::defaultPageSize() const
 {
     // Needs to be determined only once, therefore static
+#ifndef NO_QT_SUPPORT
     static SizeF size = SizeF::fromQSizeF(
         QPageSize::size(defaultPageSizeIsLetter() ? QPageSize::Letter : QPageSize::A4, QPageSize::Inch));
+#else
+    static SizeF size = defaultPageSizeIsLetter() ? SizeF(8.5, 11.0) : SizeF(210.0 / 25.4, 297.0 / 25.4);
+#endif
 
     return size;
 }
 
 bool EngravingConfiguration::canLayoutIcons() const
 {
+#ifndef NO_QT_SUPPORT
     return uiConfiguration() != nullptr;
+#else
+    return false;
+#endif
 }
 
 muse::String EngravingConfiguration::iconsFontFamily() const
 {
+#ifndef NO_QT_SUPPORT
     return uiConfiguration() ? String::fromStdString(uiConfiguration()->iconsFontFamily()) : String();
+#else
+    return String();
+#endif
 }
 
 Color EngravingConfiguration::defaultColor() const
@@ -281,9 +315,9 @@ Color EngravingConfiguration::displayedDefaultColor(bool inverted) const
 void EngravingConfiguration::setDisplayedDefaultColor(Color color, bool inverted)
 {
     if (inverted) {
-        settings()->setSharedValue(INVERTED_DISPLAYED_DEFAULT_COLOR, Val(color.toQColor()));
+        settings()->setSharedValue(INVERTED_DISPLAYED_DEFAULT_COLOR, colorValue(color));
     } else {
-        settings()->setSharedValue(DISPLAYED_DEFAULT_COLOR, Val(color.toQColor()));
+        settings()->setSharedValue(DISPLAYED_DEFAULT_COLOR, colorValue(color));
     }
 }
 
@@ -300,7 +334,13 @@ void EngravingConfiguration::resetDisplayedDefaultColors()
 
 Color EngravingConfiguration::indicatorIconInvertedSelectionColor() const
 {
+#ifndef NO_QT_SUPPORT
     return Color::fromQColor(voiceColor(0).toQColor().lighter(135));
+#else
+    Color color = voiceColor(0);
+    color.applyTint(0.35f);
+    return color;
+#endif
 }
 
 Color EngravingConfiguration::lassoColor() const
@@ -345,9 +385,13 @@ Color EngravingConfiguration::noteBackgroundColor() const
 
 Color EngravingConfiguration::fontPrimaryColor() const
 {
+#ifndef NO_QT_SUPPORT
     return uiConfiguration()
            ? Color(uiConfiguration()->currentTheme().values[muse::ui::ThemeStyleKey::FONT_PRIMARY_COLOR].toString())
            : Color::BLACK;
+#else
+    return Color::BLACK;
+#endif
 }
 
 Color EngravingConfiguration::voiceColor(voice_idx_t voiceIdx) const
@@ -372,7 +416,7 @@ Color EngravingConfiguration::selectionColor(voice_idx_t voice, bool itemVisible
 
 void EngravingConfiguration::setSelectionColor(voice_idx_t voiceIndex, Color color)
 {
-    settings()->setSharedValue(VOICE_COLORS[voiceIndex].key, Val(color.toQColor()));
+    settings()->setSharedValue(VOICE_COLORS[voiceIndex].key, colorValue(color));
 }
 
 muse::async::Channel<voice_idx_t, Color> EngravingConfiguration::selectionColorChanged() const
@@ -382,7 +426,13 @@ muse::async::Channel<voice_idx_t, Color> EngravingConfiguration::selectionColorC
 
 Color EngravingConfiguration::highlightSelectionColor(voice_idx_t voice) const
 {
+#ifndef NO_QT_SUPPORT
     return Color::fromQColor(selectionColor(voice).toQColor().lighter(135));
+#else
+    Color color = selectionColor(voice);
+    color.applyTint(0.35f);
+    return color;
+#endif
 }
 
 bool EngravingConfiguration::dynamicsApplyToAllVoices() const
@@ -417,7 +467,7 @@ muse::async::Channel<bool> EngravingConfiguration::autoUpdateFretboardDiagramsCh
 
 Color EngravingConfiguration::formattingColor() const
 {
-    return Color::fromQColor(settings()->value(FORMATTING_COLOR).toQColor());
+    return colorFromValue(settings()->value(FORMATTING_COLOR));
 }
 
 muse::async::Channel<Color> EngravingConfiguration::formattingColorChanged() const
@@ -427,7 +477,7 @@ muse::async::Channel<Color> EngravingConfiguration::formattingColorChanged() con
 
 Color EngravingConfiguration::frameColor() const
 {
-    return Color::fromQColor(settings()->value(FRAME_COLOR).toQColor());
+    return colorFromValue(settings()->value(FRAME_COLOR));
 }
 
 muse::async::Channel<Color> EngravingConfiguration::frameColorChanged() const
@@ -437,12 +487,12 @@ muse::async::Channel<Color> EngravingConfiguration::frameColorChanged() const
 
 Color EngravingConfiguration::scoreGreyColor() const
 {
-    return Color::fromQColor(settings()->value(SCORE_GREY_COLOR).toQColor());
+    return colorFromValue(settings()->value(SCORE_GREY_COLOR));
 }
 
 Color EngravingConfiguration::invisibleColor() const
 {
-    return Color::fromQColor(settings()->value(INVISIBLE_COLOR).toQColor());
+    return colorFromValue(settings()->value(INVISIBLE_COLOR));
 }
 
 muse::async::Channel<Color> EngravingConfiguration::invisibleColorChanged() const
@@ -452,7 +502,7 @@ muse::async::Channel<Color> EngravingConfiguration::invisibleColorChanged() cons
 
 Color EngravingConfiguration::unlinkedColor() const
 {
-    return Color::fromQColor(settings()->value(UNLINKED_COLOR).toQColor());
+    return colorFromValue(settings()->value(UNLINKED_COLOR));
 }
 
 muse::async::Channel<Color> EngravingConfiguration::unlinkedColorChanged() const

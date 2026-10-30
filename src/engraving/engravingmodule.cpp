@@ -291,7 +291,9 @@ void EngravingContext::registerExports()
 #ifndef ENGRAVING_NO_INTERNAL
     m_paletteScoreProvider = std::make_shared<PaletteScoreProvider>(iocContext());
     ioc()->registerExport<IPaletteScoreProvider>(mname, m_paletteScoreProvider);
+#ifdef MUE_BUILD_ENGRAVING_DEVTOOLS
     ioc()->registerExport<IEngravingElementsProvider>(mname, new EngravingElementsProvider());
+#endif
     ioc()->registerExport<IEngravingContextConfiguration>(mname, new EngravingContextConfiguration(iocContext()));
 #endif
 }

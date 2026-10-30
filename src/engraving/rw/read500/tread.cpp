@@ -589,7 +589,11 @@ bool TRead::readItemProperties(EngravingItem* item, XmlReader& e, ReadContext& c
 
 static Spanner* tryCreateSpanner(const AsciiStringView& tag, ReadContext& ctx, bool requireNoteAnchor)
 {
-    ElementType type = TConv::fromXml(tag, ElementType::INVALID);
+    // Speculative probe: most callers offer every tag they do not understand, so a
+    // miss (an ordinary property such as "eid" or "track") is expected and must
+    // stay silent. Only a real element type whose spanner anchor mismatches is an
+    // error worth reporting elsewhere.
+    ElementType type = TConv::fromXml(tag, ElementType::INVALID, /*silent*/ true);
     if (type == ElementType::INVALID) {
         return nullptr;
     }

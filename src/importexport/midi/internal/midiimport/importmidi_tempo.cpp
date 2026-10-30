@@ -21,6 +21,7 @@
  */
 #include "importmidi_tempo.h"
 
+#include <cmath>
 #include <map>
 
 #include "importmidi_inner.h"
@@ -105,7 +106,7 @@ static void setTempoToScore(Score* score, int tick, double beatsPerSecond, const
         return;
     }
 
-    const double tempoInBpm = roundTempo ? qRound(beatsPerSecond * 60.0) : (beatsPerSecond * 60.0);
+    const double tempoInBpm = roundTempo ? static_cast<int>(std::lround(beatsPerSecond * 60.0)) : (beatsPerSecond * 60.0);
 
     Segment* segment = measure->getChordRestOrTimeTickSegment(f);
     TempoText* tempoText = mu::engraving::Factory::createTempoText(segment);
@@ -124,7 +125,7 @@ static void setTempoToScore(Score* score, int tick, double beatsPerSecond, const
 
 static inline double roundToBpm(double beatsPerSecond)
 {
-    return qRound(beatsPerSecond * 60.0) / 60.0;
+    return static_cast<int>(std::lround(beatsPerSecond * 60.0)) / 60.0;
 }
 
 static void applyAllTempoEvents(const std::multimap<int, MTrack>& tracks, Score* score, const bool roundTempo)

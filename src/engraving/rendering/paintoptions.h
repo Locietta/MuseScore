@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <functional>
+
 #include "types/color.h"
 
 namespace mu::engraving {

@@ -882,10 +882,17 @@ private:
         int timestampChangesCount = 0;
 
         for (auto it = cbegin(); it != cend(); ++it) {
-            dynamic_level_t amplitudeDynamicLevel = it->second.appliedPatternSegment.expressionPattern.maxAmplitudeLevel();
-            dynamic_level_t dynamicLevelOffset = std::abs(amplitudeDynamicLevel - dynamicLevelFromType(DynamicType::Natural));
+            // Only articulations with a meaningful dynamic offset participate in the average: an empty
+            // dynamicOffsetMap means "use the nominal dynamic" (see sumUpOffsets), so it must not count as a
+            // dynamic change. Otherwise two articulations without an expression pattern (the default in the
+            // 5.0 profiles) produce a non-empty all-zero average map, and noteVelocity() then reads a maximum
+            // amplitude level of 0 instead of falling back to the nominal dynamic level.
+            const ExpressionPattern& expPattern = it->second.appliedPatternSegment.expressionPattern;
+            const bool hasMeaningfulDynamicOffset = !expPattern.dynamicOffsetMap.empty()
+                                                    && expPattern.maxAmplitudeLevel()
+                                                    != dynamicLevelFromType(DynamicType::Natural);
 
-            if (dynamicLevelOffset != 0) {
+            if (hasMeaningfulDynamicOffset) {
                 dynamicChangesCount++;
             }
 

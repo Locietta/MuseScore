@@ -41,7 +41,16 @@ struct Context
 using ContextPtr = std::shared_ptr<Context>;
 
 static const IoCID globalId = 0;
+#ifndef NO_QT_SUPPORT
 static const ContextPtr globalCtx;
+#else
+inline const ContextPtr& globalContextInstance()
+{
+    static const ContextPtr s_ctx = std::make_shared<Context>(globalId);
+    return s_ctx;
+}
+static const ContextPtr& globalCtx = globalContextInstance();
+#endif
 
 class Contextable
 {

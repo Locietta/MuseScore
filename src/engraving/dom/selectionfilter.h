@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <variant>
+
 #include "mscore.h"
 #include "chord.h"
 

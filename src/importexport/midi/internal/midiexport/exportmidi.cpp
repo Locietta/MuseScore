@@ -40,6 +40,10 @@
 
 #include "log.h"
 
+#ifdef NO_QT_SUPPORT
+#include "io/file.h"
+#endif
+
 using namespace mu::engraving;
 
 namespace mu::iex::midi {
@@ -110,7 +114,7 @@ void ExportMidi::writeHeader(const CompatMidiRendererInternal::Context& context)
             default:
                 n = 2;
                 LOGD("ExportMidi: unknown time signature %s",
-                     qPrintable(ts.toString()));
+                     muPrintable(ts.toString()));
                 break;
             }
 
@@ -213,7 +217,7 @@ void ExportMidi::writeHeader(const CompatMidiRendererInternal::Context& context)
 //    from mscore->synthesizerState() as the synthState parameter.
 //---------------------------------------------------------
 
-bool ExportMidi::write(QIODevice* device, bool midiExpandRepeats, bool exportRPNs, const SynthesizerState& synthState)
+bool ExportMidi::write(MidiIODevice* device, bool midiExpandRepeats, bool exportRPNs, const SynthesizerState& synthState)
 {
     m_midiFile.setDivision(Constants::DIVISION);
     m_midiFile.setFormat(1);
@@ -425,22 +429,30 @@ bool ExportMidi::write(QIODevice* device, bool midiExpandRepeats, bool exportRPN
     return !m_midiFile.write(device);
 }
 
-bool ExportMidi::write(const QString& name, bool midiExpandRepeats, bool exportRPNs, const SynthesizerState& synthState)
+bool ExportMidi::write(const MidiPath& name, bool midiExpandRepeats, bool exportRPNs, const SynthesizerState& synthState)
 {
+#ifdef NO_QT_SUPPORT
+    muse::io::File file(name);
+    if (!file.open(muse::io::IODevice::WriteOnly)) {
+        return false;
+    }
+    return write(&file, midiExpandRepeats, exportRPNs, synthState);
+#else
     m_file.setFileName(name);
     if (!m_file.open(QIODevice::WriteOnly)) {
         return false;
     }
     return write(&m_file, midiExpandRepeats, exportRPNs, synthState);
+#endif
 }
 
-bool ExportMidi::write(QIODevice* device, bool midiExpandRepeats, bool exportRPNs)
+bool ExportMidi::write(MidiIODevice* device, bool midiExpandRepeats, bool exportRPNs)
 {
     SynthesizerState ss;
     return write(device, midiExpandRepeats, exportRPNs, ss);
 }
 
-bool ExportMidi::write(const QString& name, bool midiExpandRepeats, bool exportRPNs)
+bool ExportMidi::write(const MidiPath& name, bool midiExpandRepeats, bool exportRPNs)
 {
     SynthesizerState ss;
     return write(name, midiExpandRepeats, exportRPNs, ss);

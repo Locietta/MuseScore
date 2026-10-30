@@ -23,6 +23,7 @@
 #include "assert.h"
 
 #include <cmath>
+#include <stdexcept>
 
 #include "engraving/dom/articulation.h"
 #include "engraving/dom/bend.h"
@@ -60,28 +61,36 @@ bool PowerTab::readBoolean()
 uint8_t PowerTab::readUInt8()
 {
     uint8_t byte;
-    _file->read((uint8_t*)&byte, 1);
+    if (_file->read((uint8_t*)&byte, 1) != 1) {
+        throw std::runtime_error("Unexpected end of PowerTab file");
+    }
     return byte;
 }
 
 unsigned short PowerTab::readShort()
 {
     uint16_t val;
-    _file->read((uint8_t*)&val, 2);
+    if (_file->read((uint8_t*)&val, 2) != 2) {
+        throw std::runtime_error("Unexpected end of PowerTab file");
+    }
     return val;
 }
 
 char PowerTab::readChar()
 {
     char byte;
-    _file->read((uint8_t*)&byte, 1);
+    if (_file->read((uint8_t*)&byte, 1) != 1) {
+        throw std::runtime_error("Unexpected end of PowerTab file");
+    }
     return byte;
 }
 
 int PowerTab::readInt()
 {
     int32_t val;
-    _file->read((uint8_t*)&val, 4);
+    if (_file->read((uint8_t*)&val, 4) != 4) {
+        throw std::runtime_error("Unexpected end of PowerTab file");
+    }
     return val;
 }
 
@@ -98,11 +107,14 @@ std::string PowerTab::readString(int length)
             length = readShort();
         }
     }
-    char* p = new char[length];
-    _file->read((uint8_t*)p, length);
+    if (length < 0 || static_cast<size_t>(length) > _file->size() - _file->pos()) {
+        throw std::runtime_error("Invalid PowerTab string length");
+    }
 
-    std::string s(p, length);
-    delete[] p;
+    std::string s(static_cast<size_t>(length), '\0');
+    if (length > 0 && _file->read((uint8_t*)s.data(), static_cast<size_t>(length)) != static_cast<size_t>(length)) {
+        throw std::runtime_error("Unexpected end of PowerTab file");
+    }
     return s;
 }
 
@@ -156,7 +168,7 @@ void PowerTab::readSongInfo(ptSongInfo& info)
             break;
         }
         default:
-            assert(0);
+            throw std::runtime_error("Invalid PowerTab release type");
         }
 
         if (readChar() == 0) {
@@ -1254,6 +1266,7 @@ void PowerTab::ptPosition::addComponent(ptComponent* c)
 
 Err PowerTab::read()
 {
+    try {
     if (!readVersion()) {
         return Err::FileBadFormat;
     }
@@ -1313,5 +1326,9 @@ Err PowerTab::read()
         m->add(s);
     }
     return Err::NoError;
+    } catch (const std::exception& e) {
+        LOGE() << "PowerTab import failed: " << e.what();
+        return Err::FileBadFormat;
+    }
 }
 } // namespace mu::iex::guitarpro

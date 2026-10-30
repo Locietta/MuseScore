@@ -26,7 +26,10 @@
 
 #include "modularity/ioc.h"
 #include "global/iglobalconfiguration.h"
+#include "global/types/retval.h"
+#ifndef NO_QT_SUPPORT
 #include "ui/iuiconfiguration.h"
+#endif
 #include "importexport/guitarpro/iguitarproconfiguration.h"
 
 #include "../iengravingconfiguration.h"
@@ -35,7 +38,9 @@ namespace mu::engraving {
 class EngravingConfiguration : public IEngravingConfiguration, public muse::async::Asyncable
 {
     muse::GlobalInject<muse::IGlobalConfiguration> globalConfiguration;
+#ifndef NO_QT_SUPPORT
     muse::GlobalInject<muse::ui::IUiConfiguration> uiConfiguration;
+#endif
     muse::GlobalInject<iex::guitarpro::IGuitarProConfiguration> guitarProConfiguration;
 
 public:

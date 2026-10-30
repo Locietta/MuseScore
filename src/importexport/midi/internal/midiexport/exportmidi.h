@@ -23,7 +23,11 @@
 #ifndef EXPORTMIDI_H
 #define EXPORTMIDI_H
 
+#ifdef NO_QT_SUPPORT
+#include "io/path.h"
+#else
 #include <QFile>
+#endif
 
 #include "../midishared/midifile.h"
 #include "engraving/compat/midi/pausemap.h"
@@ -35,6 +39,12 @@ class SynthesizerState;
 }
 
 namespace mu::iex::midi {
+#ifdef NO_QT_SUPPORT
+using MidiPath = muse::io::path_t;
+#else
+using MidiPath = QString;
+#endif
+
 //---------------------------------------------------------
 //   ExportMidi
 //---------------------------------------------------------
@@ -43,15 +53,17 @@ class ExportMidi
 {
 public:
     ExportMidi(engraving::Score* s) { m_score = s; }
-    bool write(const QString& name, bool midiExpandRepeats, bool exportRPNs);
-    bool write(QIODevice* device, bool midiExpandRepeats, bool exportRPNs);
-    bool write(const QString& name, bool midiExpandRepeats, bool exportRPNs, const engraving::SynthesizerState& synthState);
-    bool write(QIODevice* device, bool midiExpandRepeats, bool exportRPNs, const engraving::SynthesizerState& synthState);
+    bool write(const MidiPath& name, bool midiExpandRepeats, bool exportRPNs);
+    bool write(MidiIODevice* device, bool midiExpandRepeats, bool exportRPNs);
+    bool write(const MidiPath& name, bool midiExpandRepeats, bool exportRPNs, const engraving::SynthesizerState& synthState);
+    bool write(MidiIODevice* device, bool midiExpandRepeats, bool exportRPNs, const engraving::SynthesizerState& synthState);
 
 private:
     void writeHeader(const engraving::CompatMidiRendererInternal::Context& context);
 
+#ifndef NO_QT_SUPPORT
     QFile m_file;
+#endif
     MidiFile m_midiFile;
     engraving::Score* m_score = nullptr;
 };

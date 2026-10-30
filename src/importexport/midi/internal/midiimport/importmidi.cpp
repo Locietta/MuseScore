@@ -20,17 +20,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
+#include <cstdint>
+#include <exception>
 #include <set>
+#include <string>
+#include <vector>
 
+#ifndef NO_QT_SUPPORT
 #include <QFile>
 #include <QFileInfo>
+#endif
 
 #include "translation.h"
 
 #include "engraving/engravingerrors.h"
 #include "engraving/rw/xmlwriter.h"
 
+#ifndef NO_QT_SUPPORT
 #include "engraving/infrastructure/messagebox.h"
+#endif
 
 #include "engraving/dom/articulation.h"
 #include "engraving/dom/barline.h"
@@ -80,6 +89,11 @@
 #include "importmidi_tuplet.h"
 #include "importmidi_tuplet_tonotes.h"
 #include "importmidi_voice.h"
+#include "importmidi.h"
+
+#ifdef NO_QT_SUPPORT
+#include "io/buffer.h"
+#endif
 
 #include "log.h"
 
@@ -100,7 +114,7 @@ void lengthenTooShortNotes(std::multimap<int, MTrack>& tracks)
     }
 }
 
-#ifdef QT_DEBUG
+#ifndef NDEBUG
 
 bool doNotesOverlap(const MTrack& track)
 {
@@ -253,7 +267,7 @@ void quantizeAllTracks(std::multimap<int, MTrack>& tracks,
         }
         const auto basicQuant = Quantize::quantValueToFraction(
             opers.data()->trackOpers.quantValue.value(mtrack.indexOfOperation));
-#ifdef QT_DEBUG
+#ifndef NDEBUG
         Q_ASSERT_X(MChord::isLastTickValid(lastTick, mtrack.chords),
                    "quantizeAllTracks", "Last tick is less than max note off time");
 #endif
@@ -264,7 +278,7 @@ void quantizeAllTracks(std::multimap<int, MTrack>& tracks,
         } else {
             MidiTuplet::findAllTuplets(mtrack.tuplets, mtrack.chords, sigmap, basicQuant);
         }
-#ifdef QT_DEBUG
+#ifndef NDEBUG
         Q_ASSERT_X(!doNotesOverlap(track.second),
                    "quantizeAllTracks",
                    "There are overlapping notes of the same voice that is incorrect");
@@ -274,7 +288,7 @@ void quantizeAllTracks(std::multimap<int, MTrack>& tracks,
         MChord::collectChords(mtrack, { 2, 1 }, { 4, 3 });
         Quantize::quantizeChords(mtrack.chords, sigmap, basicQuant);
         MidiTuplet::removeEmptyTuplets(mtrack);
-#ifdef QT_DEBUG
+#ifndef NDEBUG
         Q_ASSERT_X(MidiTuplet::areTupletRangesOk(mtrack.chords, mtrack.tuplets),
                    "quantizeAllTracks", "Tuplet chord/note is outside tuplet "
                                         "or non-tuplet chord/note is inside tuplet");
@@ -380,7 +394,7 @@ void MTrack::processMeta(int tick, const MidiEvent& mm)
     }
     break;
     case META_COPYRIGHT:
-        cs->setMetaTag(u"copyright", QString((const char*)(mm.edata())));
+        cs->setMetaTag(u"copyright", muse::String::fromUtf8(reinterpret_cast<const char*>(mm.edata())));
         break;
     case META_TIME_SIGNATURE:
         break;                                  // added earlier
@@ -395,7 +409,7 @@ void MTrack::processMeta(int tick, const MidiEvent& mm)
     }
 }
 
-QList<std::pair<ReducedFraction, TDuration> >
+std::vector<std::pair<ReducedFraction, TDuration> >
 MTrack::toDurationList(const Measure* measure,
                        int voice,
                        const ReducedFraction& startTick,
@@ -474,7 +488,7 @@ void MTrack::fillGapWithRests(Score* score,
         } else {
             const auto dl = toDurationList(measure, voice, startChordTick, len,
                                            Meter::DurationType::REST);
-            if (dl.isEmpty()) {
+            if (dl.empty()) {
                 LOGD("cannot create duration list for len %d", len.ticks());
                 restLen = ReducedFraction(0, 1);              // fake
                 break;
@@ -497,7 +511,7 @@ void MTrack::fillGapWithRests(Score* score,
 }
 
 void setMusicNotesFromMidi(Score*,
-                           const QList<MidiNote>& midiNotes,
+                           const std::vector<MidiNote>& midiNotes,
                            Chord* chord,
                            const Drumset* drumset,
                            bool useDrumset)
@@ -533,7 +547,7 @@ void setMusicNotesFromMidi(Score*,
     }
 }
 
-void setTies(Chord* chord, QList<MidiNote>& midiNotes)
+void setTies(Chord* chord, std::vector<MidiNote>& midiNotes)
 {
     for (int i = 0; i < midiNotes.size(); ++i) {
         const MidiNote& midiNote = midiNotes[i];
@@ -547,7 +561,7 @@ void setTies(Chord* chord, QList<MidiNote>& midiNotes)
 // convert midiChords with the same onTime value to music notation
 // and fill the remaining empty duration with rests
 
-void MTrack::processPendingNotes(QList<MidiChord>& midiChords,
+void MTrack::processPendingNotes(std::vector<MidiChord>& midiChords,
                                  int voice,
                                  const ReducedFraction& startChordTickFrac,
                                  const ReducedFraction& nextChordTick)
@@ -563,7 +577,7 @@ void MTrack::processPendingNotes(QList<MidiChord>& midiChords,
     // all midiChords here should have the same onTime value
     // and all notes in each midiChord should have the same duration
     ReducedFraction startChordTick = startChordTickFrac;
-    while (!midiChords.isEmpty()) {
+    while (!midiChords.empty()) {
         const ReducedFraction tick = startChordTick;
         ReducedFraction len = nextChordTick - tick;
         if (len <= ReducedFraction(0, 1)) {
@@ -574,7 +588,7 @@ void MTrack::processPendingNotes(QList<MidiChord>& midiChords,
         len = splitDurationOnBarBoundary(len, tick, measure);
 
         const auto dl = toDurationList(measure, voice, tick, len, Meter::DurationType::NOTE);
-        if (dl.isEmpty()) {
+        if (dl.empty()) {
             break;
         }
         const TDuration& d = dl[0].second;
@@ -601,8 +615,8 @@ void MTrack::processPendingNotes(QList<MidiChord>& midiChords,
         for (int k = 0; k < midiChords.size(); ++k) {
             MidiChord& midiChord = midiChords[k];
             setMusicNotesFromMidi(score, midiChord.notes, chord, drumset, useDrumset);
-            if (!midiChord.notes.empty() && midiChord.notes.first().offTime - tick <= len) {
-                midiChords.removeAt(k);
+            if (!midiChord.notes.empty() && midiChord.notes.front().offTime - tick <= len) {
+                midiChords.erase(midiChords.begin() + k);
                 --k;
                 continue;
             }
@@ -645,7 +659,7 @@ void MTrack::createNotes(const ReducedFraction& lastTick)
         // chords here are consist of notes with equal durations
         // several chords may have the same onTime value
         ReducedFraction startChordTick;
-        QList<MidiChord> midiChords;
+        std::vector<MidiChord> midiChords;
 
         for (auto it = chords.begin(); it != chords.end();) {
             const auto& nextChordTick = it->first;
@@ -667,9 +681,9 @@ void MTrack::createNotes(const ReducedFraction& lastTick)
                 if (midiChord1.voice != voice) {
                     continue;
                 }
-                midiChords.append(midiChord1);
+                midiChords.push_back(midiChord1);
             }
-            if (midiChords.isEmpty()) {
+            if (midiChords.empty()) {
                 break;
             }
         }
@@ -690,9 +704,9 @@ Fraction metaTimeSignature(const MidiEvent& e)
     return Fraction(z, n);
 }
 
-QList<MTrack> prepareTrackList(const std::multimap<int, MTrack>& tracks)
+std::vector<MTrack> prepareTrackList(const std::multimap<int, MTrack>& tracks)
 {
-    QList<MTrack> trackList;
+    std::vector<MTrack> trackList;
     for (const auto& track: tracks) {
         // show track even if all initial notes were cleaned up
         if (track.second.hadInitialNotes) {
@@ -909,15 +923,15 @@ void setTrackInfo(MTrack& mt)
     auto& opers = midiImportOperations;
 
     const int currentTrack = mt.indexOfOperation;
-    const QString instrName = MidiInstr::instrumentName(mt.program, mt.mtrack->drumTrack());
+    const muse::String instrName = MidiInstr::instrumentName(mt.program, mt.mtrack->drumTrack());
     if (opers.data()->processingsOfOpenedFile == 0) {
         opers.data()->trackOpers.midiInstrName.setValue(currentTrack, instrName);
         // set channel number (from 1): number = index + 1
         opers.data()->trackOpers.channel.setValue(currentTrack, mt.mtrack->outChannel() + 1);
     }
 
-    const QString msInstrName = MidiInstr::msInstrName(currentTrack);
-    const QString trackInstrName = (msInstrName.isEmpty()) ? instrName : msInstrName;
+    const muse::String msInstrName = MidiInstr::msInstrName(currentTrack);
+    const muse::String trackInstrName = (msInstrName.isEmpty()) ? instrName : msInstrName;
 
     if (mt.staff->isTop()) {
         Part* part  = mt.staff->part();
@@ -989,7 +1003,7 @@ void processMeta(MTrack& mt, bool isLyric)
 
 // key list with key signatures of all tracks
 //   to assign it to tracks without any specified key signature
-KeyList findAllKeyList(const QList<MTrack>& tracks)
+KeyList findAllKeyList(const std::vector<MTrack>& tracks)
 {
     KeyList kl;
     for (int i = 0; i < tracks.size(); ++i) {
@@ -1002,7 +1016,7 @@ KeyList findAllKeyList(const QList<MTrack>& tracks)
     return kl;
 }
 
-void createNotes(const ReducedFraction& lastTick, QList<MTrack>& tracks)
+void createNotes(const ReducedFraction& lastTick, std::vector<MTrack>& tracks)
 {
     for (int i = 0; i < tracks.size(); ++i) {
         MTrack& mt = tracks[i];
@@ -1011,7 +1025,7 @@ void createNotes(const ReducedFraction& lastTick, QList<MTrack>& tracks)
     }
 }
 
-void processNonLyricMeta(QList<MTrack>& tracks)
+void processNonLyricMeta(std::vector<MTrack>& tracks)
 {
     for (int i = 0; i < tracks.size(); ++i) {
         MTrack& mt = tracks[i];
@@ -1019,7 +1033,7 @@ void processNonLyricMeta(QList<MTrack>& tracks)
     }
 }
 
-void setTrackInfo(QList<MTrack>& tracks)
+void setTrackInfo(std::vector<MTrack>& tracks)
 {
     for (int i = 0; i < tracks.size(); ++i) {
         MTrack& mt = tracks[i];
@@ -1027,7 +1041,7 @@ void setTrackInfo(QList<MTrack>& tracks)
     }
 }
 
-void processLyricMeta(QList<MTrack>& tracks)
+void processLyricMeta(std::vector<MTrack>& tracks)
 {
     for (int i = 0; i < tracks.size(); ++i) {
         MTrack& mt = tracks[i];
@@ -1035,7 +1049,7 @@ void processLyricMeta(QList<MTrack>& tracks)
     }
 }
 
-void createKeys(QList<MTrack>& tracks)
+void createKeys(std::vector<MTrack>& tracks)
 {
     const Key defaultKey = Key::C;       // TODO-LIB findKey(mtrack, score->sigmap());
     const KeyList& allKeyList = findAllKeyList(tracks);
@@ -1046,7 +1060,7 @@ void createKeys(QList<MTrack>& tracks)
     }
 }
 
-void applySwing(QList<MTrack>& tracks)
+void applySwing(std::vector<MTrack>& tracks)
 {
     for (int i = 0; i < tracks.size(); ++i) {
         MTrack& mt = tracks[i];
@@ -1054,7 +1068,7 @@ void applySwing(QList<MTrack>& tracks)
         const auto& opers = midiImportOperations.data()->trackOpers;
         const auto swingType = opers.swing.value(mt.indexOfOperation);
         Swing::detectSwing(mt.staff, swingType);
-#ifdef QT_DEBUG
+#ifndef NDEBUG
         Q_ASSERT_X(MidiTie::areTiesConsistent(mt.staff),
                    "applySwing", "Ties are inconsistent");
 
@@ -1065,7 +1079,7 @@ void applySwing(QList<MTrack>& tracks)
     }
 }
 
-void createClefs(QList<MTrack>& tracks)
+void createClefs(std::vector<MTrack>& tracks)
 {
     for (int i = 0; i < tracks.size(); ++i) {
         MTrack& mt = tracks[i];
@@ -1098,7 +1112,7 @@ void setLeftRightHandSplit(const std::multimap<int, MTrack>& tracks)
     }
 }
 
-ReducedFraction findFirstChordTick(const QList<MTrack>& tracks)
+ReducedFraction findFirstChordTick(const std::vector<MTrack>& tracks)
 {
     ReducedFraction firstTick(0, 1);
     for (const auto& track: tracks) {
@@ -1130,7 +1144,7 @@ ReducedFraction findLastChordTick(const std::multimap<int, MTrack>& tracks)
     return lastTick;
 }
 
-QList<MTrack> convertMidi(Score* score, const MidiFile* mf)
+std::vector<MTrack> convertMidi(Score* score, const MidiFile* mf)
 {
     auto* sigmap = score->sigmap();
 
@@ -1177,7 +1191,7 @@ QList<MTrack> convertMidi(Score* score, const MidiFile* mf)
     }
 
     MChord::removeOverlappingNotes(tracks);
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     Q_ASSERT_X(!doNotesOverlap(tracks),
                "convertMidi", "There are overlapping notes of the same voice that is incorrect");
 #endif
@@ -1187,7 +1201,7 @@ QList<MTrack> convertMidi(Score* score, const MidiFile* mf)
     ReducedFraction lastTick = findLastChordTick(tracks);
     quantizeAllTracks(tracks, sigmap, lastTick);
     MChord::removeOverlappingNotes(tracks);
-#ifdef QT_DEBUG
+#ifndef NDEBUG
     Q_ASSERT_X(!doNotesOverlap(tracks),
                "convertMidi", "There are overlapping notes of the same voice that is incorrect");
     Q_ASSERT_X(noTooShortNotes(tracks),
@@ -1201,7 +1215,7 @@ QList<MTrack> convertMidi(Score* score, const MidiFile* mf)
     Simplify::simplifyDurationsForDrums(tracks, sigmap);
     MChord::splitUnequalChords(tracks);
     // no more track insertion/reordering/deletion from now
-    QList<MTrack> trackList = prepareTrackList(tracks);
+    std::vector<MTrack> trackList = prepareTrackList(tracks);
     MidiInstr::setGrandStaffProgram(trackList);
     MidiInstr::findInstrumentsForAllTracks(trackList);
     MidiInstr::createInstruments(score, trackList);
@@ -1236,22 +1250,39 @@ void loadMidiData(MidiFile& mf)
     }
 }
 
+namespace {
+#ifdef NO_QT_SUPPORT
+// Erase the one-shot cache entry on every exit path, including exceptions from
+// the notation algorithms.  MidiImportOperations is process-global, so leaving
+// the entry (or the current-file pointer) behind would leak state into the next
+// document imported by the same host.
+struct MidiImportFileGuard {
+    MidiOperations::Data& opers;
+    const std::string key;
+
+    ~MidiImportFileGuard() { opers.excludeMidiFile(key); }
+};
+#endif
+}
+
+#ifndef NO_QT_SUPPORT
 Err importMidi(MasterScore* score, const QString& name)
 {
     if (name.isEmpty()) {
         return Err::FileNotFound;
     }
 
+    const std::string fileName = name.toStdString();
     auto& opers = midiImportOperations;
 
-    MidiOperations::CurrentMidiFileSetter setCurrentMidiFile(opers, name);
-    if (!opers.hasMidiFile(name)) {
-        opers.addNewMidiFile(name);
+    MidiOperations::CurrentMidiFileSetter setCurrentMidiFile(opers, fileName);
+    if (!opers.hasMidiFile(fileName)) {
+        opers.addNewMidiFile(fileName);
     }
 
     // Check if file has been modified on disk since last import
     QFileInfo fileInfo(name);
-    qint64 currentModTime = fileInfo.lastModified().toSecsSinceEpoch();
+    int64_t currentModTime = fileInfo.lastModified().toSecsSinceEpoch();
     bool needsReload = (opers.data()->processingsOfOpenedFile == 0)
                        || (opers.data()->fileModificationTime != currentModTime);
 
@@ -1278,13 +1309,65 @@ Err importMidi(MasterScore* score, const QString& name)
         fp.close();
 
         loadMidiData(mf);
-        opers.setMidiFileData(name, mf);
+        opers.setMidiFileData(fileName, mf);
         opers.data()->fileModificationTime = currentModTime;
     }
 
-    opers.data()->tracks = convertMidi(score, opers.midiFile(name));
+    opers.data()->tracks = convertMidi(score, opers.midiFile(fileName));
     ++opers.data()->processingsOfOpenedFile;
 
     return Err::NoError;
 }
+#else
+Err importMidiFromBuffer(MasterScore* score, const std::string& bytes)
+{
+    if (!score || bytes.empty()) {
+        return Err::FileBadFormat;
+    }
+
+    muse::ByteArray data(bytes.data(), bytes.size());
+    muse::io::Buffer buffer(&data);
+    if (!buffer.open(muse::io::IODevice::ReadOnly)) {
+        return Err::FileOpenError;
+    }
+
+    MidiFile mf;
+    try {
+        if (!mf.read(&buffer)) {
+            LOGD("importMidi: bad file format");
+            return Err::FileBadFormat;
+        }
+    } catch (const std::exception& error) {
+        LOGD("importMidi: bad file format: %s", error.what());
+        return Err::FileBadFormat;
+    }
+
+    // Timing conversion divides by this value; malformed zero-division files
+    // must fail before entering the quantization pipeline.
+    if (mf.division() <= 0) {
+        return Err::FileBadFormat;
+    }
+
+    loadMidiData(mf);
+
+    auto& opers = midiImportOperations;
+    static const std::string key = "native-memory.mid";
+    // A previous failed call must not be reused as an options/cache carrier.
+    opers.excludeMidiFile(key);
+
+    MidiImportFileGuard cleanup{ opers, key };
+    MidiOperations::CurrentMidiFileSetter setCurrentMidiFile(opers, key);
+    opers.addNewMidiFile(key);
+    opers.setMidiFileData(key, mf);
+
+    auto* importData = opers.data();
+    if (!importData) {
+        return Err::FileOpenError;
+    }
+
+    importData->tracks = convertMidi(score, opers.midiFile(key));
+    ++importData->processingsOfOpenedFile;
+    return Err::NoError;
+}
+#endif
 }
