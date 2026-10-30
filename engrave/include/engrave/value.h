@@ -53,8 +53,9 @@ struct Color {
 
 // An enum value as its MSCX token: the text the engine's TConv writes for it, so
 // the vocabulary is the one of a saved score and survives a sync.  A few enums
-// (SYMID and the composite Align and OrnamentInterval) have no token list; their
-// tokens are still accepted and produced.
+// have no token list (SYMID's set is open, Align and OrnamentInterval build theirs
+// from two tokens, AccidentalRole and HookType use numbers); their tokens are still
+// accepted and produced.
 struct Enum {
     std::string token;
 
@@ -69,8 +70,8 @@ struct Opaque {
     bool operator==(const Opaque&) const = default;
 };
 
-// The value of one property or style.  Context-free alternatives are compared as
-// they are.  A default-constructed Value is std::monostate: no value at all.
+// The value of one property or style.  A default-constructed Value is
+// std::monostate: no value at all.
 using Value = std::variant<std::monostate, bool, std::int64_t, double, std::string, Fraction, Point, Size, Color,
                            Enum, std::vector<std::int64_t>, Opaque>;
 
