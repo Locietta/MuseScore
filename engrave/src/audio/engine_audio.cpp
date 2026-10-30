@@ -208,12 +208,10 @@ struct EngineState {
     std::shared_ptr<engine::IAudioContext> context;
     int sampleRate = kDefaultSampleRate;
     // One entry per SoundFont of the setup, in its order; the first is the
-    // default. inputParams duplicates fontInputs.front() for the callers that
-    // predate the list.
+    // default.
     std::vector<std::string> soundfontPaths;
-    std::vector<std::string> soundfontIds;
     std::vector<AudioInputParams> fontInputs;
-    AudioInputParams inputParams;
+    // The default font's identity, for the callers that predate the list.
     std::string soundfontPath;
     std::string soundfontUri;
     std::string soundfontId;
@@ -584,10 +582,8 @@ bool initialize_engine_audio(const EngineAudioSetup& setup, std::string* error)
 
         AudioInputParams input;
         input.resourceMeta = *found;
-        state.soundfontIds.push_back(it->second.name);
         state.fontInputs.push_back(input);
         if (index == 0) {
-            state.inputParams = input;
             state.soundfontPath = path;
             state.soundfontUri = uri.toString();
             state.soundfontId = it->second.name;
