@@ -92,7 +92,6 @@ void for_each_object(MasterScore& master, const Function& func) {
             if (measure->mmRest()) visit(measure->mmRest());
             for (EngravingItem* item : measure->el()) visit_tree(item);
             for (Segment* segment = measure->first(); segment; segment = segment->next()) {
-                visit(segment);
                 for (EngravingItem* item : segment->elist()) {
                     if (item) visit_tree(item);
                 }
