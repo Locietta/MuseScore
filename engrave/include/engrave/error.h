@@ -14,7 +14,8 @@ enum struct ErrorCode {
     InvalidArgument,   // an option the caller passed is invalid
     InvalidInput,      // the score data is malformed or the importer rejected it
     UnsupportedFormat, // the data matches no format the engine reads
-    NotFound,          // a file or template does not exist
+    NotFound,          // a file, template or element does not exist
+    StaleHandle,       // the element an id or address names is no longer part of the score
     ResourceLimit,     // the input exceeds a size limit
     Unsupported,       // a valid request the engine does not implement
     Io,                // a file exists but cannot be read

@@ -1,9 +1,13 @@
 #include <engrave/document.h>
 
 #include <format>
+#include <iterator>
 
+#include "engrave/src/api/handles.h"
 #include "engrave/src/api/state.h"
 #include "engrave/src/score/export_options.h"
+
+#include "engraving/engravingproject.h"
 
 namespace engrave {
 
@@ -13,11 +17,21 @@ std::unique_ptr<Document> Document::Impl::make(EngineState& engine, music::Score
     impl->engine = &engine;
     impl->project = std::move(project);
     impl->diagnostics = std::move(diagnostics);
+    // Every path that produces a document (open, create, and later a restore) hands
+    // out ids here, so that an element always has one before a caller can name it.
+    assign_missing_ids(*impl->project->masterScore());
     ++engine.live_documents;
-    return std::unique_ptr<Document>(new Document(std::move(impl)));
-}
+    return std::unique_ptr<Document>(new Document(std::move(impl)));}
 
 Document::Document(std::unique_ptr<Impl> impl) : impl_(std::move(impl)) {}
+
+mu::engraving::MasterScore* DocumentAccess::master_score(Document& document) {
+    return document.impl_->project->masterScore();
+}
+
+music::ScoreProject& DocumentAccess::project(Document& document) {
+    return document.impl_->project;
+}
 
 Document::~Document() {
     impl_->engine->check_thread();
