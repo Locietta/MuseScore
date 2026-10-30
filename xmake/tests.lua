@@ -7,6 +7,9 @@
 --   *_test, semantic_dump
 --       regression binaries of the engrave adapters, driven by musescore-mcp's
 --       scripts/run_lanes.py;
+--   engrave_api_test, example_embedder
+--       the public API's tests and its leak test, an embedder that sees
+--       nothing but engrave/include;
 --   noqt_probe, engine_audio_probe, audio_engine_link_check
 --       dev probes of the runtime, the audio driver and the audio engine link
 --       closure.
@@ -150,6 +153,59 @@ target("engine_audio_probe")
         -- PeakWorkingSetSize for the probe's memory report.
         add_syslinks("psapi")
     end
+target_end()
+
+-------------------------------------------------------------------------------
+-- engrave public API
+-------------------------------------------------------------------------------
+
+-- The API's own tests.  Besides the public headers they include only
+-- engrave/src/api/sniff.h, which is std-only as well.
+target("engrave_api_test")
+    set_kind("binary")
+    add_deps("engrave")
+    add_packages("gtest")
+    add_includedirs(source_root)
+    add_defines('ENGRAVE_TEST_SOURCE_ROOT="' .. source_root:gsub("\\", "/") .. '"')
+    add_files(path.join(tests_dir, "api_test.cpp"))
+    if is_plat("windows") then
+        add_files(utf8_manifest)
+    end
+target_end()
+
+-- The leak test: an embedder compiled with the public include root as its
+-- only include path and none of the project's defines, so it builds only
+-- while the public headers stay std-only.  The compile is done here rather
+-- than by the target's flags because project-scope settings (engine include
+-- roots, feature defines, package and dependency include paths) would
+-- otherwise reach it.
+local public_includes = ENGRAVE_PUBLIC_INCLUDES
+target("example_embedder")
+    set_kind("binary")
+    add_deps("engrave")
+    add_files(path.join(tests_dir, "example_embedder.cpp"))
+    on_build_file(function (target, sourcefile, opt)
+        import("core.project.depend")
+        import("core.tool.compiler")
+        import("utils.progress")
+        local objectfile = target:objectfile(sourcefile)
+        local headers = {}
+        for _, dir in ipairs(public_includes) do
+            table.join2(headers, os.files(path.join(dir, "engrave", "*.h")))
+        end
+        local compile = {configs = {
+            languages = target:get("languages"),
+            runtimes = target:get("runtimes"),
+            exceptions = target:get("exceptions"),
+            includedirs = public_includes,
+        }}
+        depend.on_changed(function ()
+            progress.show(opt.progress, "${color.build.object}compiling.leak-test %s", sourcefile)
+            vprint(compiler.compcmd(sourcefile, objectfile, compile))
+            os.mkdir(path.directory(objectfile))
+            compiler.compile(sourcefile, objectfile, compile)
+        end, {dependfile = target:dependfile(objectfile), files = table.join(sourcefile, headers)})
+    end)
 target_end()
 
 -- Dev-only closure check: the audio engine links on its own, without engrave.
