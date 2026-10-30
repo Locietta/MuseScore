@@ -110,3 +110,23 @@ muse/framework/tours/
 muse/framework/uicomponents/
 muse/framework/update/
 muse/framework/vst/
+
+# Batch 3: Uncompiled importers and audio layers
+src/importexport/audioexport/
+src/importexport/bb/
+src/importexport/bww/
+src/importexport/capella/
+src/importexport/imagesexport/
+src/importexport/lyricsexport/
+src/importexport/mei/
+src/importexport/mlscore/
+src/importexport/musedata/
+src/importexport/ove/
+src/importexport/tabledit/
+src/importexport/videoexport/
+src/importexport/CMakeLists.txt
+muse/framework/audio/driver/
+muse/framework/audio/main/
+muse/framework/audio/tests/
+muse/framework/audio/engine/platform/general/generalaudioworker.cpp
+muse/framework/audio/engine/platform/general/generalaudioworker.h
