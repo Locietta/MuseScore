@@ -232,12 +232,14 @@ ENGRAVE_INCLUDES = {
     path.join(source_root, "src"),
 }
 
--- The adapters' internal headers ("runtime/noqt_runtime.h", ...).  Besides
--- the library and its tests, only the musescore-mcp host includes them, as a
--- privileged client until A5 moves it onto the public API.
+-- The adapters' internal headers, included from the checkout root as
+-- "engrave/src/<area>/<file>.h" so that no engine include root can supply a
+-- header of the same name, whatever the include order.  Besides the library
+-- and its tests, only the musescore-mcp host includes them, as a privileged
+-- client until A5 moves it onto the public API.
 local engrave_src = path.join(source_root, "engrave", "src")
 ENGRAVE_INTERNAL_INCLUDES = {
-    engrave_src,
+    source_root,
 }
 
 local fluidsynth_dir = path.join(source_root, "muse", "framework", "audio", "thirdparty", "fluidsynth", "fluidsynth-2.3.3")
@@ -318,10 +320,11 @@ target("muse_global")
         path.join(source_root, "muse", "framework", "global", "thirdparty", "kors_modularity", "modularity", "*.cpp"),
         path.join(source_root, "muse", "framework", "global", "thirdparty", "kors_profiler", "profiler", "*.cpp")
     )
-    -- The Qt-free implementation of muse::Settings (upstream's settings.cpp is
-    -- trimmed).  engraving and the other modules call it, so it must link with
-    -- muse_global rather than with engrave, which comes first on the link line.
-    add_files(path.join(engrave_src, "runtime", "noqt_settings.cpp"))
+    -- engrave/src/global implements framework services that upstream builds
+    -- from trimmed Qt sources (muse::Settings).  engraving and the other modules
+    -- call them, so they must link with muse_global rather than with engrave,
+    -- which comes first on the link line.
+    add_files(path.join(engrave_src, "global", "*.cpp"))
     if is_plat("linux") then
         add_syslinks("dl", "pthread", {public = true})
     end
@@ -503,11 +506,11 @@ target_end()
 ---------------------------------------------------------------------------
 -- engrave: the Qt-free adapters
 ---------------------------------------------------------------------------
--- Every .cpp under engrave/src is part of the library; a new file in an area
--- folder needs no edit here.  The areas include each other's headers as
--- "<area>/<file>.h".  engrave/src comes last in the include path so that the
--- engine's own "io/..." and "audio/..." headers are never shadowed by an area.
--- The include path is shared with the adapter tests in xmake/tests.lua.
+-- Every .cpp under engrave/src except the global/ area (compiled by
+-- muse_global) is part of the library; a new file in an area folder needs no
+-- edit here.  The areas include each other's headers as
+-- "engrave/src/<area>/<file>.h" (source_root is on the include path).  The
+-- include path is shared with the adapter tests in xmake/tests.lua.
 ENGRAVE_ADAPTER_INCLUDES = {
     path.join(source_root, "src", "engraving", "thirdparty", "dtl"),
     source_root,
@@ -517,7 +520,7 @@ ENGRAVE_ADAPTER_INCLUDES = {
     path.join(source_root, "src", "engraving"),
     path.join(source_root, "muse", "framework", "draw"),
 }
-for _, list in ipairs({ENGRAVE_AUDIO_INCLUDES, ENGRAVE_INCLUDES, ENGRAVE_INTERNAL_INCLUDES}) do
+for _, list in ipairs({ENGRAVE_AUDIO_INCLUDES, ENGRAVE_INCLUDES}) do
     for _, dir in ipairs(list) do
         table.insert(ENGRAVE_ADAPTER_INCLUDES, dir)
     end
@@ -530,9 +533,7 @@ target("engrave")
     add_engine_target_defaults()
     add_defines(table.unpack(ENGRAVE_GLOBAL_DEFINES))
     add_includedirs(ENGRAVE_ADAPTER_INCLUDES)
-    add_files(path.join(engrave_src, "**.cpp"))
-    -- Compiled into muse_global, see there.
-    remove_files(path.join(engrave_src, "runtime", "noqt_settings.cpp"))
+    add_files(path.join(engrave_src, "**.cpp|global/*.cpp"))
     -- cairo renders pages (render/); its headers and library directory come
     -- from the including project, like zlib.
     add_links("cairo", {public = true})

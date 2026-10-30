@@ -1,6 +1,6 @@
 #pragma once
 
-#include "audio/audio_mix.h"
+#include "engrave/src/audio/audio_mix.h"
 
 #include <cstdint>
 #include <optional>

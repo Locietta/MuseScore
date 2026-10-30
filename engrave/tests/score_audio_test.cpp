@@ -1,5 +1,5 @@
-#include "runtime/noqt_runtime.h"
-#include "audio/score_audio.h"
+#include "engrave/src/runtime/noqt_runtime.h"
+#include "engrave/src/audio/score_audio.h"
 
 #include "engraving/engravingproject.h"
 #include "engraving/dom/masterscore.h"

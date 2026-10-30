@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
-#include "runtime/noqt_runtime.h"
-#include "runtime/runtime_assets.h"
+#include "engrave/src/runtime/noqt_runtime.h"
+#include "engrave/src/runtime/runtime_assets.h"
 #include "draw/internal/ifontsengine.h"
 #include "draw/types/font.h"
 #include "global/modularity/ioc.h"

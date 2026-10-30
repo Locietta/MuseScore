@@ -1,5 +1,5 @@
 #pragma once
-#include "score/export_options.h"
+#include "engrave/src/score/export_options.h"
 #include <memory>
 #include <string>
 

@@ -11,7 +11,7 @@
 
 #include "global/modularity/ioc.h"
 
-#include "audio/engine_audio.h"
+#include "engrave/src/audio/engine_audio.h"
 
 #include "audio/common/rpc/irpcchannel.h"
 #include "audio/engine/enginesetup.h"

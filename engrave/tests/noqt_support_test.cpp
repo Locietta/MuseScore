@@ -1,5 +1,5 @@
-#include "audio/engine_audio.h"
-#include "runtime/noqt_filesystem.h"
+#include "engrave/src/audio/engine_audio.h"
+#include "engrave/src/runtime/noqt_filesystem.h"
 #include "settings.h"
 #include <fstream>
 #include <iostream>
