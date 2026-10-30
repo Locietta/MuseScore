@@ -326,3 +326,11 @@ src/engraving/tests/voiceswitching_tests.cpp
 
 # Batch 5B: SoundFonts (bootstrap downloads the pinned SoundFont asset)
 share/sound/
+
+# Batch 5D: Conditional Qt-guarded UI, project, notation and workspace modules
+src/notation/
+src/project/
+muse/framework/ui/
+muse/framework/multiwindows/
+muse/framework/rcommand/
+muse/framework/workspace/
