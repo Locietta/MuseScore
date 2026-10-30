@@ -33,6 +33,10 @@ music::ScoreProject& DocumentAccess::project(Document& document) {
     return document.impl_->project;
 }
 
+api::EditHooks& DocumentAccess::edit_hooks(Document& document) {
+    return document.impl_->edit_hooks;
+}
+
 Document::~Document() {
     impl_->engine->check_thread();
     --impl_->engine->live_documents;
@@ -50,6 +54,7 @@ const std::vector<Diagnostic>& Document::diagnostics() const {
 
 Result<std::vector<std::byte>> Document::export_score(const ExportOptions& options) {
     impl_->engine->check_thread();
+    if (impl_->poisoned) return std::unexpected(Error{ErrorCode::Poisoned, "an earlier edit left the document unusable"});
     const char* name = nullptr;
     switch (options.format) {
     case Format::Mscz: name = "mscz"; break;

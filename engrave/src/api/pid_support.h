@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <string_view>
 
 #include "engraving/dom/property.h"
@@ -12,5 +13,9 @@ std::string_view name_of(mu::engraving::Pid pid);
 
 // The inverse; Pid::END for a name the catalogue does not know.
 mu::engraving::Pid pid_of(std::string_view name);
+
+// Whether an edit may set the property on an element of the type (its MSCX type
+// name); nothing when the catalogue does not list it for the type.
+std::optional<bool> settable(std::string_view type, mu::engraving::Pid pid);
 
 } // namespace engrave::api

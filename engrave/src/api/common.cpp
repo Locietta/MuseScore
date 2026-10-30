@@ -30,6 +30,9 @@ std::string_view to_string(ErrorCode code) noexcept {
     case ErrorCode::ResourceLimit: return "ResourceLimit";
     case ErrorCode::Unsupported: return "Unsupported";
     case ErrorCode::Io: return "Io";
+    case ErrorCode::RevisionConflict: return "RevisionConflict";
+    case ErrorCode::EditRejected: return "EditRejected";
+    case ErrorCode::Poisoned: return "Poisoned";
     }
     return "Unknown";
 }

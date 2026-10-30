@@ -12,6 +12,7 @@
 #include <engrave/document.h>
 #include <engrave/engine.h>
 
+#include "engrave/src/api/batch.h"
 #include "engrave/src/runtime/noqt_runtime.h"
 
 namespace mu::engraving {
@@ -42,6 +43,9 @@ struct Document::Impl {
     music::ScoreProject project;
     std::uint64_t revision = 1;
     std::vector<Diagnostic> diagnostics;
+    // A failed edit could not restore the score: only destruction is left.
+    bool poisoned = false;
+    api::EditHooks edit_hooks;
 
     static std::unique_ptr<Document> make(EngineState& engine, music::ScoreProject project,
                                           std::vector<Diagnostic> diagnostics);
@@ -53,6 +57,7 @@ struct Document::Impl {
 struct DocumentAccess {
     static mu::engraving::MasterScore* master_score(Document& document);
     static music::ScoreProject& project(Document& document);
+    static api::EditHooks& edit_hooks(Document& document);
 };
 
 // The path as UTF-8 with '/' separators: the engine's path type reads
