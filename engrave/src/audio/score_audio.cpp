@@ -316,4 +316,50 @@ ScoreAudioMixDefaults score_audio_mix_defaults(const std::string& mscz_bytes)
     return result;
 }
 
+AudioMix score_audio_default_mix(const ScoreAudioMixDefaults& defaults,
+                                 const std::vector<ScoreAudioTrackInfo>& tracks,
+                                 int excerpt_id, const std::string& excerpt_name)
+{
+    const std::map<std::pair<std::string, std::string>, TrackSoloMute>* excerpt_solo_mute
+        = excerpt_id >= 0 ? defaults.get_excerpt_map(excerpt_id, excerpt_name) : nullptr;
+
+    AudioMix mix;
+    mix.master = defaults.master;
+    mix.tracks.reserve(tracks.size());
+    for (std::size_t index = 0; index < tracks.size(); ++index) {
+        const ScoreAudioTrackInfo& track = tracks[index];
+        AudioOutputParams output;
+        const auto key = std::make_pair(track.part_id, track.instrument_id);
+        if (const auto found = defaults.tracks.find(key); found != defaults.tracks.end()) {
+            output.volume_db = found->second.volume_db;
+            output.balance = found->second.balance;
+            if (excerpt_id < 0) {
+                output.solo = found->second.solo;
+                output.muted = found->second.muted;
+            }
+        }
+        if (excerpt_id >= 0) {
+            // An excerpt file owns its solo/mute state; without one the track
+            // is neither soloed nor muted.
+            if (excerpt_solo_mute) {
+                const auto found = excerpt_solo_mute->find(key);
+                if (found != excerpt_solo_mute->end()) {
+                    output.solo = found->second.solo;
+                    output.muted = found->second.muted;
+                }
+            }
+        }
+        mix.tracks.push_back(AudioTrackParams{ static_cast<std::int64_t>(index), output });
+    }
+
+    derive_force_mute(mix);
+    for (std::size_t index = 0; index < tracks.size(); ++index) {
+        if (tracks[index].chord_symbols) {
+            mix.tracks[index].output.muted = true;
+            mix.tracks[index].output.force_mute = true;
+        }
+    }
+    return mix;
+}
+
 } // namespace music

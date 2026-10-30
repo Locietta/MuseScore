@@ -7,15 +7,30 @@
 #include "engrave/src/api/state.h"
 #include "engrave/src/score/export_options.h"
 
+#include "engraving/dom/excerpt.h"
+#include "engraving/dom/masterscore.h"
 #include "engraving/engravingproject.h"
 
 namespace engrave {
 
+Result<int> excerpt_id_of(mu::engraving::MasterScore& master, const ScoreSel& selection) {
+    const Result<mu::engraving::Score*> selected = select_score(master, selection);
+    if (!selected) return std::unexpected(selected.error());
+    if ((*selected)->isMaster()) return -1;
+    const std::vector<mu::engraving::Excerpt*>& excerpts = master.excerpts();
+    for (std::size_t index = 0; index < excerpts.size(); ++index) {
+        if (excerpts[index] && excerpts[index]->excerptScore() == *selected) return static_cast<int>(index);
+    }
+    return std::unexpected(Error{ErrorCode::StaleHandle, "the selected excerpt is not part of the document"});
+}
+
 std::unique_ptr<Document> Document::Impl::make(EngineState& engine, music::ScoreProject project,
+                                               music::ScoreAudioMixDefaults audio_defaults,
                                                std::vector<Diagnostic> diagnostics) {
     auto impl = std::make_unique<Impl>();
     impl->engine = &engine;
     impl->project = std::move(project);
+    impl->audio_defaults = std::move(audio_defaults);
     impl->diagnostics = std::move(diagnostics);
     // Every path that produces a document (open, create, and later a restore) hands
     // out ids here, so that an element always has one before a caller can name it.

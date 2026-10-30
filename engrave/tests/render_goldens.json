@@ -1,0 +1,79 @@
+{
+ "note": "The A2 render goldens for three corpus scores, copied from musescore-mcp tests/golden/<platform>/<fixture> at superproject commit 8acd1d0. svg is the sha256 of the stored page-N.svg text; png is describe_png's width/height/mode and the sha256 of the RGBA bytes PIL decodes; pdf is describe_pdf's page count. scripts/golden.py normalizes SVG to LF and leaves it otherwise unchanged, and decodes the PNG to RGBA (8 bits per channel, no alpha premultiplication), which is what the test reproduces.",
+ "fixtures": {
+  "ghost_note.mscx": {
+   "linux": {
+    "pdf": 1,
+    "png": {
+     "height": 1684,
+     "sha256": "657b06cc0e55554228c58177b122885d156b93d5254f68567496c7b054cdc246",
+     "width": 1191
+    },
+    "svg": [
+     "8ae400e71efb4240231de41d8c7e61544606b56f96cade56f24a6c785f8f3b80"
+    ]
+   },
+   "windows": {
+    "pdf": 1,
+    "png": {
+     "height": 1684,
+     "sha256": "657b06cc0e55554228c58177b122885d156b93d5254f68567496c7b054cdc246",
+     "width": 1191
+    },
+    "svg": [
+     "9b5191595d6081e64dbc088283655ced6f02395c218bfb48e6983917cd107990"
+    ]
+   }
+  },
+  "repeat70.mscx": {
+   "linux": {
+    "pdf": 1,
+    "png": {
+     "height": 1684,
+     "sha256": "863054633b37b1f05c557f9db6359631892746d53cb0875198b229d38c1ae1f4",
+     "width": 1191
+    },
+    "svg": [
+     "ee96b6099a3f8e87e787db2a76255820c57127fb6626b2c062621d41fbbda241"
+    ]
+   },
+   "windows": {
+    "pdf": 1,
+    "png": {
+     "height": 1684,
+     "sha256": "875334994664e5fc981259795c340b5e3e0b3da88c948bda664af8cd85d58ef2",
+     "width": 1191
+    },
+    "svg": [
+     "cc196e0ab86e22bbfc1e73fdb7831bbea73ee6be84d67146b1dba693772fe48c"
+    ]
+   }
+  },
+  "slurs.mscz": {
+   "linux": {
+    "pdf": 2,
+    "png": {
+     "height": 171,
+     "sha256": "efaf04c96e76ff0ae32adfe90951b25f8c02df616d7a47a65a184ad5edc941df",
+     "width": 1191
+    },
+    "svg": [
+     "f3e5187aed677c7e29cdae79da02201fb3eab0ea9e4e0c88865c5ce26fd10dc1",
+     "73604d614fcac1bb87fcb090f0dea02b5e324f614d9a5d4bf85f58bd227f0551"
+    ]
+   },
+   "windows": {
+    "pdf": 2,
+    "png": {
+     "height": 171,
+     "sha256": "c2c12dfff331aacdc142309e32ff1180ef50b94cfa2f52ca175331d498aa1e50",
+     "width": 1191
+    },
+    "svg": [
+     "190bb720cab5e19bd41c9d0be3635722722bacad418a90490ebb8f04dfbd34c6",
+     "f29fe97a0290787415ca8b239a936a517b5311c6f014ee278d8001940239e416"
+    ]
+   }
+  }
+ }
+}

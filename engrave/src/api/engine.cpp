@@ -94,10 +94,25 @@ Result<std::unique_ptr<Engine>> Engine::create(const EngineOptions& options) {
     for (const auto& font : options.fonts) {
         if (!std::filesystem::is_regular_file(font, ec)) return fail(ErrorCode::NotFound, "no font file '" + utf8(font) + "'");
     }
+    if (options.audio_sample_rate < 8000 || options.audio_sample_rate > 192000)
+        return fail(ErrorCode::InvalidArgument,
+                    std::format("the audio sample rate must be between 8000 and 192000 Hz, not {}", options.audio_sample_rate));
+    for (const auto& soundfont : options.soundfonts) {
+        if (!std::filesystem::is_regular_file(soundfont, ec))
+            return fail(ErrorCode::NotFound, "no SoundFont file '" + utf8(soundfont) + "'");
+        const auto extension = soundfont.extension().u8string();
+        if (extension != u8".sf2" && extension != u8".sf3")
+            return fail(ErrorCode::InvalidArgument, "a SoundFont is an .sf2 or .sf3 file, not '" + utf8(soundfont) + "'");
+    }
     check(!s_engine_created.exchange(true), "engrave supports one Engine per process");
 
     auto impl = std::make_unique<Impl>();
     impl->state.resources = resources;
+    impl->state.cache_dir = options.cache_dir.empty() ? std::filesystem::temp_directory_path(ec)
+                                                      : std::filesystem::absolute(options.cache_dir);
+    for (const auto& soundfont : options.soundfonts)
+        impl->state.soundfonts.push_back(std::filesystem::absolute(soundfont));
+    impl->state.audio_sample_rate = options.audio_sample_rate;
     if (!options.cache_dir.empty()) music::set_runtime_cache_root(utf8(std::filesystem::absolute(options.cache_dir)));
     mu::engraving::MScore::testMode = options.deterministic_ids;
     music::initialize_native_runtime(utf8(resources));
@@ -128,6 +143,10 @@ Capabilities Engine::capabilities() const {
         .engine_version = MUSE_APP_VERSION,
         .import_formats = {Format::Mscz, Format::Mscx, Format::MusicXml, Format::Mxl, Format::Midi, Format::GuitarPro},
         .export_formats = {Format::Mscz, Format::MusicXml, Format::Mxl, Format::Midi},
+        .render_formats = {RenderFormat::Pdf, RenderFormat::Png, RenderFormat::Svg},
+        .audio_formats = {AudioFormat::Wav, AudioFormat::Flac, AudioFormat::Opus, AudioFormat::Mp3, AudioFormat::Aac},
+        .soundfonts = impl_->state.soundfonts,
+        .audio_sample_rate = impl_->state.audio_sample_rate,
     };
 }
 
@@ -172,6 +191,10 @@ Result<std::unique_ptr<Document>> Engine::open(std::span<const std::byte> data, 
     } catch (const std::exception& error) {
         return fail(ErrorCode::InvalidInput, std::format("cannot read the data as {}: {}", to_string(*format), error.what()));
     }
+    // An MSCZ can carry the project's default mixer settings. Read them from the
+    // input, before the DOM exists and before anything can rewrite the archive.
+    music::ScoreAudioMixDefaults audio_defaults;
+    if (*format == Format::Mscz) audio_defaults = music::score_audio_mix_defaults(bytes);
     if (project->isCorruptedUponLoading())
         diagnostics.push_back({Severity::Warning, "the score failed the engine's sanity check after loading"});
     auto repairs = id_repairs(*project->masterScore());
@@ -179,7 +202,7 @@ Result<std::unique_ptr<Document>> Engine::open(std::span<const std::byte> data, 
         return fail(ErrorCode::InvalidInput, "the score has malformed or duplicated element ids: " + repairs.front().message);
     }
     diagnostics.insert(diagnostics.end(), repairs.begin(), repairs.end());
-    return Document::Impl::make(impl_->state, std::move(project), std::move(diagnostics));
+    return Document::Impl::make(impl_->state, std::move(project), std::move(audio_defaults), std::move(diagnostics));
 }
 
 Result<std::unique_ptr<Document>> Engine::open(const std::filesystem::path& file, const OpenOptions& options) {
@@ -227,7 +250,7 @@ Result<std::unique_ptr<Document>> Engine::create_document(const CreateOptions& o
         return fail(ErrorCode::InvalidInput, std::format("cannot read the template '{}': {}", utf8(mscx), error.what()));
     }
     apply_metadata(project->masterScore(), options);
-    return Document::Impl::make(impl_->state, std::move(project), {});
+    return Document::Impl::make(impl_->state, std::move(project), {}, {});
 }
 
 } // namespace engrave

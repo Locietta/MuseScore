@@ -31,8 +31,14 @@ std::string render_score(mu::engraving::Score* score, const std::string& format,
 std::string render_score(mu::engraving::Score* score, const std::string& format, const ExportOptions& options) {
     using namespace mu::engraving;
     if (!score || !score->npages()) throw std::runtime_error("Score has no pages");
-    if (options.page < 0 || (format != "pdf" && static_cast<size_t>(options.page) >= score->npages()))
+    const int npages = static_cast<int>(score->npages());
+    if (options.page < 0 || (format != "pdf" && options.page >= npages))
         throw std::invalid_argument("Page out of range");
+    // A PDF holds a range of pages; PNG and SVG render options.page alone.
+    const int firstPage = options.first_page;
+    const int lastPage = options.last_page >= 0 ? options.last_page : npages - 1;
+    if (format == "pdf" && (firstPage < 0 || lastPage < firstPage || lastPage >= npages))
+        throw std::invalid_argument("Page range out of range");
     // 5.0 drops the context IoC: IScoreRenderer is a global interface registered
     // by EngravingModule, and resolve() looks the export up by interface id.
     const auto renderer = muse::modularity::globalIoc()->resolve<rendering::IScoreRenderer>("native");
@@ -47,7 +53,7 @@ std::string render_score(mu::engraving::Score* score, const std::string& format,
     const double width = inches.width() * dpi, height = inches.height() * dpi;
     if (!std::isfinite(width) || !std::isfinite(height) || width <= 0 || height <= 0
         || width > 32767 || height > 32767 || width * height > 64e6)
-        throw std::runtime_error("Page dimensions exceed rendering limit");
+        throw RenderLimitExceeded("Page dimensions exceed rendering limit");
     std::string output;
     cairo_surface_t* raw = nullptr;
     if (format == "pdf") raw = cairo_pdf_surface_create_for_stream(append_bytes, &output, width, height);
@@ -79,8 +85,8 @@ std::string render_score(mu::engraving::Score* score, const std::string& format,
         rendering::IScoreRenderer::ScorePaintOptions paintOptions;
         paintOptions.isPrinting = true;
         paintOptions.deviceDpi = dpi;
-        paintOptions.fromPage = format == "pdf" ? 0 : options.page;
-        paintOptions.toPage = format == "pdf" ? static_cast<int>(score->npages()) - 1 : options.page;
+        paintOptions.fromPage = format == "pdf" ? firstPage : options.page;
+        paintOptions.toPage = format == "pdf" ? lastPage : options.page;
         paintOptions.onNewPage = [&] { cairo_show_page(context.get()); check(cairo_status(context.get())); };
         paintOptions.printPageBackground = format == "pdf" ? true : options.draw_page_background;
         renderer->paintScore(&painter, score, paintOptions);

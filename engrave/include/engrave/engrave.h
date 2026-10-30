@@ -1,5 +1,6 @@
 #pragma once
 
+#include <engrave/audio.h>
 #include <engrave/document.h>
 #include <engrave/edit.h>
 #include <engrave/engine.h>

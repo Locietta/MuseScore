@@ -62,11 +62,10 @@ using namespace mu::engraving;
 
 namespace music {
 namespace {
-constexpr sample_rate_t kSampleRate = 44100;
+constexpr sample_rate_t kDefaultSampleRate = 44100;
 constexpr samples_t kSamplesPerChannel = 4096;
 constexpr audioch_t kAudioChannelCount = 2;
 constexpr double kPlaybackTailSecs = 3.0;
-constexpr gain_t kDefaultAuxSend = 0.30f;
 constexpr const char* kReverbTrackName = "Reverb";
 constexpr const char* kAuxTrackName = "Aux 2";
 constexpr const char* kMetronomeTrackName = "Metronome";
@@ -207,7 +206,12 @@ struct EngineState {
     engine::EngineGlobalSetup* engineSetup = nullptr;
     engine::EngineController* controller = nullptr;
     std::shared_ptr<engine::IAudioContext> context;
-    AudioInputParams inputParams;
+    int sampleRate = kDefaultSampleRate;
+    // One entry per SoundFont of the setup, in its order; the first is the
+    // default.
+    std::vector<std::string> soundfontPaths;
+    std::vector<AudioInputParams> fontInputs;
+    // The default font's identity, for the callers that predate the list.
     std::string soundfontPath;
     std::string soundfontUri;
     std::string soundfontId;
@@ -222,7 +226,7 @@ EngineState& engine_state()
 OutputSpec output_spec()
 {
     OutputSpec spec;
-    spec.sampleRate = kSampleRate;
+    spec.sampleRate = engine_state().sampleRate;
     spec.samplesPerChannel = kSamplesPerChannel;
     spec.audioChannelCount = kAudioChannelCount;
     return spec;
@@ -244,7 +248,7 @@ AudioFxChain make_reverb_fx_chain()
     return chain;
 }
 
-SoundTrackFormat make_soundtrack_format(EngineAudioFormat format)
+SoundTrackFormat make_soundtrack_format(EngineAudioFormat format, const AudioRenderRequest& request)
 {
     SoundTrackFormat result;
     result.outputSpec = output_spec();
@@ -280,6 +284,12 @@ SoundTrackFormat make_soundtrack_format(EngineAudioFormat format)
         result.bitRate = 128;
         break;
     }
+
+    // Caller overrides; the API validates them against the format.
+    if (request.bit_rate > 0) result.bitRate = request.bit_rate;
+    if (request.bit_depth == 16) result.sampleFormat = AudioSampleFormat::Int16;
+    else if (request.bit_depth == 24) result.sampleFormat = AudioSampleFormat::Int24;
+    else if (request.bit_depth == 32) result.sampleFormat = AudioSampleFormat::Float32;
 
     return result;
 }
@@ -435,7 +445,7 @@ void set_engine_audio_midi_event_hook(EngineAudioMidiEventHook hook)
     s_midi_event_hook = std::move(hook);
 }
 
-bool initialize_engine_audio(const std::string& soundfont_path, std::string* error)
+bool initialize_engine_audio(const EngineAudioSetup& setup, std::string* error)
 {
     EngineState& state = engine_state();
     const auto fail = [error](std::string message) {
@@ -445,19 +455,28 @@ bool initialize_engine_audio(const std::string& soundfont_path, std::string* err
         return false;
     };
 
+    const std::vector<std::string>& soundfont_paths = setup.soundfonts;
     if (state.controller) {
-        if (!state.soundfontId.empty() && state.soundfontPath == soundfont_path) {
+        if (!state.soundfontId.empty() && state.soundfontPaths == soundfont_paths
+            && state.sampleRate == setup.sample_rate) {
             return true;
         }
         if (state.soundfontId.empty()) {
             return fail("audio engine initialisation failed earlier; restart the process");
         }
-        return fail("audio engine is already initialised with SoundFont '" + state.soundfontPath
-                    + "' (only one engine and one SoundFont per process)");
+        return fail("audio engine is already initialised with another SoundFont list or sample rate");
     }
 
-    if (soundfont_path.empty() || !synth::isSoundFont(io::path_t(soundfont_path))) {
-        return fail("SoundFont must be an existing .sf2 or .sf3 file: " + soundfont_path);
+    if (setup.sample_rate < 8000 || setup.sample_rate > 192000) {
+        return fail("audio sample rate must be between 8000 and 192000 Hz: " + std::to_string(setup.sample_rate));
+    }
+    if (soundfont_paths.empty()) {
+        return fail("no SoundFont was given (one .sf2 or .sf3 file is needed)");
+    }
+    for (const std::string& path : soundfont_paths) {
+        if (path.empty() || !synth::isSoundFont(io::path_t(path))) {
+            return fail("SoundFont must be an existing .sf2 or .sf3 file: " + path);
+        }
     }
 
     // Uri::fromLocalFile() resolves the absolute path through global IFileSystem.
@@ -499,9 +518,10 @@ bool initialize_engine_audio(const std::string& soundfont_path, std::string* err
 
     AudioEngineConfig config;
     config.useSoundFontLowPassFilter = true; // desktop parity
+    state.sampleRate = setup.sample_rate;
     controller->init(output_spec(), config);
 
-    // 4. SoundFont. addSoundFont() is synchronous for file: URIs
+    // 4. SoundFonts. addSoundFont() is synchronous for file: URIs
     // (soundfontrepository.cpp:68-77, 117-168) and refreshes FluidResolver
     // through soundFontsChanged (fluidresolver.cpp:44-50, 102-145).
     auto repository = globalIoc()->resolve<synth::ISoundFontRepository>("engine_audio");
@@ -517,18 +537,14 @@ bool initialize_engine_audio(const std::string& soundfont_path, std::string* err
     fluid_set_log_function(FLUID_WARN, fluid_log_to_logger, nullptr);
     fluid_set_log_function(FLUID_INFO, fluid_log_to_logger, nullptr);
 
-    const Uri uri = Uri::fromLocalFile(io::path_t(soundfont_path));
-    repository->addSoundFont(uri);
-
-    const synth::SoundFontsMap& soundfonts = repository->soundFonts();
-    auto it = soundfonts.find(uri);
-    if (it == soundfonts.end()) {
-        return fail("failed to load SoundFont '" + soundfont_path + "'");
+    for (const std::string& path : soundfont_paths) {
+        state.soundfontPaths.push_back(path);
+        repository->addSoundFont(Uri::fromLocalFile(io::path_t(path)));
     }
 
     // 5. One audio context for the process. 4.7.6 created a TrackSequence per
     // export instead; in 5.0 the context owns the graph and the master chain
-    // (audiocontext.cpp:44-86), and a worker process renders one job.
+    // (audiocontext.cpp:44-86).
     auto audioEngine = globalIoc()->resolve<engine::IAudioEngine>("engine_audio");
     if (!audioEngine) {
         return fail("audio engine is not registered");
@@ -544,22 +560,43 @@ bool initialize_engine_audio(const std::string& soundfont_path, std::string* err
     // audioengineconfiguration.cpp:35-41, 103-109), which is absent from this
     // process, and the track would be silent.
     const AudioResourceMetaList resources = context.val->availableInputResources();
-    for (const AudioResourceMeta& meta : resources) {
-        if (meta.id != it->second.name || !isResourceType(meta, AudioResourceType::FluidSoundfont)) {
-            continue;
+    for (std::size_t index = 0; index < soundfont_paths.size(); ++index) {
+        const std::string& path = soundfont_paths[index];
+        const Uri uri = Uri::fromLocalFile(io::path_t(path));
+        const synth::SoundFontsMap& soundfonts = repository->soundFonts();
+        auto it = soundfonts.find(uri);
+        if (it == soundfonts.end()) {
+            return fail("failed to load SoundFont '" + path + "'");
         }
 
-        state.inputParams = AudioInputParams();
-        state.inputParams.resourceMeta = meta;
+        const AudioResourceMeta* found = nullptr;
+        for (const AudioResourceMeta& meta : resources) {
+            if (meta.id == it->second.name && isResourceType(meta, AudioResourceType::FluidSoundfont)) {
+                found = &meta;
+                break;
+            }
+        }
+        if (!found) {
+            return fail("SoundFont '" + path + "' is not available as an audio input resource");
+        }
 
-        state.context = context.val;
-        state.soundfontPath = soundfont_path;
-        state.soundfontUri = uri.toString();
-        state.soundfontId = it->second.name;
-        return true;
+        AudioInputParams input;
+        input.resourceMeta = *found;
+        state.fontInputs.push_back(input);
+        if (index == 0) {
+            state.soundfontPath = path;
+            state.soundfontUri = uri.toString();
+            state.soundfontId = it->second.name;
+        }
     }
 
-    return fail("SoundFont '" + soundfont_path + "' is not available as an audio input resource");
+    state.context = context.val;
+    return true;
+}
+
+bool initialize_engine_audio(const std::string& soundfont_path, std::string* error)
+{
+    return initialize_engine_audio(EngineAudioSetup{ { soundfont_path }, kDefaultSampleRate }, error);
 }
 
 bool engine_audio_initialized()
@@ -581,25 +618,35 @@ std::string engine_soundfont_uri()
 AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderRequest& request)
 {
     AudioRenderResult result;
-    const auto fail = [&result](std::string message) {
+    const auto fail = [&result](AudioRenderResult::Failure kind, std::string message) {
         result.ok = false;
+        result.failure = kind;
         result.error = std::move(message);
         return result;
     };
 
     const EngineState& state = engine_state();
     if (!state.controller || !state.context || state.soundfontId.empty()) {
-        return fail("audio engine is not initialised");
+        return fail(AudioRenderResult::Failure::EngineFailure, "audio engine is not initialised");
     }
     if (!master) {
-        return fail("score is null");
+        return fail(AudioRenderResult::Failure::EngineFailure, "score is null");
     }
     if (request.output_path.empty()) {
-        return fail("output path is empty");
+        return fail(AudioRenderResult::Failure::EngineFailure, "output path is empty");
     }
 
     MasterScore* masterScore = master;
     engine::IAudioContext& context = *state.context;
+
+    // Drop what the previous render left in the shared context: its tracks and
+    // their sources, the synthesizer instances behind them and the fx chains
+    // (the reverb return is one). Muse Reverb keeps state between renders, so
+    // without this a second render in one process does not equal a fresh one.
+    // A fresh context has nothing to drop, so the first render is unaffected.
+    context.removeAllTracks();
+    context.clearSources();
+    context.clearAllFx();
 
     // Excerpt selection mutes every master part that is absent from, or
     // invisible in, the excerpt (masternotation.cpp:748-770).
@@ -608,17 +655,18 @@ AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderReque
     if (request.excerpt_id >= 0) {
         const std::vector<Excerpt*>& excerpts = masterScore->excerpts();
         if (static_cast<std::size_t>(request.excerpt_id) >= excerpts.size()) {
-            return fail("excerpt id is out of range");
+            return fail(AudioRenderResult::Failure::EngineFailure, "excerpt id is out of range");
         }
 
         const Excerpt* excerpt = excerpts[static_cast<std::size_t>(request.excerpt_id)];
         if (!excerpt) {
-            return fail("excerpt entry is null");
+            return fail(AudioRenderResult::Failure::EngineFailure, "excerpt entry is null");
         }
 
         const Score* excerptScore = excerpt->excerptScore();
         if (!excerptScore || excerptScore->masterScore() != masterScore) {
-            return fail("excerpt has no score owned by this master score");
+            return fail(AudioRenderResult::Failure::EngineFailure,
+                        "excerpt has no score owned by this master score");
         }
 
         for (const Part* part : masterScore->parts()) {
@@ -643,7 +691,7 @@ AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderReque
 
     const InstrumentTrackIdSet existingTrackIds = model.existingTrackIdSet();
     if (existingTrackIds.empty()) {
-        return fail("score has no playable tracks");
+        return fail(AudioRenderResult::Failure::InvalidScore, "score has no playable tracks");
     }
 
     // Repeat-expanded play time plus the upstream 3 s tail
@@ -663,7 +711,7 @@ AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderReque
     // int literal (C2666). The meaning is unchanged - a non-positive millisecond
     // duration means the score has nothing to play.
     if (totalDurationMs.raw() <= 0) {
-        return fail("score has no audio duration");
+        return fail(AudioRenderResult::Failure::InvalidScore, "score has no audio duration");
     }
 
     // 4.7.6 wrote (msecs * 1000 * rate) / 1000000 output frames. The writer
@@ -671,16 +719,18 @@ AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderReque
     // (soundtrackwriter.cpp:66-72), so hand it the frame count converted back
     // to time: the render then has exactly the same length as before.
     const std::uint64_t totalFrames = static_cast<std::uint64_t>(totalDurationMs) * 1000ULL
-                                      * kSampleRate / 1000000ULL;
-    const secs_t renderSecs = secs_t(static_cast<double>(totalFrames) / static_cast<double>(kSampleRate));
+                                      * state.sampleRate / 1000000ULL;
+    const secs_t renderSecs = secs_t(static_cast<double>(totalFrames) / static_cast<double>(state.sampleRate));
 
     // Refuse an oversized render before the encoder creates the file. The
     // parent applies the same projection before spawning a worker; this guard
     // also covers direct callers (engine_audio_probe, tests).
     const double durationSecs = static_cast<double>(totalDurationMs) / 1000.0;
-    const std::uint64_t projectedBytes = projected_audio_bytes(audio_output_codec_of(request.format), durationSecs);
+    const std::uint64_t projectedBytes = projected_audio_bytes(audio_output_codec_of(request.format), durationSecs,
+                                                               state.sampleRate);
     if (projectedBytes > kAudioOutputLimit) {
-        return fail(std::string("projected ") + audio_format_name(request.format) + " output of "
+        return fail(AudioRenderResult::Failure::ResourceLimit,
+                    std::string("projected ") + audio_format_name(request.format) + " output of "
                     + std::to_string(static_cast<int>(durationSecs / 60.0)) + " min (~"
                     + std::to_string(projectedBytes / (1024 * 1024))
                     + " MiB) exceeds the 1 GiB audio export limit");
@@ -689,7 +739,7 @@ AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderReque
     std::string chainError;
     engine::TrackChainPtr masterChain = make_master_chain(state.context, request, chainError);
     if (!masterChain) {
-        return fail(std::move(chainError));
+        return fail(AudioRenderResult::Failure::EngineFailure, std::move(chainError));
     }
 
     // The public mix is indexed by the same deterministic track list that
@@ -745,7 +795,11 @@ AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderReque
         const bool forceMute = !isMetronome && hasSolo && !mix.solo;
 
         TrackParams params;
-        params.source = state.inputParams;
+        const int font = mix.soundfont < 0 ? 0 : mix.soundfont;
+        if (static_cast<std::size_t>(font) >= state.fontInputs.size()) {
+            return fail(AudioRenderResult::Failure::EngineFailure, "track names an unknown SoundFont");
+        }
+        params.source = state.fontInputs[static_cast<std::size_t>(font)];
         set_track_control(params.control, mix);
         params.control.muted = mix.muted || forceMute || isChordSymbols || isMetronome
                                || (excerptSelected && mutedParts.count(trackId.partId) > 0);
@@ -754,7 +808,9 @@ AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderReque
             // tracks (playbackcontroller.cpp:1220-1227; defaultAuxSendValue is
             // 0.30 for both, playbackconfiguration.cpp:272-289). Mixer index 0
             // feeds the first aux track (muse/framework/audio/engine/internal/
-            // mixer.cpp:283-309), which is the reverb added below.
+            // mixer.cpp:283-309), which is the reverb added below. With the
+            // reverb off the first send stays at zero, so the master is the dry
+            // mix; the aux tracks are still added, so the graph keeps its shape.
             //
             // The second send must stay at zero: 5.0 always gives an aux track
             // an FxChain (AudioContext::onFxChainParamsChanged builds one even
@@ -766,13 +822,14 @@ AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderReque
             // chain *params* were empty (4.7.6 mixer.cpp:507-509, 527-529), so
             // that send was discarded there; keeping it zero reproduces the
             // 4.7.6 mix bit-exactly.
-            params.auxSends = { AuxSendParams { kDefaultAuxSend, true }, AuxSendParams { 0.0f, true } };
+            const double send = request.reverb ? request.reverb_send : 0.0;
+            params.auxSends = { AuxSendParams { static_cast<gain_t>(send), true }, AuxSendParams { 0.0f, true } };
         }
 
         const std::string name = track_name(masterScore, model, trackId);
         RetVal2<TrackId, TrackParams> added = context.addTrack(name, playbackData, params);
         if (!added.ret) {
-            return fail("addTrack failed: " + added.ret.toString());
+            return fail(AudioRenderResult::Failure::EngineFailure, "addTrack failed: " + added.ret.toString());
         }
     }
 
@@ -783,11 +840,11 @@ AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderReque
     reverbParams.fxChain = make_reverb_fx_chain();
     RetVal2<TrackId, TrackParams> reverb = context.addAuxTrack(kReverbTrackName, reverbParams);
     if (!reverb.ret) {
-        return fail("addAuxTrack(reverb) failed: " + reverb.ret.toString());
+        return fail(AudioRenderResult::Failure::EngineFailure, "addAuxTrack(reverb) failed: " + reverb.ret.toString());
     }
     RetVal2<TrackId, TrackParams> aux2 = context.addAuxTrack(kAuxTrackName, TrackParams());
     if (!aux2.ret) {
-        return fail("addAuxTrack(aux 2) failed: " + aux2.ret.toString());
+        return fail(AudioRenderResult::Failure::EngineFailure, "addAuxTrack(aux 2) failed: " + aux2.ret.toString());
     }
 
     context.setDuration(renderSecs);
@@ -813,14 +870,15 @@ AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderReque
 
     StreamingFileDevice device(io::path_t(request.output_path));
     if (!device.open(io::IODevice::WriteOnly)) {
-        return fail(std::string("cannot write ") + audio_format_name(request.format) + " output: '"
+        return fail(AudioRenderResult::Failure::EngineFailure,
+                    std::string("cannot write ") + audio_format_name(request.format) + " output: '"
                     + request.output_path + "'");
     }
 
     // The writer owns the render loop (soundtrackwriter.cpp:133-207): it sets
     // the source to PlayingOffline, renders in 4096-frame chunks, encodes them
     // and calls rpcChannel()->process() after each one.
-    soundtrack::SoundTrackWriter writer(device, make_soundtrack_format(request.format), renderSecs, masterChain);
+    soundtrack::SoundTrackWriter writer(device, make_soundtrack_format(request.format, request), renderSecs, masterChain);
     const Ret writeRet = writer.write();
 
     // Flush before the FileSystem size check below.
@@ -836,7 +894,8 @@ AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderReque
         // writable, and the bare Ret has no context. Name the format and path
         // instead of reporting the raw code.
         const std::string detail = writeRet.toString();
-        return fail(std::string(audio_format_name(request.format)) + " encoder failed (" + detail
+        return fail(AudioRenderResult::Failure::EngineFailure,
+                    std::string(audio_format_name(request.format)) + " encoder failed (" + detail
                     + "): '" + request.output_path + "'");
     }
 
@@ -847,6 +906,7 @@ AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderReque
     result.bytes = file_size(request.output_path);
     if (result.bytes == 0) {
         result.ok = false;
+        result.failure = AudioRenderResult::Failure::EngineFailure;
         result.error = "audio export reported success but wrote no data";
     }
 
