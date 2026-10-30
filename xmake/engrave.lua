@@ -10,10 +10,10 @@
 --   * the pinned third-party package recipes the engine targets need (declared
 --     here with add_requires, so any project that includes this file resolves
 --     them without repeating the pins);
---   * the checked-in source manifest (xmake/manifest.lua) and the generated
---     framework configuration header;
+--   * the generated framework configuration header;
 --   * the engine module targets: muse_global, muse_draw, muse_mpe, engraving,
---     the iex_* importers, native_fluidsynth and muse_audio_engine.
+--     the iex_* importers, native_fluidsynth and muse_audio_engine, compiled
+--     via folder globs.
 --
 -- The including project may set ENGRAVE_SOURCE_ROOT to build the engine
 -- sources from a checkout other than this one; the fork itself builds from its
@@ -26,13 +26,6 @@ local source_root = path.absolute(ENGRAVE_SOURCE_ROOT or fork_root)
 ---------------------------------------------------------------------------
 -- Third-party dependencies
 ---------------------------------------------------------------------------
--- Every library is a local recipe with a pinned archive and SHA-256, so no
--- build input depends on the xmake-repo revision a machine has: pugixml/opus/
--- opusenc/picojson because xmake-repo's versions or layouts differ,
--- freetype/lame/utfcpp because xmake-repo carried no version pin of its own
--- (see the recipe headers for the copied upstream pins).  Only build tools
--- (cmake, nasm, pkgconf) and the dev-only gtest still come from xmake-repo.
--- freetype: muse_deps builds it static with PNG/bzip2/zlib/harfbuzz disabled.
 local package_dir = path.join(fork_root, "xmake", "packages")
 includes(path.join(package_dir, "freetype.lua"))
 includes(path.join(package_dir, "harfbuzz.lua"))
@@ -45,10 +38,6 @@ includes(path.join(package_dir, "pugixml.lua"))
 includes(path.join(package_dir, "utfcpp.lua"))
 includes(path.join(package_dir, "picojson.lua"))
 
--- Third-party engine dependencies, pinned to the versions MuseScore 5.0 builds
--- against (muse/buildscripts/muse_deps.ref = 39c897ed, recipes/):
---   freetype 2.14.1, harfbuzz 12.3.0, flac 1.4.3, lame 3.100, opus 1.5.2,
---   opusenc 0.2.1, fdk-aac 2.0.3, pugixml 1.15, utfcpp 4.1.1, picojson 111c9be.
 add_requires("freetype 2.14.1", {system = false, configs = {
     zlib = false, png = false, bzip2 = false, woff2 = false, harfbuzz = false}})
 add_requires("muse-harfbuzz 12.3.0", {system = false})
@@ -62,102 +51,8 @@ add_requires("utfcpp v4.1.1", {system = false})
 add_requires("muse-picojson 111c9be", {system = false})
 
 ---------------------------------------------------------------------------
--- Pinned source manifest
----------------------------------------------------------------------------
--- xmake/manifest.lua is generated from the engine's own CMake source lists by
--- tools/capture_xmake_manifest.py and committed, so a normal build never runs
--- CMake or the generator.
---
--- A project-scope xmake script has no raise()/error(); a fatal input problem is
--- reported by defining a target whose on_load raises at configure time and
--- returning from this file.  Do not turn this into a silent continue: a build
--- without the manifest has nothing to compile.
-local function input_failure(message)
-    target("engrave_build_check")
-        set_kind("phony")
-        on_load(function ()
-            raise("%s", message)
-        end)
-    target_end()
-end
-
-local manifest_path = path.join(fork_root, "xmake", "manifest.lua")
-if not os.isfile(manifest_path) then
-    input_failure("xmake/manifest.lua is missing. Run once: python tools/capture_xmake_manifest.py")
-    return
-end
-includes(manifest_path)
-local manifest = MUSESCORE_XMAKE_MANIFEST
-if not manifest or not manifest.targets then
-    input_failure("xmake/manifest.lua did not define MUSESCORE_XMAKE_MANIFEST")
-    return
-end
-
--- The manifest is engine data, so a missing target means the generator and
--- this file disagree; say which one instead of linking an empty library.
-local engine_targets = {
-    "muse_global", "muse_draw", "muse_mpe", "engraving", "iex_musicxml",
-    "iex_guitarpro", "iex_midi_import", "native_fluidsynth", "muse_audio_engine",
-    "noqt_support",
-}
-for _, name in ipairs(engine_targets) do
-    if not manifest.targets[name] then
-        input_failure("the engine manifest has no target: " .. name)
-        return
-    end
-end
-
--- Resolve the portable placeholders used by the captured manifest.  The
--- manifest is engine-only, so every path is a SOURCE_ROOT path; the
--- PROJECT_ROOT form is accepted for manifests captured by older generators.
--- The generator's self-check guarantees only those two exist, so an unknown one
--- is reported and then fails as a missing file.
-local function expand(item)
-    return (item:gsub("%${([A-Z_]+)}", function(name)
-        if name == "PROJECT_ROOT" or name == "SOURCE_ROOT" then
-            return source_root
-        end
-        print("error: unknown manifest placeholder: " .. name)
-        return item
-    end))
-end
-
-local function expand_list(items)
-    local result = {}
-    for _, item in ipairs(items or {}) do
-        table.insert(result, expand(item))
-    end
-    return result
-end
-
-local function add_manifest_target(name)
-    local spec = manifest.targets[name]
-    local sources = expand_list(spec.sources)
-    if #sources > 0 then
-        add_files(sources)
-    end
-    -- The Qt-free feature selection changes class layouts and interfaces, so
-    -- the manifest applies it to every engine target.
-    if manifest.defines and #manifest.defines > 0 then
-        add_defines(table.unpack(manifest.defines))
-    end
-    if spec.defines and #spec.defines > 0 then
-        add_defines(spec.defines)
-    end
-    add_includedirs(expand_list(spec.includes))
-    add_includedirs("$(builddir)/xmake-generated")
-    return spec
-end
-
----------------------------------------------------------------------------
 -- Generated framework configuration header
 ---------------------------------------------------------------------------
--- The engine's framework config header. 5.0 moved the template into the
--- absorbed framework tree (muse/framework/cmake); the #cmakedefine shape is
--- unchanged, but the variables it substitutes changed
--- (MUSE_APP_INSTALL_* replaced MUSE_APP_INSTALL_NAME, AUDIO_WORKER_MODE became
--- AUDIO_HYBRID_MODE, MUSE_MODULE_*_COMPAT/MULTICONTEXT_WIP are gone).
-
 local function read_version(os, io)
     local text = io.readfile(path.join(source_root, "version.cmake")) or ""
     local function value(name)
@@ -175,8 +70,6 @@ local function read_version(os, io)
         return result
     end
     local root_args = {"-C", source_root, "rev-parse", "--show-toplevel"}
-    -- Probe first: iorunv raises in the xmake script sandbox when git is absent
-    -- or the source tree is not a checkout, and the revision must fall back.
     local root_probe = os.execv("git", root_args,
         {try = true, stdout = os.nuldev(), stderr = os.nuldev()})
     if root_probe ~= 0 then
@@ -185,13 +78,9 @@ local function read_version(os, io)
     else
         local top_level = tostring(os.iorunv("git", root_args) or ""):gsub("%s+", "")
         if normalized_path(top_level) ~= normalized_path(source_root) then
-            -- A plain directory inside another checkout must not inherit the
-            -- outer repository's SHA as the engine revision.
             print("warning: " .. source_root .. " is not a git checkout root (repository root '"
                 .. top_level .. "'); MUSE_APP_REVISION will be empty")
         else
-            -- Full SHA + first 7 characters: --short can grow when the prefix
-            -- is ambiguous, which would make the reported revision unstable.
             local head_args = {"-C", source_root, "rev-parse", "HEAD"}
             local code = os.execv("git", head_args,
                 {try = true, stdout = os.nuldev(), stderr = os.nuldev()})
@@ -213,8 +102,6 @@ local function read_version(os, io)
     local result = {
         MUSE_APP_NAME_HUMAN_READABLE = value("MUSE_APP_NAME_HUMAN_READABLE") or "MuseScore Studio",
         MUSE_APP_NAME_MACHINE_READABLE = value("MUSE_APP_NAME_MACHINE_READABLE") or "MuseScoreStudio",
-        -- Upstream SetupConfigure.cmake leaves MUSE_APP_UNSTABLE undefined for
-        -- MUSE_APP_BUILD_MODE=release; debug and releasedbg stay unstable.
         MUSE_APP_UNSTABLE = not is_mode("release"),
         MUSE_APP_BUILD_NUMBER = "1",
         MUSE_APP_REVISION = revision,
@@ -222,10 +109,6 @@ local function read_version(os, io)
         MUSE_APP_VERSION_MAJOR = major,
         MUSE_APP_VERSION_MINOR = minor,
         MUSE_APP_VERSION_PATCH = patch,
-        -- Selected module graph.  The engine modules we compile need their
-        -- enable macros; the audio work mode is only read by
-        -- audio/common/workmode.cpp defaultMode() (no Qt path) and stays at the
-        -- 4.7.6 value.
         MUSE_MODULE_AUDIO = true,
         MUSE_MODULE_AUDIO_API = true,
         MUSE_MODULE_AUDIO_EXPORT = true,
@@ -290,8 +173,6 @@ local function write_if_changed(os, io, filename, content)
     return true
 end
 
--- The generator runs in target-callback scope, where raise() exists (a
--- project-scope function would not see it).
 target("muse_generated")
     set_kind("phony")
     set_default(false)
@@ -320,16 +201,141 @@ target("muse_generated")
 target_end()
 
 ---------------------------------------------------------------------------
+-- Exports for the including project
+---------------------------------------------------------------------------
+ENGRAVE_SOURCE_ROOT = source_root
+ENGRAVE_FORK_ROOT = fork_root
+
+ENGRAVE_DEFINES = {
+    "NO_QT_SUPPORT",
+    "ENGRAVING_NO_ACCESSIBILITY",
+    "ENGRAVING_NO_INTERACTIVE",
+    "ENGRAVING_NO_API",
+    "MUSICXML_NO_INTERNAL",
+    "MUSICXML_NO_INTERACTIVE",
+    "MUSICXML_NO_VALIDATION",
+    "MUSE_MODULE_AUDIO_EXPORT",
+    "MUSE_MODULE_DRAW_USE_FONTFACE_FT",
+    "MUSE_MODULE_DRAW_USE_QTTEXTDRAW",
+}
+
+ENGRAVE_GLOBAL_DEFINES = {
+    "KORS_PROFILER_ENABLED",
+}
+
+ENGRAVE_INCLUDES = {
+    path.join(source_root, "muse"),
+    path.join(source_root, "muse", "framework"),
+    path.join(source_root, "muse", "framework", "global"),
+    path.join(source_root, "src"),
+}
+
+local fluidsynth_dir = path.join(source_root, "muse", "framework", "audio", "thirdparty", "fluidsynth", "fluidsynth-2.3.3")
+local fluidsynth_src = path.join(fluidsynth_dir, "src")
+
+
+ENGRAVE_AUDIO_ENGINE = {
+    defines = {
+        "KORS_PROFILER_ENABLED",
+        "NO_GLIB",
+        "NO_THREADS",
+        "SYSTEM_LAME",
+    },
+    includes = {
+        path.join(source_root, "muse", "framework", "audio", "common"),
+        path.join(source_root, "src"),
+        path.join(source_root, "muse"),
+        path.join(source_root, "muse", "framework"),
+        path.join(source_root, "muse", "framework", "global"),
+        path.join(source_root, "muse", "framework", "audio"),
+        path.join(source_root, "muse", "framework", "audio", "engine"),
+        path.join(fluidsynth_dir, "include"),
+        fluidsynth_src,
+        path.join(fluidsynth_src, "bindings"),
+        path.join(fluidsynth_src, "drivers"),
+        path.join(fluidsynth_src, "external"),
+        path.join(fluidsynth_src, "midi"),
+        path.join(fluidsynth_src, "rvoice"),
+        path.join(fluidsynth_src, "sfloader"),
+        path.join(fluidsynth_src, "synth"),
+        path.join(fluidsynth_src, "utils"),
+    },
+}
+
+ENGRAVE_AUDIO_INCLUDES = {
+    path.join(fluidsynth_dir, "include"),
+    fluidsynth_src,
+    path.join(fluidsynth_src, "bindings"),
+    path.join(fluidsynth_src, "drivers"),
+    path.join(fluidsynth_src, "external"),
+    path.join(fluidsynth_src, "midi"),
+    path.join(fluidsynth_src, "rvoice"),
+    path.join(fluidsynth_src, "sfloader"),
+    path.join(fluidsynth_src, "synth"),
+    path.join(fluidsynth_src, "utils"),
+    path.join(source_root, "muse", "framework", "audio"),
+}
+
+ENGRAVE_NOQT_SUPPORT = {
+    sources = {
+        path.join(source_root, "muse", "framework", "draw", "internal", "*.cpp"),
+        path.join(source_root, "src", "importexport", "midi", "internal", "midiexport", "*.cpp"),
+        path.join(source_root, "src", "importexport", "midi", "internal", "midishared", "*.cpp"),
+        path.join(source_root, "src", "importexport", "musicxml", "internal", "musicxmlconfiguration.cpp"),
+    },
+    defines = {
+        "DRAW_NO_QSVGRENDER",
+        "ENGRAVING_NO_ACCESSIBILITY",
+        "KORS_PROFILER_ENABLED",
+        "MUSE_MODULE_DRAW_USE_FONTFACE_FT",
+        "MUSE_MODULE_DRAW_USE_QTTEXTDRAW",
+    },
+    includes = {
+        path.join(source_root, "muse", "framework", "draw"),
+        path.join(source_root, "src"),
+        path.join(source_root, "muse"),
+        path.join(source_root, "muse", "framework"),
+        path.join(source_root, "muse", "framework", "global"),
+        path.join(source_root, "src", "importexport", "midi"),
+        path.join(source_root, "src", "engraving"),
+        path.join(source_root, "src", "engraving", "infrastructure"),
+        path.join(source_root, "src", "engraving", "thirdparty", "dtl"),
+        path.join(source_root, "src", "importexport", "musicxml"),
+    },
+}
+
+---------------------------------------------------------------------------
 -- Engine module targets
 ---------------------------------------------------------------------------
--- Source lists, per-target defines and include directories all come from the
--- manifest; nothing here selects files by hand.
+local function add_engine_target_defaults()
+    add_defines(table.unpack(ENGRAVE_DEFINES))
+    add_includedirs("$(builddir)/xmake-generated")
+end
 
 target("muse_global")
     set_kind("static")
     add_deps("muse_generated")
     add_packages("muse-pugixml", "utfcpp", "muse-picojson")
-    add_manifest_target("muse_global")
+    add_engine_target_defaults()
+    add_defines("GLOBAL_NO_INTERNAL", "KORS_PROFILER_ENABLED", "MUSE_MODULE_GLOBAL_LOGGER_DEBUGLEVEL")
+    add_includedirs(
+        path.join(source_root, "muse", "framework", "global"),
+        path.join(source_root, "src"),
+        path.join(source_root, "muse"),
+        path.join(source_root, "muse", "framework")
+    )
+    add_files(
+        path.join(source_root, "muse", "framework", "global", "*.cpp"),
+        path.join(source_root, "muse", "framework", "global", "io", "*.cpp"),
+        path.join(source_root, "muse", "framework", "global", "io", "devtools", "*.cpp"),
+        path.join(source_root, "muse", "framework", "global", "modularity", "*.cpp"),
+        path.join(source_root, "muse", "framework", "global", "serialization", "**.cpp"),
+        path.join(source_root, "muse", "framework", "global", "types", "*.cpp"),
+        path.join(source_root, "muse", "framework", "global", "thirdparty", "kors_async", "async", "internal", "*.cpp"),
+        path.join(source_root, "muse", "framework", "global", "thirdparty", "kors_logger", "src", "*.cpp"),
+        path.join(source_root, "muse", "framework", "global", "thirdparty", "kors_modularity", "modularity", "*.cpp"),
+        path.join(source_root, "muse", "framework", "global", "thirdparty", "kors_profiler", "profiler", "*.cpp")
+    )
     if is_plat("linux") then
         add_syslinks("dl", "pthread", {public = true})
     end
@@ -337,82 +343,176 @@ target("muse_global")
 target("muse_draw")
     set_kind("static")
     add_deps("muse_generated", "muse_global")
-    -- public: every consumer includes draw headers that reach <ft2build.h>/<hb-ft.h>
-    -- (fontsengine.h, fontfaceutils.h), and xmake only propagates package include
-    -- dirs of a dependency when the package is public.
     add_packages("freetype", "muse-harfbuzz", {public = true})
-    add_manifest_target("muse_draw")
+    add_engine_target_defaults()
+    add_defines("DRAW_NO_QSVGRENDER", "KORS_PROFILER_ENABLED", "MUSE_MODULE_DRAW_USE_FONTFACE_FT", "MUSE_MODULE_DRAW_USE_QTTEXTDRAW")
+    add_includedirs(
+        path.join(source_root, "muse", "framework", "draw"),
+        path.join(source_root, "src"),
+        path.join(source_root, "muse"),
+        path.join(source_root, "muse", "framework"),
+        path.join(source_root, "muse", "framework", "global")
+    )
+    add_files(
+        path.join(source_root, "muse", "framework", "draw", "*.cpp"),
+        path.join(source_root, "muse", "framework", "draw", "types", "*.cpp"),
+        path.join(source_root, "muse", "framework", "draw", "utils", "*.cpp")
+    )
 
 target("muse_mpe")
     set_kind("static")
     add_deps("muse_generated", "muse_global")
-    add_manifest_target("muse_mpe")
+    add_engine_target_defaults()
+    add_defines("KORS_PROFILER_ENABLED")
+    add_includedirs(
+        path.join(source_root, "muse", "framework", "mpe"),
+        path.join(source_root, "src"),
+        path.join(source_root, "muse"),
+        path.join(source_root, "muse", "framework"),
+        path.join(source_root, "muse", "framework", "global")
+    )
+    add_files(
+        path.join(source_root, "muse", "framework", "mpe", "*.cpp"),
+        path.join(source_root, "muse", "framework", "mpe", "internal", "*.cpp")
+    )
 
 target("engraving")
     set_kind("static")
     add_deps("muse_generated", "muse_global", "muse_draw", "muse_mpe")
-    add_manifest_target("engraving")
+    add_engine_target_defaults()
+    add_defines("ENGRAVING_NO_ACCESSIBILITY", "KORS_PROFILER_ENABLED")
+    add_includedirs(
+        path.join(source_root, "src", "engraving"),
+        path.join(source_root, "src"),
+        path.join(source_root, "muse"),
+        path.join(source_root, "muse", "framework"),
+        path.join(source_root, "muse", "framework", "global"),
+        path.join(source_root, "src", "engraving", "infrastructure"),
+        path.join(source_root, "src", "engraving", "thirdparty", "dtl")
+    )
+    add_files(
+        path.join(source_root, "src", "engraving", "*.cpp"),
+        path.join(source_root, "src", "engraving", "automation", "**.cpp"),
+        path.join(source_root, "src", "engraving", "compat", "**.cpp"),
+        path.join(source_root, "src", "engraving", "dom", "**.cpp"),
+        path.join(source_root, "src", "engraving", "editing", "**.cpp"),
+        path.join(source_root, "src", "engraving", "infrastructure", "**.cpp"),
+        path.join(source_root, "src", "engraving", "internal", "**.cpp"),
+        path.join(source_root, "src", "engraving", "playback", "**.cpp"),
+        path.join(source_root, "src", "engraving", "rendering", "**.cpp"),
+        path.join(source_root, "src", "engraving", "rw", "**.cpp"),
+        path.join(source_root, "src", "engraving", "style", "**.cpp"),
+        path.join(source_root, "src", "engraving", "types", "**.cpp")
+    )
 
 target("iex_musicxml")
     set_kind("static")
     add_deps("muse_generated", "muse_global", "engraving")
-    add_manifest_target("iex_musicxml")
+    add_engine_target_defaults()
+    add_defines("ENGRAVING_NO_ACCESSIBILITY", "KORS_PROFILER_ENABLED", "MUSICXML_NO_INTERACTIVE", "MUSICXML_NO_INTERNAL", "MUSICXML_NO_VALIDATION")
+    add_includedirs(
+        path.join(source_root, "src", "importexport", "musicxml"),
+        path.join(source_root, "src"),
+        path.join(source_root, "muse"),
+        path.join(source_root, "muse", "framework"),
+        path.join(source_root, "muse", "framework", "global"),
+        path.join(source_root, "src", "engraving"),
+        path.join(source_root, "src", "engraving", "infrastructure"),
+        path.join(source_root, "src", "engraving", "thirdparty", "dtl")
+    )
+    add_files(path.join(source_root, "src", "importexport", "musicxml", "**.cpp"))
+    -- Compiled elsewhere into noqt_support:
+    remove_files(path.join(source_root, "src", "importexport", "musicxml", "internal", "musicxmlconfiguration.cpp"))
 
--- Import algorithms keep their upstream module boundary; both source lists are
--- generated from the engine's importexport CMakeLists, so they follow
--- upstream's file moves (for example the 5.0 guitarbendimport split and the new
--- MIDI import model, which stays out: it is Qt-only).
 target("iex_guitarpro")
     set_kind("static")
     add_deps("muse_generated", "engraving")
-    add_manifest_target("iex_guitarpro")
+    add_engine_target_defaults()
+    add_defines("ENGRAVING_NO_ACCESSIBILITY", "KORS_PROFILER_ENABLED")
+    add_includedirs(
+        path.join(source_root, "src", "importexport", "guitarpro"),
+        path.join(source_root, "src"),
+        path.join(source_root, "muse"),
+        path.join(source_root, "muse", "framework"),
+        path.join(source_root, "muse", "framework", "global"),
+        path.join(source_root, "src", "engraving"),
+        path.join(source_root, "src", "engraving", "infrastructure"),
+        path.join(source_root, "src", "engraving", "thirdparty", "dtl")
+    )
+    add_files(path.join(source_root, "src", "importexport", "guitarpro", "internal", "**.cpp"))
 target_end()
 
 target("iex_midi_import")
     set_kind("static")
     add_deps("muse_generated", "engraving")
-    add_manifest_target("iex_midi_import")
+    add_engine_target_defaults()
+    add_defines("ENGRAVING_NO_ACCESSIBILITY", "KORS_PROFILER_ENABLED")
+    add_includedirs(
+        path.join(source_root, "src", "importexport", "midi"),
+        path.join(source_root, "src"),
+        path.join(source_root, "muse"),
+        path.join(source_root, "muse", "framework"),
+        path.join(source_root, "muse", "framework", "global"),
+        path.join(source_root, "src", "engraving"),
+        path.join(source_root, "src", "engraving", "infrastructure"),
+        path.join(source_root, "src", "engraving", "thirdparty", "dtl")
+    )
+    add_files(
+        path.join(source_root, "src", "importexport", "midi", "internal", "midiimport", "*.cpp"),
+        path.join(source_root, "src", "importexport", "midi", "thirdparty", "beatroot", "*.cpp")
+    )
 target_end()
----------------------------------------------------------------------------
--- Audio engine
----------------------------------------------------------------------------
+
 target("native_fluidsynth")
     set_kind("static")
     if is_plat("windows") then
         set_languages("c11", "cxx23")
     else
-        -- Upstream's NO_GLIB fallback uses alloca from GNU libc headers.
         set_languages("gnu17", "cxx23")
     end
-    add_manifest_target("native_fluidsynth")
+    add_engine_target_defaults()
+    add_defines("EXTERN_VORBIS_SUPPORT", "KORS_PROFILER_ENABLED", "NO_GLIB", "NO_THREADS")
+    add_includedirs(
+        path.join(fluidsynth_dir, "include"),
+        fluidsynth_src,
+        path.join(fluidsynth_src, "bindings"),
+        path.join(fluidsynth_src, "drivers"),
+        path.join(fluidsynth_src, "external"),
+        path.join(fluidsynth_src, "midi"),
+        path.join(fluidsynth_src, "rvoice"),
+        path.join(fluidsynth_src, "sfloader"),
+        path.join(fluidsynth_src, "synth"),
+        path.join(fluidsynth_src, "utils")
+    )
+    add_files(
+        path.join(source_root, "muse", "framework", "audio", "thirdparty", "fluidsynth", "vorbis_decode.cpp"),
+        path.join(fluidsynth_src, "bindings", "*.c"),
+        path.join(fluidsynth_src, "drivers", "*.c"),
+        path.join(fluidsynth_src, "midi", "*.c"),
+        path.join(fluidsynth_src, "midi", "*.cpp"),
+        path.join(fluidsynth_src, "rvoice", "*.c"),
+        path.join(fluidsynth_src, "sfloader", "*.c"),
+        path.join(fluidsynth_src, "synth", "*.c"),
+        path.join(fluidsynth_src, "utils", "*.c")
+    )
     set_warnings("none")
 
--- MuseScore 5.0's audio engine and its encoders.  The source list is in the
--- manifest (audio/common + audio/engine + fluidsynth); the encoders are the
--- pinned packages.  MUSE_THREADS_SUPPORT is deliberately left undefined so the
--- mixer stays single-threaded, and the engine's own audio worker thread
--- (platform/general/generalaudioworker.cpp) is not compiled: the host drives
--- the engine from its own thread.
 target("muse_audio_engine")
     set_kind("static")
     add_deps("muse_generated", "muse_global", "native_fluidsynth")
     add_packages("muse-flac", "lame", "muse-opus", "muse-opusenc", "muse-fdk-aac")
-    add_manifest_target("muse_audio_engine")
+    add_engine_target_defaults()
+    add_defines(ENGRAVE_AUDIO_ENGINE.defines)
+    add_includedirs(ENGRAVE_AUDIO_ENGINE.includes)
+    add_files(
+        path.join(source_root, "muse", "framework", "audio", "common", "*.cpp"),
+        path.join(source_root, "muse", "framework", "audio", "common", "rpc", "platform", "general", "*.cpp"),
+        path.join(source_root, "muse", "framework", "audio", "engine", "*.cpp"),
+        path.join(source_root, "muse", "framework", "audio", "engine", "internal", "**.cpp")
+    )
 target_end()
 
 ---------------------------------------------------------------------------
--- Exports for the including project
+-- Upstream tests hook
 ---------------------------------------------------------------------------
--- The host builds its own adapter targets on top of these: it needs the
--- generated header, the engine include directories, the engine's global
--- defines (class layouts must match), and the engine-side source list of
--- noqt_support (see the superproject's xmake.lua).
-ENGRAVE_MANIFEST = manifest
-ENGRAVE_MANIFEST_INCLUDES = expand_list(manifest.includes)
-ENGRAVE_SOURCE_ROOT = source_root
-ENGRAVE_FORK_ROOT = fork_root
-
--- The upstream gtest suites belong to the engine's build as well; they are
--- defined only when the including project supplies the Qt-free test runtime
--- (see the top of xmake/tests.lua).
 includes(path.join(fork_root, "xmake", "tests.lua"))

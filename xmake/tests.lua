@@ -18,8 +18,6 @@
 -- the harness and its runtime sources move next to this file and the hook goes
 -- away.
 
--- A project-scope xmake script has no raise(); report a broken hook by
--- defining a target whose on_load raises at configure time.
 local function support_failure(message)
     target("engrave_tests_check")
         set_kind("phony")
@@ -48,32 +46,8 @@ if not runtime_target then
     return
 end
 
--- gtest comes from xmake-repo: MuseScore 5.0 no longer vendors googletest, and
--- the version muse_deps fetches is not reproduced here.  These targets never
--- run in a release build.
 add_requires("gtest v1.17.0", {system = false, configs = {shared = false}})
 
-local manifest = ENGRAVE_MANIFEST
-local function expand(item)
-    return (item:gsub("%${([A-Z_]+)}", function(name)
-        if name == "PROJECT_ROOT" or name == "SOURCE_ROOT" then
-            return source_root
-        end
-        print("error: unknown manifest placeholder: " .. name)
-        return item
-    end))
-end
-
-local function expand_list(items)
-    local result = {}
-    for _, item in ipairs(items or {}) do
-        table.insert(result, expand(item))
-    end
-    return result
-end
-
--- Test data: the engine's own tests directory, passed to the harness through
--- ENGRAVING_TESTS_DATA_ROOT and at run time by --engraving-data.
 local engraving_tests_dir = path.join(source_root, "src", "engraving", "tests")
 
 -------------------------------------------------------------------------------
@@ -82,21 +56,28 @@ local engraving_tests_dir = path.join(source_root, "src", "engraving", "tests")
 
 target("engraving_playback_tests")
     set_kind("binary")
-    -- Dev-only upstream tests; built explicitly by the upstream_gtest lane.
     set_default(false)
     set_basename("engraving_playback_tests")
     add_deps("muse_generated", runtime_target)
     add_packages("gtest")
-    add_defines(table.unpack(manifest.defines))
-    add_defines(manifest.targets.engraving.defines)
+    add_defines(table.unpack(ENGRAVE_DEFINES))
+    add_defines("ENGRAVING_NO_ACCESSIBILITY", "KORS_PROFILER_ENABLED")
     add_defines("TEST_HAS_ENGRAVING=1")
     add_defines('ENGRAVING_TESTS_DATA_ROOT="' .. engraving_tests_dir:gsub("\\", "/") .. '"')
-    add_includedirs(expand_list(manifest.targets.engraving.includes))
-    add_includedirs(source_root)
-    add_includedirs(engraving_tests_dir)
-    add_includedirs(path.join(source_root, "muse/framework"))
-    add_includedirs(harness_dir)
-    add_includedirs("$(builddir)/xmake-generated")
+    add_includedirs(
+        path.join(source_root, "src", "engraving"),
+        path.join(source_root, "src"),
+        path.join(source_root, "muse"),
+        path.join(source_root, "muse", "framework"),
+        path.join(source_root, "muse", "framework", "global"),
+        path.join(source_root, "src", "engraving", "infrastructure"),
+        path.join(source_root, "src", "engraving", "thirdparty", "dtl"),
+        source_root,
+        engraving_tests_dir,
+        path.join(source_root, "muse", "framework"),
+        harness_dir,
+        "$(builddir)/xmake-generated"
+    )
     add_files(
         path.join(engraving_tests_dir, "playback/playbackeventsrendering_tests.cpp"),
         path.join(engraving_tests_dir, "playback/playbackmodel_tests.cpp"),
@@ -125,20 +106,25 @@ target_end()
 
 target("mpe_tests")
     set_kind("binary")
-    -- Dev-only upstream tests; built explicitly by the upstream_gtest lane.
     set_default(false)
     set_basename("mpe_tests")
     add_deps("muse_generated", "muse_mpe")
     add_packages("gtest")
-    add_defines(table.unpack(manifest.defines))
-    add_defines(manifest.targets.muse_mpe.defines)
-    add_includedirs(expand_list(manifest.targets.muse_mpe.includes))
-    add_includedirs(path.join(source_root, "muse/framework"))
-    add_includedirs(harness_dir)
-    add_includedirs("$(builddir)/xmake-generated")
+    add_defines(table.unpack(ENGRAVE_DEFINES))
+    add_defines("KORS_PROFILER_ENABLED")
+    add_includedirs(
+        path.join(source_root, "muse", "framework", "mpe"),
+        path.join(source_root, "src"),
+        path.join(source_root, "muse"),
+        path.join(source_root, "muse", "framework"),
+        path.join(source_root, "muse", "framework", "global"),
+        path.join(source_root, "muse", "framework"),
+        harness_dir,
+        "$(builddir)/xmake-generated"
+    )
     add_files(
-        path.join(source_root, "muse/framework/mpe/tests/singlenotearticulationstest.cpp"),
-        path.join(source_root, "muse/framework/mpe/tests/multinotearticulationstest.cpp"),
+        path.join(source_root, "muse", "framework/mpe/tests/singlenotearticulationstest.cpp"),
+        path.join(source_root, "muse", "framework/mpe/tests/multinotearticulationstest.cpp"),
         path.join(harness_dir, "gtest_main.cpp"),
         path.join(harness_dir, "test_environment.cpp")
     )
