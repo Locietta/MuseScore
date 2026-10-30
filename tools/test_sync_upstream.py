@@ -68,6 +68,22 @@ Steps 27-29 are the third hardening round:
   step 29  (4) abort finishes the persisted removal plan instead of leaving a half
            removed trimmed file untracked
 
+Steps 30-31 follow up the A3 sync trial: every human resolution of an upstream conflict is
+classified against both merge sides (`ours`, `theirs`, `neither`, `deleted`) and recorded
+in the merge commit message (step 30), and the recorded classification survives an
+interruption between staging the resolution and the commit (step 31).
+
+Steps 32-36 follow up the A3 review findings 1 and 7:
+
+  step 32  a framework-only clean addition under a trimmed prefix is dropped and reported,
+           the framework merge commit records it, and the branch moves
+  step 33  a framework modify/delete on a trimmed path keeps our deletion and is reported
+           as a discarded change instead of stopping for a human
+  step 34  an interrupted framework TRIM removal is replayed by `continue`, and `abort`
+           finishes the persisted plan and leaves a clean worktree
+  step 35  a solved upstream conflict reports every path as ours/theirs/neither/deleted
+  step 36  the same classification for a solved framework conflict
+
 Requirements: python 3.10+, git 2.40+ (ort merge strategy, `-Xsubtree`), and a
 clone that carries the mirrors `origin/upstream/musescore` and
 `origin/upstream/muse-framework` plus the framework commits the pins name. The
@@ -211,9 +227,9 @@ UPSTREAM_ANCHOR_PRESENT = "if (MUSE_MODULE_CLOUD_QML)"  # insertion point before
 FINAL_DIFF = ["D\t.gitmodules", "A\tTRIM", "D\tmuse_deps"]
 
 REPORT_HEADERS = {
-    "discardedChanges": "upstream changes discarded on trimmed paths: ",
-    "droppedAdditions": "new upstream files dropped under trimmed prefixes: ",
-    "resolutions": "conflict resolutions that differ from the merge sides: ",
+    "discardedChanges": "changes discarded on trimmed paths: ",
+    "droppedAdditions": "new files dropped under trimmed prefixes: ",
+    "resolutions": "conflict resolutions, classified against the merge sides: ",
 }
 
 SYNC_TIMEOUT = 1800
@@ -406,6 +422,8 @@ class Context:
         self.sb = Sandbox(work, env)
         self.base = ""
         self.local_edit_commit = ""
+        # The resolutions block step 30 recorded in an upstream merge commit message.
+        self.merge_resolution_block = ""
         # The framework commit the branch has incorporated; synthetic pins descend from it.
         self.framework_tip = FW_FINAL
 
@@ -554,6 +572,33 @@ def parse_report(out: str) -> dict[str, list[str]]:
         if key not in report:
             raise Failure(f"no report block '{header.strip()}' in the sync output")
     return report
+
+
+def resolution_entry(kind: str, path: str) -> str:
+    """One resolutions report item as `summary()` and the merge messages render it."""
+    return f"{kind:<8}{path}"
+
+
+def resolution_block(resolutions: dict[str, str]) -> str:
+    """The resolutions report block as `summary()` and the merge messages render it."""
+    return "\n".join([f"{REPORT_HEADERS['resolutions']}{len(resolutions)}"]
+                     + [f"  {resolution_entry(kind, path)}"
+                        for path, kind in sorted(resolutions.items())])
+
+
+def message_resolution_block(message: str) -> str:
+    """The resolutions block of a commit message, verbatim ('' when it has none)."""
+    lines = message.splitlines()
+    for index, line in enumerate(lines):
+        if not line.startswith(REPORT_HEADERS["resolutions"]):
+            continue
+        block = [line]
+        for item in lines[index + 1:]:
+            if not item.strip():
+                break
+            block.append(item)
+        return "\n".join(block)
+    return ""
 
 
 # --- preflight ------------------------------------------------------------------
@@ -902,13 +947,18 @@ def step_framework_conflict(ctx: Context) -> None:
     ctx.expect(f"Framework-Commit: {FW_CONFLICT}" in message,
                "step 4: the tool's framework merge commit has no Framework-Commit trailer",
                message)
+    ctx.expect_eq(message_resolution_block(message), resolution_block({CONFLICT_FILE: "neither"}),
+                  "step 4: the framework merge commit does not record the resolution")
+    ctx.expect_eq(message_resolution_block(sb.git("log", "-1", "--format=%B", upstream_merge)),
+                  resolution_block({}),
+                  "step 4: the upstream merge records resolutions it did not make")
     report = parse_report(out)
     ctx.expect_eq(report["discardedChanges"], STEP4_DISCARDED,
                   "step 4: discarded changes are not the trimmed upstream edits")
     ctx.expect_eq(report["droppedAdditions"], [],
                   "step 4: unexpected dropped additions")
-    ctx.expect_eq(report["resolutions"], [CONFLICT_FILE],
-                  "step 4: the report does not list the path the human resolved")
+    ctx.expect_eq(report["resolutions"], [resolution_entry("neither", CONFLICT_FILE)],
+                  "step 4: the report does not classify the path the human resolved")
     ctx.expect_eq(sb.read(CONFLICT_FILE), expected,
                   "step 4: the committed file does not keep both lines")
     ctx.require_clean_end("step 4")
@@ -1719,7 +1769,7 @@ def step_removal_audit(ctx: Context) -> None:
                f"planned: {planned}")
     ctx.expect_eq(planned[1:], [first, second],
                   "step 26: the persisted plan is not the planned removal")
-    ctx.expect_eq(state["report"]["droppedAdditions"], [first, second],
+    ctx.expect_eq(state["report"]["upstream"]["droppedAdditions"], [first, second],
                   "step 26: the report entries were not persisted with the plan")
     ctx.expect_eq(sb.ls_files("--", "src/appshell/audit"), [second],
                   "step 26: the interrupted removal left the wrong entries in the index")
@@ -1830,8 +1880,6 @@ def step_merge_outcome_recovery(ctx: Context) -> None:
     ctx.expect("muse/extra/collide.txt" in state["conflicts"],
                "step 28: the unmerged framework path was not persisted with the outcome",
                f"conflicts: {state['conflicts']}")
-    ctx.expect(state["preResolutionTree"],
-               "step 28: the pre-resolution snapshot is missing")
     _rc, out, _err = ctx.sync("abort", expect=0)
     ctx.expect("discarded the in-progress merge" in out,
                "step 28: abort does not say what it discards", out)
@@ -1846,14 +1894,19 @@ def step_merge_outcome_recovery(ctx: Context) -> None:
                "step 28: continue did not report the framework conflict", out)
     ctx.expect_eq(sorted(sb.unmerged()), ["muse/extra/collide.txt"],
                   "step 28: the resumed framework merge lost its conflict")
+    sides = (sb.state()["resolutionSides"]["framework"] or {}).get("muse/extra/collide.txt") or {}
+    ctx.expect(all(sides.get(name) for name in ("base", "ours", "theirs")),
+               "step 28: the conflicted path's base/ours/theirs sides were not persisted",
+               f"{sides}")
     sb.path("muse/extra/collide.txt").write_bytes(b"resolved by hand\n")
     sb.git("add", "--", "muse/extra/collide.txt")
     _rc, out, _err = ctx.sync("continue", expect=0)
     ctx.expect_eq(sb.read("muse/extra/collide.txt"), "resolved by hand\n",
                   "step 28: the resolution is not in the framework merge commit")
     report = parse_report(out)
-    ctx.expect("muse/extra/collide.txt" in report["resolutions"],
-               "step 28: the resolution is not listed in the report", f"{report}")
+    ctx.expect_eq(report["resolutions"],
+                  [resolution_entry("neither", "muse/extra/collide.txt")],
+                  "step 28: the resolution is not classified in the report")
     ctx.framework_tip = moved
     ctx.require_clean_end("step 28 (framework continue)")
 
@@ -1888,6 +1941,436 @@ def step_removal_abort(ctx: Context) -> None:
     ctx.require_clean_end("step 29")
 
 
+# The file the resolution steps change on both sides, so the merge conflicts.
+RESOLUTION_FILE = "src/extra/resolution.txt"
+RESOLUTION_SEED = "alpha\nbeta\ngamma\n"
+RESOLUTION_OURS = "alpha\nour beta\ngamma\n"
+RESOLUTION_THEIRS = "alpha\ntheir beta\ngamma\n"
+RESOLUTION_NEITHER = "alpha\nresolved beta (neither side)\ngamma\n"
+RESOLUTION_OURS_2 = "alpha\nour second beta\ngamma\n"
+RESOLUTION_THEIRS_2 = "alpha\ntheir second beta\ngamma\n"
+RESOLUTION_NEITHER_2 = "alpha\nresolved second beta (neither side)\ngamma\n"
+
+
+def step_resolution_message(ctx: Context) -> None:
+    """A resolution that differs from both merge sides is named in the merge commit."""
+    sb = ctx.sb
+    seed = ctx.upstream_commit({RESOLUTION_FILE: RESOLUTION_SEED},
+                               message="test: seed the file a resolution will touch")
+    ctx.sync_synthetic(seed, expect=0)
+    sb.path(RESOLUTION_FILE).write_bytes(RESOLUTION_OURS.encode("utf-8"))
+    sb.git("add", "--", RESOLUTION_FILE)
+    sb.git("commit", "--quiet", "-m", "test: our side of the resolution")
+    previous = sb.rev("HEAD")
+    target = ctx.upstream_commit({RESOLUTION_FILE: RESOLUTION_THEIRS},
+                                 message="test: their side of the resolution")
+    _rc, out, _err = ctx.sync_synthetic(target, expect=2)
+    ctx.expect_eq(sorted(sb.unmerged()), [RESOLUTION_FILE],
+                  "step 30: the conflict is not the file both sides changed")
+    ctx.expect_eq(parse_list_after(out, "conflicts that need a human"), [RESOLUTION_FILE],
+                  "step 30: the script did not stop on the conflicting path")
+    ctx.expect(RESOLUTION_NEITHER not in (sb.blob(f"{previous}:{RESOLUTION_FILE}"),
+                                         sb.blob(f"{target}:{RESOLUTION_FILE}")),
+               "step 30: the resolution would not differ from the merge sides")
+    sb.path(RESOLUTION_FILE).write_bytes(RESOLUTION_NEITHER.encode("utf-8"))
+    sb.git("add", "--", RESOLUTION_FILE)
+    _rc, out, _err = ctx.sync("continue", expect=0)
+    ctx.expect_eq(sb.parents(), [previous, target],
+                  "step 30: the resolution was not committed as the upstream merge")
+    ctx.expect_eq(sb.read(RESOLUTION_FILE), RESOLUTION_NEITHER,
+                  "step 30: the committed file is not the resolution")
+    message = sb.git("log", "-1", "--format=%B", "HEAD")
+    report = parse_report(out)
+    ctx.expect_eq(report["resolutions"], [resolution_entry("neither", RESOLUTION_FILE)],
+                  "step 30: the report does not classify the path the human resolved")
+    ctx.merge_resolution_block = message_resolution_block(message)
+    ctx.expect_eq(ctx.merge_resolution_block, resolution_block({RESOLUTION_FILE: "neither"}),
+                  "step 30: the merge commit message does not record the resolutions the "
+                  "report lists")
+    ctx.expect(f"Sync-Upstream: {target}" in message,
+               "step 30: the merge commit lost its Sync-Upstream trailer", message)
+    ctx.require_clean_end("step 30")
+
+
+def step_resolution_resume(ctx: Context) -> None:
+    """The resolutions are recorded before the commit, so a resume writes the same one."""
+    sb = ctx.sb
+    sb.path(RESOLUTION_FILE).write_bytes(RESOLUTION_OURS_2.encode("utf-8"))
+    sb.git("add", "--", RESOLUTION_FILE)
+    sb.git("commit", "--quiet", "-m", "test: our side of the resumed resolution")
+    previous = sb.rev("HEAD")
+    target = ctx.upstream_commit({RESOLUTION_FILE: RESOLUTION_THEIRS_2},
+                                 message="test: their side of the resumed resolution")
+    _rc, _out, _err = ctx.sync_synthetic(target, expect=2)
+    ctx.expect_eq(sorted(sb.unmerged()), [RESOLUTION_FILE],
+                  "step 31: the conflict is not the file both sides changed")
+    sb.path(RESOLUTION_FILE).write_bytes(RESOLUTION_NEITHER_2.encode("utf-8"))
+    sb.git("add", "--", RESOLUTION_FILE)
+    # Interrupt once the resolution is staged and the state saved, before the commit.
+    _rc, _out, err = ctx.sync("continue", expect=1, stop_after="upstream-commit-pending")
+    ctx.expect("[test] stopped after upstream-commit-pending" in err,
+               "step 31: the pre-commit stop hook did not fire", err)
+    ctx.expect_eq(sb.rev("HEAD"), previous, "step 31: the interruption committed the merge")
+    ctx.expect_eq(sb.branch(), f"sync/{target[:12]}",
+                  "step 31: the interruption left the wrong branch")
+    ctx.expect_eq(sb.git("rev-parse", "MERGE_HEAD").strip(), target,
+                  "step 31: the interruption left no merge of the target to commit")
+    state = sb.state()
+    ctx.expect_eq(state["stage"], "upstream-merge",
+                  "step 31: the interrupted run moved the stage")
+    ctx.expect_eq(state["report"]["upstream"]["resolutions"], {RESOLUTION_FILE: "neither"},
+                  "step 31: the resolutions were not persisted before the commit")
+    _rc, out, _err = ctx.sync("continue", expect=0)
+    ctx.expect_eq(sb.parents(), [previous, target],
+                  "step 31: the resumed run did not commit the upstream merge")
+    ctx.expect_eq(sb.read(RESOLUTION_FILE), RESOLUTION_NEITHER_2,
+                  "step 31: the committed file is not the resolution")
+    message = sb.git("log", "-1", "--format=%B", "HEAD")
+    report = parse_report(out)
+    ctx.expect_eq(report["resolutions"], [resolution_entry("neither", RESOLUTION_FILE)],
+                  "step 31: the report does not classify the path the human resolved")
+    ctx.expect_eq(message_resolution_block(message), ctx.merge_resolution_block,
+                  "step 31: the resumed run wrote a different resolutions block")
+    ctx.require_clean_end("step 31")
+
+
+# The framework module the follow-up steps trim on the branch. TRIM is fork-root
+# relative while the framework merge produces `muse/framework/...` for a framework path
+# `framework/...`, so both the entry and the paths below are fork-root paths.
+FRAMEWORK_TRIM = "muse/framework/media/"
+
+
+def trim_framework_media(ctx: Context, step: str) -> str:
+    """Add the framework media module to the branch's TRIM, deleting what it names.
+
+    TRIM belongs to the branch (a sync never changes it), and a trimmed path may not stay
+    in the tree, so the entry is committed together with the deletion it stands for.
+    """
+    sb = ctx.sb
+    prefix = FRAMEWORK_TRIM.rstrip("/")
+    ctx.expect(sb.ls_files("--", prefix), f"{step}: the branch tracks no files under {prefix}/")
+    trim = sb.read("TRIM")
+    ctx.expect_eq(trim.split().count(FRAMEWORK_TRIM), 0,
+                  f"{step}: the TRIM entry for {prefix}/ already exists")
+    sb.git("rm", "-q", "-r", "--", prefix)
+    sb.path("TRIM").write_bytes((trim.rstrip("\n") + "\n" + FRAMEWORK_TRIM + "\n")
+                                 .encode("utf-8"))
+    sb.git("add", "--", "TRIM")
+    sb.git("commit", "--quiet", "-m", "test: TRIM the framework media module")
+    ctx.expect_eq(sb.ls_files("--", prefix), [],
+                  f"{step}: a trimmed path is still in the index")
+    ctx.expect_eq(sb.status_all(), "", f"{step}: the TRIM commit left changes behind")
+    return sb.rev("HEAD")
+
+
+def step_framework_trim_addition(ctx: Context) -> None:
+    """A framework addition under a trimmed prefix is dropped, reported and never committed."""
+    sb = ctx.sb
+    previous = trim_framework_media(ctx, "step 32")
+    added = FRAMEWORK_TRIM + "trimmed-addition.txt"
+    framework = ctx.framework_commit({"framework/media/trimmed-addition.txt": "dropped\n"},
+                                     message="test: framework addition under a trimmed prefix")
+    target = ctx.upstream_commit({"src/extra/framework-trim-addition.txt": "upstream\n"},
+                                 framework=framework,
+                                 message="test: pin the framework addition")
+    _rc, out, _err = ctx.sync_synthetic(target, "extra/framework", expect=0)
+    report = parse_report(out)
+    ctx.expect_eq(report["droppedAdditions"], [added],
+                  "step 32: the framework addition under the trimmed prefix is not reported")
+    ctx.expect_eq(report["discardedChanges"], [], "step 32: unexpected discarded changes")
+    ctx.expect_eq(report["resolutions"], [], "step 32: unexpected resolutions")
+    head = sb.rev("HEAD")
+    ctx.expect_eq(sb.count(f"{previous}..{head}", first_parent=True), 2,
+                  "step 32: expected the upstream and the framework merge commits")
+    upstream_merge = sb.parents(head)[0]
+    ctx.expect_eq(sb.parents(head), [upstream_merge, framework],
+                  "step 32: the framework merge is not a merge of the pinned framework")
+    ctx.expect_eq(sb.parents(upstream_merge), [previous, target],
+                  "step 32: the upstream merge does not merge the synthetic target")
+    ctx.expect(not sb.exists(added), "step 32: the dropped addition is still on disk")
+    ctx.expect_eq(sb.ls_files("--", FRAMEWORK_TRIM.rstrip("/")), [],
+                  "step 32: the dropped addition is still in the index")
+    ctx.expect_eq(sb.git("ls-tree", "-r", "--name-only", "HEAD", "--",
+                         FRAMEWORK_TRIM.rstrip("/")), "",
+                  "step 32: the framework merge commit contains a trimmed path")
+    message = sb.git("log", "-1", "--format=%B", head)
+    ctx.expect(f"{REPORT_HEADERS['droppedAdditions']}1" in message,
+               "step 32: the framework merge commit does not report the dropped addition",
+               message)
+    ctx.expect(added in message,
+               "step 32: the framework merge message does not name the dropped path", message)
+    ctx.expect(f"Framework-Commit: {framework}" in message,
+               "step 32: the framework merge lost its Framework-Commit trailer", message)
+    ctx.expect_eq(message_resolution_block(message), resolution_block({}),
+                  "step 32: the framework merge records a resolution it did not make")
+    ctx.framework_tip = framework
+    ctx.require_clean_end("step 32")
+
+
+def step_framework_trim_modify_delete(ctx: Context) -> None:
+    """A framework change to a path TRIM deleted keeps the deletion instead of stopping."""
+    sb = ctx.sb
+    previous = sb.rev("HEAD")
+    trimmed_path = FRAMEWORK_TRIM + "CMakeLists.txt"
+    ctx.expect(not sb.exists(trimmed_path), "step 33: the trimmed path is still in the tree")
+    framework = ctx.framework_commit(
+        {"framework/media/CMakeLists.txt": "# a framework change on a trimmed path\n"},
+        message="test: framework modification of a trimmed path")
+    target = ctx.upstream_commit({"src/extra/framework-trim-modify.txt": "upstream\n"},
+                                 framework=framework,
+                                 message="test: pin the framework modification")
+    _rc, out, _err = ctx.sync_synthetic(target, "extra/framework", expect=0)
+    report = parse_report(out)
+    ctx.expect_eq(report["discardedChanges"], [trimmed_path],
+                  "step 33: the framework change on the trimmed path is not a discarded change")
+    ctx.expect_eq(report["droppedAdditions"], [], "step 33: unexpected dropped additions")
+    ctx.expect_eq(report["resolutions"], [],
+                  "step 33: the trimmed modify/delete was reported as a manual resolution")
+    head = sb.rev("HEAD")
+    upstream_merge = sb.parents(head)[0]
+    ctx.expect_eq(sb.parents(head), [upstream_merge, framework],
+                  "step 33: the framework merge is not a merge of the pinned framework")
+    ctx.expect_eq(sb.parents(upstream_merge), [previous, target],
+                  "step 33: the upstream merge does not merge the synthetic target")
+    ctx.expect_eq(sb.unmerged(), {}, "step 33: the trimmed modify/delete left a conflict open")
+    ctx.expect(not sb.exists(trimmed_path), "step 33: the trimmed path came back")
+    ctx.expect_eq(sb.ls_files("--", FRAMEWORK_TRIM.rstrip("/")), [],
+                  "step 33: a trimmed path is in the index")
+    message = sb.git("log", "-1", "--format=%B", head)
+    ctx.expect(f"{REPORT_HEADERS['discardedChanges']}1" in message,
+               "step 33: the framework merge commit does not report the discarded change",
+               message)
+    ctx.expect(trimmed_path in message,
+               "step 33: the framework merge message does not name the discarded path", message)
+    ctx.framework_tip = framework
+    ctx.require_clean_end("step 33")
+
+
+def framework_trim_case(ctx: Context, label: str,
+                        prefix: str) -> tuple[str, str, list[str]]:
+    """A framework commit adding two files under the trimmed prefix, and an upstream pin.
+
+    Two additions put two entries in the framework removal plan, so the test hook can stop
+    between the index and worktree half of that plan: the upstream merge's plan only holds
+    ort's displaced `muse~<sha>` entry.
+    """
+    names = [f"framework/media/{prefix}-one.txt", f"framework/media/{prefix}-two.txt"]
+    framework = ctx.framework_commit({name: f"{label}\n" for name in names},
+                                     message=f"test: framework additions for {label}")
+    target = ctx.upstream_commit({f"src/extra/{label}.txt": f"{label}\n"}, framework=framework,
+                                 message=f"test: pin the framework additions for {label}")
+    return framework, target, [FRAMEWORK_TRIM + name[len("framework/media/"):]
+                               for name in names]
+
+
+def step_framework_trim_recovery(ctx: Context) -> None:
+    """An interrupted framework TRIM removal is replayed by `continue` and finished by `abort`."""
+    sb = ctx.sb
+
+    # (a) abort after the plan reached the index but not the worktree
+    before = sb.rev("HEAD")
+    _framework, target, added = framework_trim_case(ctx, "fw-trim-abort", "abort-addition")
+    _rc, _out, err = ctx.sync_synthetic(
+        target, "extra/framework", expect=1,
+        env_overrides={"SYNC_UPSTREAM_TEST_STOP_AFTER_RM": "2"})
+    ctx.expect("stopped after removing index entry 2" in err,
+               "step 34: the framework removal stop hook did not fire", err)
+    state = sb.state()
+    ctx.expect_eq([entry["path"] for entry in state["removals"]], added,
+                  "step 34: the framework removal plan was not persisted")
+    ctx.expect_eq(state["report"]["framework"]["droppedAdditions"], added,
+                  "step 34: the report entries were not persisted with the framework plan")
+    ctx.expect(not any(path.startswith(FRAMEWORK_TRIM) for path in state["conflicts"]),
+               "step 34: the trimmed framework addition stopped for a human",
+               f"{state['conflicts']}")
+    ctx.expect(sb.exists(added[1]),
+               "step 34: the interruption did not leave the half-removed file behind")
+    ctx.expect(not sb.exists(added[0]),
+               "step 34: the interruption did not finish the first removal's worktree half")
+    ctx.expect_eq(sb.ls_files("--", FRAMEWORK_TRIM.rstrip("/")), [],
+                  "step 34: the interrupted framework removal left index entries")
+    _rc, out, _err = ctx.sync("abort", expect=0)
+    ctx.expect("discarded the in-progress merge" in out,
+               "step 34: abort does not say what it discards", out)
+    ctx.expect_eq(sb.rev("HEAD"), before, "step 34: abort did not return to the branch tip")
+    ctx.expect_eq(sb.status_all(), "", "step 34: abort left the worktree dirty")
+    for path in added:
+        ctx.expect(not sb.exists(path), f"step 34: abort left {path} behind")
+    ctx.expect(not sb.path(FRAMEWORK_TRIM.rstrip("/")).exists(),
+               "step 34: abort left the emptied directory behind")
+    ctx.expect(not sb.state_file().exists(), "step 34: abort left the state file behind")
+    ctx.expect_eq(sb.sync_branches(), [], "step 34: abort left the temporary branch behind")
+    ctx.require_clean_end("step 34 (abort)")
+
+    # (b) the same interruption, resumed: the plan is replayed and reported exactly once
+    framework, target, added = framework_trim_case(ctx, "fw-trim-resume", "resume-addition")
+    _rc, _out, err = ctx.sync_synthetic(
+        target, "extra/framework", expect=1,
+        env_overrides={"SYNC_UPSTREAM_TEST_STOP_AFTER_RM": "2"})
+    ctx.expect("stopped after removing index entry 2" in err,
+               "step 34: the second framework removal stop hook did not fire", err)
+    _rc, out, _err = ctx.sync("continue", expect=0)
+    report = parse_report(out)
+    ctx.expect_eq(report["droppedAdditions"], added,
+                  "step 34: the resumed framework sync lost or duplicated the report entry")
+    for path in added:
+        ctx.expect(not sb.exists(path), f"step 34: the resumed sync left {path} behind")
+    head = sb.rev("HEAD")
+    ctx.expect_eq(sb.parents(head), [sb.parents(head)[0], framework],
+                  "step 34: the resumed sync is not a merge of the pinned framework")
+    ctx.framework_tip = framework
+    ctx.require_clean_end("step 34 (resume)")
+
+    # (c) interrupted right after the framework merge commit: the commit carries the report
+    framework, target, added = framework_trim_case(ctx, "fw-trim-boundary", "boundary-addition")
+    _rc, _out, err = ctx.sync_synthetic(target, "extra/framework", expect=1,
+                                        stop_after="framework-merge")
+    ctx.expect("[test] stopped after framework-merge" in err,
+               "step 34: the framework-merge stop hook did not fire", err)
+    state = sb.state()
+    ctx.expect_eq(state["report"]["framework"]["droppedAdditions"], added,
+                  "step 34: the framework merge did not record the dropped additions")
+    ctx.expect_eq(state["removals"], [],
+                  "step 34: the framework merge left a removal plan behind")
+    message = sb.git("log", "-1", "--format=%B", "HEAD")
+    ctx.expect(f"{REPORT_HEADERS['droppedAdditions']}{len(added)}" in message
+               and all(path in message for path in added),
+               "step 34: the framework merge commit does not report its dropped additions",
+               message)
+    for path in added:
+        ctx.expect(not sb.exists(path),
+                   f"step 34: the framework merge commit contains {path}")
+    _rc, out, _err = ctx.sync("continue", expect=0)
+    report = parse_report(out)
+    ctx.expect_eq(report["droppedAdditions"], added,
+                  "step 34: the resumed sync lost the dropped additions")
+    ctx.framework_tip = framework
+    ctx.require_clean_end("step 34 (boundary)")
+
+
+CLASSIFY_SEED = "alpha\nbeta\ngamma\n"
+CLASSIFY_OURS = "alpha\nour beta\ngamma\n"
+CLASSIFY_THEIRS = "alpha\ntheir beta\ngamma\n"
+CLASSIFY_NEITHER = "alpha\nmerged beta (neither side)\ngamma\n"
+CLASSIFY_CONTENT = {"ours": CLASSIFY_OURS, "theirs": CLASSIFY_THEIRS,
+                    "neither": CLASSIFY_NEITHER}
+UPSTREAM_CLASSIFY = {
+    "ours": "src/extra/classify-a-ours.txt",
+    "theirs": "src/extra/classify-b-theirs.txt",
+    "neither": "src/extra/classify-c-neither.txt",
+    "deleted": "src/extra/classify-d-deleted.txt",
+}
+FRAMEWORK_CLASSIFY = {
+    "ours": "extra/classify-a-ours.txt",
+    "theirs": "extra/classify-b-theirs.txt",
+    "neither": "extra/classify-c-neither.txt",
+    "deleted": "extra/classify-d-deleted.txt",
+}
+
+
+def resolve_classified(sb: Sandbox, paths: dict[str, str]) -> None:
+    """Resolve every conflicted path the four ways the report must tell apart."""
+    for kind, path in paths.items():
+        if kind == "deleted":
+            sb.git("rm", "-q", "--", path)
+            continue
+        sb.path(path).write_bytes(CLASSIFY_CONTENT[kind].encode("utf-8"))
+        sb.git("add", "--", path)
+
+
+def expect_classified(ctx: Context, sb: Sandbox, paths: dict[str, str], step: str) -> None:
+    """The committed tree and the classifications of a solved set of conflicts."""
+    for kind in ("ours", "theirs", "neither"):
+        ctx.expect_eq(sb.read(paths[kind]), CLASSIFY_CONTENT[kind],
+                      f"{step}: the '{kind}' resolution is not the expected content")
+    ctx.expect(not sb.ok("cat-file", "-e", f"HEAD:{paths['deleted']}"),
+               f"{step}: the 'deleted' resolution is still in the merge commit")
+
+
+def step_upstream_resolution_classes(ctx: Context) -> None:
+    """Every solved upstream conflict is classified against both merge sides."""
+    sb = ctx.sb
+    seed = ctx.upstream_commit({path: CLASSIFY_SEED for path in UPSTREAM_CLASSIFY.values()},
+                               message="test: seed the files the classification will resolve")
+    ctx.sync_synthetic(seed, expect=0)
+    for path in UPSTREAM_CLASSIFY.values():
+        sb.path(path).write_bytes(CLASSIFY_OURS.encode("utf-8"))
+        sb.git("add", "--", path)
+    sb.git("commit", "--quiet", "-m", "test: our side of the classification files")
+    previous = sb.rev("HEAD")
+    target = ctx.upstream_commit({path: CLASSIFY_THEIRS for path in UPSTREAM_CLASSIFY.values()},
+                                 message="test: their side of the classification files")
+    _rc, _out, _err = ctx.sync_synthetic(target, expect=2)
+    ctx.expect_eq(sorted(sb.unmerged()), sorted(UPSTREAM_CLASSIFY.values()),
+                  "step 35: not every classification file conflicted")
+    resolve_classified(sb, UPSTREAM_CLASSIFY)
+    _rc, out, _err = ctx.sync("continue", expect=0)
+    ctx.expect_eq(sb.parents(), [previous, target],
+                  "step 35: the resolutions were not committed as the upstream merge")
+    expect_classified(ctx, sb, UPSTREAM_CLASSIFY, "step 35")
+    expected = {path: kind for kind, path in UPSTREAM_CLASSIFY.items()}
+    report = parse_report(out)
+    ctx.expect_eq(report["resolutions"],
+                  [resolution_entry(kind, path) for path, kind in sorted(expected.items())],
+                  "step 35: the report does not classify every resolution")
+    message = sb.git("log", "-1", "--format=%B", "HEAD")
+    ctx.expect_eq(message_resolution_block(message), resolution_block(expected),
+                  "step 35: the upstream merge commit does not record the classification")
+    ctx.require_clean_end("step 35")
+
+
+def step_framework_resolution_classes(ctx: Context) -> None:
+    """The framework merge classifies every solved conflict the same way."""
+    sb = ctx.sb
+    seed_framework = ctx.framework_commit(
+        {path: CLASSIFY_SEED for path in FRAMEWORK_CLASSIFY.values()},
+        message="test: seed the framework classification files")
+    seed_target = ctx.upstream_commit(
+        {"src/extra/framework-classify-seed.txt": "seed\n"}, framework=seed_framework,
+        message="test: bring the framework classification files in")
+    ctx.sync_synthetic(seed_target, "extra/framework", expect=0)
+    ctx.framework_tip = seed_framework
+    local = {kind: "muse/" + path for kind, path in FRAMEWORK_CLASSIFY.items()}
+    for path in local.values():
+        sb.path(path).write_bytes(CLASSIFY_OURS.encode("utf-8"))
+        sb.git("add", "--", path)
+    sb.git("commit", "--quiet", "-m", "test: our side of the framework classification files")
+    previous = sb.rev("HEAD")
+    moved = ctx.framework_commit({path: CLASSIFY_THEIRS for path in FRAMEWORK_CLASSIFY.values()},
+                                 parent=seed_framework,
+                                 message="test: their side of the framework classification files")
+    target = ctx.upstream_commit({"src/extra/framework-classify-moved.txt": "moved\n"},
+                                 framework=moved,
+                                 message="test: pin the colliding framework classification")
+    _rc, out, _err = ctx.sync_synthetic(target, "extra/framework", expect=2)
+    ctx.expect("framework conflicts in muse/" in out,
+               "step 36: the framework merge did not stop on the classification files", out)
+    ctx.expect_eq(sorted(sb.unmerged()), sorted(local.values()),
+                  "step 36: not every framework classification file conflicted")
+    resolve_classified(sb, local)
+    _rc, out, _err = ctx.sync("continue", expect=0)
+    head = sb.rev("HEAD")
+    upstream_merge = sb.parents(head)[0]
+    ctx.expect_eq(sb.parents(head), [upstream_merge, moved],
+                  "step 36: the resolutions were not committed as the framework merge")
+    ctx.expect_eq(sb.parents(upstream_merge), [previous, target],
+                  "step 36: the upstream merge is not the pin of the framework commit")
+    expect_classified(ctx, sb, local, "step 36")
+    expected = {path: kind for kind, path in local.items()}
+    report = parse_report(out)
+    ctx.expect_eq(report["resolutions"],
+                  [resolution_entry(kind, path) for path, kind in sorted(expected.items())],
+                  "step 36: the report does not classify every framework resolution")
+    message = sb.git("log", "-1", "--format=%B", head)
+    ctx.expect_eq(message_resolution_block(message), resolution_block(expected),
+                  "step 36: the framework merge commit does not record the classification")
+    ctx.expect_eq(message_resolution_block(sb.git("log", "-1", "--format=%B", upstream_merge)),
+                  resolution_block({}),
+                  "step 36: the upstream merge records resolutions it did not make")
+    ctx.framework_tip = moved
+    ctx.require_clean_end("step 36")
+
+
 STEPS = [
     ("absorb: test TRIM + framework absorbed at muse/", step_absorb),
     ("link bump 7b2d005464: two merges and the trimmed-edit report", step_link_bump),
@@ -1918,6 +2401,18 @@ STEPS = [
     ("an ignored incoming file is refused, not overwritten (1)", step_ignored_incoming),
     ("a crash after a merge outcome is resumable (3)", step_merge_outcome_recovery),
     ("abort finishes a partially removed trimmed path (4)", step_removal_abort),
+    ("a resolution reaches the upstream merge commit message (A3)", step_resolution_message),
+    ("the recorded resolutions survive an interruption (A3)", step_resolution_resume),
+    ("a framework addition under a trimmed prefix is dropped (A3-1)",
+     step_framework_trim_addition),
+    ("a framework trimmed modify/delete keeps the deletion (A3-1)",
+     step_framework_trim_modify_delete),
+    ("an interrupted framework TRIM removal resumes and aborts (A3-1)",
+     step_framework_trim_recovery),
+    ("upstream resolutions are classified against both sides (A3-7)",
+     step_upstream_resolution_classes),
+    ("framework resolutions are classified against both sides (A3-7)",
+     step_framework_resolution_classes),
 ]
 
 
