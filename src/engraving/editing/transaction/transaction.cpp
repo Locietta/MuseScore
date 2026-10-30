@@ -112,11 +112,19 @@ void Transaction::push(UndoableCommand* cmd)
         return;
     }
 
+    if (s_pushHook) {
+        s_pushHook(cmd, false);
+    }
+
     // NOTE: append the command _before_ performing it. Some commands' redo()
     // may themselves push further commands; those must end up _after_ this
     // command in the transaction, so that undo reverses them first.
     m_undoableTransaction->appendCommand(cmd);
     cmd->redo();
+
+    if (s_pushHook) {
+        s_pushHook(cmd, true);
+    }
 }
 
 void Transaction::pushWithoutPerforming(UndoableCommand* cmd)
@@ -126,7 +134,20 @@ void Transaction::pushWithoutPerforming(UndoableCommand* cmd)
         return;
     }
 
+    if (s_pushHook) {
+        s_pushHook(cmd, false);
+    }
+
     m_undoableTransaction->appendCommand(cmd);
+
+    if (s_pushHook) {
+        s_pushHook(cmd, true);
+    }
+}
+
+void Transaction::setPushHook(PushHook hook)
+{
+    s_pushHook = hook;
 }
 
 //---------------------------------------------------------
