@@ -1,5 +1,0 @@
-
-include text_nabcc.dis
-#include en-us-brf.dis
-include spaces.uti
-include braille-patterns.cti
