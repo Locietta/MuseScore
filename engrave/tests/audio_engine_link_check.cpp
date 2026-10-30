@@ -4,14 +4,14 @@
 // encoders. It is not the export driver: it only proves that the static
 // libraries resolve, that the engine services register, and that an
 // AudioContext can be created against the shared no-op RPC channel (the real
-// driver is native/engine_audio.cpp).
+// driver is engrave/src/audio/engine_audio.cpp).
 
 #include <iostream>
 #include <memory>
 
 #include "global/modularity/ioc.h"
 
-#include "engine_audio.h"
+#include "audio/engine_audio.h"
 
 #include "audio/common/rpc/irpcchannel.h"
 #include "audio/engine/enginesetup.h"

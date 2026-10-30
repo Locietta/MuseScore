@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
-#include "noqt_runtime.h"
-#include "score_excerpts.h"
-#include "score_metadata.h"
-#include "score_render.h"
+#include "runtime/noqt_runtime.h"
+#include "score/score_excerpts.h"
+#include "score/score_metadata.h"
+#include "render/score_render.h"
 #include "engraving/engravingproject.h"
 #include "engraving/dom/masterscore.h"
 #include "engraving/dom/part.h"

@@ -11,7 +11,7 @@
 #include "global/stringutils.h"
 
 #if defined(TEST_HAS_ENGRAVING)
-#include "noqt_runtime.h"
+#include "runtime/noqt_runtime.h"
 #include "engraving/dom/mscore.h"
 #include "utils/scorerw.h"
 #include "mocks/engravingconfigurationmock.h"

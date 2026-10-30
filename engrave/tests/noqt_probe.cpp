@@ -1,5 +1,5 @@
-#include "noqt_filesystem.h"
-#include "noqt_application.h"
+#include "runtime/noqt_filesystem.h"
+#include "runtime/noqt_application.h"
 #include "global/log.h"
 #include "global/io/buffer.h"
 #include "draw/internal/fontprovider.h"

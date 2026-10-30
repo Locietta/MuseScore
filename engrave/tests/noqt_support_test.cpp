@@ -1,5 +1,5 @@
-#include "engine_audio.h"
-#include "noqt_filesystem.h"
+#include "audio/engine_audio.h"
+#include "runtime/noqt_filesystem.h"
 #include "settings.h"
 #include <fstream>
 #include <iostream>
@@ -17,7 +17,7 @@ static std::string utf8String(const std::filesystem::path& path) {
 
 
 #include "global/modularity/ioc.h"
-#include "native/tests/ioc_tu2.h"
+#include "ioc_tu2.h"
 
 #ifdef MODULENAME
 #undef MODULENAME
@@ -130,9 +130,9 @@ public:
  *    A required export that is missing resolves to null; resolve() and the
  *    injections never throw or assert. The host turns that null into a clear
  *    failure at its own call sites:
- *      native/engine_audio.cpp:464-466   IFileSystem    -> "native runtime (IFileSystem) is not initialised; ..."
- *      native/score_render.cpp:38-39     IScoreRenderer -> "Score renderer unavailable"
- *      native/cairo_painter.cpp:390-392  IFontsDatabase -> "CairoPainter: IFontsDatabase is not registered"
+ *      engrave/src/audio/engine_audio.cpp:464-466   IFileSystem    -> "native runtime (IFileSystem) is not initialised; ..."
+ *      engrave/src/render/score_render.cpp:38-39     IScoreRenderer -> "Score renderer unavailable"
+ *      engrave/src/render/cairo_painter.cpp:390-392  IFontsDatabase -> "CairoPainter: IFontsDatabase is not registered"
  *    Those call sites live in translation units this test binary does not link,
  *    except the first: engine_audio is linked here, and section 8 executes it.
  *    What the other two guards rely on is pinned as a condition: after
@@ -141,7 +141,7 @@ public:
  *    required service.
  *
  * 8. Host Failure Without the File-System Service:
- *    initialize_engine_audio() (native/engine_audio.cpp:438) is a real host
+ *    initialize_engine_audio() (engrave/src/audio/engine_audio.cpp:438) is a real host
  *    entry point that requires IFileSystem - it turns the SoundFont path into
  *    an absolute Uri. With no such export registered it must return false, fill
  *    `error` with its documented message, leave no engine behind, and not
@@ -288,8 +288,8 @@ void test_ioc_contract(const std::filesystem::path& assetsRoot)
 
     // 7. A required dependency that is gone fails instead of serving a stale
     //    adapter. The host registers its native filesystem exactly like this
-    //    (native/noqt_runtime.cpp) and guards later use of it with
-    //    native/engine_audio.cpp:464-466 (that guard itself runs in section 8).
+    //    (engrave/src/runtime/noqt_runtime.cpp) and guards later use of it with
+    //    engrave/src/audio/engine_audio.cpp:464-466 (that guard itself runs in section 8).
     auto runtimeFileSystem = std::make_shared<music::NativeFileSystem>(assetsRoot);
     gIoc->registerExport<muse::io::IFileSystem>("contract_test", runtimeFileSystem);
     expect(gIoc->resolve<muse::io::IFileSystem>("contract_test") == runtimeFileSystem,
@@ -317,7 +317,7 @@ void test_ioc_contract(const std::filesystem::path& assetsRoot)
 
 /*
  * 8. Host failure path. initialize_engine_audio() resolves IFileSystem itself
- *    (native/engine_audio.cpp:464-466) because it turns the SoundFont path into
+ *    (engrave/src/audio/engine_audio.cpp:464-466) because it turns the SoundFont path into
  *    an absolute Uri, and that path ends in FileInfo's own GlobalInject, which
  *    would be a null dereference (muse/framework/global/io/fileinfo.h:33,
  *    fileinfo.cpp:71). With the service gone the call must report that clearly

@@ -32,7 +32,7 @@
 // chord-symbol pseudo track.
 
 #include "score_metadata.h"
-#include "score_audio.h"
+#include "audio/score_audio.h"
 
 #include <algorithm>
 #include <cfloat>

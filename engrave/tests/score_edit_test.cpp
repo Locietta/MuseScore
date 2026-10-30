@@ -1,7 +1,7 @@
-#include "noqt_runtime.h"
-#include "score_edit.h"
-#include "score_excerpts.h"
-#include "score_query.h"
+#include "runtime/noqt_runtime.h"
+#include "score/score_edit.h"
+#include "score/score_excerpts.h"
+#include "score/score_query.h"
 
 #include "engraving/dom/masterscore.h"
 #include "engraving/dom/measure.h"

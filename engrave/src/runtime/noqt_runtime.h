@@ -1,5 +1,5 @@
 #pragma once
-#include "export_options.h"
+#include "score/export_options.h"
 #include <memory>
 #include <string>
 

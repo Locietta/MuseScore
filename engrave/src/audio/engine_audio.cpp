@@ -40,7 +40,7 @@
 #include "engraving/playback/playbackmodel.h"
 
 #include "score_audio.h"
-#include "score_excerpts.h"
+#include "score/score_excerpts.h"
 
 #include "global/io/ifilesystem.h"
 #include "global/io/iodevice.h"
