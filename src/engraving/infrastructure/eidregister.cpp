@@ -35,26 +35,42 @@ EID EIDRegister::newEIDForItem(const EngravingObject* item)
     return eid;
 }
 
-void EIDRegister::registerItemEID(const EID& eid, const EngravingObject* item)
+bool EIDRegister::registerItemEID(const EID& eid, const EngravingObject* item)
 {
     std::lock_guard lock(m_mutex);
-    IF_ASSERT_FAILED(eid.isValid() && item) {
-        return;
+    if (!eid.isValid() || !item) {
+        return false;
     }
 
-    bool inserted = m_eidToItem.emplace(eid, const_cast<EngravingObject*>(item)).second;
-    assert(inserted);
+    EngravingObject* object = const_cast<EngravingObject*>(item);
 
-    inserted = m_itemToEid.emplace(const_cast<EngravingObject*>(item), eid).second;
-    assert(inserted);
+    // A file written by a buggy or hand-edited tool can name one id twice. Keep the
+    // first element and leave both maps as they are; the reader gives the second
+    // element a fresh EID (read500/tread.cpp, readItemEID).
+    const auto byEID = m_eidToItem.find(eid);
+    if (byEID != m_eidToItem.end()) {
+        if (byEID->second == object) {
+            return true;
+        }
+        ++m_repairs.duplicate;
+        return false;
+    }
+
+    // An element keeps exactly one id: re-registering replaces the previous one.
+    const auto byItem = m_itemToEid.find(object);
+    if (byItem != m_itemToEid.end()) {
+        m_eidToItem.erase(byItem->second);
+        byItem->second = eid;
+    } else {
+        m_itemToEid.emplace(object, eid);
+    }
+    m_eidToItem.emplace(eid, object);
 
     if (MScore::testMode) {
         EID::updateMaxValTestMode(eid, m_maxValTestMode);
     }
 
-#ifdef NDEBUG
-    UNUSED(inserted);
-#endif
+    return true;
 }
 
 void EIDRegister::removeItem(const EngravingObject* item)
@@ -111,4 +127,27 @@ EID EIDRegister::EIDFromItem(const EngravingObject* item) const
     std::shared_lock lock(m_mutex);
     auto iter = m_itemToEid.find(const_cast<EngravingObject*>(item));
     return iter == m_itemToEid.end() ? EID::invalid() : iter->second;
+}
+
+EIDRepairCount EIDRegister::repairs() const
+{
+    std::shared_lock lock(m_mutex);
+    return m_repairs;
+}
+
+std::vector<std::pair<EID, const EngravingObject*> > EIDRegister::entries() const
+{
+    std::shared_lock lock(m_mutex);
+    std::vector<std::pair<EID, const EngravingObject*> > result;
+    result.reserve(m_eidToItem.size());
+    for (const auto& entry : m_eidToItem) {
+        result.emplace_back(entry.first, entry.second);
+    }
+    return result;
+}
+
+size_t EIDRegister::size() const
+{
+    std::shared_lock lock(m_mutex);
+    return m_eidToItem.size();
 }

@@ -22,6 +22,10 @@ struct EngineOptions {
     std::filesystem::path cache_dir;
     // Extra text fonts, added in order.
     std::vector<std::filesystem::path> fonts;
+    // Sequential element ids instead of random ones, so that two opens of the same
+    // file agree. Tests use it; it also changes what the writer stores, so leave
+    // it off otherwise.
+    bool deterministic_ids = false;
 };
 
 struct Capabilities {
@@ -46,6 +50,10 @@ struct OpenOptions {
     std::optional<Format> format;
     // Only its extension is used. open(path) defaults it to the path.
     std::filesystem::path filename_hint;
+    // Reject a score whose element ids are malformed or duplicated. By default
+    // such a score opens, the affected elements get fresh ids, and a warning
+    // diagnostic says how many were repaired.
+    bool strict_ids = false;
 };
 
 // Exactly one of template_id and template_path must be set. Parts, measures,

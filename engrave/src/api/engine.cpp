@@ -11,9 +11,11 @@
 
 #include "muse_framework_config.h"
 #include "engraving/dom/masterscore.h"
+#include "engraving/dom/mscore.h"
 #include "engraving/dom/text.h"
 #include "engraving/engravingproject.h"
 
+#include "engrave/src/api/handles.h"
 #include "engrave/src/api/sniff.h"
 #include "engrave/src/api/state.h"
 #include "engrave/src/runtime/runtime_assets.h"
@@ -97,6 +99,7 @@ Result<std::unique_ptr<Engine>> Engine::create(const EngineOptions& options) {
     auto impl = std::make_unique<Impl>();
     impl->state.resources = resources;
     if (!options.cache_dir.empty()) music::set_runtime_cache_root(utf8(std::filesystem::absolute(options.cache_dir)));
+    mu::engraving::MScore::testMode = options.deterministic_ids;
     music::initialize_native_runtime(utf8(resources));
     std::unique_ptr<Engine> engine(new Engine(std::move(impl)));
     for (const auto& font : options.fonts) {
@@ -171,6 +174,11 @@ Result<std::unique_ptr<Document>> Engine::open(std::span<const std::byte> data, 
     }
     if (project->isCorruptedUponLoading())
         diagnostics.push_back({Severity::Warning, "the score failed the engine's sanity check after loading"});
+    auto repairs = id_repairs(*project->masterScore());
+    if (options.strict_ids && !repairs.empty()) {
+        return fail(ErrorCode::InvalidInput, "the score has malformed or duplicated element ids: " + repairs.front().message);
+    }
+    diagnostics.insert(diagnostics.end(), repairs.begin(), repairs.end());
     return Document::Impl::make(impl_->state, std::move(project), std::move(diagnostics));
 }
 

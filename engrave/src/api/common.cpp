@@ -26,6 +26,7 @@ std::string_view to_string(ErrorCode code) noexcept {
     case ErrorCode::InvalidInput: return "InvalidInput";
     case ErrorCode::UnsupportedFormat: return "UnsupportedFormat";
     case ErrorCode::NotFound: return "NotFound";
+    case ErrorCode::StaleHandle: return "StaleHandle";
     case ErrorCode::ResourceLimit: return "ResourceLimit";
     case ErrorCode::Unsupported: return "Unsupported";
     case ErrorCode::Io: return "Io";

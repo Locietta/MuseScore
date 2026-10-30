@@ -721,9 +721,9 @@ EID EngravingObject::eid() const
     return masterScore()->eidRegister()->EIDFromItem(this);
 }
 
-void EngravingObject::setEID(EID id) const
+bool EngravingObject::setEID(EID id) const
 {
-    masterScore()->eidRegister()->registerItemEID(id, this);
+    return masterScore()->eidRegister()->registerItemEID(id, this);
 }
 
 EID EngravingObject::assignNewEID() const

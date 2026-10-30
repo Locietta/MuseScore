@@ -173,6 +173,25 @@ target("engrave_api_test")
     end
 target_end()
 
+-- The handle tests (H1-H13) reach the score through the library's internal headers:
+-- the public read and edit API they will eventually use does not exist yet.
+target("engrave_handles_test")
+    set_kind("binary")
+    add_deps("engrave")
+    add_packages("gtest")
+    add_defines(table.unpack(ENGRAVE_DEFINES))
+    add_defines(table.unpack(ENGRAVE_GLOBAL_DEFINES))
+    add_includedirs(ENGRAVE_ADAPTER_INCLUDES)
+    add_includedirs("$(builddir)/xmake-generated")
+    add_defines('ENGRAVE_TEST_SOURCE_ROOT="' .. source_root:gsub("\\", "/") .. '"')
+    add_files(path.join(tests_dir, "handles_test.cpp"))
+    if is_plat("windows") then
+        add_files(utf8_manifest)
+    else
+        add_links("m")
+    end
+target_end()
+
 -- The leak test: an embedder compiled with the public include root as its
 -- only include path and none of the project's defines, so it builds only
 -- while the public headers stay std-only.  The compile is done here rather

@@ -31,6 +31,7 @@ struct Document {
 
 private:
     friend struct Engine;
+    friend struct DocumentAccess;
     struct Impl;
     explicit Document(std::unique_ptr<Impl> impl);
     std::unique_ptr<Impl> impl_;

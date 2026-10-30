@@ -128,6 +128,11 @@ using namespace mu::engraving;
 namespace mu::engraving {
 std::set<Score*> Score::validScores;
 
+bool Score::isAlive(const Score* score)
+{
+    return validScores.find(const_cast<Score*>(score)) != validScores.end();
+}
+
 bool noSeq           = false;
 bool noMidi          = false;
 bool midiInputTrace  = false;
@@ -252,6 +257,13 @@ Score::Score(MasterScore* parent, const MStyle& s)
 
 Score::~Score()
 {
+    // The register lives on the master score, which outlives an excerpt unless the
+    // whole document is going away. An excerpt removed from the document must not
+    // leave its id behind: a later allocation at the same address would inherit it.
+    if (m_masterScore && m_masterScore != this && Score::isAlive(m_masterScore)) {
+        m_masterScore->eidRegister()->onItemDestroyed(this);
+    }
+
     Score::validScores.erase(this);
 
     for (MuseScoreView* v : m_viewer) {

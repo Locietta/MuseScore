@@ -14,12 +14,15 @@
 
 #include "engrave/src/runtime/noqt_runtime.h"
 
+namespace mu::engraving {
+class MasterScore;
+}
+
 namespace engrave {
 
 // Contract checks stay on in release builds: they guard process-global engine
 // state that a violation would corrupt.
 void check(bool condition, std::string_view message) noexcept;
-
 struct EngineState {
     std::thread::id owner = std::this_thread::get_id();
     std::filesystem::path resources;
@@ -42,6 +45,14 @@ struct Document::Impl {
 
     static std::unique_ptr<Document> make(EngineState& engine, music::ScoreProject project,
                                           std::vector<Diagnostic> diagnostics);
+};
+
+// The score behind a Document. The library's own tests drive undo, layout, saves
+// and the engine's MSCX export through it until the read and edit API exist (see
+// engrave/tests/handles_test.cpp).
+struct DocumentAccess {
+    static mu::engraving::MasterScore* master_score(Document& document);
+    static music::ScoreProject& project(Document& document);
 };
 
 // The path as UTF-8 with '/' separators: the engine's path type reads
