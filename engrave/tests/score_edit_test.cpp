@@ -522,7 +522,6 @@ int main(int argc, char** argv)
         expect(no_op.changed_notes == 0 && score->undoStack()->currentIndex() == no_op_index,
                "No-op pitch request changed undo history");
 
-#ifdef MUSIC_CORE_TESTING
         // Failure while a redo branch exists must preserve both score and history.
         score->undoRedo(true, nullptr);
         const auto before_failure = music::export_native_score(project, "mscx", 0, "");
@@ -552,7 +551,6 @@ int main(int argc, char** argv)
         catch (const music::NativeEditFailure& e) { poisoned = e.poisoned(); }
         expect(poisoned, "Unexpected transaction exception was not marked poisoned");
         // Do not issue another operation on this document: core must retire it.
-#endif
 
         const auto before_cap = music::export_native_score(project, "mscx", 0, "");
         const bool was_clean = score->undoStack()->isClean();

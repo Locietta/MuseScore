@@ -431,12 +431,10 @@ NativePitchResult inspect_score_pitch_edit(mu::engraving::MasterScore* score, co
     return prepare_score_pitch_edit(score, edit).result;
 }
 
-#ifdef MUSIC_CORE_TESTING
 namespace {
 NativeEditTestFault test_fault = NativeEditTestFault::none;
 }
 void set_native_edit_test_fault(NativeEditTestFault fault) { test_fault = fault; }
-#endif
 
 NativePitchResult apply_score_pitch_edit(mu::engraving::MasterScore* score, const NativePitchEdit& edit) {
     auto prepared = prepare_score_pitch_edit(score, edit);
@@ -453,7 +451,6 @@ NativePitchResult apply_score_pitch_edit(mu::engraving::MasterScore* score, cons
             if (change.oldPitch == change.pitch) continue;
             EditNote::undoChangePitch(score, change.note, change.pitch, change.tpc1, change.tpc2);
             ++applied;
-#ifdef MUSIC_CORE_TESTING
             if (applied == 1 && test_fault != NativeEditTestFault::none) {
                 const auto fault = test_fault;
                 test_fault = NativeEditTestFault::none;
@@ -461,7 +458,6 @@ NativePitchResult apply_score_pitch_edit(mu::engraving::MasterScore* score, cons
                     throw std::runtime_error("Injected pitch transaction exception");
                 MScore::setError(MsError::NO_NOTE_SELECTED);
             }
-#endif
         }
         const bool engine_failed = MScore::_error != MsError::MS_NO_ERROR && !MScore::_errorIsWarning;
         const auto message = engine_failed ? engine_error_message() : std::string{};
