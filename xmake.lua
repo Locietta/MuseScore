@@ -62,6 +62,15 @@ if cairo_prefix and cairo_prefix ~= "" then
     target("engrave")
         add_sysincludedirs(path.join(cairo_prefix, "include"), path.join(cairo_prefix, "include", "cairo"))
         add_linkdirs(path.join(cairo_prefix, "lib"), {public = true})
+        if not is_plat("windows") then
+            -- The prefix's cairo is a shared library, so every binary that links the
+            -- engine needs its directory at run time.  Without this, a host with no
+            -- system cairo (cachy) starts such a binary in the loader instead: exit
+            -- 127, "libcairo.so.2: cannot open shared object file", unless the caller
+            -- sets LD_LIBRARY_PATH.  A static library's rpathdirs are exported to the
+            -- targets that depend on it, which is what puts the path in each binary.
+            add_rpathdirs(path.join(cairo_prefix, "lib"))
+        end
     target_end()
 else
     add_requires("cairo", {system = true})
