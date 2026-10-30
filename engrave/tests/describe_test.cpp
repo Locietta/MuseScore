@@ -394,13 +394,18 @@ TEST(Corpus, EveryPropertyOfEveryCorpusTypeReads) {
 
 TEST(Generator, CheckedInTableIsCurrent) {
     if (g_python.empty()) GTEST_SKIP() << "pass --python=<interpreter> to run the generator check";
-    // The doubled outer quotes are cmd.exe's rule for a command line that starts
-    // with a quote: it drops the first and the last one, which keeps the inner ones.
     const std::string command = std::format(
-        "\"\"{}\" \"{}\" --check --root \"{}\"\"", g_python.make_preferred().string(),
+        "\"{}\" \"{}\" --check --root \"{}\"", g_python.make_preferred().string(),
         (std::filesystem::path(ENGRAVE_TEST_SOURCE_ROOT) / "tools" / "gen_pid_support.py").make_preferred().string(),
         std::filesystem::path(ENGRAVE_TEST_SOURCE_ROOT).make_preferred().string());
-    EXPECT_EQ(std::system(command.c_str()), 0) << command;
+#ifdef _WIN32
+    // cmd.exe drops the first and the last quote of a command line that starts with
+    // one; an extra pair keeps the inner quotes intact.
+    const std::string quoted = std::format("\"{}\"", command);
+#else
+    const std::string quoted = command;
+#endif
+    EXPECT_EQ(std::system(quoted.c_str()), 0) << quoted;
 }
 
 namespace {
