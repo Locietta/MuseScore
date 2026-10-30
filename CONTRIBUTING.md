@@ -1,1 +1,0 @@
-If you would like to contribute, please see the [Contributing page](https://github.com/musescore/MuseScore/wiki/Contributing) on the GitHub Wiki. Thanks!
