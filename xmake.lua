@@ -37,6 +37,12 @@ includes("xmake/packages/zlib.lua")
 add_requires("muse-zlib 1.3.1", {system = false})
 add_packages("muse-zlib")
 
+-- nlohmann/json: engrave's score/ headers use it, and so does the code that
+-- includes them, so both must see one copy: the consumer's (the superproject
+-- has the pixi 3.12.0).  A bare checkout gets the same release from xmake-repo.
+add_requires("nlohmann_json v3.12.0", {system = false})
+add_packages("nlohmann_json")
+
 -- cairo: engrave's page renderer links it.  Like zlib it is the consumer's
 -- choice (the superproject's PDF and PNG goldens are pinned to its pixi cairo).
 -- A bare checkout uses the system cairo, or the install prefix given with
