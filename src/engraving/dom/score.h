@@ -299,6 +299,9 @@ public:
     virtual bool readOnly() const;
 
     static void onElementDestruction(EngravingItem* se);
+    // Whether the score has not started destructing: code that reaches a score
+    // through a pointer it does not own checks this before touching it.
+    static bool isAlive(const Score* score);
 
     void scanElements(std::function<void(EngravingItem*)> func) override;
 

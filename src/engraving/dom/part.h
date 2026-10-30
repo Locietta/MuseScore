@@ -67,6 +67,7 @@ public:
     static const Fraction MAIN_INSTRUMENT_TICK;
 
     Part(Score* score = nullptr, ElementType type = ElementType::PART);
+    ~Part() override;
     void initFromInstrTemplate(const InstrumentTemplate*);
 
     const muse::ID& id() const;
