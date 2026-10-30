@@ -11,8 +11,8 @@
 //
 // The public edit API does not exist yet, so a test that needs an edit, a rollback
 // or a restore drives the engine's own primitives: startCmd/endCmd (a transaction),
-// the undo history, and an MSCZ save followed by a reopen.  H6 (copy and paste) is
-// deferred; the report says why.
+// the undo history, and an MSCZ save followed by a reopen; H7 runs its removal as an
+// edit batch (api::BatchGuard).  H6 (copy and paste) is deferred; the report says why.
 
 #include <algorithm>
 #include <cstdio>
@@ -33,6 +33,7 @@
 
 #include <engrave/engrave.h>
 
+#include "engrave/src/api/batch.h"
 #include "engrave/src/api/handles.h"
 #include "engrave/src/api/state.h"
 #include "engrave/src/runtime/noqt_runtime.h"
@@ -690,47 +691,45 @@ TEST(Handles, H5bRemovingAPartLeavesNoId) {
 // --- H7 -------------------------------------------------------------------
 
 TEST(Handles, H7RemovedElementsGoStale) {
-    // Deferred: undoing a removal through the raw undo stack faults in this engine, and a
-    // rollback does not restore the element's id (layout rebuilds the element). S6's
-    // BatchGuard is the supported path. See notes/a4/s3/REPORT.md.
-    GTEST_SKIP() << "removal and rollback need the batch path (notes/a4/s3/REPORT.md)";
-    // A note the walk knows: it has an id, and removing it takes it out of its chord.
+    // The removal runs as an edit batch, through the engine's own deletion: deleteItem
+    // turns a chord whose only note goes into a rest. (A bare undoRemoveElement of such
+    // a note leaves an empty chord, which layout cannot handle.)
     auto document = open_with(ElementType::NOTE);
     ASSERT_TRUE(document) << "no corpus score has a note with an id";
     MasterScore& master = master_of(*document);
     const auto before = element_map(*document);
-    ASSERT_FALSE(before.empty());
+    const ElementId id = engine_id(*first_live(master, ElementType::NOTE));
+    const auto remove = [&master, id](bool roll_back) {
+        return engrave::api::Step([&master, id, roll_back](engrave::api::EditContext&) -> engrave::Result<void> {
+            master.deleteItem(mu::engraving::toEngravingItem(engrave::resolve(master, id)->object));
+            // Inside the batch the element is out of the score but not yet destroyed.
+            const auto during = engrave::resolve(master, id);
+            EXPECT_FALSE(during) << "a removed element resolves inside its own batch";
+            if (!during) EXPECT_EQ(during.error().code, ErrorCode::StaleHandle);
+            if (roll_back) return std::unexpected(engrave::Error{ErrorCode::EditRejected, "rolled back by the test"});
+            return {};
+        });
+    };
 
-    // Inside the batch the element is out of the tree but not yet destroyed.
-    {
-        EngravingItem* note = mu::engraving::toEngravingItem(first_live(master, ElementType::NOTE));
-        ASSERT_NE(note, nullptr);
-        const ElementId id = engine_id(*note);
-        ASSERT_TRUE(live(master, id));
-        Command command(master);
-        master.undoRemoveElement(note);
-        const auto during = engrave::resolve(master, id);
-        ASSERT_FALSE(during) << "a removed element resolves inside its own batch";
-        EXPECT_EQ(during.error().code, ErrorCode::StaleHandle);
-        // The rollback unwinds the removal: the score is what it was.
-        command.rollback();
-        expect_same_ids(before, element_map(*document), "a rollback");
-        expect_inv(*document);
-    }
+    // The rollback brings the element back with its id.
+    const auto rolled_back = engrave::api::BatchGuard(*document).run({remove(true)}, engrave::api::Policy::Transaction, {});
+    ASSERT_FALSE(rolled_back);
+    EXPECT_EQ(rolled_back.error().op_index, 0u);
+    EXPECT_EQ(document->revision(), 1u);
+    EXPECT_TRUE(live(master, id));
+    expect_same_ids(before, element_map(*document), "a rollback");
+    expect_inv(*document);
 
-    // Committed and cleaned up, the history drops the element for good.
-    auto fresh = open_with(ElementType::NOTE);
-    ASSERT_TRUE(fresh);
-    MasterScore& again = master_of(*fresh);
-    EngravingItem* doomed = mu::engraving::toEngravingItem(first_live(again, ElementType::NOTE));
-    ASSERT_NE(doomed, nullptr);
-    const ElementId id = engine_id(*doomed);
-    ASSERT_TRUE(live(again, id));
-    commit(again, [&](MasterScore&) { again.undoRemoveElement(doomed); });
-    const auto gone = engrave::resolve(again, id);
+    // Committed, the history cleanup destroys the element, and the id names nothing.
+    const auto committed = engrave::api::BatchGuard(*document).run({remove(false)}, engrave::api::Policy::Transaction, {});
+    ASSERT_TRUE(committed) << committed.error().message;
+    EXPECT_EQ(document->revision(), 2u);
+    EXPECT_TRUE(std::ranges::contains(committed->removed, id) || std::ranges::contains(committed->replaced, id))
+        << "the batch does not report the removed id";
+    const auto gone = engrave::resolve(master, id);
     ASSERT_FALSE(gone) << "the removed element still resolves after the commit";
     EXPECT_EQ(gone.error().code, ErrorCode::NotFound);
-    expect_inv(*fresh);
+    expect_inv(*document);
 }
 
 // --- H8 -------------------------------------------------------------------
@@ -768,18 +767,17 @@ TEST(Handles, H8ReplacedElementsLoseTheirId) {
     EXPECT_FALSE(live(master, clef_id)) << "the replaced clef still resolves";
     expect_inv(*document);
 
-    // A duration change rebuilds the ChordRest, so its id goes with it.
+    // A duration change keeps a chord whose new length fits where it is (the length is
+    // a property then) and rebuilds it otherwise; either way the diff and the resolver
+    // agree on whether the old id still names the chord.
     mu::engraving::ChordRest* chord_rest = mu::engraving::toChordRest(first_live(master, ElementType::CHORD));
-    if (chord_rest) {
-        const ElementId chord_id = engine_id(*chord_rest);
-        const auto before_change = engrave::live_ids(master);
-        commit(master, [&](MasterScore&) { master.changeCRlen(chord_rest, mu::engraving::Fraction(1, 2)); });
-        const engrave::IdDiff change = engrave::diff_ids(before_change, engrave::live_ids(master));
-        EXPECT_FALSE(change.replaced.empty()) << "the duration change did not replace the chord's id";
-        EXPECT_FALSE(live(master, chord_id)) << "the duration change kept the chord's id";
-    } else {
-        RecordProperty("duration", "no chord in this score");
-    }
+    ASSERT_NE(chord_rest, nullptr) << "the walk hands out no chord";
+    const ElementId chord_id = engine_id(*chord_rest);
+    const auto before_change = engrave::live_ids(master);
+    commit(master, [&](MasterScore&) { master.changeCRlen(chord_rest, mu::engraving::Fraction(1, 2)); });
+    const engrave::IdDiff change = engrave::diff_ids(before_change, engrave::live_ids(master));
+    const bool dropped = std::ranges::contains(change.replaced, chord_id) || std::ranges::contains(change.removed, chord_id);
+    EXPECT_NE(live(master, chord_id), dropped) << "the diff and the resolver disagree about the chord";
     expect_inv(*document);
 }
 
