@@ -7,6 +7,7 @@
 
 #include <engrave/error.h>
 #include <engrave/output.h>
+#include <engrave/query.h>
 
 namespace engrave {
 
@@ -28,6 +29,24 @@ struct Document {
     // Unsupported for a format the engine does not write (see Capabilities).
     // Throws std::runtime_error if the engine's writer fails.
     Result<std::vector<std::byte>> export_score(const ExportOptions& options);
+
+    // The score's structure: metadata, parts and staves, measures, time, key and
+    // tempo changes, and the excerpts. StaleHandle when the selection names a score
+    // the document no longer has, InvalidArgument when it names something else.
+    Result<Outline> outline(const ScoreSel& score = {});
+
+    // The elements that match, in a stable order. NotFound for a type or property
+    // name the catalogue does not know, InvalidArgument for a filter that cannot be
+    // answered (an unknown voice, a measure window out of range or too wide, a
+    // cursor past the end), ResourceLimit when more elements match than one query
+    // may report.
+    Result<QueryResult> query(const Query& request);
+
+    // The properties of one element.  The default is every property the catalogue
+    // lists for its type. NotFound for a property name the catalogue does not know
+    // and for a reference nothing answers; InvalidArgument for a property the
+    // element's type does not have, and for an OpRef, which only a batch can use.
+    Result<std::vector<PropertyRead>> get(const Ref& target, const std::vector<std::string>& props = {});
 
 private:
     friend struct Engine;

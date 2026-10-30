@@ -211,6 +211,25 @@ target("engrave_describe_test")
     end
 target_end()
 
+-- The read tests: outline, query and get against the A2 semantic dump, the metadata
+-- export and the positions export, which walk the same score independently.
+target("engrave_read_test")
+    set_kind("binary")
+    add_deps("muse_generated", "engrave")
+    add_packages("gtest")
+    add_defines(table.unpack(ENGRAVE_DEFINES))
+    add_defines(table.unpack(ENGRAVE_GLOBAL_DEFINES))
+    add_includedirs(ENGRAVE_ADAPTER_INCLUDES)
+    add_includedirs(ENGRAVE_INTERNAL_INCLUDES)
+    add_includedirs("$(builddir)/xmake-generated")
+    add_files(path.join(tests_dir, "read_test.cpp"))
+    if is_plat("windows") then
+        add_files(utf8_manifest)
+    else
+        add_links("m")
+    end
+target_end()
+
 -- The leak test: an embedder compiled with the public include root as its
 -- only include path and none of the project's defines, so it builds only
 -- while the public headers stay std-only.  The compile is done here rather
