@@ -37,11 +37,12 @@
 //   - every engine call (bootstrap, export, track listing) must happen on the
 //     same OS thread. It is not safe to export from two threads or to run two
 //     exports at the same time;
-//   - a process may render at most one audio job. Muse Reverb keeps state
-//     between renders, so a second export in the same process would not be
-//     byte-identical to a fresh one. The host never initialises the engine:
-//     each audio export runs in its own --worker child (worker_protocol.cpp),
-//     which handles exactly one job and then exits.
+//   - a process may render any number of audio jobs: export_score_audio() drops
+//     what the previous job left in the shared context (its tracks and sources,
+//     the synthesizer instances behind them, and the fx chains, Muse Reverb
+//     included) before it builds the graph. A second render therefore starts
+//     from the same state as the first, and the caller gets the same bytes it
+//     would get from a fresh process (engrave_output_test's D4 test).
 //
 // initialize_engine_audio() needs the native runtime already set up
 // (music::initialize_native_runtime): Uri::fromLocalFile resolves through
@@ -136,32 +137,42 @@ public:
 using EngineAudioMidiEventHook = std::function<void(const muse::midi::Event&, std::uint64_t frame)>;
 void set_engine_audio_midi_event_hook(EngineAudioMidiEventHook hook);
 
-// Initialises the process-wide engine and loads one SoundFont:
+// Initialises the process-wide engine and loads its SoundFonts:
 //   AudioSanitizer setup, NullRpcChannel registered as rpc::IRpcChannel,
 //   capturing IMidiOutPort registered, EngineGlobalSetup::{registerExports,
 //   resolveImports} (AudioEngine, AudioFactory, AudioEngineConfiguration, SynthResolver
 //   with the Fluid resolver, FxResolver with MuseFX, SoundFontRepository,
-//   TransportEventsDispatcher), EngineController::init({44100, 4096, 2},
-//   {useSoundFontLowPassFilter=true}), addSoundFont(Uri::fromLocalFile(path)),
-//   one AudioContext (id 1) whose availableInputResources() must report the
-//   SoundFont.
-// The SoundFont resource id is its complete basename ("FluidR3Mono_GM" for
-// ".../FluidR3Mono_GM.sf3"), matching FluidSoundFontParser::parseSoundFont
-// (fluidsoundfontparser.cpp:70) and FluidResolver::refresh
-// (fluidresolver.cpp:102-145).
+//   TransportEventsDispatcher), EngineController::init(<setup.sample_rate, 4096, 2>,
+//   {useSoundFontLowPassFilter=true}), addSoundFont for every font, one AudioContext
+//   (id 1) whose availableInputResources() must report each of them.
+// The first font of the list is the default: every track plays it unless its
+// request names another index. A SoundFont's resource id is its complete basename
+// ("FluidR3Mono_GM" for ".../FluidR3Mono_GM.sf3"), matching
+// FluidSoundFontParser::parseSoundFont (fluidsoundfontparser.cpp:70) and
+// FluidResolver::refresh (fluidresolver.cpp:102-145).
+//
+// The sample rate is fixed here for the life of the process, like the context
+// output spec it feeds; every render the engine writes is at that rate.
 //
 // Returns false and fills `error` (when not null) if the engine was already
-// initialised with a different SoundFont, the path is not .sf2/.sf3, the
-// native runtime/IFileSystem is missing, the font cannot be parsed, or the
-// parsed font does not show up as an engine input resource. A failed call after
-// the engine services were constructed leaves the process without a usable
+// initialised with a different list or rate, a path is not .sf2/.sf3, the
+// native runtime/IFileSystem is missing, a font cannot be parsed, or a parsed
+// font does not show up as an engine input resource. A failed call after the
+// engine services were constructed leaves the process without a usable
 // engine; exit instead of retrying.
+struct EngineAudioSetup {
+    std::vector<std::string> soundfonts; // in order; the first is the default
+    int sample_rate = 44100;
+};
+bool initialize_engine_audio(const EngineAudioSetup& setup, std::string* error = nullptr);
+// One SoundFont at 44100 Hz.
 bool initialize_engine_audio(const std::string& soundfont_path, std::string* error = nullptr);
 bool engine_audio_initialized();
 
-// SoundFont identity of the successfully initialised engine (empty when not
-// initialised). The URI is the encoded "file://" form used as the repository
-// key; it lets callers verify the Windows drive-letter/UTF-8 round trip.
+// SoundFont identity of the successfully initialised engine's default (first)
+// font (empty when not initialised). The URI is the encoded "file://" form used
+// as the repository key; it lets callers verify the Windows drive-letter/UTF-8
+// round trip.
 std::string engine_soundfont_resource_id();
 std::string engine_soundfont_uri();
 
@@ -184,6 +195,9 @@ struct EngineAudioTrackParams {
     double balance = 0.0;
     bool solo = false;
     bool muted = false;
+    // Index into EngineAudioSetup::soundfonts, or -1 for the default (the
+    // first). Every track resolves its own Fluid source from it.
+    int soundfont = -1;
 };
 
 struct AudioRenderRequest {
@@ -199,6 +213,15 @@ struct AudioRenderRequest {
     double master_balance = 0.0;
     // Indexed by engine_audio_tracks(master, excerpt_id) order.
     std::vector<EngineAudioTrackParams> tracks;
+    // Encoder settings. bit_rate is in kbps and applies to MP3, Ogg and AAC;
+    // bit_depth is 16 or 24 for WAV and FLAC, and 32 for a Float32 WAV. 0 keeps
+    // the format's default (128 kbps; Float32 WAV, Int16 FLAC).
+    int bit_rate = 0;
+    int bit_depth = 0;
+    // The Muse Reverb aux send: on by default at 0.30, as desktop mixes; off
+    // sends nothing to the reverb return and renders the dry mix.
+    bool reverb = true;
+    double reverb_send = 0.30;
     // Kept for source compatibility. 4.7.6 waited for saveSoundTrack()'s
     // promise and could at least catch a promise that never ran; 5.0's
     // SoundTrackWriter renders synchronously inside export_score_audio()
@@ -210,7 +233,17 @@ struct AudioRenderRequest {
 };
 
 struct AudioRenderResult {
+    // Why a render failed. EngineFailure is the only kind the caller cannot act
+    // on: the engine's graph, synthesizer or encoder failed.
+    enum class Failure {
+        None,
+        InvalidScore,  // nothing to play, or no length to play it
+        ResourceLimit, // the projected output exceeds the 1 GiB cap
+        EngineFailure,
+    };
+
     bool ok = false;
+    Failure failure = Failure::None;
     std::string error;
     // Total sample frames the writer emits: (repeat-expanded play time + 3 s,
     // truncated to milliseconds) at 44100 Hz. Computed from the same duration
@@ -226,23 +259,27 @@ struct AudioRenderResult {
 };
 
 // Renders `master` with the engine and writes one audio file. The request
-// format selects the upstream encoder defaults:
+// format selects the upstream encoder defaults, which bit_rate/bit_depth can
+// override (engine_audio.cpp validates neither: the caller does).
 //   WAV  Float32, FLAC Int16, MP3 128 kbps, OGG 128 kbps (Opus in Ogg),
 //   AAC  128 kbps (ADTS; desktop AacWriter reuses exportMp3Bitrate).
-// The engine renders 44100 Hz stereo in 4096-frame chunks. Ogg/Opus is
-// resampled to 48 kHz inside libopusenc (upstream OggWriter behavior too), so
-// the decoded Ogg stream is 48 kHz while its duration follows the engine
-// render.
+// The engine renders at the rate initialize_engine_audio() fixed, in 4096-frame
+// chunks. Ogg/Opus is resampled to 48 kHz inside libopusenc (upstream OggWriter
+// behavior too), so the decoded Ogg stream is 48 kHz while its duration follows
+// the engine render.
 //
 // Setup mirrors desktop playback/export:
+//   the context's previous tracks, sources and fx are dropped first, so every
+//   render starts from the state a fresh process has;
 //   PlaybackModel on `master` (repeats as requested, chord symbols off,
 //   metronome off) kept alive for the whole export;
 //   the context is stopped and seeked to zero (audiocontext.cpp:785-793);
 //   addTrack per playable InstrumentTrackId with resolveTrackPlaybackData() and
-//   an explicit Fluid source resource (so a track never falls back to the
-//   nonexistent default "MS Basic" resource), TrackParams::auxSends =
-//   {{0.30,true}, {0.30,true}}; aux 0 is Muse Reverb (fx chain copied from
-//   playbackcontroller.cpp:63-73), aux 1 is an empty output;
+//   an explicit Fluid source resource from the track's SoundFont (so a track
+//   never falls back to the nonexistent default "MS Basic" resource),
+//   TrackParams::auxSends = {{request.reverb_send,true}, {0,true}}; aux 0 is
+//   Muse Reverb (fx chain copied from playbackcontroller.cpp:63-73), aux 1 is
+//   an empty output;
 //   setDuration(total render time); SoundTrackWriter over the context.
 //
 // Master volume/balance/mute are applied by an explicit master TrackChain that

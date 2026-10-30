@@ -5,7 +5,9 @@
 #include <memory>
 #include <vector>
 
+#include <engrave/audio.h>
 #include <engrave/error.h>
+#include <engrave/handle.h>
 #include <engrave/output.h>
 #include <engrave/query.h>
 
@@ -29,6 +31,30 @@ struct Document {
     // Unsupported for a format the engine does not write (see Capabilities).
     // Throws std::runtime_error if the engine's writer fails.
     Result<std::vector<std::byte>> export_score(const ExportOptions& options);
+
+    // How many pages the selected score has. NotFound, StaleHandle and
+    // InvalidArgument as outline() reports them; an excerpt that has never been
+    // laid out is laid out first.
+    Result<std::int32_t> page_count(const ScoreSel& score = {});
+
+    // Draws pages of the selected score. InvalidArgument for an unknown format, a
+    // page range outside the score, and a dpi that is not PNG's 36..1200; ResourceLimit
+    // for a page the renderer's size limit rejects. Throws std::runtime_error if
+    // the engine's renderer fails.
+    Result<RenderOutput> render(const RenderOptions& options);
+
+    // The score's playback tracks and the document's default mix, in the same
+    // order a render uses.
+    Result<AudioTracks> audio_tracks(const ScoreSel& score = {});
+
+    // Renders the selected score's audio and hands the encoded stream to the sink
+    // in chunks. Unsupported when the Engine was created without a SoundFont, for
+    // a sample rate other than the Engine's, and for a preset; InvalidArgument for
+    // an encoder setting the format does not take, a mix value out of range and a
+    // track or SoundFont that does not exist; ResourceLimit when the projected
+    // output exceeds the 1 GiB cap. Throws std::runtime_error if the engine's
+    // audio graph or encoder fails.
+    Result<AudioRenderResult> render_audio(const AudioOptions& options, const ByteSink& sink);
 
     // The score's structure: metadata, parts and staves, measures, time, key and
     // tempo changes, and the excerpts. NotFound when nothing has the excerpt id,

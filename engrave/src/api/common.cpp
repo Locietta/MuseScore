@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include <engrave/audio.h>
 #include <engrave/error.h>
 #include <engrave/output.h>
 
@@ -42,6 +43,26 @@ std::string_view to_string(Format format) noexcept {
     case Format::Mxl: return "MXL";
     case Format::Midi: return "MIDI";
     case Format::GuitarPro: return "Guitar Pro";
+    }
+    return "Unknown";
+}
+
+std::string_view to_string(RenderFormat format) noexcept {
+    switch (format) {
+    case RenderFormat::Pdf: return "PDF";
+    case RenderFormat::Png: return "PNG";
+    case RenderFormat::Svg: return "SVG";
+    }
+    return "Unknown";
+}
+
+std::string_view to_string(AudioFormat format) noexcept {
+    switch (format) {
+    case AudioFormat::Wav: return "WAV";
+    case AudioFormat::Flac: return "FLAC";
+    case AudioFormat::Opus: return "Opus";
+    case AudioFormat::Mp3: return "MP3";
+    case AudioFormat::Aac: return "AAC";
     }
     return "Unknown";
 }

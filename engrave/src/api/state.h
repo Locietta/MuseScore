@@ -12,6 +12,7 @@
 #include <engrave/document.h>
 #include <engrave/engine.h>
 
+#include "engrave/src/audio/score_audio.h"
 #include "engrave/src/runtime/noqt_runtime.h"
 
 namespace mu::engraving {
@@ -26,7 +27,12 @@ void check(bool condition, std::string_view message) noexcept;
 struct EngineState {
     std::thread::id owner = std::this_thread::get_id();
     std::filesystem::path resources;
+    // Where a render_audio writes its temporary file. Set by Engine::create.
+    std::filesystem::path cache_dir;
+    std::vector<std::filesystem::path> soundfonts;
+    std::int32_t audio_sample_rate = 44100;
     std::size_t live_documents = 0;
+    unsigned audio_render_index = 0; // names the temporary files of one process
 
     void check_thread() const noexcept {
         check(std::this_thread::get_id() == owner, "engrave called from a thread other than the Engine's");
@@ -40,10 +46,14 @@ struct Engine::Impl {
 struct Document::Impl {
     EngineState* engine = nullptr;
     music::ScoreProject project;
+    // The source MSCZ's audiosettings.json, read before the DOM exists; a
+    // document from any other format, or from a template, has neutral values.
+    music::ScoreAudioMixDefaults audio_defaults;
     std::uint64_t revision = 1;
     std::vector<Diagnostic> diagnostics;
 
     static std::unique_ptr<Document> make(EngineState& engine, music::ScoreProject project,
+                                          music::ScoreAudioMixDefaults audio_defaults,
                                           std::vector<Diagnostic> diagnostics);
 };
 
@@ -58,5 +68,10 @@ struct DocumentAccess {
 // The path as UTF-8 with '/' separators: the engine's path type reads
 // "E:\a" as a relative path.
 std::string utf8(const std::filesystem::path& path);
+
+// The index of the excerpt the selection names, or -1 for the master score, as
+// the audio driver names it. NotFound, StaleHandle and InvalidArgument as
+// select_score reports them.
+Result<int> excerpt_id_of(mu::engraving::MasterScore& master, const ScoreSel& selection);
 
 } // namespace engrave

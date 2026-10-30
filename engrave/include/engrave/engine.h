@@ -24,6 +24,14 @@ struct EngineOptions {
     std::filesystem::path cache_dir;
     // Extra text fonts, added in order.
     std::vector<std::filesystem::path> fonts;
+    // SoundFonts the audio renderer may use, in order; the first is the default
+    // one every track plays unless its AudioOptions name another. The audio
+    // engine itself starts on the first render_audio, because it is
+    // process-global and costs a synthesizer per font.
+    std::vector<std::filesystem::path> soundfonts;
+    // The audio sample rate, in Hz. Fixed for the Engine: its audio context is
+    // created with it, so AudioOptions::sample_rate must agree.
+    std::int32_t audio_sample_rate = 44100;
     // Sequential element ids instead of random ones, so that two opens of the same
     // file agree. Tests use it; it also changes what the writer stores, so leave
     // it off otherwise.
@@ -34,6 +42,11 @@ struct Capabilities {
     std::string engine_version; // written into saved scores, e.g. "5.0.0"
     std::vector<Format> import_formats;
     std::vector<Format> export_formats;
+    // Render formats and audio encoders this build has.
+    std::vector<RenderFormat> render_formats;
+    std::vector<AudioFormat> audio_formats;
+    std::vector<std::filesystem::path> soundfonts; // EngineOptions::soundfonts, in order
+    std::int32_t audio_sample_rate = 0;
 };
 
 struct TemplateInfo {

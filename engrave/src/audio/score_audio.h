@@ -102,4 +102,16 @@ struct ScoreAudioMixDefaults {
 // the supported range are ignored field by field.
 ScoreAudioMixDefaults score_audio_mix_defaults(const std::string& mscz_bytes);
 
+// The document's default mix for the listed tracks: master volume/balance from
+// the archive's root audiosettings.json, each track's volume/balance by
+// (partId, instrumentId), and solo/mute from the root file for the master score
+// or from the excerpt's own file otherwise. forceMute is derived as playback
+// derives it and chord-symbol pseudo tracks are muted, so this is the mix a
+// render uses when the caller overrides nothing. `tracks` must be the list
+// score_audio_track_info() gave for the same excerpt, and `defaults` the values
+// score_audio_mix_defaults() read from the document's source.
+AudioMix score_audio_default_mix(const ScoreAudioMixDefaults& defaults,
+                                 const std::vector<ScoreAudioTrackInfo>& tracks,
+                                 int excerpt_id = -1, const std::string& excerpt_name = {});
+
 } // namespace music

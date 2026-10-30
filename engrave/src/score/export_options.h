@@ -31,6 +31,10 @@ struct AudioMixOverride {
 
 struct ExportOptions {
     int page = 0;
+    // PDF only: the pages the document holds, both ends inclusive. A negative
+    // last_page means the score's last page.
+    int first_page = 0;
+    int last_page = -1;
     int excerpt_id = -1;
     int png_dpi = 144;
     bool draw_page_background = false;
