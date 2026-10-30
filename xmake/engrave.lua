@@ -12,13 +12,15 @@
 --     them without repeating the pins);
 --   * the generated framework configuration header;
 --   * the engine module targets: muse_global, muse_draw, muse_mpe, engraving,
---     the iex_* importers, native_fluidsynth and muse_audio_engine, compiled
---     via folder globs.
+--     the iex_* import/export modules, native_fluidsynth and
+--     muse_audio_engine, compiled via folder globs;
+--   * engrave, the library of Qt-free adapters in engrave/src (runtime, io,
+--     render, audio, score), and its tests (xmake/tests.lua).
 --
 -- The including project may set ENGRAVE_SOURCE_ROOT to build the engine
 -- sources from a checkout other than this one; the fork itself builds from its
--- own tree.  It may also set ENGRAVE_TEST_SUPPORT (see xmake/tests.lua) when it
--- provides the Qt-free test runtime.
+-- own tree.  It supplies zlib and the cairo headers and library directory
+-- (the fork's xmake.lua does so for the standalone build).
 
 local fork_root = path.directory(os.scriptdir())
 local source_root = path.absolute(ENGRAVE_SOURCE_ROOT or fork_root)
@@ -230,6 +232,14 @@ ENGRAVE_INCLUDES = {
     path.join(source_root, "src"),
 }
 
+-- The adapters' internal headers ("runtime/noqt_runtime.h", ...).  Besides
+-- the library and its tests, only the musescore-mcp host includes them, as a
+-- privileged client until A5 moves it onto the public API.
+local engrave_src = path.join(source_root, "engrave", "src")
+ENGRAVE_INTERNAL_INCLUDES = {
+    engrave_src,
+}
+
 local fluidsynth_dir = path.join(source_root, "muse", "framework", "audio", "thirdparty", "fluidsynth", "fluidsynth-2.3.3")
 local fluidsynth_src = path.join(fluidsynth_dir, "src")
 
@@ -274,34 +284,6 @@ ENGRAVE_AUDIO_INCLUDES = {
     path.join(fluidsynth_src, "synth"),
     path.join(fluidsynth_src, "utils"),
     path.join(source_root, "muse", "framework", "audio"),
-}
-
-ENGRAVE_NOQT_SUPPORT = {
-    sources = {
-        path.join(source_root, "muse", "framework", "draw", "internal", "*.cpp"),
-        path.join(source_root, "src", "importexport", "midi", "internal", "midiexport", "*.cpp"),
-        path.join(source_root, "src", "importexport", "midi", "internal", "midishared", "*.cpp"),
-        path.join(source_root, "src", "importexport", "musicxml", "internal", "musicxmlconfiguration.cpp"),
-    },
-    defines = {
-        "DRAW_NO_QSVGRENDER",
-        "ENGRAVING_NO_ACCESSIBILITY",
-        "KORS_PROFILER_ENABLED",
-        "MUSE_MODULE_DRAW_USE_FONTFACE_FT",
-        "MUSE_MODULE_DRAW_USE_QTTEXTDRAW",
-    },
-    includes = {
-        path.join(source_root, "muse", "framework", "draw"),
-        path.join(source_root, "src"),
-        path.join(source_root, "muse"),
-        path.join(source_root, "muse", "framework"),
-        path.join(source_root, "muse", "framework", "global"),
-        path.join(source_root, "src", "importexport", "midi"),
-        path.join(source_root, "src", "engraving"),
-        path.join(source_root, "src", "engraving", "infrastructure"),
-        path.join(source_root, "src", "engraving", "thirdparty", "dtl"),
-        path.join(source_root, "src", "importexport", "musicxml"),
-    },
 }
 
 ---------------------------------------------------------------------------
@@ -355,6 +337,7 @@ target("muse_draw")
     )
     add_files(
         path.join(source_root, "muse", "framework", "draw", "*.cpp"),
+        path.join(source_root, "muse", "framework", "draw", "internal", "*.cpp"),
         path.join(source_root, "muse", "framework", "draw", "types", "*.cpp"),
         path.join(source_root, "muse", "framework", "draw", "utils", "*.cpp")
     )
@@ -421,8 +404,6 @@ target("iex_musicxml")
         path.join(source_root, "src", "engraving", "thirdparty", "dtl")
     )
     add_files(path.join(source_root, "src", "importexport", "musicxml", "**.cpp"))
-    -- Compiled elsewhere into noqt_support:
-    remove_files(path.join(source_root, "src", "importexport", "musicxml", "internal", "musicxmlconfiguration.cpp"))
 
 target("iex_guitarpro")
     set_kind("static")
@@ -442,7 +423,8 @@ target("iex_guitarpro")
     add_files(path.join(source_root, "src", "importexport", "guitarpro", "internal", "**.cpp"))
 target_end()
 
-target("iex_midi_import")
+-- MIDI import, export and the MIDI file layer they share: upstream's iex_midi.
+target("iex_midi")
     set_kind("static")
     add_deps("muse_generated", "engraving")
     add_engine_target_defaults()
@@ -458,7 +440,9 @@ target("iex_midi_import")
         path.join(source_root, "src", "engraving", "thirdparty", "dtl")
     )
     add_files(
+        path.join(source_root, "src", "importexport", "midi", "internal", "midiexport", "*.cpp"),
         path.join(source_root, "src", "importexport", "midi", "internal", "midiimport", "*.cpp"),
+        path.join(source_root, "src", "importexport", "midi", "internal", "midishared", "*.cpp"),
         path.join(source_root, "src", "importexport", "midi", "thirdparty", "beatroot", "*.cpp")
     )
 target_end()
@@ -513,6 +497,45 @@ target("muse_audio_engine")
 target_end()
 
 ---------------------------------------------------------------------------
--- Upstream tests hook
+-- engrave: the Qt-free adapters
+---------------------------------------------------------------------------
+-- Every .cpp under engrave/src is part of the library; a new file in an area
+-- folder needs no edit here.  The areas include each other's headers as
+-- "<area>/<file>.h".  engrave/src comes last in the include path so that the
+-- engine's own "io/..." and "audio/..." headers are never shadowed by an area.
+-- The include path is shared with the adapter tests in xmake/tests.lua.
+ENGRAVE_ADAPTER_INCLUDES = {
+    path.join(source_root, "src", "engraving", "thirdparty", "dtl"),
+    source_root,
+    path.join(source_root, "src"),
+    path.join(source_root, "muse", "framework"),
+    path.join(source_root, "muse", "framework", "global"),
+    path.join(source_root, "src", "engraving"),
+    path.join(source_root, "muse", "framework", "draw"),
+}
+for _, list in ipairs({ENGRAVE_AUDIO_INCLUDES, ENGRAVE_INCLUDES, ENGRAVE_INTERNAL_INCLUDES}) do
+    for _, dir in ipairs(list) do
+        table.insert(ENGRAVE_ADAPTER_INCLUDES, dir)
+    end
+end
+
+target("engrave")
+    set_kind("static")
+    add_deps("muse_generated", "muse_global", "muse_draw", "muse_mpe", "engraving",
+        "iex_musicxml", "iex_guitarpro", "iex_midi", "muse_audio_engine", "native_fluidsynth")
+    add_engine_target_defaults()
+    add_defines(table.unpack(ENGRAVE_GLOBAL_DEFINES))
+    add_includedirs(ENGRAVE_ADAPTER_INCLUDES)
+    add_files(path.join(engrave_src, "**.cpp"))
+    -- cairo renders pages (render/); its headers and library directory come
+    -- from the including project, like zlib.
+    add_links("cairo", {public = true})
+    if not is_plat("windows") then
+        add_links("m", {public = true})
+    end
+target_end()
+
+---------------------------------------------------------------------------
+-- Tests: the upstream gtest suites, the adapter tests and the dev probes
 ---------------------------------------------------------------------------
 includes(path.join(fork_root, "xmake", "tests.lua"))

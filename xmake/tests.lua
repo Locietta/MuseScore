@@ -1,50 +1,23 @@
--- Upstream GoogleTest suites (dev-only).
+-- Tests of the engine and of the engrave library (dev-only).
 --
--- engraving_playback_tests and mpe_tests compile upstream's own Qt-free tests
--- against the engine.  They are part of the engine's build, but they also need
--- a Qt-free runtime: a file system, font services, the application object and
--- the engraving/MPE modules, plus the test harness that initialises them.  That
--- runtime lives in the musescore-mcp superproject's native/ adapters until S1
--- moves it into the library, so the including project supplies it here:
+--   engraving_playback_tests, mpe_tests
+--       upstream's own Qt-free GoogleTest suites, compiled against the engine
+--       and started by the harness in engrave/tests (gtest_main.cpp,
+--       test_environment.cpp), which initialises the engrave runtime;
+--   *_test, semantic_dump
+--       regression binaries of the engrave adapters, driven by musescore-mcp's
+--       scripts/run_lanes.py;
+--   noqt_probe, engine_audio_probe, audio_engine_link_check
+--       dev probes of the runtime, the audio driver and the audio engine link
+--       closure.
 --
---   ENGRAVE_TEST_SUPPORT = {
---       runtime_target = "score_engine",     -- target providing the runtime
---       harness_dir = "<dir>",               -- holds gtest_main.cpp and
---                                            -- test_environment.cpp
---       utf8_manifest = "<file>",            -- optional: Windows UTF-8 manifest
---   }
---
--- Without it (the fork's standalone build) the suites are not defined.  In S1
--- the harness and its runtime sources move next to this file and the hook goes
--- away.
-
-local function support_failure(message)
-    target("engrave_tests_check")
-        set_kind("phony")
-        on_load(function ()
-            raise("%s", message)
-        end)
-    target_end()
-end
-
-if not ENGRAVE_TEST_SUPPORT then
-    return
-end
+-- Every binary lands in the including project's build directory under its
+-- own name.
 
 local fork_root = path.directory(os.scriptdir())
 local source_root = path.absolute(ENGRAVE_SOURCE_ROOT or fork_root)
-local harness_dir = ENGRAVE_TEST_SUPPORT.harness_dir
-local runtime_target = ENGRAVE_TEST_SUPPORT.runtime_target
-local utf8_manifest = ENGRAVE_TEST_SUPPORT.utf8_manifest
-
-if not harness_dir or not os.isfile(path.join(harness_dir, "gtest_main.cpp")) then
-    support_failure("ENGRAVE_TEST_SUPPORT.harness_dir must contain gtest_main.cpp")
-    return
-end
-if not runtime_target then
-    support_failure("ENGRAVE_TEST_SUPPORT.runtime_target is required")
-    return
-end
+local tests_dir = path.join(source_root, "engrave", "tests")
+local utf8_manifest = path.join(tests_dir, "utf8.manifest")
 
 add_requires("gtest v1.17.0", {system = false, configs = {shared = false}})
 
@@ -58,7 +31,7 @@ target("engraving_playback_tests")
     set_kind("binary")
     set_default(false)
     set_basename("engraving_playback_tests")
-    add_deps("muse_generated", runtime_target)
+    add_deps("muse_generated", "engrave")
     add_packages("gtest")
     add_defines(table.unpack(ENGRAVE_DEFINES))
     add_defines("ENGRAVING_NO_ACCESSIBILITY", "KORS_PROFILER_ENABLED")
@@ -75,9 +48,10 @@ target("engraving_playback_tests")
         source_root,
         engraving_tests_dir,
         path.join(source_root, "muse", "framework"),
-        harness_dir,
+        tests_dir,
         "$(builddir)/xmake-generated"
     )
+    add_includedirs(ENGRAVE_INTERNAL_INCLUDES)
     add_files(
         path.join(engraving_tests_dir, "playback/playbackeventsrendering_tests.cpp"),
         path.join(engraving_tests_dir, "playback/playbackmodel_tests.cpp"),
@@ -89,14 +63,11 @@ target("engraving_playback_tests")
         path.join(engraving_tests_dir, "utils/scorecomp.cpp"),
         path.join(engraving_tests_dir, "utils/scorerw.cpp"),
         path.join(engraving_tests_dir, "utils/testutils.cpp"),
-        path.join(harness_dir, "gtest_main.cpp"),
-        path.join(harness_dir, "test_environment.cpp")
+        path.join(tests_dir, "gtest_main.cpp"),
+        path.join(tests_dir, "test_environment.cpp")
     )
-    add_links("cairo", "z")
     if is_plat("windows") then
-        if utf8_manifest then add_files(utf8_manifest) end
-    else
-        add_links("m")
+        add_files(utf8_manifest)
     end
 target_end()
 
@@ -119,17 +90,81 @@ target("mpe_tests")
         path.join(source_root, "muse", "framework"),
         path.join(source_root, "muse", "framework", "global"),
         path.join(source_root, "muse", "framework"),
-        harness_dir,
+        tests_dir,
         "$(builddir)/xmake-generated"
     )
     add_files(
         path.join(source_root, "muse", "framework/mpe/tests/singlenotearticulationstest.cpp"),
         path.join(source_root, "muse", "framework/mpe/tests/multinotearticulationstest.cpp"),
-        path.join(harness_dir, "gtest_main.cpp"),
-        path.join(harness_dir, "test_environment.cpp")
+        path.join(tests_dir, "gtest_main.cpp"),
+        path.join(tests_dir, "test_environment.cpp")
     )
     if is_plat("windows") then
-        if utf8_manifest then add_files(utf8_manifest) end
+        add_files(utf8_manifest)
+    else
+        add_links("m")
+    end
+target_end()
+
+-------------------------------------------------------------------------------
+-- engrave adapter tests and probes
+-------------------------------------------------------------------------------
+
+local function add_adapter_binary(name, file)
+    target(name)
+        set_kind("binary")
+        add_deps("muse_generated", "engrave")
+        add_defines(table.unpack(ENGRAVE_DEFINES))
+        add_defines(table.unpack(ENGRAVE_GLOBAL_DEFINES))
+        add_includedirs(ENGRAVE_ADAPTER_INCLUDES)
+        add_includedirs("$(builddir)/xmake-generated")
+        add_files(path.join(tests_dir, file))
+        if is_plat("windows") then
+            add_files(utf8_manifest)
+        end
+    target_end()
+end
+
+add_adapter_binary("archive_test", "archive_test.cpp")
+add_adapter_binary("assets_test", "assets_test.cpp")
+add_adapter_binary("excerpts_test", "excerpts_test.cpp")
+add_adapter_binary("score_audio_test", "score_audio_test.cpp")
+add_adapter_binary("score_edit_test", "score_edit_test.cpp")
+add_adapter_binary("score_positions_test", "score_positions_test.cpp")
+add_adapter_binary("semantic_dump", "semantic_dump.cpp")
+add_adapter_binary("noqt_probe", "noqt_probe.cpp")
+
+-- The IoC contract test calls a real entry point that requires the file-system
+-- service (initialize_engine_audio, which guards on it in engine_audio.cpp);
+-- ioc_tu2.cpp is its second translation unit.
+add_adapter_binary("noqt_support_test", "noqt_support_test.cpp")
+target("noqt_support_test")
+    add_files(path.join(tests_dir, "ioc_tu2.cpp"))
+target_end()
+
+-- Dev-only probe used by the engine_audio lane; built explicitly.
+add_adapter_binary("engine_audio_probe", "engine_audio_probe.cpp")
+target("engine_audio_probe")
+    set_default(false)
+    if is_plat("windows") then
+        -- PeakWorkingSetSize for the probe's memory report.
+        add_syslinks("psapi")
+    end
+target_end()
+
+-- Dev-only closure check: the audio engine links on its own, without engrave.
+target("audio_engine_link_check")
+    set_kind("binary")
+    set_default(false)
+    add_deps("muse_generated", "muse_audio_engine")
+    add_defines(table.unpack(ENGRAVE_DEFINES))
+    add_defines(ENGRAVE_AUDIO_ENGINE.defines)
+    add_includedirs(ENGRAVE_AUDIO_ENGINE.includes)
+    add_includedirs(ENGRAVE_INTERNAL_INCLUDES)
+    add_includedirs("$(builddir)/xmake-generated")
+    add_files(path.join(tests_dir, "audio_engine_link_check.cpp"))
+    if is_plat("windows") then
+        add_files(utf8_manifest)
     else
         add_links("m")
     end
