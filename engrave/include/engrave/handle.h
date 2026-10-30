@@ -8,15 +8,9 @@
 #include <string_view>
 #include <variant>
 
-namespace engrave {
+#include <engrave/value.h>
 
-// A time position as a fraction of a whole note, e.g. {3, 4} for the third
-// quarter. The denominator is positive; the value is not necessarily reduced.
-struct Fraction {
-    std::int64_t num = 0;
-    std::int64_t den = 1;
-    friend auto operator<=>(const Fraction&, const Fraction&) = default;
-};
+namespace engrave {
 
 // An element's id: the two values the writer stores in an MSCX <eid>, high half
 // first. Ids are document-scoped, so two documents can hand out equal ones. A

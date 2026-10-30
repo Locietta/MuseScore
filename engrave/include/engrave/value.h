@@ -1,5 +1,6 @@
 #pragma once
 
+#include <compare>
 #include <cstdint>
 #include <string>
 #include <variant>
@@ -21,11 +22,12 @@ enum struct Unit {
 // The shape of a property or style value.  One per Value alternative.
 enum struct ValueKind { Bool, Int, Real, String, Point, Size, Color, Fraction, Enum, IntList, Opaque };
 
+// A time position as a fraction of a whole note, e.g. {3, 4} for the third
+// quarter. The denominator is positive; the value is not necessarily reduced.
 struct Fraction {
     std::int64_t num = 0;
     std::int64_t den = 1;
-
-    bool operator==(const Fraction&) const = default;
+    friend auto operator<=>(const Fraction&, const Fraction&) = default;
 };
 
 struct Point {
