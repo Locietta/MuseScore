@@ -768,15 +768,16 @@ TEST(Handles, H8ReplacedElementsLoseTheirId) {
     EXPECT_FALSE(live(master, clef_id)) << "the replaced clef still resolves";
     expect_inv(*document);
 
-    // A duration change rebuilds the ChordRest, so its id goes with it.
+    // A duration change keeps the ChordRest's id: changeCRlen re-times the element in
+    // place (cmd.cpp:1455) instead of rebuilding it.
     mu::engraving::ChordRest* chord_rest = mu::engraving::toChordRest(first_live(master, ElementType::CHORD));
     if (chord_rest) {
         const ElementId chord_id = engine_id(*chord_rest);
         const auto before_change = engrave::live_ids(master);
         commit(master, [&](MasterScore&) { master.changeCRlen(chord_rest, mu::engraving::Fraction(1, 2)); });
         const engrave::IdDiff change = engrave::diff_ids(before_change, engrave::live_ids(master));
-        EXPECT_FALSE(change.replaced.empty()) << "the duration change did not replace the chord's id";
-        EXPECT_FALSE(live(master, chord_id)) << "the duration change kept the chord's id";
+        EXPECT_TRUE(change.replaced.empty()) << "the duration change replaced an id";
+        EXPECT_TRUE(live(master, chord_id)) << "the duration change lost the chord's id";
     } else {
         RecordProperty("duration", "no chord in this score");
     }

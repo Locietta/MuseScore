@@ -22,6 +22,7 @@ class EID;
 class EngravingItem;
 class EngravingObject;
 class MasterScore;
+class Score;
 }
 
 namespace engrave {
@@ -70,6 +71,13 @@ std::vector<LiveId> live_ids(mu::engraving::MasterScore& score);
 // the excerpts) the score, its parts, its staves, then the elements. Layout objects
 // and segments are included; each object appears once.
 std::vector<mu::engraving::EngravingObject*> document_objects(mu::engraving::MasterScore& score);
+
+// The score a selection names: the master, or one of its excerpts. NotFound when no
+// excerpt has the id, InvalidArgument when the id names something else.
+Result<mu::engraving::Score*> select_score(mu::engraving::MasterScore& master, const ScoreSel& selection);
+// The selection that names a score of the document: unset for the master, the score's
+// id for an excerpt.
+ScoreSel selection_of(const mu::engraving::Score& score);
 
 // The ids an edit created, dropped, and dropped in place of a new one.
 struct IdDiff {
