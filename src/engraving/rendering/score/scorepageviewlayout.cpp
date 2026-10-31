@@ -170,6 +170,30 @@ void ScorePageViewLayout::layoutPageView(Score* score, LayoutContext& ctx, const
 {
     TRACEFUNC;
 
+    // initLayoutContext moves the tail of Score::systems() into the layout's list of
+    // reusable systems; the layout then re-collects them, deletes them or hands them
+    // back at layoutFinished. If something throws in between (a bad_alloc while the
+    // layout pushes a command, for example) they stay parented to the score without
+    // being in Score::systems(), still pointing at their page, and outlive it. Give
+    // them back, so that the next layout collects, reuses or deletes them again.
+    struct ReturnsReusableSystems {
+        Score* score;
+        std::vector<System*>& reusable;
+        ~ReturnsReusableSystems()
+        {
+            if (reusable.empty()) {
+                return;
+            }
+            // This runs while unwinding, where a throw would terminate the process:
+            // if growing the score's list cannot allocate, leave them leaked instead.
+            try {
+                score->systems().insert(score->systems().end(), reusable.begin(), reusable.end());
+                reusable.clear();
+            } catch (...) {
+            }
+        }
+    } returnsReusableSystems{ score, ctx.mutState().systemList() };
+
     LAYOUT_CALL_CLEAR();
     LAYOUT_CALL();
 
@@ -256,6 +280,9 @@ void ScorePageViewLayout::layoutFinished(Score* score, LayoutContext& ctx)
     }
 
     score->systems().insert(score->systems().end(), state.systemList().begin(), state.systemList().end());
+    // The reusable systems now belong to the score again; anything left in the list
+    // would make layoutPageView's guard insert them a second time.
+    state.systemList().clear();
 
     /* If the headers/footers involve page count, we need to re-calculate them. This needs to
      * be done after laying out all pages, so that the total number of pages will be known: */
