@@ -116,17 +116,6 @@ Page* Fermata::page() const
 }
 
 //---------------------------------------------------------
-//   dragAnchorLines
-//---------------------------------------------------------
-
-std::vector<LineF> Fermata::dragAnchorLines() const
-{
-    std::vector<LineF> result;
-    result.push_back(LineF(canvasPos(), layoutParent()->canvasPos()));
-    return result;
-}
-
-//---------------------------------------------------------
 //   getProperty
 //---------------------------------------------------------
 
@@ -281,8 +270,6 @@ FermataType Fermata::fermataType() const
 //---------------------------------------------------------
 //   accessibleInfo
 //---------------------------------------------------------
-
-
 
 Sid Fermata::defaultPosSid() const
 {

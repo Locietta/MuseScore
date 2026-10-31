@@ -49,7 +49,6 @@ public:
     void remove(EngravingItem*) override;
     bool acceptDrop(EditData&) const override;
     EngravingItem* drop(Transaction& tx, EditData&) override;
-    RectF drag(EditData&) override;
 
     Align align() const { return m_align; }
     void setAlign(Align a) { m_align = a; }
@@ -57,7 +56,6 @@ public:
     const std::vector<EngravingItem*>& leafs() const { return m_leafs; }
     PointF pagePos() const override;
     PointF canvasPos() const override;
-    std::vector<LineF> dragAnchorLines() const override;
 
 protected:
     BSymbol(const ElementType& type, EngravingObject* parent, ElementFlags f = ElementFlag::NOTHING);

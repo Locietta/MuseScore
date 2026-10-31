@@ -65,11 +65,6 @@ public:
 
     const TranslatableString& chordLineTypeName() const;
 
-    void startDragGrip(EditData&) override;
-    void dragGrip(EditData&) override;
-
-
-
     int subtype() const override;
     TranslatableString subtypeUserName() const override;
 
@@ -77,11 +72,6 @@ public:
     bool setProperty(Pid propertyId, const PropertyValue&) override;
     PropertyValue propertyDefault(Pid) const override;
 
-    bool needStartEditingAfterSelecting() const override { return true; }
-    int gripsCount() const override { return m_straight ? 1 : static_cast<int>(ldata()->path.elementCount()); }
-    Grip initialEditModeGrip() const override { return Grip(gripsCount() - 1); }
-    Grip defaultGrip() const override { return initialEditModeGrip(); }
-    std::vector<PointF> gripsPositions(const EditData&) const override;
 
     bool isToTheLeft() const { return m_chordLineType == ChordLineType::PLOP || m_chordLineType == ChordLineType::SCOOP; }
     bool isBelow() const { return m_chordLineType == ChordLineType::SCOOP || m_chordLineType == ChordLineType::FALL; }

@@ -220,25 +220,6 @@ EngravingItem* Marker::prevSegmentElement()
 //   accessibleInfo
 //---------------------------------------------------------
 
-
-
-std::vector<LineF> Marker::dragAnchorLines() const
-{
-    Measure* m = measure();
-
-    std::vector<LineF> lines(TextBase::dragAnchorLines());
-
-    if (!m || !isRightMarker()) {
-        return lines;
-    }
-
-    for (LineF& l : lines) {
-        l.setP1(l.p1() + PointF(m->width(), 0.0));
-    }
-
-    return lines;
-}
-
 String Marker::symbolString() const
 {
     // Returns the coda/segno symbol if present

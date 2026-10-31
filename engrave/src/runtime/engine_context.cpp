@@ -23,7 +23,6 @@
 #include "engraving/internal/engravingconfiguration.h"
 #include "engraving/internal/engravingcontextconfiguration.h"
 #include "engraving/internal/engravingfontsprovider.h"
-#include "engraving/internal/palettescoreprovider.h"
 #include "engraving/rendering/score/scorerenderer.h"
 #include "engraving/style/defaultstyle.h"
 #include "importexport/musicxml/internal/musicxmlconfiguration.h"
@@ -128,7 +127,6 @@ struct EngineContext::Impl {
     std::unique_ptr<mu::iex::musicxml::MusicXmlConfiguration> musicXml;
     std::shared_ptr<EngravingContextConfiguration> contextConfiguration;
     EngravingServices engraving;
-    std::unique_ptr<PaletteScoreProvider> palette;
 
     std::unique_ptr<EngineAudio> audio;
     void teardown() noexcept;
@@ -139,9 +137,6 @@ void EngineContext::Impl::teardown() noexcept
 {
     try {
         audio.reset();
-        if (palette) palette->deinit();
-        engraving.paletteScoreProvider = nullptr;
-        palette.reset();
         engraving = EngravingServices();
         contextConfiguration.reset();
         musicXml.reset();
@@ -207,10 +202,6 @@ EngineContext::EngineContext(const std::string& assets, const std::string& cache
         MScore::setNudgeStep50(0.01);     // Alt  + cursor key (default 0.01)
 
         d.musicXml->init();
-
-        d.palette = std::make_unique<PaletteScoreProvider>(d.engraving);
-        d.palette->init();
-        d.engraving.paletteScoreProvider = d.palette.get();
 
         loadInstrumentTemplates(":/engraving/instruments/instruments.xml");
     } catch (...) {

@@ -40,13 +40,8 @@ public:
 class MoveElementAnchors
 {
 public:
-    static void moveElementAnchors(EngravingItem* element, KeyboardKey key, KeyboardModifier mod);
     static void moveSegment(EngravingItem* element, Segment* newSeg, Fraction tickDiff);
     static void checkMeasureBoundariesAndMoveIfNeed(EngravingItem* element);
-
-    static void moveElementAnchorsOnDrag(EngravingItem* element, EditData& ed);
-
-    static Segment* findNewAnchorSegmentForLine(LineSegment* lineSegment, const EditData& ed, const Segment* curSeg);
 
 private:
     static bool canAnchorToEndOfPrevious(const EngravingItem* element);

@@ -101,7 +101,6 @@ public:
     bool acceptDrop(EditData&) const override;
     EngravingItem* drop(Transaction& tx, EditData&) override;
 
-    bool isEditable() const override { return false; }
 
     bool isSmall() const { return m_isSmall; }
     void setSmall(bool val);

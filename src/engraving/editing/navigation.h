@@ -46,8 +46,6 @@ public:
     static Lyrics* lastLyricsInMeasure(const Segment* seg, const staff_idx_t staffIdx, const int no, const PlacementV& placement);
     static Lyrics* prevLyrics(const Lyrics* lyrics);
     static Lyrics* nextLyrics(const Lyrics* lyrics);
-    static EngravingItem* move(Score* score, const String& cmd);
-    static EngravingItem* selectMove(Score* score, const String& cmd);
 
     static EngravingItem* chordNoteAbove(Score* score, EngravingItem* element);
     static EngravingItem* chordNoteBelow(Score* score, EngravingItem* element);

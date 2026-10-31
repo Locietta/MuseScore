@@ -60,8 +60,6 @@ public:
     int subtype() const override;
     TranslatableString subtypeUserName() const override;
 
-    std::vector<LineF> dragAnchorLines() const override;
-
     PropertyValue getProperty(Pid propertyId) const override;
     bool setProperty(Pid propertyId, const PropertyValue&) override;
     PropertyValue propertyDefault(Pid) const override;
@@ -77,8 +75,6 @@ public:
 
     bool play() const { return m_play; }
     void setPlay(bool val) { m_play = val; }
-
-
 
     Sid defaultPosSid() const override;
 

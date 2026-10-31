@@ -57,20 +57,12 @@ public:
     int subtype() const override { return int(m_spacerType); }
     TranslatableString subtypeUserName() const override;
 
-    bool isEditable() const override { return true; }
-    void startDragGrip(EditData&) override;
-    void dragGrip(EditData&) override;
 
     void setGap(Spatium sp);
     Spatium gap() const { return m_gap; }
 
     double absoluteGap() const { return absoluteFromSpatium(m_gap); }
 
-    bool needStartEditingAfterSelecting() const override { return true; }
-    int gripsCount() const override { return 1; }
-    Grip initialEditModeGrip() const override { return Grip::START; }
-    Grip defaultGrip() const override { return Grip::START; }
-    std::vector<PointF> gripsPositions(const EditData&) const override;
 
     PropertyValue getProperty(Pid propertyId) const override;
     bool setProperty(Pid propertyId, const PropertyValue&) override;

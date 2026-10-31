@@ -163,7 +163,6 @@ public:
     void setScore(Score* s) override;
     Measure* cloneMeasure(Score*, const Fraction& tick, TieMap*);
 
-    bool isEditable() const override { return false; }
     void checkMeasure(staff_idx_t idx, bool useGapRests = true);
 
     void add(EngravingItem*) override;

@@ -98,29 +98,9 @@ PlacementV Fingering::calculatePlacement() const
     return below ? PlacementV::BELOW : PlacementV::ABOVE;
 }
 
-bool Fingering::isEditAllowed(EditData& ed) const
-{
-    if (isTextNavigationKey(ed.key, ed.modifiers)) {
-        return false;
-    }
-
-    if (ed.key == Key_Left) {
-        return cursor()->column() != 0 || cursor()->hasSelection();
-    }
-
-    if (ed.key == Key_Right) {
-        bool cursorInLastColumn = cursor()->column() == cursor()->curLine().columns();
-        return !cursorInLastColumn || cursor()->hasSelection();
-    }
-
-    return TextBase::isEditAllowed(ed);
-}
-
 //---------------------------------------------------------
 //   accessibleInfo
 //---------------------------------------------------------
-
-
 
 bool Fingering::isOnCrossBeamSide() const
 {

@@ -25,7 +25,6 @@
 #include "iengravingconfiguration.h" // IWYU pragma: keep
 
 #include "../editing/elementeditdata.h"
-#include "../editing/mscoreview.h"
 #include "../rendering/iscorerenderer.h"
 
 #include "note.h"
@@ -59,88 +58,6 @@ SlurTieSegment::SlurTieSegment(const SlurTieSegment& b)
     }
 }
 
-bool SlurTieSegment::isEditAllowed(EditData& ed) const
-{
-    if (ed.key == Key_Home && !(ed.modifiers & ~KeyboardModifier::KeypadModifier) && ed.hasCurrentGrip()) {
-        return true;
-    }
-
-    return false;
-}
-
-//---------------------------------------------------------
-//   edit
-//    return true if event is accepted
-//---------------------------------------------------------
-
-bool SlurTieSegment::edit(EditData& ed)
-{
-    if (!isEditAllowed(ed)) {
-        return false;
-    }
-
-    if (ed.key == Key_Home && !(ed.modifiers & ~KeyboardModifier::KeypadModifier)) {
-        if (ed.hasCurrentGrip()) {
-            startDragGrip(ed);
-            if (ed.curGrip == Grip::SHOULDER) {
-                ups(Grip::BEZIER1).off = PointF();
-                ups(Grip::BEZIER2).off = PointF();
-            } else {
-                ups(ed.curGrip).off = PointF();
-            }
-            renderer()->layoutItem(spanner());
-            endDragGrip(ed);
-        }
-        return true;
-    }
-    return false;
-}
-
-//---------------------------------------------------------
-//   gripAnchorLines
-//---------------------------------------------------------
-
-std::vector<LineF> SlurTieSegment::gripAnchorLines(Grip grip) const
-{
-    std::vector<LineF> result;
-
-    if (!system() || (grip != Grip::START && grip != Grip::END)) {
-        return result;
-    }
-
-    PointF sp(system()->pagePos());
-    PointF pp(pagePos());
-    PointF p1(ups(Grip::START).p + pp);
-    PointF p2(ups(Grip::END).p + pp);
-
-    PointF anchorPosition;
-    int gripIndex = static_cast<int>(grip);
-
-    switch (spannerSegmentType()) {
-    case SpannerSegmentType::SINGLE:
-        anchorPosition = (grip == Grip::START ? p1 : p2);
-        break;
-
-    case SpannerSegmentType::BEGIN:
-        anchorPosition = (grip == Grip::START ? p1 : system()->pageBoundingRect().topRight());
-        break;
-
-    case SpannerSegmentType::MIDDLE:
-        anchorPosition = (grip == Grip::START ? sp : system()->pageBoundingRect().topRight());
-        break;
-
-    case SpannerSegmentType::END:
-        anchorPosition = (grip == Grip::START ? sp : p2);
-        break;
-    }
-
-    const Page* p = system()->page();
-    const PointF pageOffset = p ? p->pos() : PointF();
-    result.push_back(LineF(anchorPosition, gripsPositions().at(gripIndex)).translated(pageOffset));
-
-    return result;
-}
-
 //---------------------------------------------------------
 //   move
 //---------------------------------------------------------
@@ -170,19 +87,6 @@ void SlurTieSegment::spatiumChanged(double oldValue, double newValue)
 //   gripsPositions
 //---------------------------------------------------------
 
-std::vector<PointF> SlurTieSegment::gripsPositions(const EditData&) const
-{
-    const int ngrips = gripsCount();
-    std::vector<PointF> grips(ngrips);
-
-    const PointF p(pagePos());
-    for (int i = 0; i < ngrips; ++i) {
-        grips[i] = m_ups[i].p + m_ups[i].off + p;
-    }
-
-    return grips;
-}
-
 bool SlurTieSegment::isUserModified() const
 {
     return SpannerSegment::isUserModified() || !(visible() && autoplace()
@@ -192,31 +96,6 @@ bool SlurTieSegment::isUserModified() const
                                                  && ups(Grip::BEZIER1).off.isNull()
                                                  && ups(Grip::BEZIER2).off.isNull()
                                                  && ups(Grip::END).off.isNull());
-}
-
-//---------------------------------------------------------
-//   startDragGrip
-//---------------------------------------------------------
-
-void SlurTieSegment::startDragGrip(EditData& ed)
-{
-    ElementEditDataPtr eed = ed.getData(this);
-    IF_ASSERT_FAILED(eed) {
-        return;
-    }
-    for (Pid i : { Pid::SLUR_UOFF1, Pid::SLUR_UOFF2, Pid::SLUR_UOFF3, Pid::SLUR_UOFF4, Pid::OFFSET }) {
-        eed->pushProperty(i);
-    }
-}
-
-//---------------------------------------------------------
-//   endDragGrip
-//---------------------------------------------------------
-
-void SlurTieSegment::endDragGrip(EditData& ed)
-{
-    EngravingItem::endDragGrip(ed);
-    triggerLayout();
 }
 
 //---------------------------------------------------------

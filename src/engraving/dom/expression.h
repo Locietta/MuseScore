@@ -36,8 +36,6 @@ public:
     Expression(DummyParentOr<Segment> parent);
     Expression(const Expression& expression);
 
-    bool isEditAllowed(EditData&) const override;
-
     Expression* clone() const override { return new Expression(*this); }
 
     Segment* segment() const { return toSegment(ownershipParent()); }
@@ -45,8 +43,6 @@ public:
     PropertyValue propertyDefault(Pid id) const override;
 
     double computeDynamicExpressionDistance(const Dynamic* snappedDyn) const;
-
-    std::unique_ptr<ElementGroup> getDragGroup(std::function<bool(const EngravingItem*)> isDragged) override;
 
     bool acceptDrop(EditData& ed) const override;
     EngravingItem* drop(Transaction& tx, EditData& ed) override;

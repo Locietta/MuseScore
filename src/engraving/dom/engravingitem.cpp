@@ -46,7 +46,6 @@
 #include "rendering/score/chordlayout.h"
 #include "rendering/score/tlayout.h"
 
-
 #include "../editing/addremoveelement.h"
 #include "../editing/editdata.h"
 #include "../editing/editproperty.h"
@@ -133,7 +132,6 @@ EngravingItem::~EngravingItem()
     delete m_layoutData;
 }
 
-
 bool EngravingItem::accessibleEnabled() const
 {
     return m_accessibleEnabled;
@@ -193,7 +191,6 @@ const std::shared_ptr<rendering::IScoreRenderer>& EngravingItem::renderer() cons
 {
     return score()->renderer();
 }
-
 
 //---------------------------------------------------------
 //   spatiumChanged
@@ -421,11 +418,6 @@ bool EngravingItem::onTabStaff() const
     return stt ? stt->isTabStaff() : false;
 }
 
-bool EngravingItem::hasGrips() const
-{
-    return gripsCount() > 0;
-}
-
 track_idx_t EngravingItem::track() const
 {
     return m_track;
@@ -433,7 +425,7 @@ track_idx_t EngravingItem::track() const
 
 void EngravingItem::setTrack(track_idx_t val)
 {
-    IF_ASSERT_FAILED(val < m_score->ntracks() || val == 0 || val == muse::nidx || m_score->isPaletteScore()) {
+    IF_ASSERT_FAILED(val < m_score->ntracks() || val == 0 || val == muse::nidx) {
         // Zero and muse::nidx have special use cases.
         // In all other cases the track can't be larger than the total track count.
         return;
@@ -912,15 +904,7 @@ bool EngravingItem::intersects(const RectF& rr) const
     return shape().intersects(rr.translated(-pagePos()));
 }
 
-bool EngravingItem::hitShapeContains(const PointF& p) const
-{
-    return hitShape().contains(p - pagePos());
-}
 
-bool EngravingItem::hitShapeIntersects(const RectF& rr) const
-{
-    return hitShape().intersects(rr.translated(-pagePos()));
-}
 
 //---------------------------------------------------------
 //   remove
@@ -2154,39 +2138,6 @@ EngravingItem* EngravingItem::prevSegmentElement()
     return Navigation::firstElement(score());
 }
 
-
-
-
-//---------------------------------------------------------
-//   nextGrip
-//---------------------------------------------------------
-
-bool EngravingItem::nextGrip(EditData& ed) const
-{
-    int i = int(ed.curGrip) + 1;
-    if (i >= ed.grips) {
-        ed.curGrip = Grip(0);
-        return false;
-    }
-    ed.curGrip = Grip(i);
-    return true;
-}
-
-//---------------------------------------------------------
-//   prevGrip
-//---------------------------------------------------------
-
-bool EngravingItem::prevGrip(EditData& ed) const
-{
-    int i = int(ed.curGrip) - 1;
-    if (i < 0) {
-        ed.curGrip = Grip(ed.grips - 1);
-        return false;
-    }
-    ed.curGrip = Grip(i);
-    return true;
-}
-
 //---------------------------------------------------------
 //   isUserModified
 //    Check if this element was modified by user and
@@ -2258,269 +2209,6 @@ void EngravingItem::triggerLayoutToEnd() const
 void EditData::addData(std::shared_ptr<ElementEditData> ed)
 {
     m_data.push_back(ed);
-}
-
-//---------------------------------------------------------
-//   startDrag
-//---------------------------------------------------------
-
-void EngravingItem::startDrag(EditData& ed)
-{
-    if (!isMovable()) {
-        return;
-    }
-    std::shared_ptr<ElementEditData> eed = std::make_shared<ElementEditData>();
-    eed->e = this;
-    eed->pushProperty(Pid::OFFSET);
-    eed->pushProperty(Pid::AUTOPLACE);
-    ed.addData(eed);
-    if (ed.modifiers & AltModifier) {
-        setAutoplace(false);
-    }
-}
-
-//---------------------------------------------------------
-//   drag
-///   Return update Rect relative to canvas.
-//---------------------------------------------------------
-
-RectF EngravingItem::drag(EditData& ed)
-{
-    if (!isMovable()) {
-        return RectF();
-    }
-
-    const RectF r0(canvasBoundingRect());
-
-    const PointF offset0 = ed.evtDelta + offset();
-    double x = offset0.x();
-    double y = offset0.y();
-
-    double _spatium = spatium();
-    if (ed.hRaster) {
-        double hRaster = _spatium / MScore::hRaster();
-        int n = lrint(x / hRaster);
-        x = hRaster * n;
-    }
-    if (ed.vRaster) {
-        double vRaster = _spatium / MScore::vRaster();
-        int n = lrint(y / vRaster);
-        y = vRaster * n;
-    }
-
-    setOffset(PointF(x, y));
-//      setGenerated(false);
-
-    if (isTextBase()) {           // TODO: check for other types
-        //
-        // restrict move to page boundaries
-        //
-        const RectF r(canvasBoundingRect());
-        Page* p = 0;
-        EngravingItem* e = this;
-        while (e) {
-            if (e->isPage()) {
-                p = toPage(e);
-                break;
-            }
-            e = e->layoutParent();
-        }
-        if (p) {
-            bool move = false;
-            RectF pr(p->canvasBoundingRect());
-            if (r.right() > pr.right()) {
-                x -= r.right() - pr.right();
-                move = true;
-            } else if (r.left() < pr.left()) {
-                x += pr.left() - r.left();
-                move = true;
-            }
-            if (r.bottom() > pr.bottom()) {
-                y -= r.bottom() - pr.bottom();
-                move = true;
-            } else if (r.top() < pr.top()) {
-                y += pr.top() - r.top();
-                move = true;
-            }
-            if (move) {
-                setOffset(PointF(x, y));
-            }
-        }
-    }
-    return canvasBoundingRect().united(r0);
-}
-
-//---------------------------------------------------------
-//   endDrag
-//---------------------------------------------------------
-
-void EngravingItem::endDrag(EditData& ed)
-{
-    if (!isMovable()) {
-        return;
-    }
-    ElementEditDataPtr eed = ed.getData(this);
-    if (!eed) {
-        return;
-    }
-    for (const auto& [id, v, f] : eed->propertyData) {
-        setPropertyFlags(id, f);     // reset initial property flags state
-        score()->undoPropertyChanged(this, id, v,
-                                     f == PropertyFlags::STYLED ? PropertyFlags::UNSTYLED : f);
-        setGenerated(false);
-    }
-    score()->hideAnchors();
-}
-
-//---------------------------------------------------------
-//   genericDragAnchorLines
-//---------------------------------------------------------
-
-std::vector<LineF> EngravingItem::genericDragAnchorLines() const
-{
-    double xp = 0.0;
-    for (EngravingItem* e = layoutParent(); e; e = e->layoutParent()) {
-        xp += e->x();
-    }
-    double yp;
-    if (ownershipParent()->isSegment() || ownershipParent()->isMeasure()) {
-        Measure* meas = ownershipParent()->isSegment() ? toSegment(ownershipParent())->measure() : toMeasure(ownershipParent());
-        System* system = meas->system();
-        const staff_idx_t stIdx = effectiveStaffIdx();
-        if (stIdx == muse::nidx) {
-            return { LineF() };
-        }
-        yp = system ? system->staffCanvasYpage(stIdx) : 0.0;
-        if (placement() == PlacementV::BELOW) {
-            yp += system ? system->staff(stIdx)->bbox().height() : 0.0;
-        }
-        //adjust anchor Y positions to staffType offset
-        if (staff()) {
-            yp += staff()->staffTypeForElement(this)->yoffset().val() * spatium();
-        }
-    } else {
-        yp = layoutParent()->canvasPos().y();
-    }
-    PointF p1(xp, yp);
-    LineF anchorLine(p1, canvasPos());
-    return { anchorLine };
-}
-
-//---------------------------------------------------------
-//   updateGrips
-//---------------------------------------------------------
-
-void EngravingItem::updateGrips(EditData& ed) const
-{
-    const auto positions(gripsPositions(ed));
-    const size_t ngrips = positions.size();
-    for (int i = 0; i < int(ngrips); ++i) {
-        ed.grip[i].translate(positions[i]);
-    }
-}
-
-//---------------------------------------------------------
-//   startEdit
-//---------------------------------------------------------
-
-void EngravingItem::startEdit(EditData& ed)
-{
-    std::shared_ptr<ElementEditData> elementData = std::make_shared<ElementEditData>();
-    elementData->e = this;
-    ed.addData(elementData);
-}
-
-//---------------------------------------------------------
-//   isEditAllowed
-//---------------------------------------------------------
-
-bool EngravingItem::isEditAllowed(EditData& ed) const
-{
-    return ed.key == Key_Home;
-}
-
-//---------------------------------------------------------
-//   edit
-//    return true if event is accepted
-//---------------------------------------------------------
-
-bool EngravingItem::edit(EditData& ed)
-{
-    if (ed.key == Key_Home) {
-        setOffset(PointF());
-        return true;
-    }
-    return false;
-}
-
-//---------------------------------------------------------
-//   startDragGrip
-//---------------------------------------------------------
-
-void EngravingItem::startDragGrip(EditData& ed)
-{
-    ElementEditDataPtr eed = ed.getData(this);
-    if (!eed) {
-        eed = std::make_shared<ElementEditData>();
-        eed->e = this;
-        ed.addData(eed);
-    }
-    eed->pushProperty(Pid::OFFSET);
-    eed->pushProperty(Pid::AUTOPLACE);
-    if (ed.modifiers & AltModifier) {
-        setAutoplace(false);
-    }
-}
-
-//---------------------------------------------------------
-//   dragGrip
-//---------------------------------------------------------
-
-void EngravingItem::dragGrip(EditData& ed)
-{
-    IF_ASSERT_FAILED(ed.curGrip != Grip::NO_GRIP) {
-        return;
-    }
-
-    score()->addRefresh(canvasBoundingRect());
-    setOffset(offset() + ed.delta);
-    score()->addRefresh(canvasBoundingRect());
-}
-
-//---------------------------------------------------------
-//   endDragGrip
-//---------------------------------------------------------
-
-void EngravingItem::endDragGrip(EditData& ed)
-{
-    ElementEditDataPtr eed = ed.getData(this);
-    bool changed = false;
-    if (eed) {
-        for (const auto& [id, data, flags] : eed->propertyData) {
-            setPropertyFlags(id, flags);       // reset initial property flags state
-            PropertyFlags f = flags;
-            if (f == PropertyFlags::STYLED) {
-                f = PropertyFlags::UNSTYLED;
-            }
-            if (score()->undoPropertyChanged(this, id, data, f)) {
-                changed = true;
-            }
-        }
-        eed->propertyData.clear();
-    }
-    if (changed) {
-        undoChangeProperty(Pid::GENERATED, false);
-    }
-    score()->hideAnchors();
-}
-
-//---------------------------------------------------------
-//   endEdit
-//---------------------------------------------------------
-
-void EngravingItem::endEdit(EditData&)
-{
-    score()->hideAnchors();
 }
 
 //---------------------------------------------------------
@@ -2707,7 +2395,6 @@ void EngravingItem::setVisible(bool f)
         m_rightParenthesis->setVisible(f);
     }
 }
-
 
 String EngravingItem::formatBarsAndBeats() const
 {

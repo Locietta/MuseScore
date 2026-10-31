@@ -368,12 +368,6 @@ EngravingItem* SpannerSegment::prevSegmentElement()
 }
 
 //---------------------------------------------------------
-//   accessibleInfo
-//---------------------------------------------------------
-
-
-
-//---------------------------------------------------------
 //   triggerLayout
 //---------------------------------------------------------
 
@@ -823,11 +817,6 @@ void Spanner::doComputeStartElement()
 
 void Spanner::computeEndElement()
 {
-    if (score()->isPaletteScore()) {
-        m_endElement = nullptr;
-        return;
-    }
-
     EngravingItem* oldEndElement = m_endElement;
 
     doComputeEndElement();

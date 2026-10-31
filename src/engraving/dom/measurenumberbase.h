@@ -41,7 +41,7 @@ public:
 
     Measure* measure() const { return toMeasure(ownershipParent()); }
 
-    bool isEditable() const override { return false; }    // The measure numbers' text should not be editable
+    // The measure numbers' text should not be editable
     bool positionRelativeToNoteheadRest() const override { return false; }
 };
 } // namespace mu::engraving

@@ -49,11 +49,7 @@ public:
     ElementType layoutType() const;
     PlacementV calculatePlacement() const;
 
-    bool isEditAllowed(EditData&) const override;
-
     PropertyValue propertyDefault(Pid id) const override;
-
-
 
     bool isOnCrossBeamSide() const;
 

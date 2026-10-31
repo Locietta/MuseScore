@@ -35,13 +35,6 @@ public:
 
     bool isEmpty() const { return ldata()->bbox().isEmpty(); }
 
-    bool isEditable() const override { return true; }
-    void dragGrip(EditData&) override;
-    void endDrag(EditData&) override {}
 
-    int gripsCount() const override { return 8; }
-    Grip initialEditModeGrip() const override { return Grip(7); }
-    Grip defaultGrip() const override { return Grip(7); }
-    std::vector<PointF> gripsPositions(const EditData&) const override;
 };
 }

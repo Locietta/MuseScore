@@ -76,13 +76,10 @@ public:
     EngravingItem* nextSegmentElement() override;
     EngravingItem* prevSegmentElement() override;
 
-
     bool positionRelativeToNoteheadRest() const override { return false; }
 
     bool centerOnSymbol() const { return m_centerOnSymbol; }
     void setCenterOnSymbol(bool val) { m_centerOnSymbol = val; }
-
-    std::vector<LineF> dragAnchorLines() const override;
 
     static constexpr std::array<MarkerType, 5> RIGHT_MARKERS {
         MarkerType::FINE,

@@ -90,11 +90,6 @@ public:
     PropertyValue propertyDefault(Pid id) const override;
     Sid getPropertyStyle(Pid) const override;
 
-    std::unique_ptr<ElementGroup> getDragGroup(std::function<bool(const EngravingItem*)> isDragged) override;
-
-
-
-
     static String dynamicText(DynamicType t);
     bool hasCustomText() const { return dynamicText(m_dynamicType) != xmlText(); }
 
@@ -111,15 +106,6 @@ public:
     static const std::vector<Dyn>& dynamicList() { return DYN_LIST; }
 
     bool hasVoiceAssignmentProperties() const override { return true; }
-
-    void startEdit(EditData&) override;
-    void endEdit(EditData&) override;
-    int gripsCount() const override;
-    std::vector<PointF> gripsPositions(const EditData& = EditData()) const override;
-    void dragGrip(EditData& editData) override;
-    void endDragGrip(EditData&) override;
-
-    bool isEditAllowed(EditData&) const override;
 
     bool positionRelativeToNoteheadRest() const override { return true; }
     bool sizeIsSpatiumDependent() const override { return true; }

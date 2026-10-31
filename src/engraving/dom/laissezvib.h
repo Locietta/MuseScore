@@ -38,8 +38,6 @@ public:
 
     LaissezVib* laissezVib() const { return (LaissezVib*)spanner(); }
 
-    int gripsCount() const override { return 0; }
-
     struct LayoutData : public TieSegment::LayoutData {
         SymId symbol = SymId::noSym;
         ld_field<PointF> posRelativeToNote = { "[LaissezVibSegment] posRelativeToNote", PointF() };

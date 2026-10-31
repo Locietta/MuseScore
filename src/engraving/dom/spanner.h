@@ -99,7 +99,6 @@ public:
     real_t& rxpos2() { return m_p2.rx(); }
     real_t& rypos2() { return m_p2.ry(); }
 
-    bool isEditable() const override { return true; }
 
     muse::ByteArray mimeData(const PointF& dragOffset) const override;
 

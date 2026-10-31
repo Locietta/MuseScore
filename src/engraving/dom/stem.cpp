@@ -77,36 +77,6 @@ PointF Stem::flagPosition() const
     return pos() + PointF(ldata()->bbox().left(), up() ? -length() : length());
 }
 
-std::vector<PointF> Stem::gripsPositions(const EditData&) const
-{
-    return { pagePos() + ldata()->line.p2() };
-}
-
-void Stem::startEdit(EditData& ed)
-{
-    EngravingItem::startEdit(ed);
-    ElementEditDataPtr eed = ed.getData(this);
-    eed->pushProperty(Pid::USER_LEN);
-}
-
-void Stem::startDragGrip(EditData& ed)
-{
-    EngravingItem::startDragGrip(ed);
-    ElementEditDataPtr eed = ed.getData(this);
-    eed->pushProperty(Pid::USER_LEN);
-}
-
-void Stem::dragGrip(EditData& ed)
-{
-    double yDelta = up() ? -ed.delta.y() : ed.delta.y();
-    m_userLength += Spatium::fromAbsolute(yDelta, spatium());
-    Chord* c = chord();
-    if (c->hook()) {
-        c->hook()->move(PointF(0.0, ed.delta.y()));
-    }
-    triggerLayout();
-}
-
 void Stem::reset()
 {
     undoChangeProperty(Pid::USER_LEN, 0.0_sp);

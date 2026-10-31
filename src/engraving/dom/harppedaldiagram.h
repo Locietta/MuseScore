@@ -53,7 +53,6 @@ public:
     HarpPedalDiagram(const HarpPedalDiagram& h);
 
     HarpPedalDiagram* clone() const override { return new HarpPedalDiagram(*this); }
-    bool isEditable() const override { return false; }
 
     Segment* segment() const { return (Segment*)ownershipParent(); }
     Measure* measure() const { return (Measure*)ownershipParent()->ownershipParent(); }

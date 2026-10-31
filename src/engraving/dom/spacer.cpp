@@ -63,57 +63,6 @@ void Spacer::setGap(Spatium sp)
 }
 
 //---------------------------------------------------------
-//   startDragGrip
-//---------------------------------------------------------
-
-void Spacer::startDragGrip(EditData& ed)
-{
-    ElementEditDataPtr eed = ed.getData(this);
-    eed->pushProperty(Pid::SPACE);
-}
-
-//---------------------------------------------------------
-//   dragGrip
-//---------------------------------------------------------
-
-void Spacer::dragGrip(EditData& ed)
-{
-    double s = ed.delta.y();
-
-    switch (spacerType()) {
-    case SpacerType::DOWN:
-    case SpacerType::FIXED:
-        m_gap += Spatium::fromAbsolute(s, spatium());
-        break;
-    case SpacerType::UP:
-        m_gap -= Spatium::fromAbsolute(s, spatium());
-        break;
-    }
-    m_gap = std::max(m_gap, 2.0_sp);
-    triggerLayout();
-}
-
-//---------------------------------------------------------
-//   gripsPositions
-//---------------------------------------------------------
-
-std::vector<PointF> Spacer::gripsPositions(const EditData&) const
-{
-    double _spatium = spatium();
-    PointF p;
-    switch (spacerType()) {
-    case SpacerType::DOWN:
-    case SpacerType::FIXED:
-        p = PointF(_spatium * .5, absoluteGap());
-        break;
-    case SpacerType::UP:
-        p = PointF(_spatium * .5, 0.0);
-        break;
-    }
-    return { pagePos() + p };
-}
-
-//---------------------------------------------------------
 //   getProperty
 //---------------------------------------------------------
 

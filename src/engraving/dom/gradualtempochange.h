@@ -90,8 +90,6 @@ public:
 
     GradualTempoChange* tempoChange() const;
 
-    void endEdit(EditData& editData) override;
-
     GradualTempoChangeSegment* findElementToSnapBefore() const;
     TempoText* findElementToSnapAfter() const;
 

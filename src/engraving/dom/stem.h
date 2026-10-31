@@ -42,10 +42,6 @@ public:
 
     EngravingItem* elementBase() const override;
 
-    bool isEditable() const override { return true; }
-    void startEdit(EditData&) override;
-    void startDragGrip(EditData&) override;
-    void dragGrip(EditData&) override;
 
     bool acceptDrop(EditData&) const override;
     EngravingItem* drop(Transaction& tx, EditData&) override;
@@ -73,11 +69,6 @@ public:
     PointF flagPosition() const;
     double length() const { return absoluteFromSpatium(m_baseLength + m_userLength); }
 
-    bool needStartEditingAfterSelecting() const override { return true; }
-    int gripsCount() const override { return 1; }
-    Grip initialEditModeGrip() const override { return Grip::START; }
-    Grip defaultGrip() const override { return Grip::START; }
-    std::vector<PointF> gripsPositions(const EditData&) const override;
 
     struct LayoutData : public EngravingItem::LayoutData {
         LineF line;

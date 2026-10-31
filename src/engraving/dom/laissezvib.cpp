@@ -22,8 +22,6 @@
 
 #include "laissezvib.h"
 
-#include "../editing/mscoreview.h"
-
 #include "chord.h"
 #include "measure.h"
 #include "note.h"

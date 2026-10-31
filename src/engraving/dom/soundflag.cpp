@@ -51,10 +51,6 @@ SoundFlag* SoundFlag::clone() const
     return new SoundFlag(*this);
 }
 
-bool SoundFlag::isEditable() const
-{
-    return false;
-}
 
 void SoundFlag::setSelected(bool f)
 {

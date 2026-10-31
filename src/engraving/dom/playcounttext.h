@@ -36,10 +36,7 @@ public:
     Segment* segment() const { return toSegment(ownershipParent()); }
     BarLine* barline() const;
 
-    bool isEditable() const override { return true; }
-    void endEdit(EditData&) override;
     bool allowTimeAnchor() const override { return false; }
-    RectF drag(EditData& ed) override;
 
     String playCountCustomText() const { return m_playCountCustomText; }
     void setPlayCountCustomText(const String& v) { m_playCountCustomText = v; }

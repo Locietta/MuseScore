@@ -21,7 +21,6 @@
  */
 #include "read500.h"
 
-#include "../editing/mscoreview.h"
 #include "../editing/noteinput.h"
 #include "../editing/paste.h"
 #include "../editing/transaction/transaction.h"
@@ -865,9 +864,6 @@ bool Read500::pasteStaff(XmlReader& e, Segment* dst, staff_idx_t dstStaff, Fract
             s = s->next1MM();
         }
 
-        for (MuseScoreView* v : score->m_viewer) {
-            v->adjustCanvasPosition(el);
-        }
         if (!score->selection().isRange()) {
             score->m_selection.setState(SelState::RANGE);
         }

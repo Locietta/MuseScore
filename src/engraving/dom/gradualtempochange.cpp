@@ -447,8 +447,3 @@ TempoText* GradualTempoChangeSegment::findElementToSnapAfter() const
 
     return nullptr;
 }
-
-void GradualTempoChangeSegment::endEdit(EditData& editData)
-{
-    TextLineBaseSegment::endEdit(editData);
-}

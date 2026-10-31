@@ -69,8 +69,6 @@ public:
     LyricsSyllabic syllabic() const { return m_syllabic; }
     void add(EngravingItem*) override;
     void remove(EngravingItem*) override;
-    bool isEditAllowed(EditData&) const override;
-    void endEdit(EditData&) override;
 
     bool positionRelativeToNoteheadRest() const override { return true; }
 
@@ -196,8 +194,6 @@ public:
 
     bool allowTimeAnchor() const override { return false; }
 
-    virtual bool isEditAllowed(EditData&) const override { return false; }
-
     struct LayoutData : public LineSegment::LayoutData {
     public:
         const std::vector<LineF>& dashes() const { return m_dashes; }
@@ -210,7 +206,6 @@ public:
 
 protected:
     LyricsLineSegment(const ElementType& type, LyricsLine* sp, ElementFlags f = ElementFlag::NOTHING);
-    void rebaseAnchors(EditData&, Grip) override;
 };
 
 class PartialLyricsLine final : public LyricsLine

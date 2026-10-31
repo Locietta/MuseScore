@@ -99,27 +99,6 @@ Sid SystemDivider::getPropertyStyle(Pid id) const
     return Symbol::getPropertyStyle(id);
 }
 
-std::vector<LineF> SystemDivider::dragAnchorLines() const
-{
-    std::vector<LineF> result;
-
-    const System* system = this->system();
-    IF_ASSERT_FAILED(system) {
-        return result;
-    }
-
-    RectF systemBBox = system->canvasBoundingRect();
-    PointF p1 =  PointF(m_dividerType == SystemDividerType::LEFT
-                        ? systemBBox.left() + system->leftMargin() : systemBBox.right(), systemBBox.bottom());
-
-    RectF thisBBox = canvasBoundingRect();
-    PointF p2 = 0.5 * (thisBBox.topLeft() + thisBBox.bottomRight());
-
-    result.push_back(LineF(p1, p2));
-
-    return result;
-}
-
 void SystemDivider::reset()
 {
     Symbol::reset();
@@ -129,12 +108,6 @@ void SystemDivider::reset()
 //---------------------------------------------------------
 //   drag
 //---------------------------------------------------------
-
-RectF SystemDivider::drag(EditData& ed)
-{
-    setGenerated(false);
-    return Symbol::drag(ed);
-}
 
 PropertyValue SystemDivider::propertyDefault(Pid id) const
 {

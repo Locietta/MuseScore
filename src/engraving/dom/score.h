@@ -116,7 +116,6 @@ class Lyrics;
 class MasterScore;
 class Measure;
 class MeasureBase;
-class MuseScoreView;
 class Note;
 class Page;
 class Part;
@@ -302,9 +301,6 @@ public:
     virtual ~Score();
     Score* clone();
 
-    Score* paletteScore() const;
-    bool isPaletteScore() const;
-
     virtual bool isMaster() const { return false; }
     virtual bool readOnly() const;
 
@@ -409,6 +405,11 @@ public:
 
     GuitarBend* addGuitarBend(GuitarBendType type, Note* note, Note* endNote = nullptr);
 
+    // Musical insertion with explicit targets; no selection or input cursor changes.
+    Segment* setNoteRestAt(Segment*, track_idx_t track, NoteVal nval, Fraction,
+                          DirectionV stemDirection = DirectionV::AUTO, bool forceAccidental = false,
+                          const std::set<SymId>& articulationIds = {}, bool rhythmic = false,
+                          EngravingItem** lastEntered = nullptr);
     Segment* setNoteRest(Segment*, track_idx_t track, NoteVal nval, Fraction, DirectionV stemDirection = DirectionV::AUTO,
                          bool forceAccidental = false, const std::set<SymId>& articulationIds = {}, bool rhythmic = false,
                          InputState* externalInputState = nullptr);
@@ -427,7 +428,6 @@ public:
     Tuplet* addTuplet(ChordRest* destinationChordRest, const Fraction& ratio, const TDuration& baseLen, TupletNumberType numberType,
                       TupletBracketType bracketType);
     bool canAddTuplet(const ChordRest* chordRest, const Fraction& ratio, const TDuration& baseLen) const;
-    void selectNewTuplet(Tuplet* tuplet);
 
     ChordRest* addClone(ChordRest* cr, const Fraction& tick, const TDuration& d);
     Rest* setRest(const Fraction& tick, track_idx_t track, const Fraction&, bool useDots, Tuplet* tuplet, bool useFullMeasureRest = true);
@@ -745,10 +745,6 @@ public:
     void setMscoreVersion(const String& val) { m_mscoreVersion = val; }
     void setMscoreRevision(int val) { m_mscoreRevision = val; }
 
-    void addViewer(MuseScoreView* v) { m_viewer.push_back(v); }
-    void removeViewer(MuseScoreView* v) { m_viewer.remove(v); }
-    const std::list<MuseScoreView*>& getViewer() const { return m_viewer; }
-
     //! NOTE Layout
     const LayoutOptions& layoutOptions() const { return m_layoutOptions; }
     void setLayoutMode(LayoutMode lm) { m_layoutOptions.mode = lm; }
@@ -945,7 +941,6 @@ private:
 
     const EngravingServices& m_services;
     MasterScore* m_masterScore = nullptr;
-    std::list<MuseScoreView*> m_viewer;
     Excerpt* m_excerpt = nullptr;
 
     String m_mscoreVersion;

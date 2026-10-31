@@ -157,12 +157,6 @@ void LyricsLine::doComputeEndElement()
 //   LyricsLineSegment
 //=========================================================
 
-void LyricsLineSegment::rebaseAnchors(EditData&, Grip)
-{
-    // Don't rebase lyric line anchors on drag
-    return;
-}
-
 LyricsLineSegment::LyricsLineSegment(LyricsLine* sp)
     : LineSegment(ElementType::LYRICSLINE_SEGMENT, sp, ElementFlag::ON_STAFF)
 {

@@ -40,12 +40,6 @@ class Box : public MeasureBase
 public:
     Box(const ElementType& type, Score* parent);
 
-    virtual bool isEditable() const override { return true; }
-
-    virtual bool isEditAllowed(EditData&) const override;
-    virtual bool edit(EditData&) override;
-    virtual void startDragGrip(EditData&) override;
-    virtual void dragGrip(EditData&) override;
 
     virtual bool acceptDrop(EditData&) const override;
     virtual EngravingItem* drop(Transaction& tx, EditData&) override;
@@ -78,14 +72,8 @@ public:
     bool setProperty(Pid propertyId, const PropertyValue&) override;
     PropertyValue propertyDefault(Pid) const override;
 
-
-
     // TODO: add a grip for moving the entire box
-    bool needStartEditingAfterSelecting() const override { return true; }
-    int gripsCount() const override { return 1; }
-    Grip initialEditModeGrip() const override { return Grip::START; }
-    Grip defaultGrip() const override { return Grip::START; }
-    std::vector<PointF> gripsPositions(const EditData&) const override { return { PointF() }; }   // overridden in descendants
+   // overridden in descendants
 
     bool canBeExcludedFromOtherParts() const override { return true; }
     void manageExclusionFromParts(bool exclude) override;
@@ -119,8 +107,6 @@ public:
 
     HBox* clone() const override { return new HBox(*this); }
 
-    RectF drag(EditData&) override;
-
     bool isMovable() const override;
     void computeMinWidth() override;
 
@@ -130,8 +116,6 @@ public:
     PropertyValue getProperty(Pid propertyId) const override;
     bool setProperty(Pid propertyId, const PropertyValue&) override;
     PropertyValue propertyDefault(Pid) const override;
-
-    std::vector<PointF> gripsPositions(const EditData&) const override;
 
 private:
     bool m_createSystemHeader = true;
@@ -161,11 +145,7 @@ public:
     PropertyValue propertyDefault(Pid) const override;
     bool setProperty(Pid propertyId, const PropertyValue&) override;
 
-    void startDragGrip(EditData&) override;
-
     bool acceptDrop(EditData&) const override;
-
-    std::vector<PointF> gripsPositions(const EditData&) const override;
 
     Spatium paddingToNotationAbove() const { return m_paddingToNotationAbove; }
     Spatium paddingToNotationBelow() const { return m_paddingToNotationBelow; }
@@ -208,12 +188,6 @@ public:
     bool setProperty(Pid propertyId, const PropertyValue& val) override;
     PropertyValue propertyDefault(Pid propertyId) const override;
 
-    int gripsCount() const override;
-    Grip initialEditModeGrip() const override;
-    Grip defaultGrip() const override;
-    std::vector<PointF> gripsPositions(const EditData&) const override;
-
-    bool needStartEditingAfterSelecting() const override { return false; }
 
     void undoReorderElements(const StringList& newOrder);
     void reorderElements(const StringList& newOrder);
@@ -268,13 +242,6 @@ public:
 
     PropertyValue propertyDefault(Pid) const override;
 
-
-
-    int gripsCount() const override;
-    Grip initialEditModeGrip() const override;
-    Grip defaultGrip() const override;
-
-    bool needStartEditingAfterSelecting() const override { return false; }
 
 private:
     Text* m_text = nullptr;

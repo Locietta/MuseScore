@@ -864,77 +864,6 @@ GuitarBendSegment::~GuitarBendSegment()
     delete m_text;
 }
 
-int GuitarBendSegment::gripsCount() const
-{
-    switch (guitarBend()->bendType()) {
-    case GuitarBendType::DIP:
-    case GuitarBendType::SCOOP:
-        return 0;
-    case GuitarBendType::DIVE:
-    case GuitarBendType::PRE_DIVE:
-        return 3;
-    default:
-        return 4;
-    }
-}
-
-std::vector<PointF> GuitarBendSegment::gripsPositions(const EditData&) const
-{
-    int gripCount = gripsCount();
-    if (gripCount == 0) {
-        return {};
-    }
-
-    std::vector<PointF> grips(gripsCount());
-    PointF pp(pagePos());
-    grips[int(Grip::START)] = pp;
-    grips[int(Grip::END)] = pos2() + pp;
-    grips[int(Grip::MIDDLE)] = pos2() * .5 + pp;
-
-    if (gripCount > 3) {
-        grips[int(Grip::APERTURE)] = ldata()->vertexPoint() + vertexPointOff() + pp;
-    }
-
-    return grips;
-}
-
-void GuitarBendSegment::startDragGrip(EditData& ed)
-{
-    ElementEditDataPtr eed = ed.getData(this);
-    if (!eed) {
-        return;
-    }
-    eed->pushProperty(Pid::BEND_VERTEX_OFF);
-    LineSegment::startDragGrip(ed);
-}
-
-void GuitarBendSegment::dragGrip(EditData& ed)
-{
-    PointF delta = ed.evtDelta;
-
-    switch (ed.curGrip) {
-    case Grip::START:
-        setOffset(offset() + delta);
-        setUserOff2(userOff2() - delta);
-        setVertexPointOff(vertexPointOff() - delta);
-        break;
-    case Grip::END:
-        setUserOff2(userOff2() + delta);
-        break;
-    case Grip::APERTURE:
-        setVertexPointOff(vertexPointOff() + delta);
-        break;
-    case Grip::MIDDLE:
-        setOffset(offset() + delta);
-        break;
-    default:
-        UNREACHABLE;
-        break;
-    }
-
-    triggerLayout();
-}
-
 PropertyValue GuitarBendSegment::getProperty(Pid id) const
 {
     switch (id) {
@@ -1158,28 +1087,6 @@ GuitarBendHoldSegment::GuitarBendHoldSegment(GuitarBendHold* sp)
     : LineSegment(ElementType::GUITAR_BEND_HOLD_SEGMENT, sp, ElementFlag::MOVABLE | ElementFlag::ON_STAFF)
 {
     setFlag(ElementFlag::ON_STAFF, true);
-}
-
-void GuitarBendHoldSegment::dragGrip(EditData& ed)
-{
-    PointF delta = ed.evtDelta;
-
-    switch (ed.curGrip) {
-    case Grip::START:
-        setOffset(offset() + delta);
-        setUserOff2(userOff2() - delta);
-        break;
-    case Grip::END:
-        setUserOff2(userOff2() + delta);
-        break;
-    case Grip::MIDDLE:
-        setOffset(offset() + delta);
-        break;
-    default:
-        break;
-    }
-
-    triggerLayout();
 }
 
 /****************************************

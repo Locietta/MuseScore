@@ -112,17 +112,6 @@ void TrillSegment::symbolLine(SymId start, SymId fill, SymId end)
     setbbox(r);
 }
 
-void TrillSegment::rebaseAnchors(EditData& ed, Grip grip)
-{
-    EngravingItem* startElement = spanner()->startElement();
-    if (startElement && startElement->isChord() && toChord(startElement)->staffMove() != 0) {
-        // This trill is on a cross-staff chord. Don't try to rebase its anchors when dragging.
-        return;
-    }
-
-    LineSegment::rebaseAnchors(ed, grip);
-}
-
 //---------------------------------------------------------
 //   scanElements
 //---------------------------------------------------------
@@ -415,8 +404,6 @@ muse::TranslatableString Trill::subtypeUserName() const
 //---------------------------------------------------------
 //   accessibleInfo
 //---------------------------------------------------------
-
-
 
 Sid Trill::defaultPosSid() const
 {

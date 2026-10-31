@@ -66,10 +66,6 @@ StringTunings* StringTunings::clone() const
     return new StringTunings(*this);
 }
 
-bool StringTunings::isEditable() const
-{
-    return false;
-}
 
 PropertyValue StringTunings::getProperty(Pid id) const
 {

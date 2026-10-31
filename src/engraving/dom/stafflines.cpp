@@ -82,19 +82,7 @@ PointF StaffLines::canvasPos() const
     return p;
 }
 
-RectF StaffLines::hitBBox() const
-{
-    double clickablePadding = spatium();
-    if (m_lines.size() <= 1) {
-        return ldata()->bbox().adjusted(0.0, -clickablePadding, 0.0, clickablePadding);
-    }
-    return ldata()->bbox();
-}
 
-Shape StaffLines::hitShape() const
-{
-    return Shape(hitBBox(), this);
-}
 
 bool StaffLines::collectForDrawing() const
 {

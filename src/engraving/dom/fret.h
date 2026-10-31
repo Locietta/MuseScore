@@ -154,7 +154,6 @@ public:
 
     void updateDiagram(const String& harmonyName);
 
-    std::vector<LineF> dragAnchorLines() const override;
     double mainWidth() const;
 
     int  strings() const { return m_strings; }
@@ -209,7 +208,6 @@ public:
     void add(EngravingItem*) override;
     void remove(EngravingItem*) override;
 
-    RectF drag(EditData&) override;
     bool acceptDrop(EditData&) const override;
     EngravingItem* drop(Transaction& tx, EditData&) override;
 
@@ -222,9 +220,6 @@ public:
     PropertyValue propertyDefault(Pid) const override;
 
     void setTrack(track_idx_t val) override;
-
-
-
 
     bool showFingering() const { return m_showFingering; }
     void setShowFingering(bool v) { m_showFingering = v; }

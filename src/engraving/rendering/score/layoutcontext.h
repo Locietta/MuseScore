@@ -98,7 +98,6 @@ public:
     bool isLineMode() const { return isMode(LayoutMode::LINE); }
     bool isLinearMode() const { return options().isLinearMode(); }
     bool isFloatMode() const { return isMode(LayoutMode::FLOAT); }
-    bool isPaletteMode() const;
     bool isPrintingMode() const;
 
     bool isShowVBox() const { return options().isShowVBox; }

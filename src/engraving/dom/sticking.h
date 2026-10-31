@@ -46,8 +46,6 @@ public:
     Segment* segment() const { return (Segment*)ownershipParent(); }
     Measure* measure() const { return (Measure*)ownershipParent()->ownershipParent(); }
 
-    bool isEditAllowed(EditData&) const override;
-
     bool positionRelativeToNoteheadRest() const override { return true; }
 };
 } // namespace mu::engraving

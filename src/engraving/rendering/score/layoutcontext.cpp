@@ -25,7 +25,6 @@
 #include "editing/addremoveelement.h"
 #include "editing/editpagelocks.h"
 #include "editing/editsystemlocks.h"
-#include "editing/mscoreview.h"
 #include "editing/transaction/transaction.h"
 #include "style/defaultstyle.h"
 
@@ -57,15 +56,6 @@ const Score* LayoutConfiguration::score() const
 const LayoutOptions& LayoutConfiguration::options() const
 {
     return score()->layoutOptions();
-}
-
-bool LayoutConfiguration::isPaletteMode() const
-{
-    IF_ASSERT_FAILED(score()) {
-        return false;
-    }
-
-    return score()->isPaletteScore();
 }
 
 bool LayoutConfiguration::isPrintingMode() const
@@ -604,9 +594,7 @@ LayoutContext::LayoutContext(Score* score)
 
 LayoutContext::~LayoutContext()
 {
-    for (MuseScoreView* v : m_score->getViewer()) {
-        v->layoutChanged();
-    }
+
 }
 
 bool LayoutContext::isValid() const

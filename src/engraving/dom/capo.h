@@ -40,7 +40,6 @@ public:
     bool setProperty(Pid id, const PropertyValue& val) override;
     void setXmlText(const String& text) override;
 
-    bool isEditable() const override;
 
     const CapoParams& params() const;
     void setParams(const CapoParams& params);

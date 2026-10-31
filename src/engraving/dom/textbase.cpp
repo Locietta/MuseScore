@@ -38,7 +38,6 @@
 #include "types/symnames.h"
 #include "types/typesconv.h"
 
-
 #include "anchors.h"
 #include "box.h"
 #include "harppedaldiagram.h"
@@ -2207,49 +2206,6 @@ RectF TextBase::pageRectangle() const
 }
 
 //---------------------------------------------------------
-//   dragTo
-//---------------------------------------------------------
-
-void TextBase::dragTo(EditData& ed)
-{
-    cursor()->set(ed.pos, TextCursor::MoveMode::KeepAnchor);
-    score()->setUpdateAll();
-    score()->update();
-}
-
-//---------------------------------------------------------
-//   dragAnchorLines
-//---------------------------------------------------------
-
-std::vector<LineF> TextBase::dragAnchorLines() const
-{
-    std::vector<LineF> result(genericDragAnchorLines());
-
-    if (layoutToParentWidth() && !result.empty()) {
-        LineF& line = result[0];
-        line.setP2(line.p2() + ldata()->bbox().topLeft());
-    }
-
-    return result;
-}
-
-//---------------------------------------------------------
-//   mousePress
-//    set text cursor
-//---------------------------------------------------------
-
-bool TextBase::mousePress(EditData& ed)
-{
-    bool shift = ed.modifiers & ShiftModifier;
-    if (!cursor()->set(ed.startMove, shift ? TextCursor::MoveMode::KeepAnchor : TextCursor::MoveMode::MoveAnchor)) {
-        return false;
-    }
-
-    score()->setUpdateAll();
-    return true;
-}
-
-//---------------------------------------------------------
 //   acceptDrop
 //---------------------------------------------------------
 
@@ -2409,18 +2365,6 @@ String TextBase::escape(String s)
     s.replace(u"\"", u"&quot;");
     return s;
 }
-
-//---------------------------------------------------------
-//   accessibleInfo
-//---------------------------------------------------------
-
-
-
-//---------------------------------------------------------
-//   screenReaderInfo
-//---------------------------------------------------------
-
-
 
 //---------------------------------------------------------
 //   subtype
@@ -2860,7 +2804,6 @@ String TextBase::getHtmlEndTag(FontStyle style, VerticalAlignment vAlign)
     return s;
 }
 
-
 void TextBase::notifyAboutTextCursorChanged()
 {
 }
@@ -3007,80 +2950,6 @@ void TextBase::initTextStyleType(TextStyleType tid)
     for (const auto& p : *textStyle(tid)) {
         setProperty(getTextPID(p.pid), styleValue(p.pid, p.sid));
     }
-}
-
-RectF TextBase::drag(EditData& ed)
-{
-    RectF result = EngravingItem::drag(ed);
-
-    MoveElementAnchors::moveElementAnchorsOnDrag(this, ed);
-
-    return result;
-}
-
-void TextBase::endDrag(EditData& ed)
-{
-    if (m_cursor->editing()) {
-        return;
-    }
-    EngravingItem::endDrag(ed);
-}
-
-//---------------------------------------------------------
-//   editCut
-//---------------------------------------------------------
-
-void TextBase::editCut(EditData& ed)
-{
-    TextEditData* ted = static_cast<TextEditData*>(ed.getData(this).get());
-    String s = cursor()->selectedText(true);
-
-    if (!s.isEmpty()) {
-        ted->selectedText = cursor()->selectedText(true);
-        ed.curGrip = Grip::START;
-        ed.key     = Key_Delete;
-        ed.s       = String();
-        edit(ed);
-    }
-}
-
-//---------------------------------------------------------
-//   editCopy
-//---------------------------------------------------------
-
-void TextBase::editCopy(EditData& ed)
-{
-    //
-    // store selection as rich and plain text
-    //
-    TextEditData* ted = static_cast<TextEditData*>(ed.getData(this).get());
-    ted->selectedText = cursor()->selectedText(true);
-    ted->selectedPlainText = cursor()->selectedText(false);
-}
-
-bool TextBase::nudge(const EditData& ed)
-{
-    bool ctrlMod = ed.modifiers & ControlModifier;
-    double step = spatium() * (ctrlMod ? MScore::nudgeStep10 : MScore::nudgeStep);
-    PointF addOffset = PointF();
-    switch (ed.key) {
-    case Key_Up:
-        addOffset = PointF(0.0, -step);
-        break;
-    case Key_Down:
-        addOffset = PointF(0.0, step);
-        break;
-    case Key_Left:
-        addOffset = PointF(-step, 0.0);
-        break;
-    case Key_Right:
-        addOffset = PointF(step, 0.0);
-        break;
-    default:
-        return false;
-    }
-    undoChangeProperty(Pid::OFFSET, offset() + addOffset, PropertyFlags::UNSTYLED);
-    return true;
 }
 
 //---------------------------------------------------------

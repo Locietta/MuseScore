@@ -271,17 +271,6 @@ bool Articulation::layoutCloseToNote() const
 }
 
 //---------------------------------------------------------
-//   dragAnchorLines
-//---------------------------------------------------------
-
-std::vector<LineF> Articulation::dragAnchorLines() const
-{
-    std::vector<LineF> result;
-    result.push_back(LineF(canvasPos(), layoutParent()->canvasPos()));
-    return result;
-}
-
-//---------------------------------------------------------
 //   getProperty
 //---------------------------------------------------------
 
@@ -638,8 +627,6 @@ bool Articulation::isBasicArticulation() const
 //---------------------------------------------------------
 //   accessibleInfo
 //---------------------------------------------------------
-
-
 
 void Articulation::setupShowOnTabStyles()
 {

@@ -35,16 +35,12 @@ public:
     HammerOnPullOffText(const HammerOnPullOffText& h);
     HammerOnPullOffText* clone() const override { return new HammerOnPullOffText(*this); }
 
-    bool isEditAllowed(EditData&) const override { return false; }
-
     HammerOnPullOffSegment* hopoSegment() const { return toHammerOnPullOffSegment(ownershipParent()); }
 
     Chord* startChord() const { return m_startChord; }
     Chord* endChord() const { return m_endChord; }
     void setStartChord(Chord* c) { m_startChord = c; }
     void setEndChord(Chord* c) { m_endChord = c; }
-
-    std::vector<LineF> dragAnchorLines() const override;
 
     bool isUserModified() const override;
     bool isValid() const { return m_isValid; }

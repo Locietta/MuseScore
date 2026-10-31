@@ -30,17 +30,9 @@ namespace mu::engraving {
 //   ElementEditData
 //    holds element specific data during element editing:
 //
-//    startDragGrip(EditData&)    creates data and attaches it to EditData
-//         dragGrip(EditData&)
-//      endDragGrip(EditData&)    use data to create undo records
-//-----------------------------------------------------------------------------
-
 enum class EditDataType : signed char {
     ElementEditData,
     TextEditData,
-    BarLineEditData,
-    BeamEditData,
-    NoteEditData,
 };
 
 class ElementEditData

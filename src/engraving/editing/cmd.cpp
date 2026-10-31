@@ -92,7 +92,6 @@
 #include "editspanner.h"
 #include "editstaff.h"
 #include "editsystemlocks.h"
-#include "mscoreview.h"
 #include "navigation.h"
 #include "transaction/transaction.h"
 #include "transaction/undostack.h"
@@ -357,7 +356,6 @@ void MasterScore::update(bool resetCmdState, bool layoutAllParts)
 
     deletePostponed(m_cmdState);
 
-    bool updateAll = false;
     if (m_cmdState.layoutRange()) {
         for (Score* s : scoreList()) {
             if (s != this && !s->isOpen() && scoreList().size() > 1 && !layoutAllParts) {
@@ -365,35 +363,14 @@ void MasterScore::update(bool resetCmdState, bool layoutAllParts)
             }
             s->doLayoutRange(m_cmdState.startTick(), m_cmdState.endTick());
         }
-        updateAll = true;
     }
 
     if (needUpdateTicksAndTimeSigMap()) {
         updateTicksAndTimeSigMap();
     }
 
-    if (updateAll || m_cmdState.updateAll()) {
-        for (Score* s : scoreList()) {
-            for (MuseScoreView* v : s->getViewer()) {
-                v->updateAll();
-            }
-        }
-    } else if (m_cmdState.updateRange()) {
-        // Any score that accumulated a refresh rect via addRefresh() calls dataChanged() on its viewers.
-        for (Score* s : scoreList()) {
-            if (s->refreshRect().isNull()) {
-                continue;
-            }
-            const std::list<MuseScoreView*>& viewers = s->getViewer();
-            if (!viewers.empty()) {
-                double d = s->style().spatium() * .5;
-                RectF rect = s->refreshRect().adjusted(-d, -d, 2 * d, 2 * d);
-                for (MuseScoreView* v : viewers) {
-                    v->dataChanged(rect);
-                }
-            }
-            s->clearRefreshRect();
-        }
+    for (Score* s : scoreList()) {
+        s->clearRefreshRect();
     }
 
     if (resetCmdState) {
@@ -881,12 +858,11 @@ void Score::createCRSequence(const Fraction& f, ChordRest* cr, const Fraction& t
 //    return segment of last created note/rest
 //---------------------------------------------------------
 
-Segment* Score::setNoteRest(Segment* segment, track_idx_t track, NoteVal nval, Fraction sd, DirectionV stemDirection,
-                            bool forceAccidental, const std::set<SymId>& articulationIds, bool rhythmic, InputState* externalInputState)
+Segment* Score::setNoteRestAt(Segment* segment, track_idx_t track, NoteVal nval, Fraction sd,
+                            DirectionV stemDirection, bool forceAccidental,
+                            const std::set<SymId>& articulationIds, bool rhythmic, EngravingItem** lastEntered)
 {
     assert(segment->segmentType() == SegmentType::ChordRest);
-    InputState& is = externalInputState ? (*externalInputState) : m_is;
-
     bool isRest   = nval.isRest();
     Fraction tick = segment->tick();
     EngravingItem* nr   = nullptr;
@@ -1049,6 +1025,19 @@ Segment* Score::setNoteRest(Segment* segment, track_idx_t track, NoteVal nval, F
     if (tie) {
         connectTies();
     }
+
+    if (lastEntered) *lastEntered = nr;
+    return segment;
+}
+
+Segment* Score::setNoteRest(Segment* segment, track_idx_t track, NoteVal nval, Fraction sd, DirectionV stemDirection,
+                            bool forceAccidental, const std::set<SymId>& articulationIds, bool rhythmic, InputState* externalInputState)
+{
+    assert(segment->segmentType() == SegmentType::ChordRest);
+    InputState& is = externalInputState ? (*externalInputState) : m_is;
+    EngravingItem* nr = nullptr;
+    segment = setNoteRestAt(segment, track, nval, sd, stemDirection, forceAccidental, articulationIds, rhythmic, &nr);
+    ChordRest* cr = nullptr;
 
     if (nr) {
         if (is.slur() && nr->isNote()) {
@@ -1467,9 +1456,6 @@ void Score::changeCRlen(ChordRest* cr, const Fraction& dstF, bool fillWithRest)
         return;
     }
 
-    //keep selected element if any
-    EngravingItem* selElement = selection().isSingle() ? getSelectedElement() : 0;
-
     track_idx_t track = cr->track();
     Tuplet* tuplet = cr->tuplet();
 
@@ -1477,7 +1463,6 @@ void Score::changeCRlen(ChordRest* cr, const Fraction& dstF, bool fillWithRest)
         //
         // make shorter and fill with rest
         //
-        deselectAll();
         if (cr->isChord()) {
             //
             // remove ties and tremolo between 2 notes
@@ -1517,9 +1502,6 @@ void Score::changeCRlen(ChordRest* cr, const Fraction& dstF, bool fillWithRest)
             setRest(cr->endTick(), track, srcF - dstF, false, tuplet);
         }
 
-        if (selElement) {
-            select(selElement, SelectType::SINGLE, 0);
-        }
         return;
     }
 
@@ -1531,9 +1513,6 @@ void Score::changeCRlen(ChordRest* cr, const Fraction& dstF, bool fillWithRest)
     if (flist.empty()) {
         return;
     }
-
-    deselectAll();
-    EngravingItem* elementToSelect = nullptr;
 
     Fraction tick  = cr->tick();
     Fraction f     = dstF;
@@ -1553,7 +1532,6 @@ void Score::changeCRlen(ChordRest* cr, const Fraction& dstF, bool fillWithRest)
 
         if (cr->isRest()) {
             Fraction timeStretch = cr1->staff()->timeStretch(cr1->tick());
-            Rest* r = toRest(cr);
             if (first) {
                 std::vector<TDuration> dList = toDurationList(f2, true);
                 undoChangeChordRestLen(cr, dList[0]);
@@ -1564,10 +1542,9 @@ void Score::changeCRlen(ChordRest* cr, const Fraction& dstF, bool fillWithRest)
                     setRest(tick2, track, d.fraction(), (d.dots() > 0), tuplet);
                 }
             } else {
-                r = setRest(tick, track, f2, false, tuplet);
+                setRest(tick, track, f2, false, tuplet);
             }
             if (first) {
-                elementToSelect = r;
                 first = false;
             }
             tick += actualTicks(f2, tuplet, timeStretch);
@@ -1588,7 +1565,6 @@ void Score::changeCRlen(ChordRest* cr, const Fraction& dstF, bool fillWithRest)
                         oc = cc;
                     }
                     if (oc && first) {
-                        elementToSelect = selElement ? selElement : oc;
                         first = false;
                     }
                     if (oc) {
@@ -1607,7 +1583,6 @@ void Score::changeCRlen(ChordRest* cr, const Fraction& dstF, bool fillWithRest)
                         oc = cc;
                     }
                     if (first) {
-                        elementToSelect = selElement;
                         first = false;
                     }
                     tick += oc->actualTicks();
@@ -1629,11 +1604,6 @@ void Score::changeCRlen(ChordRest* cr, const Fraction& dstF, bool fillWithRest)
     }
     connectTies();
 
-    if (elementToSelect) {
-        if (canReselectItem(elementToSelect)) {
-            select(elementToSelect, SelectType::SINGLE, 0);
-        }
-    }
 }
 
 //---------------------------------------------------------

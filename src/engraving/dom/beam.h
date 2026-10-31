@@ -56,9 +56,6 @@ public:
 
     Beam* clone() const override { return new Beam(*this); }
 
-    bool isEditable() const override { return true; }
-    void startEdit(EditData&) override;
-    void dragGrip(EditData&) override;
 
     Fraction tick() const override;
     Fraction rtick() const override;
@@ -141,17 +138,10 @@ public:
 
     void triggerLayout() const override;
 
-    bool needStartEditingAfterSelecting() const override { return true; }
-    int gripsCount() const override { return 3; }
-    Grip initialEditModeGrip() const override { return Grip::END; }
-    Grip defaultGrip() const override { return Grip::MIDDLE; }
-    std::vector<PointF> gripsPositions(const EditData&) const override;
 
     static ActionIconType actionIconTypeForBeamMode(BeamMode);
 
-    RectF drag(EditData&) override;
     bool isMovable() const override;
-    void startDrag(EditData&) override;
 
     bool hasAllRests();
 
@@ -182,8 +172,6 @@ private:
     friend class BeamSegment;
     Beam(Score* parent);
     Beam(const Beam&);
-
-    void initBeamEditData(EditData& ed);
 
     static constexpr std::array MAX_SLOPES = { 0, 1, 2, 3, 4, 5, 6, 7 };
 

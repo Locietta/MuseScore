@@ -48,7 +48,6 @@ public:
     TabDurationSymbol(const TabDurationSymbol&);
     TabDurationSymbol* clone() const override { return new TabDurationSymbol(*this); }
 
-    bool isEditable() const override { return false; }
 
     const StaffType* tab() const { return m_tab; }
     const String& text() const { return m_text; }

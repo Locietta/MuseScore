@@ -49,8 +49,6 @@ public:
     void consolidateAdjustmentOffsetIntoUserOffset();
 
     bool isEdited() const;
-    RectF drag(EditData&) override;
-    void dragGrip(EditData&) override;
 
     Tie* tie() const { return (Tie*)spanner(); }
 
@@ -70,7 +68,6 @@ public:
 
 protected:
     TieSegment(const ElementType& type, Tie* sp);
-    void changeAnchor(EditData&, EngravingItem*) override;
 
 private:
     int m_staffMove = 0;

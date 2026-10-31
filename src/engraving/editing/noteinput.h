@@ -63,6 +63,8 @@ public:
     static NoteVal noteVal(const Score* score, int pitch, staff_idx_t staffIdx, bool allowTransposition);
     static NoteVal noteValForPosition(const Score* score, Position pos, AccidentalType at, bool& error);
 
+    static Note* addNoteToChord(Score* score, Chord* chord, const NoteVal& noteVal,
+                                bool forceAccidental = false, const std::set<SymId>& articulationIds = {});
     static Note* addNote(Transaction& tx, Score* score, Chord* chord, const NoteVal& noteVal, bool forceAccidental = false,
                          const std::set<SymId>& articulationIds = {}, InputState* externalInputState = nullptr);
     static Note* addNoteToTiedChord(Transaction& tx, Score* score, Chord* chord, const NoteVal& noteVal, bool forceAccidental = false,

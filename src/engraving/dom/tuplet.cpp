@@ -386,68 +386,6 @@ void Tuplet::removeDurationElement(DurationElement* de)
 //   isEditable
 //---------------------------------------------------------
 
-bool Tuplet::isEditable() const
-{
-    return m_hasBracket;
-}
-
-//---------------------------------------------------------
-//   startDragGrip
-//---------------------------------------------------------
-
-void Tuplet::startDragGrip(EditData& ed)
-{
-    DurationElement::startDragGrip(ed);
-    ElementEditDataPtr eed = ed.getData(this);
-
-    eed->pushProperty(Pid::P1);
-    eed->pushProperty(Pid::P2);
-}
-
-//---------------------------------------------------------
-//   dragGrip
-//---------------------------------------------------------
-
-void Tuplet::dragGrip(EditData& ed)
-{
-    if (ed.curGrip == Grip::START) {
-        m_userP1 += ed.delta;
-    } else if (ed.curGrip == Grip::END) {
-        m_userP2 += ed.delta;
-    } else if (ed.curGrip == Grip::MIDDLE) {
-        m_userP1 += ed.delta;
-        m_userP2 += ed.delta;
-    } else {
-        UNREACHABLE;
-        return;
-    }
-
-    setGenerated(false);
-    triggerLayout();
-}
-
-//---------------------------------------------------------
-//   gripsPositions
-//---------------------------------------------------------
-
-int Tuplet::gripsCount() const
-{
-    return m_hasBracket ? 3 : 0;
-}
-
-std::vector<PointF> Tuplet::gripsPositions(const EditData&) const
-{
-    IF_ASSERT_FAILED(gripsCount() != 0) {
-        return std::vector<PointF>();
-    }
-
-    const PointF pp(pagePos());
-    PointF left = pp + m_p1;
-    PointF right = pp + m_p2;
-    PointF middle = 0.5 * (left + right);
-
-    return { left, right, middle };
-}
 
 //---------------------------------------------------------
 //   reset

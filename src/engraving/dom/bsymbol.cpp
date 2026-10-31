@@ -138,50 +138,6 @@ EngravingItem* BSymbol::drop(Transaction&, EditData& data)
 }
 
 //---------------------------------------------------------
-//   drag
-//---------------------------------------------------------
-
-RectF BSymbol::drag(EditData& ed)
-{
-    RectF r(canvasBoundingRect());
-    for (const EngravingItem* e : m_leafs) {
-        r.unite(e->canvasBoundingRect());
-    }
-
-    double x = ed.delta.x();
-    double y = ed.delta.y();
-
-    double _spatium = spatium();
-    if (ed.hRaster) {
-        double hRaster = _spatium / MScore::hRaster();
-        int n = lrint(x / hRaster);
-        x = hRaster * n;
-    }
-    if (ed.vRaster) {
-        double vRaster = _spatium / MScore::vRaster();
-        int n = lrint(y / vRaster);
-        y = vRaster * n;
-    }
-
-    setOffset(PointF(x, y));
-
-    r.unite(canvasBoundingRect());
-    for (const EngravingItem* e : m_leafs) {
-        r.unite(e->canvasBoundingRect());
-    }
-    return r;
-}
-
-//---------------------------------------------------------
-//   dragAnchorLines
-//---------------------------------------------------------
-
-std::vector<LineF> BSymbol::dragAnchorLines() const
-{
-    return genericDragAnchorLines();
-}
-
-//---------------------------------------------------------
 //   pagePos
 //---------------------------------------------------------
 

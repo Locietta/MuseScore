@@ -35,8 +35,6 @@ public:
     StaffText(DummyParentOr<Segment> parent, TextStyleType = TextStyleType::STAFF);
     StaffText(const StaffText&);
 
-    bool isEditAllowed(EditData&) const override;
-
     StaffText* clone() const override { return new StaffText(*this); }
     EngravingItem* linkedClone() override;
 

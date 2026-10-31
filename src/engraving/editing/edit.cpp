@@ -117,7 +117,6 @@
 #include "edittimesig.h"
 #include "edittremolo.h"
 #include "inserttime.h"
-#include "mscoreview.h"
 #include "navigation.h"
 #include "splitjoinmeasure.h"
 #include "transaction/transaction.h"
@@ -383,25 +382,6 @@ Tuplet* Score::addTuplet(ChordRest* destinationChordRest, const Fraction& ratio,
 //    Select where input continues in a new tuplet, and use
 //    its base length as the input duration
 //---------------------------------------------------------
-
-void Score::selectNewTuplet(Tuplet* tuplet)
-{
-    const std::vector<DurationElement*>& elements = tuplet->elements();
-    DurationElement* elementForSelect = nullptr;
-    if (!elements.empty()) {
-        DurationElement* firstElement = elements.front();
-        if (firstElement->isRest()) {
-            elementForSelect = firstElement;
-        } else if (elements.size() > 1) {
-            elementForSelect = elements[1];
-        }
-    }
-
-    if (elementForSelect) {
-        score()->select(elementForSelect, SelectType::SINGLE, 0);
-        score()->inputState().setDuration(tuplet->baseLen());
-    }
-}
 
 //---------------------------------------------------------
 //   addRest
@@ -1234,7 +1214,6 @@ void Score::deleteItem(EngravingItem* el)
         Chord* chord = toChord(el->ownershipParent());
         if (chord->notes().size() > 1) {
             undoRemoveElement(el);
-            select(chord->downNote(), SelectType::SINGLE, 0);
             break;
         }
         // else fall through
@@ -1412,11 +1391,6 @@ void Score::deleteItem(EngravingItem* el)
                         curTick += rr->actualTicks();
                     }
                 }
-            }
-            // Set input position
-            // TODO If deleted element is last of a sequence, use prev?
-            if (noteEntryMode()) {
-                Navigation::move(score(), u"prev-chord");
             }
         }
     }
@@ -1743,9 +1717,6 @@ void Score::deleteMeasures(MeasureBase* mbStart, MeasureBase* mbEnd, bool preser
 
         // adjust views
         Measure* focusOn = startMeasure->prevMeasure() ? startMeasure->prevMeasure() : score->firstMeasure();
-        for (MuseScoreView* v : score->m_viewer) {
-            v->adjustCanvasPosition(focusOn);
-        }
 
         // insert correct timesig after deletion
         Measure* mBeforeSel = startMeasure->prevMeasure();
@@ -2849,7 +2820,9 @@ MeasureBase* Score::insertBox(MeasureBase* box, MeasureBase* beforeMeasure, cons
             Measure* m = toMeasure(beforeMeasure);
             if (m->isMMRest()) {
                 beforeMeasure = m->mmRestFirst();
-                deselectAll();
+                if (options.needDeselectAll) {
+                    deselectAll();
+                }
             }
             for (size_t staffIdx = 0; staffIdx < nstaves(); ++staffIdx) {
                 if (m->isMeasureRepeatGroupWithPrevM(staffIdx)) {

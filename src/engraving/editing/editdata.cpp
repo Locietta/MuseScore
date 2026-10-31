@@ -29,7 +29,7 @@ using namespace mu::engraving;
 
 void EditData::clear()
 {
-    *this = EditData(m_view);
+    *this = EditData();
 }
 
 std::shared_ptr<ElementEditData> EditData::getData(const EngravingItem* e) const

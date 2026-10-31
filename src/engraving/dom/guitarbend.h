@@ -188,9 +188,6 @@ public:
 
     GuitarBendSegment* clone() const override { return new GuitarBendSegment(*this); }
 
-    int gripsCount() const override;
-    std::vector<PointF> gripsPositions(const EditData& = EditData()) const override;
-
     PropertyValue getProperty(Pid id) const override;
     bool setProperty(Pid propertyId, const PropertyValue& v) override;
     PropertyValue propertyDefault(Pid id) const override;
@@ -209,8 +206,6 @@ public:
     void setBendText(GuitarBendText* t) { m_text = t; }
 
     bool isUserModified() const override;
-
-    std::vector<LineF> gripAnchorLines(Grip) const override { return {}; }
 
     Color curColor(const rendering::PaintOptions& opt) const override
     {
@@ -238,8 +233,6 @@ public:
     DECLARE_LAYOUTDATA_METHODS(GuitarBendSegment)
 
 private:
-    void startDragGrip(EditData& ed) override;
-    void dragGrip(EditData& ed) override;
 
     PointF m_vertexPointOff = PointF();
     GuitarBendText* m_text = nullptr;
@@ -296,8 +289,6 @@ public:
 
     double lineWidth() const { return guitarBendHold()->lineWidth(); }
 
-    std::vector<LineF> gripAnchorLines(Grip) const override { return {}; }
-
     struct LayoutData : LineSegment::LayoutData {
     public:
         const SymIdList& symIds() const { return m_symIds; }
@@ -309,7 +300,6 @@ public:
     DECLARE_LAYOUTDATA_METHODS(GuitarBendHoldSegment)
 
 private:
-    void dragGrip(EditData& ed) override;
 
     double m_dashLength = 3.0;
 
@@ -326,7 +316,6 @@ public:
     GuitarBendText(GuitarBendSegment* parent);
     GuitarBendText* clone() const override { return new GuitarBendText(*this); }
 
-    bool isEditable() const override { return false; }
 
     bool positionRelativeToNoteheadRest() const override { return false; }
 };

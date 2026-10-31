@@ -701,32 +701,6 @@ Sid FiguredBass::getPropertyStyle(Pid id) const
     return EngravingItem::getPropertyStyle(id);
 }
 
-void FiguredBass::startEdit(EditData& ed)
-{
-    clearItems();
-    renderer()->layoutText1(this);   // re-layout without F.B.-specific formatting.
-    TextBase::startEdit(ed);
-}
-
-bool FiguredBass::isEditAllowed(EditData& ed) const
-{
-    if (isTextNavigationKey(ed.key, ed.modifiers)) {
-        return false;
-    }
-
-    if ((ed.key == Key_Left || ed.key == Key_Right) && (ed.modifiers & ControlModifier)) {
-        return false;
-    }
-
-    return TextBase::isEditAllowed(ed);
-}
-
-void FiguredBass::endEdit(EditData& ed)
-{
-    TextBase::endEdit(ed);
-    regenerateText();
-}
-
 void FiguredBass::regenerateText()
 {
     // as the standard text editor keeps inserting spurious HTML formatting and styles
@@ -1222,15 +1196,6 @@ bool FiguredBass::parenthesesMode() const
     }
     return false;
 }
-
-//---------------------------------------------------------
-//
-// METHODS BELONGING TO OTHER CLASSES
-//
-//    Work In Progress: kept here until the FiguredBass framework is reasonably set up;
-//    To be finally moved to their respective class implementation files.
-//
-//---------------------------------------------------------
 
 //---------------------------------------------------------
 //   Score::addFiguredBass

@@ -320,103 +320,6 @@ void Beam::spatiumChanged(double oldValue, double newValue)
 }
 
 //---------------------------------------------------------
-//   BeamEditData
-//---------------------------------------------------------
-
-class BeamEditData : public ElementEditData
-{
-    OBJECT_ALLOCATOR(engraving, BeamEditData)
-public:
-    int editFragment;
-    virtual EditDataType type() override { return EditDataType::BeamEditData; }
-};
-
-//---------------------------------------------------------
-//   dragGrip
-//---------------------------------------------------------
-
-void Beam::dragGrip(EditData& ed)
-{
-    int idx = directionIdx();
-    double dy = ed.delta.y();
-    BeamEditData* bed = static_cast<BeamEditData*>(ed.getData(this).get());
-    BeamFragment* f = m_fragments[bed->editFragment];
-    double y1 = f->py1[idx];
-    double y2 = f->py2[idx];
-
-    if (ed.curGrip == Grip::MIDDLE || noSlope()) {
-        y1 += dy;
-        y2 += dy;
-    } else if (ed.curGrip == Grip::START) {
-        y1 += dy;
-    } else if (ed.curGrip == Grip::END) {
-        y2 += dy;
-    } else {
-        UNREACHABLE;
-        return;
-    }
-
-    double _spatium = spatium();
-    // Because of the logic in Beam::setProperty(),
-    // changing Pid::BEAM_POS only has an effect if Pid::USER_MODIFIED is true.
-    undoChangeProperty(Pid::USER_MODIFIED, true);
-    undoChangeProperty(Pid::BEAM_POS, PairF(y1 / _spatium, y2 / _spatium));
-    undoChangeProperty(Pid::GENERATED, false);
-
-    triggerLayout();
-}
-
-//---------------------------------------------------------
-//   gripsPositions
-//---------------------------------------------------------
-
-std::vector<PointF> Beam::gripsPositions(const EditData& ed) const
-{
-    int idx = directionIdx();
-    BeamEditData* bed = static_cast<BeamEditData*>(ed.getData(this).get());
-    BeamFragment* f = m_fragments[bed->editFragment];
-
-    ChordRest* c1 = nullptr;
-    ChordRest* c2 = nullptr;
-    size_t n = m_elements.size();
-
-    if (n == 0) {
-        return std::vector<PointF>();
-    }
-
-    for (size_t i = 0; i < n; ++i) {
-        if (m_elements[i]->isChordRest()) {
-            c1 = toChordRest(m_elements[i]);
-            break;
-        }
-    }
-    if (!c1) { // no chord/rest found, no need to check again below
-        return {}; // just ignore the requested operation
-    }
-    for (int i = static_cast<int>(n) - 1; i >= 0; --i) {
-        if (m_elements[i]->isChordRest()) {
-            c2 = toChordRest(m_elements[i]);
-            break;
-        }
-    }
-    if (!c2) { // no chord/rest found, no need to check again below
-        return {}; // just ignore the requested operation
-    }
-
-    int y = pagePos().y();
-    double beamStartX = m_startAnchor.x() + (system() ? system()->x() : 0);
-    double beamEndX = m_endAnchor.x() + (system() ? system()->x() : 0);
-    double middleX = (beamStartX + beamEndX) / 2;
-    double middleY = (f->py1[idx] + y + f->py2[idx] + y) / 2;
-
-    return {
-        PointF(beamStartX, f->py1[idx] + y),
-        PointF(beamEndX, f->py2[idx] + y),
-        PointF(middleX, middleY)
-    };
-}
-
-//---------------------------------------------------------
 //   setBeamDirection
 //---------------------------------------------------------
 
@@ -470,15 +373,6 @@ void Beam::reset()
     undoResetProperty(Pid::BEAM_NO_SLOPE);
     undoResetProperty(Pid::BEAM_CROSS_STAFF_MOVE);
     undoChangeProperty(Pid::GENERATED, true);
-}
-
-//---------------------------------------------------------
-//   startEdit
-//---------------------------------------------------------
-
-void Beam::startEdit(EditData& ed)
-{
-    initBeamEditData(ed);
 }
 
 //---------------------------------------------------------
@@ -751,35 +645,6 @@ ActionIconType Beam::actionIconTypeForBeamMode(BeamMode mode)
 }
 
 //---------------------------------------------------------
-//   drag
-//---------------------------------------------------------
-
-RectF Beam::drag(EditData& ed)
-{
-    int idx = directionIdx();
-    double dy = ed.pos.y() - ed.lastPos.y();
-    BeamEditData* bed = static_cast<BeamEditData*>(ed.getData(this).get());
-    BeamFragment* f = m_fragments[bed->editFragment];
-
-    double y1 = f->py1[idx];
-    double y2 = f->py2[idx];
-
-    y1 += dy;
-    y2 += dy;
-
-    double _spatium = spatium();
-    // Because of the logic in Beam::setProperty(),
-    // changing Pid::BEAM_POS only has an effect if Pid::USER_MODIFIED is true.
-    undoChangeProperty(Pid::USER_MODIFIED, true);
-    undoChangeProperty(Pid::BEAM_POS, PairF(y1 / _spatium, y2 / _spatium));
-    undoChangeProperty(Pid::GENERATED, false);
-
-    triggerLayout();
-
-    return canvasBoundingRect();
-}
-
-//---------------------------------------------------------
 //   isMovable
 //---------------------------------------------------------
 bool Beam::isMovable() const
@@ -788,23 +653,8 @@ bool Beam::isMovable() const
 }
 
 //---------------------------------------------------------
-//   initBeamEditData
-//---------------------------------------------------------
-void Beam::initBeamEditData(EditData& ed)
-{
-    std::shared_ptr<BeamEditData> bed = std::make_shared<BeamEditData>();
-    bed->e    = this;
-    bed->editFragment = 0;
-    ed.addData(bed);
-}
-
-//---------------------------------------------------------
 //   startDrag
 //---------------------------------------------------------
-void Beam::startDrag(EditData& editData)
-{
-    initBeamEditData(editData);
-}
 }
 
 //---------------------------------------------------------
