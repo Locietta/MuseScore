@@ -442,6 +442,24 @@ const std::vector<OpCase>& registered_cases() {
     return cases();
 }
 
+// Operations whose batch is never unwound. Every batch that contains one of them is rolled
+// back from the snapshot (its policy is Snapshot, and the guard takes the weakest policy of
+// a batch), which replaces the commands instead of undoing them. Probing the unwind would
+// describe a path no document takes, and for an operation that builds a whole score subtree
+// the probe does not report a failed check but corrupts the heap: the unwind frees the link
+// lists and the elements twice, and leaves the excerpt in the master without the elements
+// the build removed from it. An operation listed here can therefore never be Transaction,
+// whatever its snapshot rows say.
+const std::map<std::string, std::string>& unwind_not_probed() {
+    static const std::map<std::string, std::string> ops = {
+        // Excerpt::createExcerpt builds the excerpt's score (its staves, its title frame and
+        // the cloned measures, with the links between them and the master's) as commands of
+        // the batch (notes/a4/excerpts/REPORT.md).
+        {"GenerateExcerpts", "an excerpt's build is restored from the snapshot, not unwound"},
+    };
+    return ops;
+}
+
 EvidenceRow run_case(Engine& engine, const OpCase& op_case, const std::filesystem::path& fixture) {
     EvidenceRow row{.name = op_case.name, .fixture = op_case.fixture};
     std::size_t ops = 0;
@@ -457,8 +475,12 @@ EvidenceRow run_case(Engine& engine, const OpCase& op_case, const std::filesyste
     row.c1 = check_commit(engine, op_case, fixture, row.pushes);
     row.c2 = check_undo(engine, op_case, fixture);
     row.r4 = pass;
-    std::tie(row.c3_unwind, row.c4_unwind) =
-        check_rollbacks(engine, op_case, fixture, row.pushes, ops, api::Policy::Transaction, row.r4);
+    if (const auto unprobed = unwind_not_probed().find(row.op); unprobed != unwind_not_probed().end()) {
+        row.c3_unwind = row.c4_unwind = "not probed: " + unprobed->second;
+    } else {
+        std::tie(row.c3_unwind, row.c4_unwind) =
+            check_rollbacks(engine, op_case, fixture, row.pushes, ops, api::Policy::Transaction, row.r4);
+    }
     std::tie(row.c3_snapshot, row.c4_snapshot) =
         check_rollbacks(engine, op_case, fixture, row.pushes, ops, api::Policy::Snapshot, row.r4);
 
