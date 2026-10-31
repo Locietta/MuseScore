@@ -37,7 +37,27 @@ TEST(MnxImport, UpstreamSemanticReferences) {
         ASSERT_TRUE(opened) << opened.error().message;
         auto reference = engine->open(data / (entry.path().stem().string() + "_ref.mscx"));
         ASSERT_TRUE(reference) << reference.error().message;
-        EXPECT_EQ(sounding_events(events(**opened)), sounding_events(events(**reference)));
+        if (entry.path().stem() == "tupletHiddenRest") {
+            // This retained MSCX reference loses A4 at tick 1280 when the native
+            // reader fills its leading tuplet gap. Use the MNX source's explicit
+            // two 3:2 groups as the independent oracle, without changing that reader.
+            const auto dump = events(**opened);
+            Json actual = Json::array();
+            for (unsigned voice = 0; voice < 2; ++voice)
+                for (const auto& event : dump.at(0).at(voice))
+                    if (event.at("kind") == "chord")
+                        actual.push_back(Json::array({voice, event.at("tick"), event.at("ticks"),
+                                                     event.at("notes").at(0).at("pitch")}));
+            const Json expected = {{0,320,320,74}, {0,640,320,72}, {0,960,320,72},
+                                   {0,1280,320,69}, {0,1600,320,67}, {1,0,320,64}, {1,320,640,65}};
+            EXPECT_EQ(actual, expected);
+            EXPECT_EQ(dump.at(0).at(0).at(0).at("kind"), "rest");
+            EXPECT_EQ(dump.at(0).at(0).at(0).at("ticks"), 320);
+            EXPECT_EQ(dump.at(0).at(1).back().at("ticks"), 960);
+            EXPECT_EQ(dump.at(0).at(0).at(2).at("notes").at(0).at("tieTo"), Json({960,0,72}));
+        } else {
+            EXPECT_EQ(sounding_events(events(**opened)), sounding_events(events(**reference)));
+        }
         // Byte input without a name exercises JSON content detection.
         std::ifstream in(entry.path(), std::ios::binary);
         const std::string bytes{std::istreambuf_iterator<char>(in), {}};
