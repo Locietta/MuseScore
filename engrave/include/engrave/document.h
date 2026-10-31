@@ -90,6 +90,12 @@ struct Document {
     // changed the score advances the revision by one and gives what it created
     // its ids. Throws when the engine failed and the document could not be
     // restored: later edits and exports then return Poisoned.
+    //
+    // A failed batch always restores the score's content and ids. Its layout is
+    // restored exactly too, unless the engine threw or an operation whose rollback
+    // policy is Snapshot had run: the document is then reloaded from a copy taken
+    // before the batch, and is laid out as if saved and reopened, which for a score
+    // written by an older version can place elements a few units differently.
     Result<EditResult> edit(const Batch& batch, std::optional<std::uint64_t> expected_revision = {});
 
 private:
