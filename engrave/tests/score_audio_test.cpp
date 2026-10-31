@@ -1,3 +1,4 @@
+#include "engrave/src/runtime/engine_context.h"
 #include "engrave/src/runtime/noqt_runtime.h"
 #include "engrave/src/audio/score_audio.h"
 
@@ -35,7 +36,7 @@ int main(int argc, char** argv)
 {
     try {
         if (argc != 3) throw std::invalid_argument("Usage: score_audio_test ASSETS UPSTREAM_ROOT");
-        music::initialize_native_runtime(argv[1]);
+        music::EngineContext context(argv[1]);
 
         // Default mix: a document opened from MSCZ carries the archive's
         // audiosettings.json values, matched by (partId, instrumentId).

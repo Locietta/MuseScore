@@ -1,3 +1,4 @@
+#include "engrave/src/runtime/engine_context.h"
 #include "engrave/src/runtime/noqt_runtime.h"
 #include "engrave/src/score/score_edit.h"
 #include "engrave/src/score/score_excerpts.h"
@@ -282,7 +283,7 @@ int main(int argc, char** argv)
 {
     try {
         if (argc != 2) throw std::invalid_argument("Usage: score_edit_test ASSETS");
-        music::initialize_native_runtime(argv[1]);
+        music::EngineContext context(argv[1]);
         const auto project = music::load_native_score(kTwoPartScore, "musicxml");
         auto* score = project->masterScore();
         expect(score->parts().size() == 2, "Fixture did not import two parts");
@@ -501,7 +502,7 @@ int main(int argc, char** argv)
 
         // Round-trip the edited master score through MusicXML: the persisted
         // sounding pitches and ties must match the live DOM semantics.
-        const std::string exported = music::export_native_score(project, "musicxml", 0, "");
+        const std::string exported = music::export_native_score(context, project, "musicxml", 0, "");
         expect(exported.find("<score-partwise") != std::string::npos, "MusicXML export was empty");
         const auto reimported = music::load_native_score(exported, "musicxml");
         auto* reimported_score = reimported->masterScore();
@@ -524,7 +525,7 @@ int main(int argc, char** argv)
 
         // Failure while a redo branch exists must preserve both score and history.
         score->undoRedo(true, nullptr);
-        const auto before_failure = music::export_native_score(project, "mscx", 0, "");
+        const auto before_failure = music::export_native_score(context, project, "mscx", 0, "");
         const auto failure_index = score->undoStack()->currentIndex();
         const auto failure_size = score->undoStack()->size();
         expect(score->undoStack()->canRedo(), "Failure fixture has no redo branch");
@@ -537,7 +538,7 @@ int main(int argc, char** argv)
                && score->undoStack()->currentIndex() == failure_index
                && score->undoStack()->size() == failure_size && score->undoStack()->canRedo(),
                "Engine rollback damaged the previous redo branch");
-        expect(music::export_native_score(project, "mscx", 0, "") == before_failure,
+        expect(music::export_native_score(context, project, "mscx", 0, "") == before_failure,
                "Injected engine failure changed serialized score");
         mu::engraving::MScore::setError(mu::engraving::MsError::MS_NO_ERROR);
         score->undoRedo(false, nullptr);
@@ -552,14 +553,14 @@ int main(int argc, char** argv)
         expect(poisoned, "Unexpected transaction exception was not marked poisoned");
         // Do not issue another operation on this document: core must retire it.
 
-        const auto before_cap = music::export_native_score(project, "mscx", 0, "");
+        const auto before_cap = music::export_native_score(context, project, "mscx", 0, "");
         const bool was_clean = score->undoStack()->isClean();
         expect(music::cap_native_edit_history(score, 0), "Undo history cap failed");
         expect(score->undoStack()->size() == 0 && score->undoStack()->currentIndex() == 0
                && !score->undoStack()->canUndo() && !score->undoStack()->canRedo(),
                "Undo history was not retired");
         expect(score->undoStack()->isClean() == was_clean, "History retirement changed dirty state");
-        expect(music::export_native_score(project, "mscx", 0, "") == before_cap,
+        expect(music::export_native_score(context, project, "mscx", 0, "") == before_cap,
                "Undo history retirement modified score contents");
 
         // An unopened headless excerpt must follow linked master edits and be
@@ -581,7 +582,7 @@ int main(int argc, char** argv)
                "Linked excerpt edit did not expand its dependency to the whole part");
         music::ExportOptions excerpt_options;
         excerpt_options.excerpt_id = 1;
-        const auto excerpt_xml = music::export_native_score(
+        const auto excerpt_xml = music::export_native_score(context,
             excerpt_project, "musicxml", excerpt_options, "");
         const auto excerpt_reopened = music::load_native_score(excerpt_xml, "musicxml");
         expect(excerpt_reopened->masterScore()->parts().size() == 1,

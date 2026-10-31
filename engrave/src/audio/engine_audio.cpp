@@ -466,9 +466,9 @@ bool initialize_engine_audio(const EngineAudioSetup& setup, std::string* error)
         }
     }
 
-    // Uri::fromLocalFile() resolves the absolute path through global IFileSystem.
-    if (!globalIoc()->resolve<io::IFileSystem>("engine_audio")) {
-        return fail("native runtime (IFileSystem) is not initialised; call initialize_native_runtime() first");
+    // Uri::fromLocalFile() resolves the absolute path through the engine's file system.
+    if (!io::fileSystem()) {
+        return fail("native runtime (IFileSystem) is not initialised; create the EngineContext first");
     }
 
     // 1. Thread identity. Everything below (and every later engine call) runs

@@ -235,7 +235,7 @@ Result<EditResult> BatchGuard::execute(std::vector<Step> steps, Policy policy, s
     UndoStack* stack = master.undoStack();
     std::optional<Snapshot> snapshot;
     if (policy == Policy::Snapshot) {
-        snapshot = Snapshot{music::export_native_score(document.project, "mscz", music::ExportOptions{}, {}),
+        snapshot = Snapshot{music::export_native_score(*document.engine->context, document.project, "mscz", music::ExportOptions{}, {}),
                             music::semantic_dump(&master).dump(1), id_list(master), {}};
         for (const mu::engraving::Score* score : master.scoreList())
             snapshot->versions.push_back({score->mscoreVersion(), score->mscoreRevision(), score->mscVersion(), score->npages() > 0});

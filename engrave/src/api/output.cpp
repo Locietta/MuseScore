@@ -91,13 +91,13 @@ Result<RenderOutput> Document::render(const RenderOptions& options) {
     try {
         RenderOutput output;
         if (options.format == RenderFormat::Pdf) {
-            output.document = bytes_of(music::render_score(&score, format, backend));
+            output.document = bytes_of(music::render_score(*impl_->engine->context, &score, format, backend));
             return output;
         }
         output.pages.reserve(static_cast<std::size_t>(last - first + 1));
         for (std::int32_t page = first; page <= last; ++page) {
             backend.page = page;
-            output.pages.push_back(bytes_of(music::render_score(&score, format, backend)));
+            output.pages.push_back(bytes_of(music::render_score(*impl_->engine->context, &score, format, backend)));
         }
         return output;
     } catch (const music::RenderLimitExceeded& error) {

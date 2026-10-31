@@ -1,5 +1,6 @@
 #include "score_render.h"
 #include "cairo_painter.h"
+#include "engrave/src/runtime/engine_context.h"
 #include "draw/painter.h"
 #include "engraving/dom/score.h"
 #include "engraving/dom/mscore.h"
@@ -22,13 +23,14 @@ void check(cairo_status_t status) {
 }
 }
 
-std::string render_score(mu::engraving::Score* score, const std::string& format, int page) {
+std::string render_score(const EngineContext& engine, mu::engraving::Score* score, const std::string& format, int page) {
     ExportOptions options;
     options.page = page;
-    return render_score(score, format, options);
+    return render_score(engine, score, format, options);
 }
 
-std::string render_score(mu::engraving::Score* score, const std::string& format, const ExportOptions& options) {
+std::string render_score(const EngineContext& engine, mu::engraving::Score* score, const std::string& format,
+                         const ExportOptions& options) {
     using namespace mu::engraving;
     if (!score || !score->npages()) throw std::runtime_error("Score has no pages");
     const int npages = static_cast<int>(score->npages());
@@ -74,7 +76,7 @@ std::string render_score(mu::engraving::Score* score, const std::string& format,
         cairo_restore(context.get());
         check(cairo_status(context.get()));
     }
-    auto provider = std::make_shared<muse::draw::CairoPainter>(context.get(), dpi);
+    auto provider = std::make_shared<muse::draw::CairoPainter>(context.get(), engine.fontsDatabase(), dpi);
     const bool wasPrinting = score->printing(), wasPdf = MScore::pdfPrinting;
     struct Restore {
         Score* score; bool printing, pdf;

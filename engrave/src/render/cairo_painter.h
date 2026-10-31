@@ -21,6 +21,8 @@ typedef struct _cairo cairo_t;
 
 
 namespace muse::draw {
+class IFontsDatabase;
+
 class CairoPainter final : public IPaintProvider
 {
 public:
@@ -34,9 +36,10 @@ public:
      *  ends up at the intended points * 1200 / 72 in score coordinates.
      *
      *  Ownership of context stays with the caller; this object never calls
-     *  cairo_destroy().  The cairo_t must outlive the CairoPainter.
+     *  cairo_destroy().  The cairo_t must outlive the CairoPainter.  Text is
+     *  drawn with the font bytes of fontsDatabase, which must outlive it too.
      */
-    explicit CairoPainter(cairo_t* context, double deviceDpi = 1200.0);
+    CairoPainter(cairo_t* context, const IFontsDatabase& fontsDatabase, double deviceDpi = 1200.0);
     ~CairoPainter() override;
 
     CairoPainter(const CairoPainter&) = delete;

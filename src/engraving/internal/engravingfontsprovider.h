@@ -33,6 +33,8 @@ class EngravingFont;
 class EngravingFontsProvider : public IEngravingFontsProvider
 {
 public:
+    explicit EngravingFontsProvider(muse::draw::IFontProvider& fontProvider)
+        : m_fontProvider(fontProvider) {}
 
     void deinit();
 
@@ -61,6 +63,7 @@ private:
         std::shared_ptr<EngravingFont> font;
     };
 
+    muse::draw::IFontProvider& m_fontProvider;
     mutable Fallback m_fallback;
     std::vector<std::shared_ptr<EngravingFont> > m_symbolFonts;
     std::unordered_map<std::string, std::shared_ptr<EngravingFont> > m_externalSymbolFonts;

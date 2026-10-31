@@ -25,7 +25,6 @@
 #include <unordered_map>
 
 #include "iengravingfont.h"
-#include "modularity/ioc.h"
 #include "draw/ifontprovider.h"
 #include "draw/types/geometry.h"
 #include "iengravingfontsprovider.h"
@@ -52,12 +51,12 @@ class Shape;
 
 class EngravingFont : public IEngravingFont
 {
-    muse::GlobalInject<muse::draw::IFontProvider> fontProvider;
-    muse::GlobalInject<IEngravingFontsProvider> engravingFonts;
 public:
-    EngravingFont(const std::string& name, const std::string& family, const muse::io::path_t& filePath,
+    EngravingFont(muse::draw::IFontProvider& fontProvider, const IEngravingFontsProvider& engravingFonts,
+                  const std::string& name, const std::string& family, const muse::io::path_t& filePath,
                   const muse::io::path_t& metadataPath);
-    EngravingFont(const std::string& name, const std::string& family, std::shared_ptr<muse::io::IODevice> font,
+    EngravingFont(muse::draw::IFontProvider& fontProvider, const IEngravingFontsProvider& engravingFonts,
+                  const std::string& name, const std::string& family, std::shared_ptr<muse::io::IODevice> font,
                   std::shared_ptr<muse::io::IODevice> metadata);
     EngravingFont(const EngravingFont& other);
 
@@ -135,6 +134,11 @@ private:
 
     bool useFallbackFont(SymId id) const;
 
+    muse::draw::IFontProvider* fontProvider() const { return m_fontProvider; }
+    const IEngravingFontsProvider* engravingFonts() const { return m_engravingFonts; }
+
+    muse::draw::IFontProvider* m_fontProvider = nullptr;
+    const IEngravingFontsProvider* m_engravingFonts = nullptr;
     bool m_loaded = false;
     std::vector<Sym> m_symbols;
     mutable muse::draw::Font m_font;

@@ -36,7 +36,6 @@
 #include <hb-ft.h>
 
 #include "draw/internal/ifontsdatabase.h"
-#include "global/modularity/ioc.h"
 
 namespace muse::draw {
 namespace {
@@ -384,14 +383,8 @@ struct FtFaceEntry {
 class FontCache
 {
 public:
-    std::shared_ptr<FtFaceEntry> get(const Font& font)
+    std::shared_ptr<FtFaceEntry> get(const Font& font, const IFontsDatabase& db)
     {
-        const std::shared_ptr<IFontsDatabase> db
-            = muse::modularity::globalIoc()->resolve<IFontsDatabase>("");
-        if (!db) {
-            throw std::runtime_error("CairoPainter: IFontsDatabase is not registered");
-        }
-
         const FontDataKey requested = dataKeyForFont(font);
         if (!requested.valid()) {
             throw std::runtime_error("CairoPainter: text drawing requires a non-empty font family");
@@ -405,7 +398,7 @@ public:
             return requestIt->second;
         }
 
-        const FontData fontData = db->fontData(requested, font.type());
+        const FontData fontData = db.fontData(requested, font.type());
         if (!fontData.valid()) {
             throw std::runtime_error("CairoPainter: IFontsDatabase returned no font data for family '"
                                      + requested.family().id().toStdString() + "'");
@@ -543,6 +536,7 @@ struct CairoPainter::Impl {
     };
 
     cairo_t* cr = nullptr;
+    const IFontsDatabase& fonts;
     double dpi = 1200.0;
     bool active = true;
     State state;
@@ -553,7 +547,7 @@ struct CairoPainter::Impl {
     bool baseClipKnown = true;
     std::map<unsigned int, CachedSurface> surfaces;
 
-    Impl(cairo_t* context, double deviceDpi);
+    Impl(cairo_t* context, const IFontsDatabase& fontsDatabase, double deviceDpi);
     ~Impl();
 
     bool isActive() const;
@@ -626,8 +620,8 @@ private:
 
 // --------------------------------------------------------------- lifecycle
 
-CairoPainter::Impl::Impl(cairo_t* context, double deviceDpi)
-    : cr(context), dpi(deviceDpi)
+CairoPainter::Impl::Impl(cairo_t* context, const IFontsDatabase& fontsDatabase, double deviceDpi)
+    : cr(context), fonts(fontsDatabase), dpi(deviceDpi)
 {
     if (!cr) {
         throw std::invalid_argument("CairoPainter: cairo_t context must not be null");
@@ -993,7 +987,7 @@ double CairoPainter::Impl::fontSizePixels(const Font& font) const
 
 std::shared_ptr<FtFaceEntry> CairoPainter::Impl::faceFor(const Font& font)
 {
-    return fontCache().get(font);
+    return fontCache().get(font, fonts);
 }
 
 void CairoPainter::Impl::applyPen()
@@ -2086,8 +2080,8 @@ void CairoPainter::Impl::drawTiledPixmap(const RectF& rect, const Pixmap& pm, co
 
 // -------------------------------------------------------- CairoPainter glue
 
-CairoPainter::CairoPainter(cairo_t* context, double deviceDpi)
-    : m_impl(std::make_unique<Impl>(context, deviceDpi))
+CairoPainter::CairoPainter(cairo_t* context, const IFontsDatabase& fontsDatabase, double deviceDpi)
+    : m_impl(std::make_unique<Impl>(context, fontsDatabase, deviceDpi))
 {
 }
 

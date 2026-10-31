@@ -25,7 +25,6 @@
 
 #include <memory>
 
-#include "global/modularity/imoduleinterface.h"
 #include "global/io/path.h"
 #include "global/io/iodevice.h"
 #include "global/types/string.h"
@@ -34,10 +33,8 @@
 #include "types/geometry.h"
 
 namespace muse::draw {
-class IFontProvider : MODULE_GLOBAL_INTERFACE
+class IFontProvider
 {
-    INTERFACE_ID(muse::draw::IFontProvider)
-
 public:
     virtual ~IFontProvider() = default;
 

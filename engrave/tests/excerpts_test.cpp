@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
+#include "engrave/src/runtime/engine_context.h"
 #include "engrave/src/runtime/noqt_runtime.h"
 #include "engrave/src/score/score_excerpts.h"
 #include "engrave/src/score/score_metadata.h"
@@ -44,7 +45,7 @@ int main(int argc, char** argv) {
         if (argc != 3) throw std::invalid_argument("Usage: excerpts_test ASSETS OUTPUT_DIRECTORY");
         const auto out = std::filesystem::absolute(std::filesystem::u8path(argv[2]));
         std::filesystem::create_directories(out);
-        music::initialize_native_runtime(argv[1]);
+        music::EngineContext context(argv[1]);
         auto project = music::load_native_score(fixture, "musicxml");
         auto* master = project->masterScore();
         expect(music::list_score_excerpts(master).empty(), "Unexpected initial excerpts");
@@ -62,14 +63,14 @@ int main(int argc, char** argv) {
             expect(records[i].part_ids.at(0) == master->parts()[i]->id().toStdString(), "Excerpt part ID mismatch");
             save(out / ("part"+std::to_string(i)+".musicxml"), export_selection(selected, false));
             save(out / ("part"+std::to_string(i)+".mid"), export_selection(selected, true));
-            save(out / ("part"+std::to_string(i)+".svg"), music::render_score(selected, "svg", 0));
+            save(out / ("part"+std::to_string(i)+".svg"), music::render_score(context, selected, "svg", 0));
         }
         for (int invalid : {-2, 2}) {
             bool rejected = false;
             try { music::select_score(master, invalid); } catch (const std::out_of_range&) { rejected = true; }
             expect(rejected, "Invalid excerpt ID accepted");
         }
-        const auto archive = music::export_native_score(project, "mscz", 0, "");
+        const auto archive = music::export_native_score(context, project, "mscz", 0, "");
         save(out / "with-excerpts.mscz", archive);
         auto reopened = music::load_native_score(archive, "mscz");
         expect(music::list_score_excerpts(reopened->masterScore()).size() == 2, "Saved excerpts lost on reopen");

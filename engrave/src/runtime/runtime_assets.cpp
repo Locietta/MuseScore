@@ -33,7 +33,6 @@
 #include "draw/internal/ifontsengine.h"
 #include "draw/types/fontstypes.h"
 #include "global/io/path.h"
-#include "global/modularity/ioc.h"
 
 namespace music {
 namespace {
@@ -66,19 +65,17 @@ std::filesystem::path pathFromUtf8(const std::string& text)
 #endif
 }
 
-std::filesystem::path s_customCacheRoot;
-
 class CacheStore
 {
 public:
-    CacheStore() = default;
+    explicit CacheStore(std::filesystem::path root) : m_root(std::move(root)) {}
 
     void ensureDirectory()
     {
         if (m_owned) return;
         std::error_code error;
-        const std::filesystem::path base = !s_customCacheRoot.empty()
-            ? s_customCacheRoot
+        const std::filesystem::path base = !m_root.empty()
+            ? m_root
             : std::filesystem::temp_directory_path(error);
         if (error || base.empty()) {
             throw std::runtime_error("Failed to resolve the temporary directory for runtime fonts");
@@ -161,6 +158,7 @@ public:
     const std::filesystem::path& dir() { ensureDirectory(); return m_dir; }
 
 private:
+    std::filesystem::path m_root;
     std::filesystem::path m_dir;
     bool m_owned = false;
     std::size_t m_leases = 0;
@@ -358,29 +356,10 @@ const FontRecord* findRegularFamilyFallback(const ActiveTable& table, const draw
     return italic;
 }
 
-class RuntimeFontsDatabase;
-class FontsEngineProxy;
-
-std::thread::id s_ownerThreadId{};
-bool s_installed = false;
-bool s_shutdown = false;
-int s_nextFontId = 1;
-std::shared_ptr<RuntimeFontsDatabase> s_database;
-std::shared_ptr<FontsEngineProxy> s_proxyEngine;
-std::vector<FontRecord> s_retainedFonts;
 struct SoundFontRecord {
     RuntimeSoundFontInfo info;
     std::size_t size = 0;
 };
-std::vector<SoundFontRecord> s_retainedSoundFonts;
-
-std::size_t retainedResourceBytes()
-{
-    std::size_t result = 0;
-    for (const auto& font : s_retainedFonts) result += font.bytes ? font.bytes->size() : 0;
-    for (const auto& font : s_retainedSoundFonts) result += font.size;
-    return result;
-}
 
 std::string contentFingerprint(const std::vector<std::uint8_t>& bytes)
 {
@@ -391,15 +370,22 @@ std::string contentFingerprint(const std::vector<std::uint8_t>& bytes)
     return buffer;
 }
 
-void checkOwnerThread()
-{
-    if (!s_installed) {
-        throw std::runtime_error("Runtime font services are not installed");
+// The owner thread and the installed/shut-down state, shared by the asset store
+// and the fonts-engine proxy it hands to the draw layer.
+struct OwnerState {
+    std::thread::id owner = std::this_thread::get_id();
+    bool installed = true;
+
+    void check() const
+    {
+        if (!installed) {
+            throw std::runtime_error("Runtime font services are not installed");
+        }
+        if (std::this_thread::get_id() != owner) {
+            throw std::runtime_error("Runtime font services called from a non-owner thread");
+        }
     }
-    if (std::this_thread::get_id() != s_ownerThreadId) {
-        throw std::runtime_error("Runtime font services called from a non-owner thread");
-    }
-}
+};
 
 std::unique_ptr<draw::FontsEngine> createEngine(draw::IFontsDatabase& database)
 {
@@ -495,9 +481,10 @@ private:
 class FontsEngineProxy final : public draw::IFontsEngine
 {
 public:
-    FontsEngineProxy(std::shared_ptr<CacheStore> cacheStore,
+    FontsEngineProxy(const OwnerState& owner, std::shared_ptr<CacheStore> cacheStore,
                      std::unique_ptr<draw::FontsEngine> engine)
-        : m_cacheStore(std::move(cacheStore)),
+        : m_owner(owner),
+          m_cacheStore(std::move(cacheStore)),
           m_engine(std::move(engine))
     {
     }
@@ -520,7 +507,7 @@ public:
     // directory); forward it so a caller can opt in.
     void setRenderCacheDirPath(const muse::io::path_t& path, const std::string& revision = std::string()) override
     {
-        checkOwnerThread();
+        m_owner.check();
         if (!m_engine) {
             throw std::runtime_error("Runtime font engine is not initialized");
         }
@@ -529,7 +516,7 @@ public:
 
     void clearLoadedFaces() override
     {
-        checkOwnerThread();
+        m_owner.check();
         if (m_engine) {
             m_engine->clearLoadedFaces();
         }
@@ -618,22 +605,46 @@ public:
 private:
     const draw::FontsEngine* engine() const
     {
-        checkOwnerThread();
+        m_owner.check();
         if (!m_engine) {
             throw std::runtime_error("Runtime font engine is not initialized");
         }
         return m_engine.get();
     }
 
+    const OwnerState& m_owner;
     std::shared_ptr<CacheStore> m_cacheStore;
     std::unique_ptr<draw::FontsEngine> m_engine;
 };
 
-RuntimeFontInfo reactivateRetained(const FontRecord& retained)
+} // namespace
+
+struct RuntimeAssets::Impl {
+    OwnerState owner;
+    std::shared_ptr<CacheStore> cacheStore;
+    std::unique_ptr<RuntimeFontsDatabase> database;
+    std::unique_ptr<FontsEngineProxy> proxyEngine;
+    std::unique_ptr<draw::FontProvider> provider;
+    int nextFontId = 1;
+    std::vector<FontRecord> retainedFonts;
+    std::vector<SoundFontRecord> retainedSoundFonts;
+
+    std::size_t retainedResourceBytes() const
+    {
+        std::size_t result = 0;
+        for (const auto& font : retainedFonts) result += font.bytes ? font.bytes->size() : 0;
+        for (const auto& font : retainedSoundFonts) result += font.size;
+        return result;
+    }
+
+    RuntimeFontInfo reactivateRetained(const FontRecord& retained);
+};
+
+RuntimeFontInfo RuntimeAssets::Impl::reactivateRetained(const FontRecord& retained)
 {
     RuntimeFontInfo result = retained.info;
 
-    const std::shared_ptr<const ActiveTable> current = s_database->activeTable();
+    const std::shared_ptr<const ActiveTable> current = database->activeTable();
     std::size_t index = current->size();
     bool alreadyActive = false;
     for (std::size_t i = 0; i < current->size(); ++i) {
@@ -655,99 +666,79 @@ RuntimeFontInfo reactivateRetained(const FontRecord& retained)
         next->push_back(retained);
     }
 
-    auto newEngine = createEngine(*s_database);
+    auto newEngine = createEngine(*database);
 
     std::shared_ptr<const ActiveTable> published = std::move(next);
-    s_database->publish(published);
-    s_proxyEngine->setEngine(std::move(newEngine));
+    database->publish(published);
+    proxyEngine->setEngine(std::move(newEngine));
     return result;
 }
 
-} // namespace
 
-void install_runtime_font_services()
+RuntimeAssets::RuntimeAssets(const std::filesystem::path& cacheRoot)
+    : m_impl(std::make_unique<Impl>())
 {
-    if (s_shutdown) throw std::runtime_error("Runtime font services have been shut down");
-    if (s_installed) {
-        if (std::this_thread::get_id() != s_ownerThreadId) {
-            throw std::runtime_error("Runtime font services were installed on another thread");
-        }
-        return;
-    }
-
-    s_ownerThreadId = std::this_thread::get_id();
-    try {
-        auto cacheStore = std::make_shared<CacheStore>();
-        auto active = std::make_shared<ActiveTable>();
-        auto database = std::make_shared<RuntimeFontsDatabase>(cacheStore, active);
-
-        auto* ioc = muse::modularity::globalIoc();
-        ioc->registerExport<muse::draw::IFontsDatabase>("native", database);
-
-        auto proxy = std::make_shared<FontsEngineProxy>(cacheStore, createEngine(*database));
-        ioc->registerExport<muse::draw::IFontsEngine>("native", proxy);
-        ioc->registerExport<draw::IFontProvider>("native",
-            std::make_shared<draw::FontProvider>(*database, *proxy));
-
-        s_database = std::move(database);
-        s_proxyEngine = std::move(proxy);
-        s_installed = true;
-    } catch (...) {
-        s_ownerThreadId = std::thread::id{};
-        throw;
-    }
-}
-
-void set_runtime_cache_root(const std::string& path)
-{
-    if (!path.empty()) {
-        s_customCacheRoot = pathFromUtf8(path);
+    if (!cacheRoot.empty()) {
         std::error_code error;
-        std::filesystem::create_directories(s_customCacheRoot, error);
-    } else {
-        s_customCacheRoot.clear();
+        std::filesystem::create_directories(cacheRoot, error);
+    }
+    m_impl->cacheStore = std::make_shared<CacheStore>(cacheRoot);
+    m_impl->database = std::make_unique<RuntimeFontsDatabase>(m_impl->cacheStore, std::make_shared<ActiveTable>());
+    m_impl->proxyEngine = std::make_unique<FontsEngineProxy>(m_impl->owner, m_impl->cacheStore,
+                                                             createEngine(*m_impl->database));
+    m_impl->provider = std::make_unique<draw::FontProvider>(*m_impl->database, *m_impl->proxyEngine);
+}
+
+RuntimeAssets::~RuntimeAssets()
+{
+    if (!m_impl->owner.installed) return;
+    try {
+        shutdown();
+    } catch (const std::exception& error) {
+        std::fprintf(stderr, "Runtime resource cleanup: %s\n", error.what());
     }
 }
 
-void shutdown_runtime_assets()
+draw::IFontsDatabase& RuntimeAssets::fontsDatabase() { return *m_impl->database; }
+draw::IFontsEngine& RuntimeAssets::fontsEngine() { return *m_impl->proxyEngine; }
+draw::IFontProvider& RuntimeAssets::fontProvider() { return *m_impl->provider; }
+
+void RuntimeAssets::shutdown()
 {
-    if (s_shutdown) return;
-    checkOwnerThread();
-    // Upstream injected services can outlive the native runtime. Explicitly
-    // release the face cache and retained files instead of waiting for their
-    // shared_ptr reference counts to reach zero during global destruction.
-    s_proxyEngine->setEngine(nullptr);
-    s_database->cacheStore()->shutdown();
-    s_retainedFonts.clear();
-    s_retainedSoundFonts.clear();
-    s_customCacheRoot.clear();
-    s_shutdown = true;
-    s_installed = false;
+    if (!m_impl->owner.installed) return;
+    m_impl->owner.check();
+    // Release the face cache and retained files explicitly; leases keep the
+    // cache directory until the last one is released.
+    m_impl->proxyEngine->setEngine(nullptr);
+    m_impl->database->cacheStore()->shutdown();
+    m_impl->retainedFonts.clear();
+    m_impl->retainedSoundFonts.clear();
+    m_impl->owner.installed = false;
 }
 
-std::shared_ptr<const void> retain_runtime_assets()
+std::shared_ptr<const void> RuntimeAssets::retain()
 {
-    checkOwnerThread();
-    return std::make_shared<ResourceLease>(s_database->cacheStore());
+    m_impl->owner.check();
+    return std::make_shared<ResourceLease>(m_impl->database->cacheStore());
 }
-
-RuntimeFontInfo add_runtime_font(const std::string& source_path)
+RuntimeFontInfo RuntimeAssets::addFont(const std::string& source_path)
 {
-    checkOwnerThread();
+    Impl& d = *m_impl;
+    d.owner.check();
 
     std::vector<std::uint8_t> bytes = readResourceFile(source_path, kMaxFontFileBytes, "Font");
 
-    for (const FontRecord& retained : s_retainedFonts) {
+    for (const FontRecord& retained : d.retainedFonts) {
         if (retained.bytes && retained.bytes->size() == bytes.size()
             && std::memcmp(retained.bytes->constData(), bytes.data(), bytes.size()) == 0) {
-            return reactivateRetained(retained);
+            return d.reactivateRetained(retained);
         }
     }
 
     const ParsedFont parsed = validateFont(bytes, source_path);
 
-    const std::size_t retainedBytes = retainedResourceBytes();
-    if (s_retainedFonts.size() >= kMaxRetainedFonts) {
+    const std::size_t retainedBytes = d.retainedResourceBytes();
+    if (d.retainedFonts.size() >= kMaxRetainedFonts) {
         throw std::runtime_error("Maximum number of retained runtime fonts (32) exceeded");
     }
     if (bytes.size() > kMaxRetainedBytes || retainedBytes > kMaxRetainedBytes - bytes.size()) {
@@ -760,12 +751,12 @@ RuntimeFontInfo add_runtime_font(const std::string& source_path)
     // Non-cryptographic content identity only; this is not a security hash.
     const std::string contentHash = contentFingerprint(bytes);
 
-    const int fontId = s_nextFontId;
+    const int fontId = d.nextFontId;
     static std::atomic<std::uint64_t> fileSequence{ 0 };
     const std::string fileName = "font_" + std::to_string(fontId) + "_"
                                  + std::to_string(fileSequence.fetch_add(1, std::memory_order_relaxed))
                                  + ".ttf";
-    const std::filesystem::path destination = s_database->cacheStore()->dir() / fileName;
+    const std::filesystem::path destination = d.database->cacheStore()->dir() / fileName;
     TempFileGuard cacheFileGuard(destination);
 
     {
@@ -803,7 +794,7 @@ RuntimeFontInfo add_runtime_font(const std::string& source_path)
     record.key = key;
     record.bytes = std::move(sharedBytes);
 
-    const std::shared_ptr<const ActiveTable> current = s_database->activeTable();
+    const std::shared_ptr<const ActiveTable> current = d.database->activeTable();
     auto nextActive = std::make_shared<ActiveTable>(*current);
     bool replaced = false;
     for (FontRecord& existing : *nextActive) {
@@ -817,26 +808,27 @@ RuntimeFontInfo add_runtime_font(const std::string& source_path)
         nextActive->push_back(record);
     }
 
-    std::vector<FontRecord> nextRetained = s_retainedFonts;
+    std::vector<FontRecord> nextRetained = d.retainedFonts;
     nextRetained.push_back(record);
 
     RuntimeFontInfo result = record.info;
-    auto newEngine = createEngine(*s_database);
+    auto newEngine = createEngine(*d.database);
 
     std::shared_ptr<const ActiveTable> published = std::move(nextActive);
-    s_database->publish(published);
-    s_retainedFonts.swap(nextRetained);
-    s_proxyEngine->setEngine(std::move(newEngine));
-    s_nextFontId = fontId + 1;
+    d.database->publish(published);
+    d.retainedFonts.swap(nextRetained);
+    d.proxyEngine->setEngine(std::move(newEngine));
+    d.nextFontId = fontId + 1;
     cacheFileGuard.commit();
     return result;
 }
 
-std::vector<RuntimeFontInfo> runtime_fonts()
+std::vector<RuntimeFontInfo> RuntimeAssets::fonts() const
 {
-    checkOwnerThread();
+    const Impl& d = *m_impl;
+    d.owner.check();
 
-    const std::shared_ptr<const ActiveTable> active = s_database->activeTable();
+    const std::shared_ptr<const ActiveTable> active = d.database->activeTable();
     std::vector<RuntimeFontInfo> result;
     result.reserve(active->size());
     for (const FontRecord& record : *active) {
@@ -845,26 +837,27 @@ std::vector<RuntimeFontInfo> runtime_fonts()
     return result;
 }
 
-RuntimeSoundFontInfo freeze_runtime_soundfont(const std::string& source_path)
+RuntimeSoundFontInfo RuntimeAssets::freezeSoundFont(const std::string& source_path)
 {
-    checkOwnerThread();
+    Impl& d = *m_impl;
+    d.owner.check();
     const auto bytes = readResourceFile(source_path, kMaxSoundFontFileBytes, "SoundFont");
     validateSoundFontHeader(bytes, source_path);
     const auto fingerprint = contentFingerprint(bytes);
-    for (const auto& retained : s_retainedSoundFonts) {
+    for (const auto& retained : d.retainedSoundFonts) {
         if (retained.size == bytes.size() && retained.info.content_hash == fingerprint
             && readResourceFile(retained.info.path, kMaxSoundFontFileBytes, "Cached SoundFont") == bytes) {
             return retained.info; // Exact byte comparison; the fingerprint is only a prefilter.
         }
     }
-    if (s_retainedSoundFonts.size() >= kMaxRetainedSoundFonts) {
+    if (d.retainedSoundFonts.size() >= kMaxRetainedSoundFonts) {
         throw std::runtime_error("Maximum number of retained SoundFonts (32) exceeded");
     }
-    if (retainedResourceBytes() > kMaxRetainedBytes - bytes.size()) {
+    if (d.retainedResourceBytes() > kMaxRetainedBytes - bytes.size()) {
         throw std::runtime_error("Retained runtime resource bytes exceed the 256 MiB limit");
     }
-    const auto destination = s_database->cacheStore()->dir()
-        / ("soundfont_" + std::to_string(s_retainedSoundFonts.size()) + ".sf2");
+    const auto destination = d.database->cacheStore()->dir()
+        / ("soundfont_" + std::to_string(d.retainedSoundFonts.size()) + ".sf2");
     TempFileGuard guard(destination);
     {
         std::ofstream output(destination, std::ios::binary | std::ios::trunc);
@@ -873,9 +866,9 @@ RuntimeSoundFontInfo freeze_runtime_soundfont(const std::string& source_path)
         if (!output) throw std::runtime_error("Failed to write retained SoundFont");
     }
     RuntimeSoundFontInfo result{pathToUtf8(destination), fingerprint};
-    auto next = s_retainedSoundFonts;
+    auto next = d.retainedSoundFonts;
     next.push_back({result, bytes.size()});
-    s_retainedSoundFonts.swap(next);
+    d.retainedSoundFonts.swap(next);
     guard.commit();
     return result;
 }

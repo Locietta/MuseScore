@@ -1,3 +1,4 @@
+#include "engrave/src/runtime/engine_context.h"
 #include "engrave/src/runtime/noqt_runtime.h"
 #include "engrave/src/score/score_positions.h"
 #include "engraving/engravingproject.h"
@@ -27,7 +28,7 @@ void check_on_page(const nlohmann::json& data) {
 int main(int argc, char** argv) {
     try {
         if (argc != 2) throw std::invalid_argument("Usage: score_positions_test ASSETS");
-        music::initialize_native_runtime(argv[1]);
+        music::EngineContext context(argv[1]);
         const auto project = music::load_native_score(R"(<score-partwise version="4.0">
 <part-list><score-part id="P1"><part-name>Piano</part-name></score-part></part-list>
 <part id="P1"><measure number="1"><attributes><divisions>1</divisions>

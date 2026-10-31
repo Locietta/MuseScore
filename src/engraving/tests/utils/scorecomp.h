@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include "global/modularity/ioc.h"
 #include "global/io/ifilesystem.h"
 
 #include "engraving/dom/score.h"
@@ -30,8 +29,6 @@
 namespace mu::engraving {
 class ScoreComp
 {
-    static inline muse::GlobalInject<muse::io::IFileSystem> fileSystem;
-
 public:
     static bool saveCompareScore(Score*, const String& saveName, const String& compareWithLocalPath);
     static bool saveCompareMimeData(muse::ByteArray mimeData, const String& saveName, const String& compareWithLocalPath);

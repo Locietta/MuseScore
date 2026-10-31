@@ -113,13 +113,13 @@ Result<std::unique_ptr<Engine>> Engine::create(const EngineOptions& options) {
     for (const auto& soundfont : options.soundfonts)
         impl->state.soundfonts.push_back(std::filesystem::absolute(soundfont));
     impl->state.audio_sample_rate = options.audio_sample_rate;
-    if (!options.cache_dir.empty()) music::set_runtime_cache_root(utf8(std::filesystem::absolute(options.cache_dir)));
     mu::engraving::MScore::testMode = options.deterministic_ids;
-    music::initialize_native_runtime(utf8(resources));
+    impl->state.context = std::make_unique<music::EngineContext>(
+        utf8(resources), options.cache_dir.empty() ? std::string() : utf8(std::filesystem::absolute(options.cache_dir)));
     std::unique_ptr<Engine> engine(new Engine(std::move(impl)));
     for (const auto& font : options.fonts) {
         try {
-            music::add_runtime_font(utf8(std::filesystem::absolute(font)));
+            engine->impl_->state.context->assets().addFont(utf8(std::filesystem::absolute(font)));
         } catch (const std::runtime_error& error) {
             return fail(ErrorCode::InvalidInput, error.what());
         }
@@ -130,11 +130,7 @@ Result<std::unique_ptr<Engine>> Engine::create(const EngineOptions& options) {
 Engine::~Engine() {
     impl_->state.check_thread();
     check(impl_->state.live_documents == 0, "an Engine was destroyed while Documents were open");
-    try {
-        music::shutdown_runtime_assets();
-    } catch (const std::exception& error) {
-        std::fprintf(stderr, "engrave: runtime asset cleanup failed: %s\n", error.what());
-    }
+    impl_->state.context.reset();
 }
 
 Capabilities Engine::capabilities() const {

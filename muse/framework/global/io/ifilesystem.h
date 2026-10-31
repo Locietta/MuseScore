@@ -22,7 +22,6 @@
 #ifndef MUSE_IO_IFILESYSTEM_H
 #define MUSE_IO_IFILESYSTEM_H
 
-#include "global/modularity/imoduleinterface.h"
 #include "global/types/bytearray.h"
 #include "global/types/datetime.h"
 #include "global/types/retval.h"
@@ -31,10 +30,8 @@
 #include "ioenums.h"
 
 namespace muse::io {
-class IFileSystem : MODULE_GLOBAL_INTERFACE
+class IFileSystem
 {
-    INTERFACE_ID(IFileSystem)
-
 public:
     virtual ~IFileSystem() = default;
 
@@ -84,6 +81,12 @@ public:
     virtual DateTime lastModified(const io::path_t& filePath) const = 0;
     virtual Ret isWritable(const io::path_t& filePath) const = 0;
 };
+
+// The engine's file system behind File, Dir, FileInfo and FileStream. These are
+// value types used throughout the engine without an owner to carry a reference,
+// so EngineContext binds its file system here for its lifetime; null outside it.
+IFileSystem* fileSystem();
+void setFileSystem(IFileSystem* fileSystem);
 }
 
 #endif // MUSE_IO_IFILESYSTEM_H

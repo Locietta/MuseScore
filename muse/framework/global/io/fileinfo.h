@@ -23,15 +23,12 @@
 #define MUSE_IO_FILEINFO_H
 
 #include "global/types/string.h"
-#include "global/modularity/ioc.h"
 #include "ifilesystem.h"
 #include "dir.h"
 
 namespace muse::io {
 class FileInfo
 {
-    static inline GlobalInject<IFileSystem> fileSystem;
-
 public:
     FileInfo() = default;
     FileInfo(const path_t& filePath);

@@ -33,6 +33,7 @@
 #include "engraving/dom/masterscore.h"
 #include "engraving/engravingproject.h"
 #include "global/types/uri.h"
+#include "engrave/src/runtime/engine_context.h"
 #include "engrave/src/runtime/noqt_runtime.h"
 #include "engrave/src/score/score_excerpts.h"
 
@@ -279,7 +280,7 @@ int main(int argc, char** argv)
         out["scoreFormat"] = scoreFormat;
 
         auto runtimeStart = std::chrono::steady_clock::now();
-        music::initialize_native_runtime(assets);
+        music::EngineContext context(assets);
         auto score = music::load_native_score(scoreBytes, scoreFormat);
         mu::engraving::MasterScore* master = score->masterScore();
         out["loadSeconds"] = seconds_since(runtimeStart);

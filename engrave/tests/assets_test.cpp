@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
-#include "engrave/src/runtime/noqt_runtime.h"
+#include "engrave/src/runtime/engine_context.h"
 #include "engrave/src/runtime/runtime_assets.h"
 #include "draw/internal/ifontsengine.h"
 #include "draw/types/font.h"
-#include "global/modularity/ioc.h"
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include <cmath>
@@ -59,19 +58,17 @@ int main(int argc, char** argv) {
         const std::string family=fixture.family;
         const auto input=out/"mutable-input.ttf";
         { std::ofstream f(input,std::ios::binary); f.write(bytes.data(),bytes.size()); expect(bool(f),"Cannot write test font"); }
-        music::initialize_native_runtime(argv[1]);
-        struct RuntimeGuard { ~RuntimeGuard() { try { music::shutdown_runtime_assets(); }
-            catch (const std::exception& e) { std::cerr << "Asset shutdown: " << e.what() << '\n'; } } } runtime_guard;
-        auto engine=muse::modularity::globalIoc()->resolve<muse::draw::IFontsEngine>("assets-test");
-        expect(bool(engine),"Missing font engine");
+        music::EngineContext context(argv[1]);
+        music::RuntimeAssets& assets=context.assets();
+        muse::draw::IFontsEngine* engine=&assets.fontsEngine();
         muse::draw::Font font(muse::draw::Font::FontFamily(family),muse::draw::Font::Type::Text);
         font.setPointSizeF(12);
         const std::u32string sample=U"MMMWWWiii012345";
         const auto before=engine->horizontalAdvance(font,sample); // Cache its missing-family fallback.
-        const auto initial_count=music::runtime_fonts().size();
-        const auto info=music::add_runtime_font(utf8(input));
+        const auto initial_count=assets.fonts().size();
+        const auto info=assets.addFont(utf8(input));
         expect(info.family==family && info.path!=utf8(input),"Font was not copied with correct family");
-        expect(music::runtime_fonts().size()==initial_count+1,"Font registry count mismatch");
+        expect(assets.fonts().size()==initial_count+1,"Font registry count mismatch");
         const auto after=engine->horizontalAdvance(font,sample);
         expect(before>0 && after>0 && std::abs(after-before)>0.01,"Cached fallback was not invalidated; choose an unregistered font");
         // A family that only ships a Medium/Bold face (FreeType flags it bold)
@@ -84,26 +81,26 @@ int main(int argc, char** argv) {
             boldAdvance=engine->horizontalAdvance(boldFont,sample);
             expect(std::abs(after-boldAdvance)<0.0001,"Regular lookup of a bold-only family did not use the registered face");
         }
-        const auto again=music::add_runtime_font(utf8(input));
+        const auto again=assets.addFont(utf8(input));
         expect(again.id==info.id && again.path==info.path,"Identical font was not deduplicated");
-        expect(music::runtime_fonts().size()==initial_count+1,"Deduplication added a font");
+        expect(assets.fonts().size()==initial_count+1,"Deduplication added a font");
         muse::draw::Font folded(muse::draw::Font::FontFamily(muse::String::fromUtf8(family).toLower()),muse::draw::Font::Type::Text);
         folded.setPointSizeF(12);
         expect(std::abs(engine->horizontalAdvance(folded,sample)-after)<0.0001,"Family lookup lost case-insensitivity");
         { std::ofstream f(input,std::ios::binary|std::ios::trunc); f<<"invalid-font"; }
         bool bad_rejected=false;
-        try { music::add_runtime_font(utf8(input)); } catch (const std::exception&) { bad_rejected=true; }
-        expect(bad_rejected && music::runtime_fonts().size()==initial_count+1,"Bad font changed registry");
+        try { assets.addFont(utf8(input)); } catch (const std::exception&) { bad_rejected=true; }
+        expect(bad_rejected && assets.fonts().size()==initial_count+1,"Bad font changed registry");
         expect(read(std::filesystem::u8path(info.path))==bytes,"Cached font changed with source file");
         expect(std::abs(engine->horizontalAdvance(font,sample)-after)<0.0001,"Bad input changed font engine state");
         bool thread_rejected=false,engine_thread_rejected=false;
         std::thread other([&]{
-            try { music::runtime_fonts(); } catch (const std::exception&) { thread_rejected=true; }
+            try { assets.fonts(); } catch (const std::exception&) { thread_rejected=true; }
             try { engine->height(font); } catch (const std::exception&) { engine_thread_rejected=true; }
         });
         other.join();
         expect(thread_rejected && engine_thread_rejected,"Font service accepted wrong thread");
-        const auto active=music::runtime_fonts();
+        const auto active=assets.fonts();
         expect(active.back().content_hash==info.content_hash,"Font fingerprint changed");
         nlohmann::json result={{"status","passed"},{"family",family},{"id",info.id},
             {"contentHash",info.content_hash},{"cachedPath",info.path},{"before",before},{"after",after},
@@ -114,29 +111,29 @@ int main(int argc, char** argv) {
             const auto sound_input=out/"mutable-input.sf2";
             { std::ofstream f(sound_input,std::ios::binary); f.write(sound_bytes.data(),sound_bytes.size());
               expect(bool(f),"Cannot write SoundFont test fixture"); }
-            const auto sound=music::freeze_runtime_soundfont(utf8(sound_input));
-            const auto repeated=music::freeze_runtime_soundfont(utf8(sound_input));
+            const auto sound=assets.freezeSoundFont(utf8(sound_input));
+            const auto repeated=assets.freezeSoundFont(utf8(sound_input));
             expect(sound.path!=utf8(sound_input) && repeated.path==sound.path,"SoundFont immutable copy/dedup failed");
             expect(read(std::filesystem::u8path(sound.path))==sound_bytes,"SoundFont copy changed bytes");
             const auto cache_dir=std::filesystem::u8path(sound.path).parent_path();
             const auto file_count=std::distance(std::filesystem::directory_iterator(cache_dir),std::filesystem::directory_iterator{});
             { std::ofstream f(sound_input,std::ios::binary|std::ios::trunc); f<<"invalid-soundfont"; }
             bool rejected=false;
-            try { music::freeze_runtime_soundfont(utf8(sound_input)); } catch(const std::exception&) { rejected=true; }
+            try { assets.freezeSoundFont(utf8(sound_input)); } catch(const std::exception&) { rejected=true; }
             expect(rejected,"Invalid SoundFont was published");
             expect(std::distance(std::filesystem::directory_iterator(cache_dir),std::filesystem::directory_iterator{})==file_count,
                    "Rejected SoundFont leaked a cache file");
             expect(read(std::filesystem::u8path(sound.path))==sound_bytes,"Source mutation altered retained SoundFont");
             bool wrong_thread=false;
-            std::thread wrong([&]{ try { music::freeze_runtime_soundfont(sound.path); }
+            std::thread wrong([&]{ try { assets.freezeSoundFont(sound.path); }
                                   catch(const std::exception&) { wrong_thread=true; } });
             wrong.join();
             expect(wrong_thread,"SoundFont accepted wrong owner thread");
             result["soundfont"]={{"cachedPath",sound.path},{"contentHash",sound.content_hash},
                 {"sourceBytes",sound_bytes.size()},{"invalidRejected",true},{"immutableCopy",true}};
         }
-        auto lease=music::retain_runtime_assets();
-        music::shutdown_runtime_assets();
+        auto lease=assets.retain();
+        assets.shutdown();
         expect(std::filesystem::exists(std::filesystem::u8path(info.path)),"Outstanding lease lost its font file");
         if (result.contains("soundfont"))
             expect(std::filesystem::exists(std::filesystem::u8path(result["soundfont"]["cachedPath"].get<std::string>())),

@@ -6,8 +6,12 @@
 
 namespace mu::engraving { class EngravingProject; class MasterScore; }
 namespace music {
+class EngineContext;
 struct UnsupportedScoreVersion : std::runtime_error { using std::runtime_error::runtime_error; };
 using ScoreProject = std::shared_ptr<mu::engraving::EngravingProject>;
+// The first step of EngineContext: validates the resources (std::invalid_argument,
+// retryable), then claims the process for its one engine and routes diagnostics
+// to stderr.
 void initialize_native_runtime(const std::string& assets);
 ScoreProject load_native_score(const std::string& bytes, const std::string& format);
 // Loads the .mscx of an MSCX directory (score_style.mss and META-INF/ beside
@@ -19,8 +23,9 @@ ScoreProject load_native_score_dir(const std::string& mscx_path);
 void copy_score_versions(mu::engraving::MasterScore* source, mu::engraving::MasterScore* target);
 void apply_score_versions(mu::engraving::MasterScore* score, const std::string& version,
                           int revision, int msc_version);
-std::string export_native_score(const ScoreProject& project, const std::string& format, int page,
+std::string export_native_score(const EngineContext& context, const ScoreProject& project,
+                                const std::string& format, int page, const std::string& soundfont);
+std::string export_native_score(const EngineContext& context, const ScoreProject& project,
+                                const std::string& format, const ExportOptions& options,
                                 const std::string& soundfont);
-std::string export_native_score(const ScoreProject& project, const std::string& format,
-                                const ExportOptions& options, const std::string& soundfont);
 }

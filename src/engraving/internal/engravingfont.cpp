@@ -44,14 +44,18 @@ using namespace mu::engraving;
 // ScoreFont
 // =============================================
 
-EngravingFont::EngravingFont(const std::string& name, const std::string& family, const path_t& filePath, const path_t& metadataPath)
-    : EngravingFont(name, family, std::make_shared<File>(filePath), std::make_shared<File>(metadataPath))
+EngravingFont::EngravingFont(IFontProvider& fontProvider, const IEngravingFontsProvider& engravingFonts,
+                             const std::string& name, const std::string& family, const path_t& filePath, const path_t& metadataPath)
+    : EngravingFont(fontProvider, engravingFonts, name, family, std::make_shared<File>(filePath), std::make_shared<File>(metadataPath))
 {
 }
 
-EngravingFont::EngravingFont(const std::string& name, const std::string& family, std::shared_ptr<IODevice> font,
+EngravingFont::EngravingFont(IFontProvider& fontProvider, const IEngravingFontsProvider& engravingFonts,
+                             const std::string& name, const std::string& family, std::shared_ptr<IODevice> font,
                              std::shared_ptr<IODevice> metadata)
-    : m_symbols(static_cast<size_t>(SymId::lastSym) + 1),
+    : m_fontProvider(&fontProvider),
+    m_engravingFonts(&engravingFonts),
+    m_symbols(static_cast<size_t>(SymId::lastSym) + 1),
     m_name(name),
     m_family(family),
     m_fontDevice(std::move(font)),
@@ -60,6 +64,7 @@ EngravingFont::EngravingFont(const std::string& name, const std::string& family,
 }
 
 EngravingFont::EngravingFont(const EngravingFont& other)
+    : m_fontProvider(other.m_fontProvider), m_engravingFonts(other.m_engravingFonts)
 {
     m_loaded = false;
     m_symbols = other.m_symbols;

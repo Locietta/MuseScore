@@ -23,7 +23,6 @@
 #define MUSE_DRAW_FONTMETRICS_H
 
 #include "global/types/string.h"
-#include "global/modularity/ioc.h"
 
 #include "types/font.h"
 #include "types/geometry.h"
@@ -33,10 +32,13 @@
 namespace muse::draw {
 class FontMetrics
 {
-    GlobalInject<IFontProvider> fontProvider;
-
 public:
     FontMetrics(const Font& font);
+
+    // FontMetrics is a value type constructed throughout layout without an owner
+    // to carry a provider, so EngineContext binds its font provider here for its
+    // lifetime; null outside it.
+    static void setProvider(IFontProvider* provider);
 
     double lineSpacing() const;
     double xHeight() const;
@@ -70,6 +72,8 @@ public:
     static double capHeight(const Font& f);
 
 private:
+    static IFontProvider* fontProvider();
+
     Font m_font;
 };
 }
