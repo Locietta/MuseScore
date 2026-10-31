@@ -692,6 +692,26 @@ TEST(Handles, H5bRemovingAPartLeavesNoId) {
     engrave::assign_missing_ids(master);
     expect_inv(*document);
     EXPECT_FALSE(live(master, excerpt_id)) << "the removed excerpt still resolves";
+
+    // The same round through the edit API: a part and its staves get fresh ids and
+    // leave none behind.
+    for (int round = 0; round < 3; ++round) {
+        auto added = document->edit(engrave::Batch{{engrave::AddPart{"piano", std::nullopt}}});
+        ASSERT_TRUE(added) << added.error().message;
+        ASSERT_FALSE(added->ops.empty());
+        ASSERT_FALSE(added->ops.front().created.empty());
+        const ElementId part_id = *added->ops.front().created.front();
+        for (const auto& id : added->ops.front().created) {
+            ASSERT_TRUE(id) << "a created part or staff has no id";
+            EXPECT_TRUE(seen.insert(engrave::to_string(*id)).second) << "a new part or staff inherited an id";
+        }
+        expect_inv(*document);
+
+        auto removed = document->edit(engrave::Batch{{engrave::RemovePart{part_id}}});
+        ASSERT_TRUE(removed) << removed.error().message;
+        expect_inv(*document);
+        EXPECT_FALSE(live(master, part_id)) << "the removed part still resolves";
+    }
 }
 
 // --- H7 -------------------------------------------------------------------
