@@ -287,3 +287,24 @@ int main(int argc, char** argv) {
     g_engine.reset();
     return result;
 }
+TEST(Open, UnicodeFilenameLyricsAndNonBmpRoundTrip) {
+    const std::string text = "\xe9\x9f\xb3\xe6\xa5\xbd \xf0\x9d\x84\x9e \xf0\x9f\x98\x80";
+    const std::string xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><score-partwise version=\"4.0\">"
+        "<part-list><score-part id=\"P1\"><part-name>Piano</part-name></score-part></part-list>"
+        "<part id=\"P1\"><measure number=\"1\"><attributes><divisions>1</divisions>"
+        "<time><beats>4</beats><beat-type>4</beat-type></time><clef><sign>G</sign><line>2</line></clef>"
+        "</attributes><note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration>"
+        "<type>whole</type><lyric><text>" + text + "</text></lyric></note></measure></part></score-partwise>";
+    const auto path = std::filesystem::current_path() / std::filesystem::u8path(text + ".musicxml");
+    struct Cleanup { std::filesystem::path p; ~Cleanup() { std::error_code ec; std::filesystem::remove(p, ec); } } cleanup{path};
+    { std::ofstream out(path, std::ios::binary); out << xml; ASSERT_TRUE(out.good()); }
+    auto document = g_engine->open(path);
+    ASSERT_TRUE(document) << document.error().message;
+    const auto saved = (*document)->export_score({.format=Format::Mscz});
+    ASSERT_TRUE(saved) << saved.error().message;
+    auto reopened = g_engine->open(*saved);
+    ASSERT_TRUE(reopened) << reopened.error().message;
+    EXPECT_NE(exported(**reopened, Format::MusicXml).find(text), std::string::npos);
+    const auto render = (*reopened)->render({.format=engrave::RenderFormat::Svg});
+    ASSERT_TRUE(render) << render.error().message;
+}

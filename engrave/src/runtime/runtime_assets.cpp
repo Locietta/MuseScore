@@ -51,20 +51,6 @@ std::string pathToUtf8(const std::filesystem::path& path)
     return std::string(reinterpret_cast<const char*>(utf8.data()), utf8.size());
 }
 
-std::filesystem::path pathFromUtf8(const std::string& text)
-{
-#if defined(__cpp_lib_char8_t)
-    std::u8string utf8;
-    utf8.reserve(text.size());
-    for (const char ch : text) {
-        utf8.push_back(static_cast<char8_t>(ch));
-    }
-    return std::filesystem::path(utf8);
-#else
-    return std::filesystem::u8path(text);
-#endif
-}
-
 class CacheStore
 {
 public:
@@ -274,7 +260,7 @@ std::vector<std::uint8_t> readResourceFile(const std::string& sourcePath,
         throw std::runtime_error(kind + " path is empty or contains NUL");
     }
 
-    const std::filesystem::path path = pathFromUtf8(sourcePath);
+    const std::filesystem::path path = std::filesystem::u8path(sourcePath);
     std::error_code error;
     if (!std::filesystem::is_regular_file(path, error) || error) {
         throw std::runtime_error(kind + " path is not a regular file: " + sourcePath);

@@ -25,25 +25,10 @@ namespace fs = std::filesystem;
 namespace {
 constexpr uint64_t kMaxReadFileSize = 256ull * 1024ull * 1024ull;
 
-fs::path pathFromUtf8(const std::string& utf8)
-{
-    std::u8string value;
-    value.reserve(utf8.size());
-    for (const char c : utf8) {
-        value.push_back(static_cast<char8_t>(static_cast<unsigned char>(c)));
-    }
-    return fs::path(value);
-}
-
 std::string pathToUtf8(const fs::path& path, bool generic = true)
 {
     const std::u8string utf8 = generic ? path.generic_u8string() : path.u8string();
-    std::string result;
-    result.reserve(utf8.size());
-    for (const char8_t c : utf8) {
-        result.push_back(static_cast<char>(c));
-    }
-    return result;
+    return std::string(reinterpret_cast<const char*>(utf8.data()), utf8.size());
 }
 
 bool hasEmbeddedNul(const std::string& value)
@@ -538,7 +523,7 @@ NativeFileSystem::Target NativeFileSystem::resolve(const io::path_t& path) const
 
             // Qt cleans resource paths, so ":/" and "://" name the same root (fret.cpp uses "://data/...").
             const std::size_t start = raw.find_first_not_of('/', 1);
-            fs::path relative = pathFromUtf8(start == std::string::npos ? std::string() : raw.substr(start));
+            fs::path relative = fs::u8path(start == std::string::npos ? std::string() : raw.substr(start));
             if (relative.is_absolute() || relative.has_root_name() || relative.has_root_directory()) {
                 return target;
             }
@@ -565,7 +550,7 @@ NativeFileSystem::Target NativeFileSystem::resolve(const io::path_t& path) const
             return target;
         }
 
-        target.path = pathFromUtf8(raw);
+        target.path = fs::u8path(raw);
         target.valid = true;
         target.resource = isProtectedPath(target.path);
         return target;
