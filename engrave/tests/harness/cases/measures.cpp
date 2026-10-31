@@ -458,6 +458,8 @@ const bool registered = register_cases({
     key_case("SetKeySig three sharps on every staff", "linked_parts.mscx", 0, 3, std::nullopt),
     key_case("SetKeySig two flats on one staff", "custom_part_name.mscx", 1, -2, 0),
     key_case("SetKeySig four flats at the third measure", "repeat_with_2_voltas.mscx", 2, -4, std::nullopt),
+    key_case("SetKeySig three flats on the second staff", "layout_elements.mscx", 1, -3, 1),
+    key_case("SetKeySig two sharps on the second staff", "pedal.mscx", 1, 2, 1),
 
     clef_case("InsertClef a bass clef before a chord", "custom_part_name.mscx", 1, 0, 0, ClefType::F),
     clef_case("InsertClef a treble clef on the lower staff", "pedal.mscx", 2, 0, 1, ClefType::G),

@@ -2275,7 +2275,16 @@ static void layoutLines(const FiguredBass* item, FiguredBass::LayoutData* ldata,
     system_idx_t sysIdx1 = muse::indexOf(systems, s1);
     system_idx_t sysIdx2 = muse::indexOf(systems, s2);
 
-    if (sysIdx2 == muse::nidx || sysIdx2 < sysIdx1) {
+    if (sysIdx1 == muse::nidx) {
+        // The measure's system is not in the score's system list: a range layout restores a
+        // system it has already detached from that list, and then there is no page position
+        // to measure a line against. Draw the line to the next segment, as for a single
+        // system below; the loop must not run from muse::nidx, which is one step short of a
+        // full wrap-around.
+        sysIdx1 = 0;
+        sysIdx2 = 0;
+        nextSegm = item->segment()->next1();
+    } else if (sysIdx2 == muse::nidx || sysIdx2 < sysIdx1) {
         sysIdx2 = sysIdx1;
         nextSegm = item->segment()->next1();
         // TODO

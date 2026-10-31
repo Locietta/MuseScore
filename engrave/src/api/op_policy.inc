@@ -21,8 +21,7 @@ ENGRAVE_OP(Remove, Transaction)
 ENGRAVE_OP(InsertMeasures, Snapshot)
 ENGRAVE_OP(RemoveMeasures, Snapshot)
 ENGRAVE_OP(SetTimeSig, Snapshot)
-// Held back from Transaction: see op_policy_test.cpp.
-ENGRAVE_OP(SetKeySig, Snapshot)
+ENGRAVE_OP(SetKeySig, Transaction)
 ENGRAVE_OP(InsertClef, Transaction)
 ENGRAVE_OP(SetLayoutBreak, Snapshot)
 
@@ -36,7 +35,7 @@ ENGRAVE_OP(GenerateExcerpts, Unexposed)
 // spanners (ops/spanners.cpp)
 ENGRAVE_OP(AddSpanner, Transaction)
 ENGRAVE_OP(AddTie, Transaction)
-ENGRAVE_OP(AddTuplet, Snapshot)
+ENGRAVE_OP(AddTuplet, Transaction)
 
 // text (ops/text.cpp)
 ENGRAVE_OP(AddText, Transaction)
