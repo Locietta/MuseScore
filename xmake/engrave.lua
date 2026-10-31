@@ -353,10 +353,7 @@ target("engraving")
     )
     add_files(engine("src/engraving/**.cpp"))
     remove_files(
-        engine("src/engraving/accessibility/**"),
-        engine("src/engraving/qml/**"),
-        engine("src/engraving/tests/**"),
-        engine("src/engraving/thirdparty/**")
+        engine("src/engraving/tests/**")
     )
 
 target("iex_musicxml")
