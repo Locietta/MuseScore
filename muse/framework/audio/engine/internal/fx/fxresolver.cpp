@@ -22,7 +22,6 @@
 
 #include "fxresolver.h"
 
-#include "audio/common/audiosanitizer.h"
 
 #include "log.h"
 
@@ -31,7 +30,6 @@ using namespace muse::audio::fx;
 
 std::vector<IFxProcessorPtr> FxResolver::resolveMasterFxList(const AudioFxChain& fxChain, const OutputSpec& outputSpec)
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     TRACEFUNC;
 
@@ -61,7 +59,6 @@ std::vector<IFxProcessorPtr> FxResolver::resolveMasterFxList(const AudioFxChain&
 
 std::vector<IFxProcessorPtr> FxResolver::resolveFxList(const TrackId trackId, const AudioFxChain& fxChain, const OutputSpec& outputSpec)
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     TRACEFUNC;
 
@@ -91,7 +88,6 @@ std::vector<IFxProcessorPtr> FxResolver::resolveFxList(const TrackId trackId, co
 
 AudioResourceMetaList FxResolver::resolveAvailableResources() const
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     TRACEFUNC;
 
@@ -109,7 +105,6 @@ AudioResourceMetaList FxResolver::resolveAvailableResources() const
 
 void FxResolver::registerResolver(const AudioFxType type, IResolverPtr resolver)
 {
-    ONLY_AUDIO_MAIN_OR_ENGINE_THREAD;
 
     std::lock_guard lock(m_mutex);
 
@@ -118,7 +113,6 @@ void FxResolver::registerResolver(const AudioFxType type, IResolverPtr resolver)
 
 void FxResolver::clearAllFx()
 {
-    ONLY_AUDIO_MAIN_OR_ENGINE_THREAD;
 
     std::lock_guard lock(m_mutex);
 

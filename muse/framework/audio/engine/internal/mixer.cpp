@@ -23,7 +23,6 @@
 
 #include <sstream>
 
-#include "audio/common/audiosanitizer.h"
 #include "audio/common/audioerrors.h"
 
 #include "nodes/signalnode.h"
@@ -45,12 +44,10 @@ static bool isChainSilent(const TrackChainPtr& chain)
 
 Mixer::~Mixer()
 {
-    ONLY_AUDIO_MAIN_OR_ENGINE_THREAD;
 }
 
 void Mixer::init()
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 }
 
 Ret Mixer::addTrack(TrackChainPtr trackChain, const AuxSendsParams& auxSends)
@@ -71,7 +68,6 @@ Ret Mixer::addTrack(TrackChainPtr trackChain, const AuxSendsParams& auxSends)
 
 Ret Mixer::addAuxTrack(TrackChainPtr trackChain)
 {
-    ONLY_AUDIO_ENGINE_THREAD;
     const size_t outBufferSize = m_outputSpec.samplesPerChannel * m_outputSpec.audioChannelCount;
 
     TrackData trackData;
@@ -86,7 +82,6 @@ Ret Mixer::addAuxTrack(TrackChainPtr trackChain)
 
 Ret Mixer::removeTrack(const TrackId trackId)
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     bool removed = muse::remove_if(m_tracks, [trackId](const TrackData& track) {
         return track.trackId == trackId;
@@ -107,13 +102,11 @@ Ret Mixer::removeTrack(const TrackId trackId)
 
 void Mixer::setAuxSends(const TrackId trackId, const AuxSendsParams& auxSends)
 {
-    ONLY_AUDIO_ENGINE_THREAD;
     m_auxSends[trackId] = auxSends;
 }
 
 void Mixer::onOutputSpecChanged(const OutputSpec& spec)
 {
-    ONLY_AUDIO_ENGINE_THREAD;
     for (auto& t : m_tracks) {
         t.chain->setOutputSpec(spec);
     }
@@ -125,7 +118,6 @@ void Mixer::onOutputSpecChanged(const OutputSpec& spec)
 
 void Mixer::onModeChanged(const ProcessMode mode)
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     for (auto& t : m_tracks) {
         t.chain->setMode(mode);
@@ -138,7 +130,6 @@ void Mixer::onModeChanged(const ProcessMode mode)
 
 void Mixer::process(float* outBuffer, samples_t samplesPerChannel)
 {
-    ONLY_AUDIO_PROC_THREAD;
 
     if (!m_enabled) {
         return;
@@ -205,7 +196,6 @@ void Mixer::setNonMutedTrackCount(size_t count)
 
 void Mixer::setTracksToProcessWhenIdle(const std::unordered_set<TrackId>& trackIds)
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     m_tracksToProcessWhenIdle = trackIds;
 }

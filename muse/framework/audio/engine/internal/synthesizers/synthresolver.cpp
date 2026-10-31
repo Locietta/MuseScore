@@ -22,7 +22,6 @@
 
 #include "synthresolver.h"
 
-#include "audio/common/audiosanitizer.h"
 
 #include "log.h"
 
@@ -31,7 +30,6 @@ using namespace muse::audio::synth;
 
 void SynthResolver::init(const AudioInputParams& defaultInputParams, const OutputSpec& defaultOutputSpec)
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     IF_ASSERT_FAILED(defaultInputParams.isValid() && defaultOutputSpec.isValid()) {
         return;
@@ -44,7 +42,6 @@ void SynthResolver::init(const AudioInputParams& defaultInputParams, const Outpu
 ISynthesizerPtr SynthResolver::resolveSynth(const TrackId trackId, const AudioInputParams& params, const audio::OutputSpec& spec,
                                             const PlaybackSetupData& setupData) const
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     TRACEFUNC;
 
@@ -72,21 +69,18 @@ ISynthesizerPtr SynthResolver::resolveSynth(const TrackId trackId, const AudioIn
 
 ISynthesizerPtr SynthResolver::resolveDefaultSynth(const TrackId trackId) const
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     return resolveSynth(trackId, m_defaultInputParams, m_defaultOutputSpec, {});
 }
 
 AudioInputParams SynthResolver::resolveDefaultInputParams() const
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     return m_defaultInputParams;
 }
 
 AudioResourceMetaList SynthResolver::resolveAvailableResources() const
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     TRACEFUNC;
 
@@ -104,7 +98,6 @@ AudioResourceMetaList SynthResolver::resolveAvailableResources() const
 
 SoundPresetList SynthResolver::resolveAvailableSoundPresets(const AudioResourceMeta& resourceMeta) const
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     TRACEFUNC;
 
@@ -120,7 +113,6 @@ SoundPresetList SynthResolver::resolveAvailableSoundPresets(const AudioResourceM
 
 void SynthResolver::registerResolver(const AudioSourceType type, IResolverPtr resolver)
 {
-    ONLY_AUDIO_MAIN_OR_ENGINE_THREAD;
 
     std::lock_guard lock(m_mutex);
 
@@ -129,7 +121,6 @@ void SynthResolver::registerResolver(const AudioSourceType type, IResolverPtr re
 
 void SynthResolver::clearSources()
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     std::lock_guard lock(m_mutex);
 

@@ -21,7 +21,6 @@
  */
 #include "audioengineconfiguration.h"
 
-#include "audio/common/audiosanitizer.h"
 #include "audio/common/soundfonttypes.h"
 
 #include "log.h"
@@ -43,7 +42,6 @@ static const AudioResourceMeta DEFAULT_AUDIO_RESOURCE_META = {
 
 void AudioEngineConfiguration::setConfig(const AudioEngineConfig& conf)
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     if (conf.autoProcessOnlineSoundsInBackground != m_conf.autoProcessOnlineSoundsInBackground) {
         m_conf.autoProcessOnlineSoundsInBackground = conf.autoProcessOnlineSoundsInBackground;

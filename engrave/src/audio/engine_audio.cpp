@@ -20,7 +20,6 @@
 
 #include <fluidsynth.h>
 
-#include "audio/common/audiosanitizer.h"
 #include "audio/common/audioutils.h"
 #include "audio/common/soundfonttypes.h"
 #include "audio/engine/audioservices.h"
@@ -386,12 +385,6 @@ bool initialize_engine_audio(EngineAudio& audio, const EngineAudioSetup& setup, 
     if (!io::fileSystem()) {
         return fail("native runtime (IFileSystem) is not initialised; create the EngineContext first");
     }
-
-    // 1. Thread identity. Everything below (and every later engine call) runs
-    // on this thread; the mixer stays single-threaded because
-    // MUSE_THREADS_SUPPORT is undefined in the generated config.
-    AudioSanitizer::setupMainThread();
-    AudioSanitizer::setupEngineThread();
 
     // The factory, configuration, SoundFont repository and synth/effect
     // resolvers; synthesizers send their events to the capturing MIDI output.

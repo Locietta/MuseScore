@@ -28,7 +28,6 @@
 
 #include "mpe/events.h"
 
-#include "audio/common/audiosanitizer.h"
 #include "audio/common/audiotypes.h"
 
 namespace muse::audio::engine {
@@ -52,7 +51,6 @@ public:
 
     void load(const mpe::PlaybackData& data)
     {
-        ONLY_AUDIO_ENGINE_THREAD;
 
         m_playbackData = data;
 
@@ -111,7 +109,6 @@ public:
 
     void setPlaybackPosition(const msecs_t newPlaybackPosition)
     {
-        ONLY_AUDIO_ENGINE_THREAD;
 
         m_playbackPosition = newPlaybackPosition;
         resetAllIterators();
@@ -119,7 +116,6 @@ public:
 
     msecs_t playbackPosition() const
     {
-        ONLY_AUDIO_ENGINE_THREAD;
 
         return m_playbackPosition;
     }
@@ -128,21 +124,18 @@ public:
 
     void setOnOffStreamFlushed(OnFlushedCallback flushed)
     {
-        ONLY_AUDIO_ENGINE_THREAD;
 
         m_onOffStreamFlushed = flushed;
     }
 
     void setOnMainStreamFlushed(OnFlushedCallback flushed)
     {
-        ONLY_AUDIO_ENGINE_THREAD;
 
         m_onMainStreamFlushed = flushed;
     }
 
     EventSequenceMap movePlaybackForward(const msecs_t nextMsecs)
     {
-        ONLY_AUDIO_ENGINE_THREAD;
 
         EventSequenceMap result;
 

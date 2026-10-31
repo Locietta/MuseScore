@@ -29,7 +29,6 @@
 
 #include "nodes/trackchain.h"
 
-#include "muse_framework_config.h"
 namespace muse::audio {
 struct ContextMixerTag
 {

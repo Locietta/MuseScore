@@ -21,13 +21,9 @@
  */
 #include "soundfontrepository.h"
 
-#include "audio/common/audiosanitizer.h"
 
 #include "fluidsynth/fluidsoundfontparser.h"
 
-#ifdef Q_OS_WASM
-#include "../../platform/web/networksfloader.h"
-#endif
 
 #include "log.h"
 
@@ -37,7 +33,6 @@ using namespace muse::audio::synth;
 
 bool SoundFontRepository::isSoundFontLoaded(const std::string& name) const
 {
-    ONLY_AUDIO_ENGINE_THREAD;
     for (const auto& p : m_soundFonts) {
         if (p.second.name == name) {
             return true;
@@ -48,13 +43,11 @@ bool SoundFontRepository::isSoundFontLoaded(const std::string& name) const
 
 bool SoundFontRepository::isLoadingSoundFonts() const
 {
-    ONLY_AUDIO_ENGINE_THREAD;
     return m_loadingSoundFontCount > 0;
 }
 
 const SoundFontsMap& SoundFontRepository::soundFonts() const
 {
-    ONLY_AUDIO_ENGINE_THREAD;
     return m_soundFonts;
 }
 
@@ -72,7 +65,6 @@ void SoundFontRepository::notifySoundFontsChanged()
 
 void SoundFontRepository::addSoundFont(const SoundFontUri& uri)
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     m_loadingSoundFontCount++;
     doAddSoundFont(uri, nullptr, [this]() {
@@ -89,7 +81,6 @@ static io::path_t fileNameFromUri(const SoundFontUri& uri)
 
 void SoundFontRepository::addSoundFontData(const SoundFontUri& uri, const ByteArray& data)
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     LOGI() << "try add sound font uri: " << uri << ", size: " << data.size();
 
@@ -151,36 +142,15 @@ void SoundFontRepository::doAddSoundFont(const SoundFontUri& uri, const SoundFon
         SoundFontPath path = uri.toLocalFile();
         parseAndAdd(uri, path);
     } else {
-#ifdef Q_OS_WASM
-        auto promise = NetworkSFLoader::load(uri);
-        promise.onResolve(this, [uri, parseAndAdd](const RetVal<ByteArray>& data) {
-            if (data.ret) {
-                const io::path_t fileName = fileNameFromUri(uri);
-
-                {
-                    FILE* file = fopen(fileName.c_str(), "wb");
-                    size_t wsize = fwrite(data.val.constChar(), sizeof(char), data.val.size(), file);
-                    IF_ASSERT_FAILED(wsize == data.val.size()) {
-                        return;
-                    }
-                    fclose(file);
-                }
-
-                parseAndAdd(uri, fileName);
-            }
-        });
-#else
         NOT_SUPPORTED;
         if (onFinished) {
             onFinished();
         }
-#endif
     }
 }
 
 void SoundFontRepository::loadSoundFonts(const std::vector<SoundFontUri>& uris)
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     SoundFontsMap* cache = new SoundFontsMap();
     m_soundFonts.swap(*cache);

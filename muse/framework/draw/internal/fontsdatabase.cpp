@@ -21,7 +21,6 @@
  */
 #include "fontsdatabase.h"
 
-#include "muse_framework_config.h"
 
 
 #include "global/io/file.h"
