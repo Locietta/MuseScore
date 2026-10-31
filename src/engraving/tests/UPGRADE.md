@@ -188,3 +188,14 @@ engine; exact SHA256 changes are recorded below.
 - src\engraving\tests\parts_data\partStyle-score-ref.mscx: 90a27489cca478e0e03570a7f58067a7f789cb80fe53aa2cb6d2fde074dc2fa4 -> 10b5efa1b5234829f8cb1a8a8f6e4bdc4073ee84c28d889f9584ca2b7fda396d
 - src\engraving\tests\parts_data\partStyle-score-reload-ref.mscx: 02664f31d5a3c3bd58622f7ff2bd47261a1c04bb51617285c8db0cc800f395ab -> 9177fe058cd9567a5156e53a0f08cf9d80a3ce2a7672067b3aa764ca37e5a5d5
 - src\engraving\tests\parts_data\voices-ref.mscx: d1c08a0e82e7ed9061ec70858e8211704864fcb22066cbadb480a2b899cd26d4 -> c7e1bd42fff4e8e3c610a618d050ba4611c6eb755769cd4791adc1fed9e4fa7f
+
+The two part-visible-tracks reference outputs were recaptured after switching
+the input to MSCZ; the part-visible-tracks test passed with its excerpt intact.
+- src/engraving/tests/parts_data/part-visible-tracks-score-ref.mscx: 47bef7ba1a8cc21d149f039deabf91e7169265a2cb48eb0b67cde41d4c7c8cb0 -> 868e98277f4301fd82fe7f99c0a929bf40e231a0880a394c5bcce7bb092adc58
+- src/engraving/tests/parts_data/part-visible-tracks-part-ref.mscx: 8f6e36199dd4e98388fb0f5d0c5c18775cb73e4ddb80830a4776de16f701ae4a -> 68a2c2a8b8ecfce08a40cd7f93efe40539c509ee4e90acf0b0ef3d0adb3a627c
+
+Verification: all 174 conversion results across both repositories match a fresh
+export of the original bytes through the untouched final A4 validation host
+(`a405/super-build/musescore-mcp.exe`, engrave-4 tree), after normalization of
+volatile writer metadata and IDs. The six initial part-reference failures were
+recaptured separately; that normalization does not replace their exact tests.
