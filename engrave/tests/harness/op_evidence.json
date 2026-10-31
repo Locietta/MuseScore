@@ -1,10 +1,10 @@
 {
   "verdicts": {
-    "EnterNotes": "Snapshot",
-    "Remove": "Snapshot",
+    "EnterNotes": "Transaction",
+    "Remove": "Transaction",
     "ResetProperty": "Transaction",
-    "SetDuration": "Snapshot",
-    "SetPitch": "Snapshot",
+    "SetDuration": "Transaction",
+    "SetPitch": "Transaction",
     "SetProperty": "Transaction",
     "SetStyle": "Transaction"
   },
@@ -15,13 +15,13 @@
       "fixture": "chordline_path.mscx",
       "pushes": 4,
       "c1": "pass",
-      "c2": "fail: undo left registered",
+      "c2": "pass",
       "c3_unwind": "pass",
       "c4_unwind": "pass",
       "c3_snapshot": "pass",
       "c4_snapshot": "pass",
       "r4": "pass",
-      "verdict": "Snapshot"
+      "verdict": "Transaction"
     },
     {
       "op": "EnterNotes",
@@ -29,13 +29,13 @@
       "fixture": "chordline_path.mscx",
       "pushes": 4,
       "c1": "pass",
-      "c2": "fail: undo left registered",
+      "c2": "pass",
       "c3_unwind": "pass",
       "c4_unwind": "pass",
       "c3_snapshot": "pass",
       "c4_snapshot": "pass",
       "r4": "pass",
-      "verdict": "Snapshot"
+      "verdict": "Transaction"
     },
     {
       "op": "EnterNotes",
@@ -43,13 +43,13 @@
       "fixture": "chordline_path.mscx",
       "pushes": 2,
       "c1": "pass",
-      "c2": "fail: undo left registered",
+      "c2": "pass",
       "c3_unwind": "pass",
       "c4_unwind": "pass",
       "c3_snapshot": "pass",
       "c4_snapshot": "pass",
       "r4": "pass",
-      "verdict": "Snapshot"
+      "verdict": "Transaction"
     },
     {
       "op": "EnterNotes",
@@ -57,13 +57,13 @@
       "fixture": "chordline_path.mscx",
       "pushes": 9,
       "c1": "pass",
-      "c2": "fail: undo left registered",
+      "c2": "pass",
       "c3_unwind": "pass",
       "c4_unwind": "pass",
       "c3_snapshot": "pass",
       "c4_snapshot": "pass",
       "r4": "pass",
-      "verdict": "Snapshot"
+      "verdict": "Transaction"
     },
     {
       "op": "EnterNotes",
@@ -71,13 +71,13 @@
       "fixture": "hairpins_and_repeats.mscx",
       "pushes": 6,
       "c1": "pass",
-      "c2": "fail: undo left registered",
+      "c2": "pass",
       "c3_unwind": "pass",
       "c4_unwind": "pass",
       "c3_snapshot": "pass",
       "c4_snapshot": "pass",
       "r4": "pass",
-      "verdict": "Snapshot"
+      "verdict": "Transaction"
     },
     {
       "op": "Remove",
@@ -85,13 +85,13 @@
       "fixture": "chordline_path.mscx",
       "pushes": 2,
       "c1": "pass",
-      "c2": "fail: undo left registered",
+      "c2": "pass",
       "c3_unwind": "pass",
       "c4_unwind": "pass",
       "c3_snapshot": "pass",
       "c4_snapshot": "pass",
       "r4": "pass",
-      "verdict": "Snapshot"
+      "verdict": "Transaction"
     },
     {
       "op": "Remove",
@@ -99,13 +99,13 @@
       "fixture": "custom_part_name.mscx",
       "pushes": 3,
       "c1": "pass",
-      "c2": "fail: undo left registered",
+      "c2": "pass",
       "c3_unwind": "pass",
       "c4_unwind": "pass",
       "c3_snapshot": "pass",
       "c4_snapshot": "pass",
       "r4": "pass",
-      "verdict": "Snapshot"
+      "verdict": "Transaction"
     },
     {
       "op": "Remove",
@@ -211,13 +211,13 @@
       "fixture": "chordline_path.mscx",
       "pushes": 4,
       "c1": "pass",
-      "c2": "fail: undo left registered",
+      "c2": "pass",
       "c3_unwind": "pass",
       "c4_unwind": "pass",
       "c3_snapshot": "pass",
       "c4_snapshot": "pass",
       "r4": "pass",
-      "verdict": "Snapshot"
+      "verdict": "Transaction"
     },
     {
       "op": "SetDuration",
@@ -225,13 +225,13 @@
       "fixture": "chordline_path.mscx",
       "pushes": 4,
       "c1": "pass",
-      "c2": "fail: undo left registered",
+      "c2": "pass",
       "c3_unwind": "pass",
       "c4_unwind": "pass",
       "c3_snapshot": "pass",
       "c4_snapshot": "pass",
       "r4": "pass",
-      "verdict": "Snapshot"
+      "verdict": "Transaction"
     },
     {
       "op": "SetPitch",
@@ -281,13 +281,13 @@
       "fixture": "chordline_path.mscx",
       "pushes": 3,
       "c1": "pass",
-      "c2": "fail: undo left registered",
+      "c2": "pass",
       "c3_unwind": "pass",
       "c4_unwind": "pass",
       "c3_snapshot": "pass",
       "c4_snapshot": "pass",
       "r4": "pass",
-      "verdict": "Snapshot"
+      "verdict": "Transaction"
     },
     {
       "op": "SetProperty",
