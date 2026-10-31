@@ -1,0 +1,23 @@
+-- Upstream MNX dependency, immutable source and archive hash.
+package("mnx-json-schema")
+    set_homepage("https://github.com/pboettch/json-schema-validator")
+    set_description("MNX import dependency: mnx-json-schema")
+    set_license("MIT")
+    add_urls("https://github.com/pboettch/json-schema-validator/archive/40af3ec39670e768fc3f01f935140af311d71024.tar.gz")
+    add_versions("40af3ec", "36d7e99a73aa6076834736f0fb108fa8e232c4739aa4b3e2089fe96efb21fa8d")
+    add_deps("nlohmann_json v3.12.0")
+    on_install(function (package)
+        io.writefile("xmake.lua", ([[
+add_rules("mode.debug", "mode.release")
+set_languages("cxx23")
+target("mnx-json-schema")
+    set_kind("static")
+    add_includedirs(%q)
+    if is_plat("windows") then add_cxxflags("/Zc:preprocessor", "/bigobj") end
+    add_files("src/*.cpp")
+    add_includedirs("src", {public = true})
+    add_headerfiles("src/(nlohmann/*.hpp)")
+]]):format(package:dep("nlohmann_json"):installdir("include")))
+        import("package.tools.xmake").install(package)
+    end)
+package_end()
