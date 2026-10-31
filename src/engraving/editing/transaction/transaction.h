@@ -113,6 +113,13 @@ public:
     void push(UndoableCommand* cmd);
     void pushWithoutPerforming(UndoableCommand* cmd);
 
+    /// Test hook for failure injection: when set, it is called for every command
+    /// pushed to a real transaction, once before the command is appended
+    /// (`appended` false) and once after it was appended and performed (`appended`
+    /// true). A hook that throws on the first call owns `cmd`.
+    using PushHook = void (*)(UndoableCommand* cmd, bool appended);
+    static void setPushHook(PushHook hook);
+
 private:
     friend class TransactionManager;
     Transaction(UndoableTransaction* undoableTransaction);
@@ -121,6 +128,8 @@ private:
 
     UndoableTransaction* m_undoableTransaction = nullptr;
     bool m_isDummy = false;
+
+    static inline PushHook s_pushHook = nullptr;
 };
 
 class TransactionManager

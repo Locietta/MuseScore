@@ -41,10 +41,19 @@ public:
     inline bool operator ==(const EID& other) const { return m_first == other.m_first && m_second == other.m_second; }
     inline bool operator !=(const EID& other) const { return m_first != other.m_first || m_second != other.m_second; }
 
+    // The two values the text form encodes; 0xFFFFFFFFFFFFFFFF is INVALID.
+    uint64_t first() const { return m_first; }
+    uint64_t second() const { return m_second; }
+
     char* toChars(char* first, char* last) const;
     std::string toStdString() const;
+    // Strict: a value that is not two non-empty halves of at most
+    // MAX_UINT64_BASE64_SIZE base64 characters gives EID::invalid(), where upstream
+    // ignored a wrong part count, accepted any character (OR-ing 0xFFFFFFFFFFFFFFFF
+    // into the half) and shifted the excess bits of a longer half out.
     static EID fromStdString(const std::string& v);
     static EID fromStdString(const std::string_view& v);
+    static EID fromParts(uint64_t first, uint64_t second) { return EID(first, second); }
     static EID newUnique();
     static EID invalid() { return EID(INVALID, INVALID); }
 

@@ -37,6 +37,48 @@ includes("xmake/packages/zlib.lua")
 add_requires("muse-zlib 1.3.1", {system = false})
 add_packages("muse-zlib")
 
+-- nlohmann/json: engrave's score/ headers use it, and so does the code that
+-- includes them, so both must see one copy: the consumer's (the superproject
+-- has the pixi 3.12.0).  A bare checkout gets the same release from xmake-repo.
+add_requires("nlohmann_json v3.12.0", {system = false})
+add_packages("nlohmann_json")
+
+-- cairo: engrave's page renderer links it.  Like zlib it is the consumer's
+-- choice (the superproject's PDF and PNG goldens are pinned to its pixi cairo).
+-- A bare checkout uses the system cairo, or the install prefix given with
+-- --cairo_prefix (<prefix>/include/cairo, <prefix>/lib), e.g. a conda env's
+-- Library directory on Windows, where no system cairo exists.  Only engrave
+-- sees the prefix's headers, so its other libraries (zlib, freetype) never
+-- replace the pinned ones in the engine targets.
+option("cairo_prefix")
+    set_default("")
+    set_showmenu(true)
+    set_description("cairo install prefix (default: the system cairo)")
+option_end()
+
+local cairo_prefix = get_config("cairo_prefix")
+if cairo_prefix and cairo_prefix ~= "" then
+    cairo_prefix = path.absolute(cairo_prefix)
+    target("engrave")
+        add_sysincludedirs(path.join(cairo_prefix, "include"), path.join(cairo_prefix, "include", "cairo"))
+        add_linkdirs(path.join(cairo_prefix, "lib"), {public = true})
+        if not is_plat("windows") then
+            -- The prefix's cairo is a shared library, so every binary that links the
+            -- engine needs its directory at run time.  Without this, a host with no
+            -- system cairo (cachy) starts such a binary in the loader instead: exit
+            -- 127, "libcairo.so.2: cannot open shared object file", unless the caller
+            -- sets LD_LIBRARY_PATH.  A static library's rpathdirs are exported to the
+            -- targets that depend on it, which is what puts the path in each binary.
+            add_rpathdirs(path.join(cairo_prefix, "lib"))
+        end
+    target_end()
+else
+    add_requires("cairo", {system = true})
+    target("engrave")
+        add_packages("cairo", {public = true})
+    target_end()
+end
+
 -- Qt platform macros normally come from <QtGlobal>; the engine branches on them
 -- under NO_QT_SUPPORT.  Defined once for every target compiled from the engine:
 --   engraving/dom/masterscore.cpp        platform metaTag

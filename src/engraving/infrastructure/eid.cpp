@@ -47,7 +47,7 @@ static char* toBase64Chars(char* const first, char* const last, uint64_t n)
     return it;
 }
 
-static constexpr uint64_t charToInt(char c)
+static constexpr int charToInt(char c)
 {
     switch (c) {
     case 'A': return 0;
@@ -115,21 +115,29 @@ static constexpr uint64_t charToInt(char c)
     case '+': return 62;
     case '/': return 63;
     default:
-        UNREACHABLE;
-        return uint64_t(-1);
+        return -1;
     }
 }
 
-static uint64_t base64StrToInt64(const std::string& s)
+// The half a base64 string encodes; false when it is empty, longer than a uint64
+// needs, or contains a character outside the alphabet.
+static bool base64StrToInt64(const std::string_view s, uint64_t& result)
 {
-    uint64_t result = 0;
-
-    for (auto iter = s.rbegin(); iter != s.rend(); ++iter) {
-        result = result << 6;
-        result |= charToInt(*iter);
+    if (s.empty() || s.size() > EID::MAX_UINT64_BASE64_SIZE) {
+        return false;
     }
 
-    return result;
+    uint64_t value = 0;
+    for (auto iter = s.rbegin(); iter != s.rend(); ++iter) {
+        const int digit = charToInt(*iter);
+        if (digit < 0) {
+            return false;
+        }
+        value = (value << 6) | static_cast<uint64_t>(digit);
+    }
+
+    result = value;
+    return true;
 }
 
 char* EID::toChars(char* const first, char* const last) const
@@ -156,27 +164,23 @@ std::string EID::toStdString() const
 
 EID EID::fromStdString(const std::string& s)
 {
-    std::stringstream ss(s);
-    std::string str;
-    std::vector<std::string> strings;
-
-    while (std::getline(ss, str, SEPARATOR)) {
-        strings.push_back(str);
-    }
-
-    if (strings.size() != 2) {
-        return EID::invalid();
-    }
-
-    const std::string& first = strings[0];
-    const std::string& second = strings[1];
-
-    return EID(base64StrToInt64(first), base64StrToInt64(second));
+    return fromStdString(std::string_view(s));
 }
 
 EID EID::fromStdString(const std::string_view& s)
 {
-    return fromStdString(std::string(s));
+    const size_t separator = s.find(SEPARATOR);
+    if (separator == std::string_view::npos || s.find(SEPARATOR, separator + 1) != std::string_view::npos) {
+        return EID::invalid();
+    }
+
+    uint64_t first = 0;
+    uint64_t second = 0;
+    if (!base64StrToInt64(s.substr(0, separator), first) || !base64StrToInt64(s.substr(separator + 1), second)) {
+        return EID::invalid();
+    }
+
+    return EID(first, second);
 }
 
 EID EID::newUnique()

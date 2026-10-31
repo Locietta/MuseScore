@@ -1,0 +1,52 @@
+#pragma once
+
+#include <cstddef>
+#include <expected>
+#include <optional>
+#include <string>
+#include <string_view>
+
+namespace engrave {
+
+// Failures the immediate caller can act on. They are returned as Result<T>.
+// Failures inside the engine that no caller can repair at the call site
+// (an exporter that produces nothing, a broken runtime) are thrown, and
+// contract violations (a call from another thread, a second Engine) abort.
+enum struct ErrorCode {
+    InvalidArgument,   // an option the caller passed is invalid
+    InvalidInput,      // the score data is malformed or the importer rejected it
+    UnsupportedFormat, // the data matches no format the engine reads
+    NotFound,          // a file, template or element does not exist
+    StaleHandle,       // the element an id or address names is no longer part of the score
+    ResourceLimit,     // the input exceeds a size limit
+    Unsupported,       // a valid request the engine does not implement
+    Io,                // a file exists but cannot be read
+    RevisionConflict,  // an edit expected another revision of the document
+    EditRejected,      // the engine refused an operation; the batch was rolled back
+    Poisoned,          // an earlier failure left the document unusable; close it
+};
+
+std::string_view to_string(ErrorCode code) noexcept;
+
+struct Error {
+    ErrorCode code = ErrorCode::InvalidArgument;
+    std::string message;
+    std::optional<std::size_t> op_index; // the failing operation of an edit batch
+};
+
+template <typename T>
+using Result = std::expected<T, Error>;
+
+enum struct Severity {
+    Info,
+    Warning,
+};
+
+// A problem that did not stop the call, e.g. a score that failed the engine's
+// sanity check on load.
+struct Diagnostic {
+    Severity severity = Severity::Info;
+    std::string message;
+};
+
+} // namespace engrave

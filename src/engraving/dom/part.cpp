@@ -65,6 +65,18 @@ Part::Part(Score* s, ElementType type)
     m_preferSharpFlat = PreferSharpFlat::AUTO;
 }
 
+Part::~Part()
+{
+    // A part is not an item, so nothing else unregisters its id. The register lives
+    // on the master score, which outlives the part unless the whole document is
+    // going away; a leftover entry would hand the id to whatever is allocated at the
+    // same address next.
+    MasterScore* master = score() ? score()->masterScore() : nullptr;
+    if (master && Score::isAlive(master)) {
+        master->eidRegister()->onItemDestroyed(this);
+    }
+}
+
 //---------------------------------------------------------
 //   initFromInstrTemplate
 //---------------------------------------------------------
