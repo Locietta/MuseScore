@@ -31,7 +31,12 @@ ENGRAVE_OP(AddPart, Transaction)
 ENGRAVE_OP(RemovePart, Transaction)
 ENGRAVE_OP(AddStaff, Snapshot)
 ENGRAVE_OP(RemoveStaff, Transaction)
-ENGRAVE_OP(GenerateExcerpts, Unexposed)
+// A snapshot, not a transaction: Excerpt::createExcerpt builds the excerpt's score as
+// commands of the batch, and unwinding them frees the link lists and the elements twice, so
+// the harness does not probe that path for this operation (tests/harness/harness.cpp). The
+// undo of a committed batch leaves the excerpt's title frame detached from the score and
+// registered, which C2 of the harness reports as `registered`.
+ENGRAVE_OP(GenerateExcerpts, Snapshot)
 
 // spanners (ops/spanners.cpp)
 ENGRAVE_OP(AddSpanner, Transaction)
