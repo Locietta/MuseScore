@@ -828,6 +828,69 @@ TEST(Read, ErrorsForStaleAndMissingReferences) {
     expect_code(second->get(note_id), ErrorCode::NotFound, "an id of another document");
 }
 
+// A leading omitted rest must remain part of the triplet. Otherwise measure
+// repair starts its duration at tick 320 and overwrites the A4 at tick 1280.
+TEST(Read, HiddenLeadingTupletRestPreservesFollowingNotes) {
+    constexpr std::string_view fixture = R"mscx(<?xml version="1.0" encoding="UTF-8"?>
+<museScore version="5.00"><Score><Division>480</Division>
+<Part><Staff><StaffType group="pitched"/></Staff><Instrument id="piano"><Channel><program value="0"/></Channel></Instrument></Part>
+<Staff id="1"><Measure><voice>
+<TimeSig><sigN>4</sigN><sigD>4</sigD></TimeSig>
+<Tuplet><normalNotes>2</normalNotes><actualNotes>3</actualNotes><baseNote>quarter</baseNote></Tuplet>
+<location><fractions>1/6</fractions></location>
+<Chord><durationType>quarter</durationType><Note><pitch>74</pitch><tpc>16</tpc></Note></Chord>
+<Chord><durationType>quarter</durationType><Note><pitch>72</pitch><tpc>14</tpc></Note></Chord>
+<endTuplet/>
+<Tuplet><normalNotes>2</normalNotes><actualNotes>3</actualNotes><baseNote>quarter</baseNote></Tuplet>
+<Chord><durationType>quarter</durationType><Note><pitch>72</pitch><tpc>14</tpc></Note></Chord>
+<Chord><durationType>quarter</durationType><Note><pitch>69</pitch><tpc>17</tpc></Note></Chord>
+<Chord><durationType>quarter</durationType><Note><pitch>67</pitch><tpc>15</tpc></Note></Chord>
+<endTuplet/>
+</voice></Measure></Staff></Score></museScore>
+)mscx";
+    for (const std::string version : {"5.00", "4.60"}) {
+        SCOPED_TRACE(version);
+        std::string xml(fixture);
+        ASSERT_FALSE(xml.empty());
+        xml.replace(xml.find("5.00"), 4, version);
+        auto document = g_engine->open(as_bytes(xml));
+        ASSERT_TRUE(document) << document.error().message;
+        engrave::Query query;
+        query.types = {"Note"};
+        query.props = {"pitch"};
+        const auto notes = (*document)->query(query);
+        ASSERT_TRUE(notes);
+        std::multiset<Row> actual;
+        query_rows(notes->elements, actual);
+        const std::multiset<Row> expected = {
+            note_row(320, 0, 0, 74), note_row(640, 0, 0, 72),
+            note_row(960, 0, 0, 72), note_row(1280, 0, 0, 69), note_row(1600, 0, 0, 67)
+        };
+        EXPECT_EQ(actual, expected);
+        query.types = {"Chord"};
+        const auto chords = (*document)->query(query);
+        ASSERT_TRUE(chords);
+        ASSERT_EQ(chords->elements.size(), 5u);
+        for (const auto& chord : chords->elements) EXPECT_EQ(ticks_of(chord.duration), 320);
+        query.types = {"Rest"};
+        const auto rests = (*document)->query(query);
+        ASSERT_TRUE(rests);
+        ASSERT_EQ(rests->elements.size(), 1u);
+        EXPECT_EQ(ticks_of(rests->elements.front().tick), 0);
+        EXPECT_EQ(ticks_of(rests->elements.front().duration), 320);
+        const auto saved = (*document)->export_score({.format = engrave::Format::Mscz});
+        ASSERT_TRUE(saved);
+        const auto reopened = g_engine->open(*saved);
+        ASSERT_TRUE(reopened);
+        query.types = {"Note"};
+        const auto roundtrip = (*reopened)->query(query);
+        ASSERT_TRUE(roundtrip);
+        actual.clear();
+        query_rows(roundtrip->elements, actual);
+        EXPECT_EQ(actual, expected);
+    }
+}
+
 // --- corpus discovery ----------------------------------------------------
 
 bool looks_like_score(const std::filesystem::path& path) {
