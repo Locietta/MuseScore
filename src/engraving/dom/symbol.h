@@ -63,7 +63,7 @@ public:
     double symAngle() const { return m_symAngle; }
     AsciiStringView symName() const;
 
-    String accessibleInfo() const override;
+
 
     int subtype() const override { return int(m_sym); }
     muse::TranslatableString subtypeUserName() const override;
@@ -101,7 +101,7 @@ public:
     FSymbol* clone() const override { return new FSymbol(*this); }
 
     String toString() const;
-    String accessibleInfo() const override;
+
 
     double baseLine() const override { return 0.0; }
     Segment* segment() const { return (Segment*)ownershipParent(); }

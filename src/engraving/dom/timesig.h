@@ -116,7 +116,7 @@ public:
 
     EngravingItem* nextSegmentElement() override;
     EngravingItem* prevSegmentElement() override;
-    String accessibleInfo() const override;
+
 
     void initElementStyle(const ElementStyle*) override;
     void styleChanged() override;

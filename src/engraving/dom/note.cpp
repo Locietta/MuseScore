@@ -3394,149 +3394,19 @@ void Note::setScore(Score* s)
 //   accessibleInfo
 //---------------------------------------------------------
 
-String Note::accessibleInfo() const
-{
-    if (!chord() || !staff()) {
-        return String();
-    }
 
-    String duration = chord()->durationUserName();
-    String voice = muse::mtrc("engraving", "Voice: %1").arg(track() % VOICES + 1);
-    String pitchName;
-    String onofftime;
-    if (!m_playEvents.empty()) {
-        int on = m_playEvents[0].ontime();
-        int off = m_playEvents[0].offtime();
-        if (on != 0 || off != NoteEvent::NOTE_LENGTH) {
-            //: Note-on and note-off times relative to note duration, expressed in thousandths (per mille)
-            onofftime = u" " + muse::mtrc("engraving", "(on %1‰ off %2‰)").arg(on, off);
-        }
-    }
-
-    const Drumset* drumset = originPart()->instrument(chord()->tick())->drumset();
-    if (fixed() && headGroup() == NoteHeadGroup::HEAD_SLASH) {
-        pitchName = chord()->noStem() ? muse::mtrc("engraving", "Beat slash") : muse::mtrc("engraving", "Rhythm slash");
-    } else if (staff()->isDrumStaff(tick()) && drumset) {
-        pitchName = drumset->translatedName(pitch());
-    } else if (staff()->isTabStaff(tick())) {
-        pitchName = muse::mtrc("engraving", "%1; String: %2; Fret: %3")
-                    .arg(tpcUserName(false), String::number(string() + 1), String::number(fret()));
-    } else {
-        pitchName = tpcUserName(false);
-    }
-
-    return muse::mtrc("engraving", "%1; Pitch: %2; Duration: %3%4%5")
-           .arg(noteTypeUserName(), pitchName, duration, onofftime, (chord()->isGrace() ? u"" : String(u"; %1").arg(voice)));
-}
 
 //---------------------------------------------------------
 //   screenReaderInfo
 //---------------------------------------------------------
 
-String Note::screenReaderInfo() const
-{
-    const Part* part = originPart();
-    if (!part) {
-        return String(); // part is nullptr on Linux after an instrument is deleted.
-    }
 
-    const Fraction tick = this->tick();
-    const Chord* chord = this->chord();
-    const Instrument* instrument = part->instrument(tick);
-
-    IF_ASSERT_FAILED(chord && instrument) {
-        return String();
-    }
-
-    String duration = chord->durationUserName();
-    Measure* m = chord->measure();
-    bool voices = m ? m->hasVoices(staffIdx()) : false;
-    String voice = voices ? muse::mtrc("engraving", "Voice: %1").arg(track() % VOICES + 1) : u"";
-    String pitchName;
-    String pitchOutOfRangeWarning;
-    if (fixed() && headGroup() == NoteHeadGroup::HEAD_SLASH) {
-        pitchName = chord->noStem() ? muse::mtrc("engraving", "Beat slash") : muse::mtrc("engraving", "Rhythm slash");
-    } else if (const Drumset* d = instrument->drumset(); d&& instrument->useDrumset()) {
-        pitchName = d->translatedName(m_pitch);
-    } else if (const Staff* staff = this->staff(); staff&& staff->isTabStaff(tick)) {
-        pitchName = muse::mtrc("engraving", "%1; String: %2; Fret: %3")
-                    .arg(tpcUserName(true, true), String::number(string() + 1), String::number(fret()));
-    } else {
-        pitchName = m_headGroup == NoteHeadGroup::HEAD_NORMAL
-                    ? tpcUserName(true, true)
-                    //: head as in note head. %1 is head type (circle, cross, etc.). %2 is pitch (e.g. Db4).
-                    : muse::mtrc("engraving", "%1 head %2").arg(translatedSubtypeUserName()).arg(tpcUserName(true));
-        if (chord->staffMove() < 0) {
-            duration += u"; " + muse::mtrc("engraving", "Cross-staff above");
-        } else if (chord->staffMove() > 0) {
-            duration += u"; " + muse::mtrc("engraving", "Cross-staff below");
-        }
-
-        if (m_pitch < instrument->minPitchP()) {
-            pitchOutOfRangeWarning = u" " + muse::mtrc("engraving", "too low");
-        } else if (m_pitch > instrument->maxPitchP()) {
-            pitchOutOfRangeWarning = u" " + muse::mtrc("engraving", "too high");
-        } else if (m_pitch < instrument->minPitchA()) {
-            pitchOutOfRangeWarning = u" " + muse::mtrc("engraving", "too low for amateurs");
-        } else if (m_pitch > instrument->maxPitchA()) {
-            pitchOutOfRangeWarning = u" " + muse::mtrc("engraving", "too high for amateurs");
-        }
-    }
-    return String(u"%1 %2 %3%4%5").arg(noteTypeUserName(), pitchName, duration, pitchOutOfRangeWarning,
-                                       (chord->isGrace() ? u"" : String(u"; %1").arg(voice)));
-}
 
 //---------------------------------------------------------
 //   accessibleExtraInfo
 //---------------------------------------------------------
 
-String Note::accessibleExtraInfo() const
-{
-    String rez;
-    if (accidental()) {
-        rez = String(u"%1 %2").arg(rez, accidental()->screenReaderInfo());
-    }
-    if (!el().empty()) {
-        for (EngravingItem* e : el()) {
-            if (!score()->selectionFilter().canSelect(e)) {
-                continue;
-            }
-            rez = String(u"%1 %2").arg(rez, e->screenReaderInfo());
-        }
-    }
-    if (tieFor()) {
-        rez += u" " + muse::mtrc("engraving", "Start of %1").arg(tieFor()->screenReaderInfo());
-    }
 
-    if (tieBack()) {
-        rez += u" " + muse::mtrc("engraving", "End of %1").arg(tieBack()->screenReaderInfo());
-    }
-
-    if (!spannerFor().empty()) {
-        for (Spanner* s : spannerFor()) {
-            if (!score()->selectionFilter().canSelect(s)) {
-                continue;
-            }
-            rez += u" " + muse::mtrc("engraving", "Start of %1").arg(s->screenReaderInfo());
-        }
-    }
-    if (!spannerBack().empty()) {
-        for (Spanner* s : spannerBack()) {
-            if (!score()->selectionFilter().canSelect(s)) {
-                continue;
-            }
-            rez += u" " + muse::mtrc("engraving", "End of %1").arg(s->screenReaderInfo());
-        }
-    }
-
-    // only read extra information for top note of chord
-    // (it is reached directly on next/previous element)
-    if (this == chord()->upNote()) {
-        rez = String(u"%1 %2").arg(rez, chord()->accessibleExtraInfo());
-    }
-
-    return rez;
-}
 
 NoteVal Note::noteVal() const
 {

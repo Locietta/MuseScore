@@ -328,7 +328,7 @@ public:
     EngravingItem* lastElementBeforeSegment();
     EngravingItem* prevSegmentElement() override;
 
-    String accessibleExtraInfo() const override;
+
 
     Note* firstGraceOrNote();
 

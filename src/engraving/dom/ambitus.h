@@ -91,7 +91,7 @@ public:
     void scanElements(std::function<void(EngravingItem*)> func) override;
     void setTrack(track_idx_t val) override;
 
-    String accessibleInfo() const override;
+
 
     void remove(EngravingItem*) override;
 

@@ -20,6 +20,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "log.h"
 #include "notearticulationsparser.h"
 
 #include "dom/measure.h"

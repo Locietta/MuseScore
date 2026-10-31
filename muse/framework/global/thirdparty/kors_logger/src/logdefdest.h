@@ -21,52 +21,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef KORS_DEFLOGDEST_H
-#define KORS_DEFLOGDEST_H
-
-#include <fstream>
-#include <sstream>
-#include <string>
-
+#pragma once
 #include "logger.h"
-
 namespace kors::logger {
-class MemLogDest : public LogDest
-{
+class MemLogDest : public LogDest {
 public:
-    explicit MemLogDest(const LogLayout& l);
-
-    std::string name() const;
-    void write(const LogMsg& logMsg);
-
-    std::string content() const;
+    explicit MemLogDest(const LogLayout& layout)
+        : LogDest(layout)
+    {
+    }
+    std::string name() const override { return "memory"; }
+    void write(const LogMsg& msg) override { m_content += m_layout.output(msg) + '\n'; }
+    std::string content() const { return m_content; }
 
 private:
-    std::stringstream m_stream;
-};
-
-class FileLogDest : public LogDest
-{
-public:
-    FileLogDest(const std::string& filePath, const LogLayout& l);
-    ~FileLogDest();
-
-    std::string name() const;
-    void write(const LogMsg& logMsg);
-
-private:
-    std::ofstream m_file;
-    std::string m_filePath;
-};
-
-class ConsoleLogDest : public LogDest
-{
-public:
-    explicit ConsoleLogDest(const LogLayout& l);
-
-    std::string name() const;
-    void write(const LogMsg& logMsg);
+    std::string m_content;
 };
 }
-
-#endif // KORS_DEFLOGDEST_H

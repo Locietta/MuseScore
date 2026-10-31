@@ -15,6 +15,7 @@
 #include "engraving/dom/text.h"
 #include "engraving/engravingproject.h"
 
+#include "engrave/src/api/mnx.h"
 #include "engrave/src/api/handles.h"
 #include "engrave/src/api/sniff.h"
 #include "engrave/src/api/state.h"
@@ -40,6 +41,7 @@ const char* backend_name(Format format) {
     case Format::Mxl: return "mxl";
     case Format::Midi: return "midi";
     case Format::GuitarPro: return "gp";
+    case Format::Mnx: return "mnx";
     }
     return "";
 }
@@ -137,7 +139,7 @@ Capabilities Engine::capabilities() const {
     impl_->state.check_thread();
     return {
         .engine_version = music::engine_version(),
-        .import_formats = {Format::Mscz, Format::Mscx, Format::MusicXml, Format::Mxl, Format::Midi, Format::GuitarPro},
+        .import_formats = {Format::Mscz, Format::Mscx, Format::MusicXml, Format::Mxl, Format::Midi, Format::GuitarPro, Format::Mnx},
         .export_formats = {Format::Mscz, Format::MusicXml, Format::Mxl, Format::Midi},
         .render_formats = {RenderFormat::Pdf, RenderFormat::Png, RenderFormat::Svg},
         .audio_formats = {AudioFormat::Wav, AudioFormat::Flac, AudioFormat::Opus, AudioFormat::Mp3, AudioFormat::Aac},
@@ -181,7 +183,8 @@ Result<std::unique_ptr<Document>> Engine::open(std::span<const std::byte> data, 
     }
     music::ScoreProject project;
     try {
-        project = music::load_native_score(*impl_->state.context, bytes, backend_name(*format));
+        project = *format == Format::Mnx ? open_mnx(*impl_->state.context, bytes)
+            : music::load_native_score(*impl_->state.context, bytes, backend_name(*format));
     } catch (const music::UnsupportedScoreVersion& error) {
         return fail(ErrorCode::Unsupported, error.what());
     } catch (const std::bad_alloc&) {

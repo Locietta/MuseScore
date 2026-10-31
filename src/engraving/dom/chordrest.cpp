@@ -1110,60 +1110,7 @@ EngravingItem* ChordRest::prevSegmentElement()
     return segment()->lastInPrevSegments(staffIdx());
 }
 
-String ChordRest::accessibleExtraInfo() const
-{
-    String rez;
-    for (EngravingItem* l : lyrics()) {
-        if (!score()->selectionFilter().canSelect(l)) {
-            continue;
-        }
-        rez = String(u"%1 %2").arg(rez, l->screenReaderInfo());
-    }
 
-    if (segment()) {
-        for (EngravingItem* e : segment()->annotations()) {
-            if (!score()->selectionFilter().canSelect(e)) {
-                continue;
-            }
-            if (e->track() == track()) {
-                rez = String(u"%1 %2").arg(rez, e->screenReaderInfo());
-            }
-        }
-
-        SpannerMap& smap = score()->spannerMap();
-        auto spanners = smap.findOverlapping(tick().ticks(), tick().ticks());
-        for (auto interval : spanners) {
-            Spanner* s = interval.value;
-            if (!score()->selectionFilter().canSelect(s)) {
-                continue;
-            }
-            // voltas are added for barlines, ties are added in notes
-            if (s->isVolta() || s->isTie()) {
-                continue;
-            }
-
-            if (s->isSlur()) {
-                if (s->tick() == tick() && s->track() == track()) {
-                    rez += u" " + muse::mtrc("engraving", "Start of %1").arg(s->screenReaderInfo());
-                }
-                if (s->tick2() == tick() && s->track2() == track()) {
-                    rez += u" " + muse::mtrc("engraving", "End of %1").arg(s->screenReaderInfo());
-                }
-            } else if (s->staffIdx() == staffIdx()) {
-                bool start = s->tick() == tick();
-                bool end   = s->tick2() == tick() + ticks();
-                if (start && end) {
-                    rez += u" " + muse::mtrc("engraving", "Start and end of %1").arg(s->screenReaderInfo());
-                } else if (start) {
-                    rez += u" " + muse::mtrc("engraving", "Start of %1").arg(s->screenReaderInfo());
-                } else if (end) {
-                    rez += u" " + muse::mtrc("engraving", "End of %1").arg(s->screenReaderInfo());
-                }
-            }
-        }
-    }
-    return rez;
-}
 
 //---------------------------------------------------------
 //   isMelismaEnd

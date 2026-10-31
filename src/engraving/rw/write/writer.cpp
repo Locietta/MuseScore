@@ -20,6 +20,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "global/appinfo.h"
+#include "log.h"
 #include "writer.h"
 
 #include "../types/types.h"

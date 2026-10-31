@@ -121,8 +121,8 @@ public:
 
     EngravingItem* nextElement() override;
     EngravingItem* prevElement() override;
-    String accessibleInfo() const override;
-    String screenReaderInfo() const override;
+
+
 
     bool shouldNotBeDrawn() const;
     bool debugDrawGap() const;

@@ -23,10 +23,10 @@
 
 #include "../imnxconfiguration.h"
 
-#include "async/asyncable.h"
+
 
 namespace mu::iex::mnxio {
-class MnxConfiguration : public IMnxConfiguration, public muse::async::Asyncable
+class MnxConfiguration : public IMnxConfiguration
 {
 public:
     void init();

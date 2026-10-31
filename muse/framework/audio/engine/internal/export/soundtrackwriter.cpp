@@ -128,10 +128,6 @@ void SoundTrackWriter::abort()
     m_isAborted = true;
 }
 
-Progress SoundTrackWriter::progress()
-{
-    return m_progress;
-}
 
 Ret SoundTrackWriter::writeStreaming()
 {
@@ -143,7 +139,6 @@ Ret SoundTrackWriter::writeStreaming()
 
     samples_t framesWritten = 0;
 
-    sendProgress(0, m_totalSamples);
 
     // Phase 1: leading silence
     const samples_t leadingEnd = m_leadingSilenceSamples;
@@ -162,7 +157,6 @@ Ret SoundTrackWriter::writeStreaming()
         }
 
         framesWritten += chunk;
-        sendProgress(framesWritten, m_totalSamples);
         if (m_blockCompleted) m_blockCompleted(framesWritten);
     }
 
@@ -190,7 +184,6 @@ Ret SoundTrackWriter::writeStreaming()
         }
 
         framesWritten += chunk;
-        sendProgress(framesWritten, m_totalSamples);
         if (m_blockCompleted) m_blockCompleted(framesWritten);
     }
 
@@ -210,7 +203,6 @@ Ret SoundTrackWriter::writeStreaming()
         }
 
         framesWritten += chunk;
-        sendProgress(framesWritten, m_totalSamples);
         if (m_blockCompleted) m_blockCompleted(framesWritten);
     }
 
@@ -219,10 +211,4 @@ Ret SoundTrackWriter::writeStreaming()
     }
 
     return muse::make_ok();
-}
-
-void SoundTrackWriter::sendProgress(uint64_t framesWritten, uint64_t totalFrames)
-{
-    const int current = totalFrames > 0 ? static_cast<int>((framesWritten * 100) / totalFrames) : 0;
-    m_progress.progress(current, 100);
 }

@@ -545,8 +545,5 @@ bool Accidental::setProperty(Pid propertyId, const PropertyValue& v)
 //   accessibleInfo
 //---------------------------------------------------------
 
-String Accidental::accessibleInfo() const
-{
-    return String(u"%1: %2").arg(EngravingItem::accessibleInfo(), translatedSubtypeUserName());
-}
+
 }

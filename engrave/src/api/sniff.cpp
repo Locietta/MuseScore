@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cctype>
 #include <string_view>
+#include <nlohmann/json.hpp>
 
 #include "global/io/buffer.h"
 #include "global/serialization/xmlstreamreader.h"
@@ -62,6 +63,13 @@ std::optional<Format> sniff_format(const std::string& data) {
     if (head.starts_with("PK\x03\x04")) {
         if (auto format = sniff_zip(data)) return format;
     }
+    std::string_view text = data;
+    if (text.starts_with("\xEF\xBB\xBF")) text.remove_prefix(3);
+    const auto first = text.find_first_not_of(" \t\r\n");
+    if (first != std::string_view::npos && text[first] == '{') {
+        auto json = nlohmann::json::parse(text, nullptr, false);
+        if (json.is_object() && json.contains("mnx") && json["mnx"].is_object()) return Format::Mnx;
+    }
     if (head.starts_with("MThd")) return Format::Midi;
     if (auto format = sniff_xml(data)) return format;
     // importGTP's magics: Power Tab, GP6 (BCFZ), and GP1-5, whose header is a
@@ -76,6 +84,7 @@ std::optional<Format> format_from_extension(const std::filesystem::path& name) {
     const auto u8 = name.extension().u8string();
     std::string ext(u8.begin(), u8.end());
     std::ranges::transform(ext, ext.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+    if (ext == ".mnx") return Format::Mnx;
     if (ext == ".mscz") return Format::Mscz;
     if (ext == ".mscx") return Format::Mscx;
     if (ext == ".musicxml" || ext == ".xml") return Format::MusicXml;

@@ -20,6 +20,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "log.h"
 #include "editnote.h"
 #include "editchord.h"
 #include "noteinput.h"

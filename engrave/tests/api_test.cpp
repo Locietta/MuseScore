@@ -74,7 +74,7 @@ TEST(Open, RejectsPreMuseScore4) {
 TEST(Capabilities, ListsFormatsAndVersion) {
     const auto capabilities = g_engine->capabilities();
     EXPECT_FALSE(capabilities.engine_version.empty());
-    EXPECT_EQ(capabilities.import_formats.size(), 6u);
+    EXPECT_EQ(capabilities.import_formats.size(), 7u);
     EXPECT_EQ(capabilities.export_formats,
               (std::vector<Format>{Format::Mscz, Format::MusicXml, Format::Mxl, Format::Midi}));
 }
@@ -148,7 +148,7 @@ TEST(Export, WritesEachExportFormat) {
 TEST(Export, RejectsFormatsTheEngineDoesNotWrite) {
     auto document = treble_clef();
     ASSERT_TRUE(document);
-    for (const auto format : {Format::Mscx, Format::GuitarPro}) {
+    for (const auto format : {Format::Mscx, Format::GuitarPro, Format::Mnx}) {
         const auto bytes = document->export_score({.format = format});
         ASSERT_FALSE(bytes);
         EXPECT_EQ(bytes.error().code, ErrorCode::Unsupported);
@@ -270,6 +270,12 @@ int main(int argc, char** argv) {
     for (int i = 1; i < argc; ++i) {
         const std::string_view arg = argv[i];
         if (arg.starts_with("--assets=")) g_resources = std::filesystem::path(arg.substr(9));
+    }
+    // Failure before binding services must leave startup retryable.
+    auto missing = engrave::Engine::create({.resources = g_resources / "c5-missing-resources"});
+    if (missing || missing.error().code != ErrorCode::NotFound) {
+        std::fprintf(stderr, "C5 startup failure did not leave services unbound\n");
+        return 1;
     }
     auto engine = engrave::Engine::create({.resources = g_resources});
     if (!engine) {

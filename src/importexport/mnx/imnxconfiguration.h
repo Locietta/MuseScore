@@ -21,12 +21,10 @@
  */
 #pragma once
 
-#include "modularity/imoduleinterface.h"
 
 namespace mu::iex::mnxio {
 class IMnxConfiguration : MODULE_GLOBAL_EXPORT_INTERFACE
 {
-    INTERFACE_ID(IMnxConfiguration)
 
 public:
     virtual ~IMnxConfiguration() = default;

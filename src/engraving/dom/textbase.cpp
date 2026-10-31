@@ -2414,56 +2414,13 @@ String TextBase::escape(String s)
 //   accessibleInfo
 //---------------------------------------------------------
 
-String TextBase::accessibleInfo() const
-{
-    String rez;
-    switch (textStyleType()) {
-    case TextStyleType::TITLE:
-    case TextStyleType::SUBTITLE:
-    case TextStyleType::COMPOSER:
-    case TextStyleType::LYRICIST:
-    case TextStyleType::TRANSLATOR:
-    case TextStyleType::MEASURE_NUMBER:
-    case TextStyleType::MMREST_RANGE:
-        rez = translatedSubtypeUserName();
-        break;
-    default:
-        rez = EngravingItem::accessibleInfo();
-        break;
-    }
-    String s = plainText().simplified();
-    if (s.size() > 20) {
-        s.truncate(20);
-        s += u"…";
-    }
-    return String(u"%1: %2").arg(rez, s);
-}
+
 
 //---------------------------------------------------------
 //   screenReaderInfo
 //---------------------------------------------------------
 
-String TextBase::screenReaderInfo() const
-{
-    String rez;
 
-    switch (textStyleType()) {
-    case TextStyleType::TITLE:
-    case TextStyleType::SUBTITLE:
-    case TextStyleType::COMPOSER:
-    case TextStyleType::LYRICIST:
-    case TextStyleType::TRANSLATOR:
-    case TextStyleType::MEASURE_NUMBER:
-    case TextStyleType::MMREST_RANGE:
-        rez = translatedSubtypeUserName();
-        break;
-    default:
-        rez = EngravingItem::accessibleInfo();
-        break;
-    }
-    String s = plainText().simplified();
-    return String(u"%1: %2").arg(rez, s);
-}
 
 //---------------------------------------------------------
 //   subtype

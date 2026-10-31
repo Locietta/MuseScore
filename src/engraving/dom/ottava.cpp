@@ -377,10 +377,7 @@ PropertyValue Ottava::propertyDefault(Pid pid) const
 //   accessibleInfo
 //---------------------------------------------------------
 
-String Ottava::accessibleInfo() const
-{
-    return String(u"%1: %2").arg(EngravingItem::accessibleInfo(), String::fromUtf8(ottavaDefault[static_cast<int>(ottavaType())].name));
-}
+
 
 //---------------------------------------------------------
 //   subtypeUserName

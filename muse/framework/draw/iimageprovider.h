@@ -22,7 +22,6 @@
 #ifndef MUSE_DRAW_IIMAGEPROVIDER_H
 #define MUSE_DRAW_IIMAGEPROVIDER_H
 
-#include "global/modularity/ioc.h"
 #include "global/io/iodevice.h"
 
 #include "types/geometry.h"
@@ -31,9 +30,8 @@
 #include "ipaintprovider.h"
 
 namespace muse::draw {
-class IImageProvider : MODULE_GLOBAL_INTERFACE
+class IImageProvider
 {
-    INTERFACE_ID(IImageProvider)
 
 public:
     virtual ~IImageProvider() = default;

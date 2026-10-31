@@ -388,8 +388,8 @@ public:
     static String unEscape(String s);
     static String escape(String s);
 
-    String accessibleInfo() const override;
-    String screenReaderInfo() const override;
+
+
 
     int subtype() const override;
     TranslatableString subtypeUserName() const override;

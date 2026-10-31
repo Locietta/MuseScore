@@ -1075,24 +1075,13 @@ PropertyValue TBox::propertyDefault(Pid id) const
 //   accessibleExtraInfo
 //---------------------------------------------------------
 
-String Box::accessibleExtraInfo() const
-{
-    String rez;
-    for (EngravingItem* e : el()) {
-        rez += u' ' + e->screenReaderInfo();
-    }
-    return rez;
-}
+
 
 //---------------------------------------------------------
 //   accessibleExtraInfo
 //---------------------------------------------------------
 
-String TBox::accessibleExtraInfo() const
-{
-    String rez = m_text->screenReaderInfo();
-    return rez;
-}
+
 
 int TBox::gripsCount() const
 {

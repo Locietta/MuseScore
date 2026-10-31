@@ -19,6 +19,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include "log.h"
 #include <array>
 #include <exception>
 #include <vector>
@@ -704,7 +705,7 @@ void MnxImporter::createVolta(engraving::Measure* measure, const mnx::global::En
             if (!text.empty()) {
                 text += u", ";
             }
-            text += String("%1").arg(number);
+            text += String(u"%1").arg(number);
         }
         text += u".";
         volta->setText(text);

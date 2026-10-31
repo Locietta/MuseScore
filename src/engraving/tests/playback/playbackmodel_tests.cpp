@@ -25,8 +25,6 @@
 #include <cmath>
 #include <memory>
 
-#include "async/asyncable.h"
-#include "async/channel.h"
 #include "mpe/tests/utils/articulationutils.h"
 #include "mpe/tests/mocks/articulationprofilesrepositorymock.h"
 
@@ -53,7 +51,7 @@ static constexpr duration_t QUARTER_NOTE_DURATION = 500000; // duration in micro
 static constexpr duration_t HALF_NOTE_DURATION = QUARTER_NOTE_DURATION * 2; // duration in microseconds for 1/2 120BPM
 static constexpr duration_t WHOLE_NOTE_DURATION = QUARTER_NOTE_DURATION * 4; // duration in microseconds for 4/4 120BPM
 
-class Engraving_PlaybackModelTests : public ::testing::Test, public muse::async::Asyncable
+class Engraving_PlaybackModelTests : public ::testing::Test
 {
 protected:
     void SetUp() override
@@ -1251,7 +1249,7 @@ TEST_F(Engraving_PlaybackModelTests, Note_Entry_Playback_Chord)
             EXPECT_FALSE(actualNoteEvent.expressionCtx() == expectedNoteEvent.expressionCtx());
             EXPECT_TRUE(actualNoteEvent.pitchCtx() == expectedNoteEvent.pitchCtx());
 
-            }
+        }
     };
 
     // [WHEN] Don't use the score dynamics

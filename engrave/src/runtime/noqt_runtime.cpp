@@ -33,12 +33,6 @@ namespace music {
 using namespace muse;
 using namespace mu;
 namespace {
-class StderrLog final : public logger::LogDest {
-public:
-    StderrLog() : LogDest(logger::LogLayout("${type}: ${message}")) {}
-    std::string name() const override { return "native-stderr"; }
-    void write(const logger::LogMsg& message) override { std::cerr << m_layout.output(message) << '\n'; }
-};
 
 
 void check(const Ret& result) { if (!result) throw std::runtime_error(result.toString()); }
@@ -97,9 +91,6 @@ void initialize_native_runtime(const std::string& assets) {
         throw std::invalid_argument("Missing native resources: " + assets);
     // Once engine state is built, a failed initialization cannot safely be retried.
     initialized = true;
-    auto* logger = logger::Logger::instance();
-    logger->clearDests();
-    logger->addDest(new StderrLog());
 
 }
 

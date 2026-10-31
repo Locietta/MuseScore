@@ -28,7 +28,7 @@
 #include "global/iapplication.h"
 #include "global/io/path.h"
 #include "global/log.h"
-#include "global/modularity/ioc.h"
+#include "global/appinfo.h"
 #include "global/translation.h"
 
 #include "engraving/dom/masterscore.h"
@@ -164,19 +164,14 @@ muse::Ret MnxExporter::exportMnx()
 {
     LOGI() << "MNX export started: schema version=" << m_mnxDocument.mnx().version();
     // Header
-    static muse::GlobalInject<muse::IApplication> application;
     auto client = m_mnxDocument.mnx().ensure_mnxdom().ensure_client();
-    muse::String version = application()->version().toString();
-    const muse::String revision = application()->revision();
-    const muse::String build = application()->build();
+    muse::String version = muse::appinfo::version().toString();
+    const muse::String revision = muse::appinfo::revision();
     if (!revision.isEmpty()) {
         version += u" rev. " + revision;
     }
-    client.set_name(application()->title().toStdString());
+    client.set_name("engrave");
     client.set_version(version.toStdString());
-    if (!build.isEmpty()) {
-        client.set_build(build.toStdString());
-    }
     if (m_score && m_score->masterScore()) {
         IFileInfoProviderPtr fileInfo = m_score->masterScore()->fileInfo();
         if (fileInfo) {

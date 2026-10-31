@@ -268,14 +268,7 @@ SymId ChordLine::waveSym() const
 //   accessibleInfo
 //---------------------------------------------------------
 
-String ChordLine::accessibleInfo() const
-{
-    String rez = EngravingItem::accessibleInfo();
-    if (chordLineType() != ChordLineType::NOTYPE) {
-        rez = String(u"%1: %2").arg(rez, chordLineTypeName().translated());
-    }
-    return rez;
-}
+
 
 int ChordLine::subtype() const
 {

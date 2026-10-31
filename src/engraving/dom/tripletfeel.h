@@ -53,7 +53,7 @@ public:
     PropertyValue propertyDefault(Pid propertyId) const override;
     Sid getPropertyStyle(Pid id) const override;
     TranslatableString subtypeUserName() const override;
-    String accessibleInfo() const override;
+
 
 private:
 

@@ -419,15 +419,7 @@ String TempoText::duration2userName(const TDuration t)
 //   accessibleInfo
 //---------------------------------------------------------
 
-String TempoText::accessibleInfo() const
-{
-    String info = tempoInfo();
-    if (info.empty()) {
-        return TextBase::accessibleInfo();
-    }
 
-    return String(u"%1: %2").arg(EngravingItem::accessibleInfo(), info);
-}
 
 String TempoText::tempoInfo() const
 {

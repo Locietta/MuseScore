@@ -31,7 +31,7 @@
 
 #include "io/path.h"
 
-#include "log.h"
+#include "global/asserts.h"
 
 namespace muse {
 inline void* loadLib(const io::path_t& path)

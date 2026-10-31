@@ -279,9 +279,9 @@ public:
     int subtype() const override { return static_cast<int>(harmonyType()); }
 
     TranslatableString typeUserName() const override;
-    String accessibleInfo() const override;
+
     String generateScreenReaderInfo() const;
-    String screenReaderInfo() const override;
+
 
     bool acceptDrop(EditData&) const override;
     EngravingItem* drop(Transaction& tx, EditData&) override;

@@ -85,10 +85,7 @@ AsciiStringView Symbol::symName() const
 //   accessibleInfo
 //---------------------------------------------------------
 
-String Symbol::accessibleInfo() const
-{
-    return String(u"%1: %2").arg(EngravingItem::accessibleInfo(), SymNames::userNameForSymId(m_sym).translated());
-}
+
 
 //---------------------------------------------------------
 //   subtypeUserName
@@ -219,10 +216,7 @@ String FSymbol::toString() const
 // be rendered correctly by Braille terminals.
 //---------------------------------------------------------
 
-String FSymbol::accessibleInfo() const
-{
-    return toString();
-}
+
 
 //---------------------------------------------------------
 //   setFont

@@ -41,7 +41,6 @@ target("engraving_playback_tests")
     add_deps("muse_generated", "engrave")
     add_packages("gtest")
     add_defines(table.unpack(ENGRAVE_DEFINES))
-    add_defines("KORS_PROFILER_ENABLED")
     add_defines("TEST_HAS_ENGRAVING=1")
     add_defines('ENGRAVING_TESTS_DATA_ROOT="' .. engraving_tests_dir:gsub("\\", "/") .. '"')
     add_includedirs(
@@ -89,7 +88,6 @@ target("mpe_tests")
     add_deps("muse_generated", "muse_mpe")
     add_packages("gtest")
     add_defines(table.unpack(ENGRAVE_DEFINES))
-    add_defines("KORS_PROFILER_ENABLED")
     add_includedirs(
         path.join(source_root, "muse", "framework", "mpe"),
         path.join(source_root, "src"),
@@ -193,6 +191,24 @@ target_end()
 
 -- Guitar Pro and PowerTab import of upstream's test data: every score file of the
 -- importer's data directory must either open to a score or return an Error.
+target("engrave_mnx_import_test")
+    set_kind("binary")
+    set_default(false)
+    add_deps("engrave")
+    add_packages("gtest")
+    add_defines(table.unpack(ENGRAVE_DEFINES))
+    add_defines(table.unpack(ENGRAVE_GLOBAL_DEFINES))
+    add_includedirs(ENGRAVE_ADAPTER_INCLUDES)
+    add_includedirs("$(builddir)/xmake-generated")
+    add_defines('ENGRAVE_TEST_SOURCE_ROOT="' .. source_root:gsub("\\", "/") .. '"')
+    add_files(path.join(tests_dir, "mnx_import_test.cpp"))
+    if is_plat("windows") then
+        add_files(utf8_manifest)
+    else
+        add_links("m")
+    end
+target_end()
+
 target("engrave_gp_import_test")
     set_kind("binary")
     set_default(false)
@@ -251,7 +267,7 @@ target("engrave_read_test")
     end
 target_end()
 
--- The edit harness (design §5.3): Document::edit, the snapshot round trip and the
+-- The edit harness (design 搂5.3): Document::edit, the snapshot round trip and the
 -- per-operation evidence.  A group of operations adds its cases as a file under
 -- harness/cases/; the folder glob picks it up.
 target("engrave_ops_test")
@@ -382,8 +398,21 @@ target("c0_gate")
     set_default(false)
     add_deps("engrave_api_test", "engrave_handles_test", "engrave_describe_test",
         "engrave_read_test", "engrave_ops_test", "engrave_op_policy_test",
-        "engrave_gp_import_test", "engrave_output_test", "engrave_output_probe",
+        "engrave_gp_import_test", "engrave_mnx_import_test", "engrave_output_test", "engrave_output_probe",
         "example_embedder", "engraving_playback_tests", "mpe_tests",
         "score_edit_test", "score_audio_test", "score_positions_test",
-        "excerpts_test", "archive_test", "assets_test", "semantic_dump", "engine_audio_probe")
+        "excerpts_test", "archive_test", "assets_test", "semantic_dump", "engine_audio_probe", "diagnostics_test")
+target_end()
+
+-- Diagnostic control flow is independent of score initialization.
+target("diagnostics_test")
+    set_kind("binary")
+    set_default(false)
+    add_deps("muse_generated", "muse_global")
+    add_packages("gtest")
+    add_includedirs(ENGRAVE_INTERNAL_INCLUDES)
+    add_includedirs(path.join(source_root, "muse", "framework"),
+        path.join(source_root, "muse", "framework", "global"))
+    add_includedirs("$(builddir)/xmake-generated")
+    add_files(path.join(tests_dir, "diagnostics_test.cpp"))
 target_end()

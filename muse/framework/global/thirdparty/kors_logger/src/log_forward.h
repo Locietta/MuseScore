@@ -1,3 +1,4 @@
+/*
 MIT License
 
 Copyright (c) 2020 Igor Korsukov
@@ -19,3 +20,36 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+*/
+#pragma once
+#include "logstream.h"
+namespace kors::logger {
+enum class Level { Off,
+    Normal,
+    Debug,
+    Full };
+enum class Color { None,
+    Black,
+    Red,
+    Green,
+    Yellow,
+    Blue,
+    Magenta,
+    Cyan,
+    White };
+bool enabled(Level level);
+class LogInput {
+public:
+    LogInput(std::string_view type, std::string_view tag, Color);
+    ~LogInput();
+    LogInput(const LogInput&) = delete;
+    LogInput& operator=(const LogInput&) = delete;
+    Stream& stream() { return m_stream; }
+    Stream& stream(const char* format, ...);
+
+private:
+    std::string_view m_type;
+    std::string_view m_tag;
+    Stream m_stream;
+};
+}

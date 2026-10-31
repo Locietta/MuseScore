@@ -371,10 +371,7 @@ EngravingItem* SpannerSegment::prevSegmentElement()
 //   accessibleInfo
 //---------------------------------------------------------
 
-String SpannerSegment::accessibleInfo() const
-{
-    return spanner()->accessibleInfo();
-}
+
 
 //---------------------------------------------------------
 //   triggerLayout

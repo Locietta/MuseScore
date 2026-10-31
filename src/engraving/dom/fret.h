@@ -223,8 +223,8 @@ public:
 
     void setTrack(track_idx_t val) override;
 
-    String accessibleInfo() const override;
-    String screenReaderInfo() const override;
+
+
 
     bool showFingering() const { return m_showFingering; }
     void setShowFingering(bool v) { m_showFingering = v; }

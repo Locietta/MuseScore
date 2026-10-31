@@ -21,6 +21,9 @@
  */
 
 #pragma once
+#include <atomic>
+
+#include "global/types/ret.h"
 
 #include <vector>
 #include <functional>
@@ -47,12 +50,10 @@ public:
     Ret write();
     void abort();
 
-    Progress progress();
 
 private:
     Ret writeStreaming();
 
-    void sendProgress(uint64_t framesWritten, uint64_t totalFrames);
 
     IAudioNodePtr m_source;
     std::function<void(uint64_t)> m_blockCompleted;
@@ -65,7 +66,6 @@ private:
 
     encode::AbstractAudioEncoderPtr m_encoderPtr;
 
-    Progress m_progress;
     std::atomic<bool> m_isAborted = false;
 };
 }

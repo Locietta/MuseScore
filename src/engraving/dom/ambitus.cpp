@@ -472,16 +472,7 @@ EngravingItem* Ambitus::prevSegmentElement()
 //   accessibleInfo
 //---------------------------------------------------------
 
-String Ambitus::accessibleInfo() const
-{
-    if (!tpcIsValid(m_topTpc) || !tpcIsValid(m_bottomTpc)) {
-        return EngravingItem::accessibleInfo();
-    }
-    return EngravingItem::accessibleInfo() + u"; "
-           + muse::mtrc("engraving", "Top pitch: %1; Bottom pitch: %2")
-           .arg(tpc2name(topTpc(), NoteSpellingType::STANDARD, NoteCaseType::AUTO, false) + String::number(topOctave()),
-                tpc2name(bottomTpc(), NoteSpellingType::STANDARD, NoteCaseType::AUTO, false) + String::number(bottomOctave()));
-}
+
 
 AccidentalType Ambitus::accidentalType(int tpc, Key key)
 {

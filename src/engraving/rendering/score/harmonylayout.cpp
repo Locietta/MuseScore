@@ -20,6 +20,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "log.h"
 #include "harmonylayout.h"
 
 #include "draw/fontmetrics.h"

@@ -173,7 +173,7 @@ public:
     EngravingItem* lastElementBeforeSegment();
     virtual EngravingItem* nextSegmentElement() override;
     virtual EngravingItem* prevSegmentElement() override;
-    virtual String accessibleExtraInfo() const override;
+
     virtual void computeUp();
 
     bool isFullMeasureRest() const { return m_durationType == DurationType::V_MEASURE; }

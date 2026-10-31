@@ -53,7 +53,7 @@ public:
 
     PropertyValue propertyDefault(Pid id) const override;
 
-    String accessibleInfo() const override;
+
 
     bool isOnCrossBeamSide() const;
 

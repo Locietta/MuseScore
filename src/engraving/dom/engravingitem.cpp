@@ -2155,10 +2155,7 @@ EngravingItem* EngravingItem::prevSegmentElement()
 }
 
 
-String EngravingItem::accessibleInfo() const
-{
-    return EngravingItem::translatedTypeUserName();
-}
+
 
 //---------------------------------------------------------
 //   nextGrip

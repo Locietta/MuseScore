@@ -560,26 +560,13 @@ Sid Dynamic::getPropertyStyle(Pid pid) const
 //   accessibleInfo
 //---------------------------------------------------------
 
-String Dynamic::accessibleInfo() const
-{
-    return String(u"%1: %2").arg(EngravingItem::accessibleInfo(), translatedSubtypeUserName());
-}
+
 
 //---------------------------------------------------------
 //   screenReaderInfo
 //---------------------------------------------------------
 
-String Dynamic::screenReaderInfo() const
-{
-    String s;
 
-    if (dynamicType() == DynamicType::OTHER) {
-        s = plainText().simplified();
-    } else {
-        s = TConv::translatedUserName(dynamicType());
-    }
-    return String(u"%1: %2").arg(EngravingItem::accessibleInfo(), s);
-}
 }
 
 bool Dynamic::isEditAllowed(EditData& ed) const

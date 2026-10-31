@@ -23,7 +23,7 @@
 #ifndef MU_ENGRAVING_PARSERBASE_H
 #define MU_ENGRAVING_PARSERBASE_H
 
-#include "log.h"
+#include "global/asserts.h"
 #include "mpe/mpetypes.h"
 
 #include "playback/renderingcontext.h"

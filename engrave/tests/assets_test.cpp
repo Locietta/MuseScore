@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 #include "engrave/src/runtime/engine_context.h"
+#include "global/io/ifilesystem.h"
 #include "engrave/src/runtime/runtime_assets.h"
 #include "draw/internal/ifontsengine.h"
 #include "draw/types/font.h"
@@ -58,8 +59,8 @@ int main(int argc, char** argv) {
         const std::string family=fixture.family;
         const auto input=out/"mutable-input.ttf";
         { std::ofstream f(input,std::ios::binary); f.write(bytes.data(),bytes.size()); expect(bool(f),"Cannot write test font"); }
-        music::EngineContext context(argv[1]);
-        music::RuntimeAssets& assets=context.assets();
+        auto context = std::make_unique<music::EngineContext>(argv[1]);
+        music::RuntimeAssets& assets=context->assets();
         muse::draw::IFontsEngine* engine=&assets.fontsEngine();
         muse::draw::Font font(muse::draw::Font::FontFamily(family),muse::draw::Font::Type::Text);
         font.setPointSizeF(12);
@@ -143,6 +144,9 @@ int main(int argc, char** argv) {
         if (result.contains("soundfont"))
             expect(!std::filesystem::exists(std::filesystem::u8path(result["soundfont"]["cachedPath"].get<std::string>())),
                    "SoundFont cache survived runtime shutdown");
+        context.reset();
+        expect(muse::io::fileSystem() == nullptr, "Engine teardown left the file system bound");
+        result["contextTeardown"] = true;
         result["shutdownCleanup"] = true;
         result["leaseDeferredCleanup"] = true;
         std::ofstream report(out/"evidence.json"); report<<result.dump(2); report.close();

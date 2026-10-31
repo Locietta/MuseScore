@@ -23,7 +23,7 @@
 #ifndef MU_ENGRAVING_FILTERBASE_H
 #define MU_ENGRAVING_FILTERBASE_H
 
-#include "log.h"
+#include "global/asserts.h"
 
 #include "playback/renderingcontext.h"
 
