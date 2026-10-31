@@ -1,5 +1,5 @@
 {
- "note": "The A2 render goldens for three corpus scores, copied from musescore-mcp tests/golden/<platform>/<fixture> at superproject commit 8acd1d0. svg is the sha256 of the stored page-N.svg text; png is describe_png's width/height/mode and the sha256 of the RGBA bytes PIL decodes; pdf is describe_pdf's page count. scripts/golden.py normalizes SVG to LF and leaves it otherwise unchanged, and decodes the PNG to RGBA (8 bits per channel, no alpha premultiplication), which is what the test reproduces. Windows repeat70 hashes were refreshed for its one-time pre-4.6 fixture upgrade on 2026-10-31; the old/new hashes and reason are pinned in the superproject tests/golden/allow.json. Linux runtime recapture is pending (this change requested a Linux build-only check).",
+ "note": "The A2 render goldens for three corpus scores, copied from musescore-mcp tests/golden/<platform>/<fixture> at superproject commit 8acd1d0. svg is the sha256 of the stored page-N.svg text; png is describe_png's width/height/mode and the sha256 of the RGBA bytes PIL decodes; pdf is describe_pdf's page count. scripts/golden.py normalizes SVG to LF and leaves it otherwise unchanged, and decodes the PNG to RGBA (8 bits per channel, no alpha premultiplication), which is what the test reproduces. Windows hashes were refreshed for the one-time pre-4.6 fixture upgrade on 2026-10-31; the old/new hashes and reason are pinned in the superproject tests/golden/allow.json. Linux runtime recapture is pending (this change requested a Linux build-only check).",
  "fixtures": {
   "ghost_note.mscx": {
    "linux": {
@@ -21,7 +21,7 @@
      "width": 1191
     },
     "svg": [
-     "9b5191595d6081e64dbc088283655ced6f02395c218bfb48e6983917cd107990"
+     "c450175e79b3fa0351d552153ba43ba4f9789e51838a880ad61bfaad264cce28"
     ]
    }
   },
@@ -41,11 +41,11 @@
     "pdf": 1,
     "png": {
      "height": 1684,
-     "sha256": "b6ac031f1902c790e12f4e039f41af9b5b1366b78b2344eb0fa8a3c0f2835a6d",
+     "sha256": "875334994664e5fc981259795c340b5e3e0b3da88c948bda664af8cd85d58ef2",
      "width": 1191
     },
     "svg": [
-     "75c2ca817082a721b6f9cd4420bfa515169c50b8299894b18e200e69a8316bed"
+     "cc196e0ab86e22bbfc1e73fdb7831bbea73ee6be84d67146b1dba693772fe48c"
     ]
    }
   },
