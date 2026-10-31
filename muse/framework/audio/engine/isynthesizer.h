@@ -24,8 +24,6 @@
 
 #include <string>
 
-#include "global/async/channel.h"
-#include "global/async/notification.h"
 
 #include "audio/common/audiotypes.h"
 #include "audio/common/timeposition.h"
@@ -49,14 +47,12 @@ public:
     virtual const mpe::PlaybackData& playbackData() const = 0;
 
     virtual const audio::AudioInputParams& params() const = 0;
-    virtual async::Channel<audio::AudioInputParams> paramsChanged() const = 0;
 
     virtual TimePosition playbackPosition() const = 0;
     virtual void setPlaybackPosition(const TimePosition& position) = 0;
 
     virtual void prepareToPlay() = 0;
     virtual bool readyToPlay() const = 0;
-    virtual async::Notification readyToPlayChanged() const = 0;
 
     virtual void flushSound() = 0;
 

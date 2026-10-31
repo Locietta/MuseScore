@@ -55,7 +55,7 @@ RetVal2<TrackId, TrackParams> OfflineRenderSession::add(const std::string& name,
     const TrackId id = ++m_lastId;
     AudioSourceNodePtr source;
     if (data) {
-        auto made = m_factory.makeEventSource(id, *data, params.source, {});
+        auto made = m_factory.makeEventSource(id, *data, params.source);
         if (!made.ret) return Result::make_ret(made.ret);
         source = made.val;
     }

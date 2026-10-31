@@ -235,7 +235,7 @@ Result<EditResult> BatchGuard::execute(std::vector<Step> steps, Policy policy, s
     UndoStack* stack = master.undoStack();
     std::optional<Snapshot> snapshot;
     if (policy == Policy::Snapshot) {
-        snapshot = Snapshot{music::export_native_score(document.project, "mscz", music::ExportOptions{}, {}),
+        snapshot = Snapshot{music::export_native_score(*document.engine->context, document.project, "mscz", music::ExportOptions{}, {}),
                             music::semantic_dump(&master).dump(1), id_list(master), {}};
         for (const mu::engraving::Score* score : master.scoreList())
             snapshot->versions.push_back({score->mscoreVersion(), score->mscoreRevision(), score->mscVersion(), score->npages() > 0});
@@ -374,7 +374,7 @@ void BatchGuard::roll_back(const Snapshot* snapshot, std::size_t history, bool u
 void BatchGuard::restore(const Snapshot& snapshot) {
     Document::Impl& document = *m_document.impl_;
     if (document.edit_hooks.fail_restore) throw std::runtime_error("the snapshot restore failed (test hook)");
-    music::ScoreProject project = music::load_native_score(snapshot.mscz, "mscz");
+    music::ScoreProject project = music::load_native_score(*document.engine->context, snapshot.mscz, "mscz");
     // The reload reads the version the writer stamped; the scores keep their own, and
     // layout depends on it (a score from an older version keeps its compatibility
     // layout), so what was laid out is laid out again, as a load does.

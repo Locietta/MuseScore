@@ -794,7 +794,7 @@ Ret NoteInput::putNote(Transaction& tx, Score* score, const Position& p, bool re
     Measure* m = is.segment()->measure();
     staff_idx_t staffIdx = track2staff(is.track());
     if (m->isMeasureRepeatGroup(staffIdx)) {
-        auto b = MessageBox(score->iocContext()).warning(muse::trc("engraving", "Note input will remove measure repeat"),
+        auto b = MessageBox().warning(muse::trc("engraving", "Note input will remove measure repeat"),
                                                          muse::trc("engraving", "This measure contains a measure repeat."
                                                                                 " If you enter notes here, it will be deleted."
                                                                                 " Do you want to continue?"));

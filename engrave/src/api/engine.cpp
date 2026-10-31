@@ -115,13 +115,13 @@ Result<std::unique_ptr<Engine>> Engine::create(const EngineOptions& options) {
     for (const auto& soundfont : options.soundfonts)
         impl->state.soundfonts.push_back(std::filesystem::absolute(soundfont));
     impl->state.audio_sample_rate = options.audio_sample_rate;
-    if (!options.cache_dir.empty()) music::set_runtime_cache_root(utf8(std::filesystem::absolute(options.cache_dir)));
     mu::engraving::MScore::testMode = options.deterministic_ids;
-    music::initialize_native_runtime(utf8(resources));
+    impl->state.context = std::make_unique<music::EngineContext>(
+        utf8(resources), options.cache_dir.empty() ? std::string() : utf8(std::filesystem::absolute(options.cache_dir)));
     std::unique_ptr<Engine> engine(new Engine(std::move(impl)));
     for (const auto& font : options.fonts) {
         try {
-            music::add_runtime_font(utf8(std::filesystem::absolute(font)));
+            engine->impl_->state.context->assets().addFont(utf8(std::filesystem::absolute(font)));
         } catch (const std::runtime_error& error) {
             return fail(ErrorCode::InvalidInput, error.what());
         }
@@ -132,11 +132,7 @@ Result<std::unique_ptr<Engine>> Engine::create(const EngineOptions& options) {
 Engine::~Engine() {
     impl_->state.check_thread();
     check(impl_->state.live_documents == 0, "an Engine was destroyed while Documents were open");
-    try {
-        music::shutdown_runtime_assets();
-    } catch (const std::exception& error) {
-        std::fprintf(stderr, "engrave: runtime asset cleanup failed: %s\n", error.what());
-    }
+    impl_->state.context.reset();
 }
 
 Capabilities Engine::capabilities() const {
@@ -187,7 +183,8 @@ Result<std::unique_ptr<Document>> Engine::open(std::span<const std::byte> data, 
     }
     music::ScoreProject project;
     try {
-        project = *format == Format::Mnx ? open_mnx(bytes) : music::load_native_score(bytes, backend_name(*format));
+        project = *format == Format::Mnx ? open_mnx(*impl_->state.context, bytes)
+            : music::load_native_score(*impl_->state.context, bytes, backend_name(*format));
     } catch (const music::UnsupportedScoreVersion& error) {
         return fail(ErrorCode::Unsupported, error.what());
     } catch (const std::bad_alloc&) {
@@ -247,7 +244,7 @@ Result<std::unique_ptr<Document>> Engine::create_document(const CreateOptions& o
 
     music::ScoreProject project;
     try {
-        project = music::load_native_score_dir(utf8(std::filesystem::absolute(mscx)));
+        project = music::load_native_score_dir(*impl_->state.context, utf8(std::filesystem::absolute(mscx)));
     } catch (const music::UnsupportedScoreVersion& error) {
         return fail(ErrorCode::Unsupported, error.what());
     } catch (const std::bad_alloc&) {

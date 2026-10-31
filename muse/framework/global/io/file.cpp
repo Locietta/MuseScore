@@ -30,6 +30,20 @@
 using namespace muse;
 using namespace muse::io;
 
+namespace {
+IFileSystem* s_fileSystem = nullptr;
+}
+
+IFileSystem* muse::io::fileSystem()
+{
+    return s_fileSystem;
+}
+
+void muse::io::setFileSystem(IFileSystem* fileSystem)
+{
+    s_fileSystem = fileSystem;
+}
+
 File::File(const path_t& filePath)
     : m_filePath(filePath)
 {

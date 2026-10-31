@@ -26,21 +26,19 @@
 
 #include "ifontsengine.h"
 
-#include "global/modularity/ioc.h"
-#include "global/async/asyncable.h"
 #include "ifontsdatabase.h"
 
 #include "fontrendercache.h"
 
 namespace muse::draw {
 class IFontFace;
-class FontsEngine : public IFontsEngine, public Contextable, public async::Asyncable
+class FontsEngine : public IFontsEngine
 {
-    GlobalInject<IFontsDatabase> fontsDatabase;
+    IFontsDatabase& m_database;
+    mutable uint64_t m_databaseRevision = 0;
 
 public:
-    FontsEngine(const modularity::ContextPtr& iocCtx)
-        : Contextable(iocCtx) {}
+    explicit FontsEngine(IFontsDatabase& database) : m_database(database) {}
     ~FontsEngine();
 
     void init();

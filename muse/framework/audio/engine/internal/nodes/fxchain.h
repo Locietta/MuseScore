@@ -26,8 +26,6 @@
 #include "audio/engine/ifxprocessor.h"
 #include "audio/engine/iplayhead.h"
 
-#include "async/asyncable.h"
-#include "async/channel.h"
 
 namespace muse::audio {
 struct FxChainTag
@@ -37,7 +35,7 @@ struct FxChainTag
 }
 
 namespace muse::audio::engine {
-class FxChain : public ChainNode<FxChainTag>, public async::Asyncable
+class FxChain : public ChainNode<FxChainTag>
 {
 public:
     void setFxList(const std::vector<IFxProcessorPtr>& fxList);
@@ -45,12 +43,10 @@ public:
     //! NOTE Must be set after adding all nodes to the chain
     void setFxChainSpec(const AudioFxChain& fxChainSpec);
     const AudioFxChain& fxChainSpec() const;
-    async::Channel<AudioFxChain> fxChainSpecChanged() const;
 
     void setPlayheadPosition(PlayheadPositionPtr playheadPosition);
 
     bool shouldProcessDuringSilence() const;
-    async::Channel<bool> shouldProcessDuringSilenceChanged() const;
 
 private:
     void rebuild() override;
@@ -59,10 +55,8 @@ private:
     void updateShouldProcessDuringSilence();
 
     AudioFxChain m_fxChainSpec;
-    async::Channel<AudioFxChain> m_fxChainSpecChanged;
 
     bool m_shouldProcessDuringSilence = false;
-    async::Channel<bool> m_shouldProcessDuringSilenceChanged;
 };
 
 using FxChainPtr = std::shared_ptr<FxChain>;

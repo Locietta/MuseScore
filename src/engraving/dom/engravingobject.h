@@ -27,7 +27,6 @@
 
 #include "global/allocator.h"
 
-#include "../devtools/iengravingelementsprovider.h"
 
 #include "../style/styledef.h"
 

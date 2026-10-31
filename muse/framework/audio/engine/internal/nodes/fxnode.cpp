@@ -49,11 +49,6 @@ const AudioFxParams& FxNode::params() const
     return m_fxProcessor->params();
 }
 
-async::Channel<audio::AudioFxParams> FxNode::paramsChanged() const
-{
-    return m_fxProcessor->paramsChanged();
-}
-
 bool FxNode::shouldProcessDuringSilence() const
 {
     return m_fxProcessor->shouldProcessDuringSilence();

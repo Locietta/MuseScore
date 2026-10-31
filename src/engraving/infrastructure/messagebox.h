@@ -25,17 +25,12 @@
 #include <set>
 #include <string>
 
-#include "modularity/ioc.h"
 
 
 namespace mu::engraving {
-class MessageBox : public muse::Contextable
+class MessageBox
 {
 public:
-
-    MessageBox(const muse::modularity::ContextPtr& iocCtx)
-        : muse::Contextable(iocCtx) {}
-
     enum Button {
         Ok,
         Cancel

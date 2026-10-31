@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <functional>
+
 #include "audio/engine/isoundfontrepository.h"
 
 namespace muse::audio::synth {
@@ -36,14 +38,19 @@ public:
     bool isLoadingSoundFonts() const override;
 
     const SoundFontsMap& soundFonts() const override;
-    async::Notification soundFontsChanged() const override;
+
+    // Called synchronously after the SoundFonts changed, where upstream sent
+    // soundFontsChanged; the audio services refresh the synth resolvers here.
+    void setOnSoundFontsChanged(std::function<void()> onSoundFontsChanged);
 
 private:
+    void notifySoundFontsChanged();
+
     void doAddSoundFont(const SoundFontUri& uri, const SoundFontsMap* cache = nullptr, std::function<void()> onFinished = nullptr);
 
     SoundFontsMap m_soundFonts;
-    async::Notification m_soundFontsChanged;
 
     size_t m_loadingSoundFontCount = 0;
+    std::function<void()> m_onSoundFontsChanged;
 };
 }

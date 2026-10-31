@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <memory>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -20,11 +21,34 @@
 #include "engraving/types/types.h"
 #include "midi/miditypes.h"
 
+namespace muse::mpe {
+class IArticulationProfilesRepository;
+}
+
 namespace mu::engraving {
 class MasterScore;
 }
 
 namespace music {
+
+// The engine's audio services, SoundFonts and render state. EngineContext owns
+// the only instance and creates it idle; initialize_engine_audio() builds the
+// services on first use. profiles must outlive it.
+class EngineAudio
+{
+public:
+    explicit EngineAudio(const muse::mpe::IArticulationProfilesRepository& profiles);
+    ~EngineAudio();
+
+    EngineAudio(const EngineAudio&) = delete;
+    EngineAudio& operator=(const EngineAudio&) = delete;
+
+    struct State;
+    State& state() const { return *m_state; }
+
+private:
+    std::unique_ptr<State> m_state;
+};
 
 // Hook for MIDI event goldens. The engine resolves a capturing IMidiOutPort and
 // FluidSynth sends every event it actually handles to it (fluidsynth.cpp:249-262,
@@ -57,9 +81,9 @@ namespace music {
 // pre-render flush adds no events. An empty function disables capture. Events
 // are sent on the engine thread; the hook must not re-enter the engine.
 using EngineAudioMidiEventHook = std::function<void(const muse::midi::Event&, std::uint64_t frame)>;
-void set_engine_audio_midi_event_hook(EngineAudioMidiEventHook hook);
+void set_engine_audio_midi_event_hook(EngineAudio& audio, EngineAudioMidiEventHook hook);
 
-// Initialises the process-wide engine and loads its SoundFonts:
+// Initialises the engine's audio services and loads its SoundFonts:
 //   AudioSanitizer setup, capturing MIDI output, service registration, explicit
 //   configuration/synth/engine initialization, then SoundFont loading.
 // The first font of the list is the default: every track plays it unless its
@@ -81,17 +105,17 @@ struct EngineAudioSetup {
     std::vector<std::string> soundfonts; // in order; the first is the default
     int sample_rate = 44100;
 };
-bool initialize_engine_audio(const EngineAudioSetup& setup, std::string* error = nullptr);
+bool initialize_engine_audio(EngineAudio& audio, const EngineAudioSetup& setup, std::string* error = nullptr);
 // One SoundFont at 44100 Hz.
-bool initialize_engine_audio(const std::string& soundfont_path, std::string* error = nullptr);
-bool engine_audio_initialized();
+bool initialize_engine_audio(EngineAudio& audio, const std::string& soundfont_path, std::string* error = nullptr);
+bool engine_audio_initialized(const EngineAudio& audio);
 
 // SoundFont identity of the successfully initialised engine's default (first)
 // font (empty when not initialised). The URI is the encoded "file://" form used
 // as the repository key; it lets callers verify the Windows drive-letter/UTF-8
 // round trip.
-std::string engine_soundfont_resource_id();
-std::string engine_soundfont_uri();
+std::string engine_soundfont_resource_id(const EngineAudio& audio);
+std::string engine_soundfont_uri(const EngineAudio& audio);
 
 enum class EngineAudioFormat {
     Wav,
@@ -201,7 +225,8 @@ struct AudioRenderResult {
 // above.
 //
 // Never throws for a bad score/format/engine state; inspect AudioRenderResult.
-AudioRenderResult export_score_audio(mu::engraving::MasterScore* master, const AudioRenderRequest& request);
+AudioRenderResult export_score_audio(EngineAudio& audio, mu::engraving::MasterScore* master,
+                                     const AudioRenderRequest& request);
 
 // One playable track for score_audio_tracks. `id` is the raw score identity
 // (muse::ID hex string / muse::String); the public trackId is this entry's

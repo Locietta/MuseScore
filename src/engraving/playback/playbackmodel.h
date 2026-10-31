@@ -26,15 +26,12 @@
 #include <map>
 #include <functional>
 
-#include "async/asyncable.h"
-#include "async/channel.h"
-#include "async/notification.h"
 #include "types/id.h"
-#include "modularity/ioc.h"
 #include "mpe/events.h"
 #include "mpe/iarticulationprofilesrepository.h"
 
 #include "../types/types.h"
+#include "../dom/score.h"
 #include "playbackeventsrenderer.h"
 #include "playbacksetupdataresolver.h"
 #include "playbackcontext.h"
@@ -47,22 +44,28 @@ class Segment;
 class Instrument;
 class RepeatList;
 
-class PlaybackModel : public muse::Contextable, public muse::async::Asyncable
+// Follows the committed changes of the loaded score as its changes listener
+// until it is destroyed or loads another score.
+class PlaybackModel : public IScoreChangesListener
 {
 public:
-    muse::GlobalInject<muse::mpe::IArticulationProfilesRepository> profilesRepository;
+    // profilesRepository may be null (no default articulation profiles); it must
+    // outlive the model.
+    explicit PlaybackModel(const muse::mpe::IArticulationProfilesRepository* profilesRepository)
+        : m_profilesRepository(profilesRepository) {}
+    ~PlaybackModel() override;
 
-public:
-    PlaybackModel(const muse::modularity::ContextPtr& iocCtx)
-        : muse::Contextable(iocCtx) {}
+    PlaybackModel(const PlaybackModel&) = delete;
+    PlaybackModel& operator=(const PlaybackModel&) = delete;
 
     void load(Score* score);
     void reload();
 
     void setSendEventsOnScoreChange(const InstrumentTrackId& trackId, bool send);
     void sendEventsForChangedTracks();
-
-    muse::async::Channel<InstrumentTrackIdSet> tracksDataChanged() const;
+    // The tracks changed since the last send, for the tracks that do not send
+    // their events on each change.
+    const InstrumentTrackIdSet& changedTrackIdSet() const { return m_changedTrackIdSet; }
 
     bool isPlayRepeatsEnabled() const;
     void setPlayRepeats(const bool isEnabled);
@@ -85,15 +88,18 @@ public:
     muse::mpe::PlaybackData& resolveTrackPlaybackData(const InstrumentTrackId& trackId);
     muse::mpe::PlaybackData& resolveTrackPlaybackData(const ID& partId, const String& instrumentId);
 
-    void triggerEventsForItems(const std::vector<const EngravingItem*>& items, muse::mpe::duration_t duration, bool flushSound);
-    void triggerMetronome(int tick);
-    void triggerCountIn(int tick, muse::mpe::duration_t& countInDuration);
+    muse::mpe::PlaybackEventsMap triggerEventsForItems(const std::vector<const EngravingItem*>& items, muse::mpe::duration_t duration);
+    muse::mpe::PlaybackEventsMap triggerMetronome(int tick);
+    muse::mpe::PlaybackEventsMap triggerCountIn(int tick, muse::mpe::duration_t& countInDuration);
 
     InstrumentTrackIdSet existingTrackIdSet() const;
-    muse::async::Channel<InstrumentTrackId> trackAdded() const;
-    muse::async::Channel<InstrumentTrackId> trackRemoved() const;
+
+    void onScoreChanges(const ScoreChanges& changes) override;
 
 private:
+    const muse::mpe::IArticulationProfilesRepository* profilesRepository() const { return m_profilesRepository; }
+    void detachFromScore();
+
     static const InstrumentTrackId METRONOME_TRACK_ID;
     static const InstrumentTrackId CHORD_SYMBOLS_TRACK_ID;
 
@@ -146,7 +152,7 @@ private:
     void clearExpiredEvents(const int tickFrom, const int tickTo, const track_idx_t trackFrom, const track_idx_t trackTo,
                             ChangedTrackIdSet* trackChanges = nullptr);
     void collectChangesTracks(const InstrumentTrackId& trackId, ChangedTrackIdSet* result);
-    void notifyAboutChanges(const InstrumentTrackIdSet& oldTracks, const InstrumentTrackIdSet& changedTracks);
+    void notifyAboutChanges(const InstrumentTrackIdSet& changedTracks);
 
     void sendEvents(const InstrumentTrackId& trackId);
 
@@ -167,7 +173,10 @@ private:
     static void applyTiedNotesTickBoundaries(const Note* note, TickBoundaries& tickBoundaries);
     static void applyTieTickBoundaries(const Tie* tie, TickBoundaries& tickBoundaries);
 
+    const muse::mpe::IArticulationProfilesRepository* m_profilesRepository = nullptr;
     Score* m_score = nullptr;
+    // The master score this model listens to; checked with Score::isAlive before detaching.
+    MasterScore* m_listenedScore = nullptr;
     bool m_expandRepeats = true;
     bool m_playChordSymbols = true;
     bool m_useScoreDynamicsForOffstreamPlayback = true;
@@ -181,9 +190,5 @@ private:
     std::unordered_map<InstrumentTrackId, bool> m_sendEventsOnScoreChangeMap;
 
     InstrumentTrackIdSet m_changedTrackIdSet;
-
-    muse::async::Channel<InstrumentTrackIdSet> m_tracksDataChanged;
-    muse::async::Channel<InstrumentTrackId> m_trackAdded;
-    muse::async::Channel<InstrumentTrackId> m_trackRemoved;
 };
 }

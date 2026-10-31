@@ -24,9 +24,9 @@
 
 #include <memory>
 
-#include "global/modularity/ioc.h"
 #include "draw/iimageprovider.h"
 
+#include "../engravingservices.h"
 #include "../iengravingconfiguration.h"
 #include "../infrastructure/mscwriter.h"
 #include "../rendering/iscorerenderer.h"
@@ -42,20 +42,23 @@ class WriteContext;
 namespace mu::engraving {
 class MasterScore;
 class Score;
-class MscSaver : public muse::Contextable
+class MscSaver
 {
-    muse::GlobalInject<muse::draw::IImageProvider> imageProvider;
-    muse::GlobalInject<IEngravingConfiguration> configuration;
-    muse::GlobalInject<rendering::IScoreRenderer> scoreRenderer;
 public:
-    MscSaver(const muse::modularity::ContextPtr& iocCtx)
-        : muse::Contextable(iocCtx) {}
+    explicit MscSaver(const EngravingServices& services)
+        : m_services(services) {}
 
     bool writeMscz(MasterScore* score, MscWriter& mscWriter, bool createThumbnail, const write::WriteContext* ctx = nullptr);
 
     bool exportPart(Score* partScore, MscWriter& mscWriter);
 
 private:
+    const std::shared_ptr<muse::draw::IImageProvider>& imageProvider() const { return m_services.imageProvider; }
+    const std::shared_ptr<IEngravingConfiguration>& configuration() const { return m_services.configuration; }
+    const std::shared_ptr<rendering::IScoreRenderer>& scoreRenderer() const { return m_services.renderer; }
+
     std::shared_ptr<muse::draw::Pixmap> createThumbnail(Score* score);
+
+    const EngravingServices& m_services;
 };
 }

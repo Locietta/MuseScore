@@ -63,7 +63,7 @@ constexpr int NUM_OF_BASSSTRINGS_WITH_NUMBER = 2;     // the max number of bass 
 
 constexpr double TAB_DEFAULT_DUR_YOFFS = -1.0;
 
-muse::GlobalInject<IEngravingConfiguration> StaffType::configuration;
+Color StaffType::s_defaultColor = Color::BLACK;
 
 std::vector<TablatureFretFont> StaffType::m_fretFonts = {};
 std::vector<TablatureDurationFont> StaffType::m_durationFonts = {};
@@ -74,7 +74,7 @@ std::vector<TablatureDurationFont> StaffType::m_durationFonts = {};
 
 StaffType::StaffType()
 {
-    m_color = configuration()->defaultColor();
+    m_color = s_defaultColor;
     // set reasonable defaults for type-specific members */
     m_symRepeat = TablatureSymbolRepeat::NEVER;
     setDurationFontName(m_durationFonts[0].displayName);
@@ -948,6 +948,7 @@ std::vector<StaffType> StaffType::m_presets;
 /* *INDENT-OFF* */
 void StaffType::initStaffTypes(const Color& defaultColor)
 {
+    s_defaultColor = defaultColor;
     initTabFonts();                         // set up TAB font presets, before initStaffTypes()
 
     // keep in sync with enum class StaffTypes

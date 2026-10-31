@@ -22,8 +22,6 @@
 
 #pragma once
 
-#include "modularity/ioc.h"
-
 #include "draw/types/pixmap.h"
 
 #include "bsymbol.h"
@@ -53,8 +51,6 @@ class Image final : public BSymbol
 {
     OBJECT_ALLOCATOR(engraving, Image)
     DECLARE_CLASSOF(ElementType::IMAGE)
-
-    muse::GlobalInject<muse::draw::IImageProvider> imageProvider;
 
 public:
     Image(DummyParentOr<EngravingItem> parent);

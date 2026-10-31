@@ -26,7 +26,6 @@
 
 #include "log.h"
 
-using namespace muse::async;
 using namespace muse::audio;
 using namespace muse::audio::synth;
 

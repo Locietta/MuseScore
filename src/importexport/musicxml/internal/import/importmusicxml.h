@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "modularity/ioc.h"
+#include "types/bytearray.h"
 #include "types/string.h"
 #include "engraving/engravingerrors.h"
 
@@ -32,7 +32,12 @@ class Score;
 }
 
 namespace mu::iex::musicxml {
-engraving::Err importMusicXmlfromBuffer(engraving::Score* score, const muse::String&, const muse::ByteArray& data);
-engraving::Err importCompressedMusicXml(engraving::MasterScore* score, const muse::String& name, bool forceMode);
-engraving::Err importMusicXml(engraving::MasterScore* score, const muse::String& name, bool forceMode);
+class IMusicXmlConfiguration;
+
+engraving::Err importMusicXmlfromBuffer(engraving::Score* score, const muse::String&, const muse::ByteArray& data,
+                                        const IMusicXmlConfiguration& configuration);
+engraving::Err importCompressedMusicXml(engraving::MasterScore* score, const muse::String& name, bool forceMode,
+                                        const IMusicXmlConfiguration& configuration);
+engraving::Err importMusicXml(engraving::MasterScore* score, const muse::String& name, bool forceMode,
+                              const IMusicXmlConfiguration& configuration);
 }

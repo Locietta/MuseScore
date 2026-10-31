@@ -36,12 +36,6 @@ void FxChain::setFxList(const std::vector<IFxProcessorPtr>& fxList)
     for (auto it = fxList.rbegin(); it != fxList.rend(); ++it) {
         FxNodePtr node = std::make_shared<FxNode>(*it);
         doAdd(node);
-
-        node->paramsChanged().onReceive(this, [this](const AudioFxParams& fxParams) {
-            m_fxChainSpec.insert_or_assign(fxParams.chainOrder, fxParams);
-            m_fxChainSpecChanged.send(m_fxChainSpec);
-            updateShouldProcessDuringSilence();
-        }, async::Asyncable::Mode::SetReplace);
     }
 
     rebuild();
@@ -87,18 +81,12 @@ void FxChain::setFxChainSpec(const AudioFxChain& fxChainSpec)
         }
     }
 
-    m_fxChainSpecChanged.send(m_fxChainSpec);
     updateShouldProcessDuringSilence();
 }
 
 const AudioFxChain& FxChain::fxChainSpec() const
 {
     return m_fxChainSpec;
-}
-
-async::Channel<AudioFxChain> FxChain::fxChainSpecChanged() const
-{
-    return m_fxChainSpecChanged;
 }
 
 void FxChain::setPlayheadPosition(PlayheadPositionPtr playheadPosition)
@@ -147,16 +135,10 @@ void FxChain::updateShouldProcessDuringSilence()
 
     if (m_shouldProcessDuringSilence != shouldProcessDuringSilence) {
         m_shouldProcessDuringSilence = shouldProcessDuringSilence;
-        m_shouldProcessDuringSilenceChanged.send(shouldProcessDuringSilence);
     }
 }
 
 bool FxChain::shouldProcessDuringSilence() const
 {
     return m_shouldProcessDuringSilence;
-}
-
-async::Channel<bool> FxChain::shouldProcessDuringSilenceChanged() const
-{
-    return m_shouldProcessDuringSilenceChanged;
 }

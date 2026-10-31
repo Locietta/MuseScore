@@ -181,22 +181,17 @@ EngravingItem* EngravingItem::layoutParent() const
 
 const std::shared_ptr<IEngravingConfiguration>& EngravingItem::configuration() const
 {
-    return score()->configuration.get();
-}
-
-const muse::modularity::ContextPtr& EngravingItem::iocContext() const
-{
-    return score()->iocContext();
+    return score()->configuration();
 }
 
 const std::shared_ptr<IEngravingContextConfiguration>& EngravingItem::contextConfiguration() const
 {
-    return score()->contextConfiguration.get();
+    return score()->contextConfiguration();
 }
 
 const std::shared_ptr<rendering::IScoreRenderer>& EngravingItem::renderer() const
 {
-    return score()->renderer.get();
+    return score()->renderer();
 }
 
 

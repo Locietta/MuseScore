@@ -1,23 +1,17 @@
 #include "noqt_runtime.h"
-#include "noqt_application.h"
-#include "noqt_filesystem.h"
 #include "engrave/src/score/score_metadata.h"
 #include "engrave/src/score/score_excerpts.h"
 #include "engrave/src/io/score_imports.h"
 #include "engrave/src/io/midi_import_adapter.h"
-#include "runtime_assets.h"
 #include "engraving/rw/rwregister.h"
 #include "engrave/src/score/score_positions.h"
 #include "engrave/src/render/score_render.h"
+#include "engine_context.h"
 #include "global/log.h"
 #include "global/io/buffer.h"
 #include "global/serialization/zipreader.h"
 #include "global/serialization/zipwriter.h"
 #include "global/serialization/xmlstreamreader.h"
-#include "draw/internal/fontprovider.h"
-#include "draw/internal/fontsengine.h"
-#include "draw/internal/fontsdatabase.h"
-#include "engraving/engravingmodule.h"
 #include "engraving/engravingproject.h"
 #include "engraving/dom/masterscore.h"
 #include "engraving/dom/score.h"
@@ -27,10 +21,8 @@
 #include "engraving/dom/part.h"
 #include "engraving/infrastructure/localfileinfoprovider.h"
 #include "engraving/rw/inoutdata.h"
-#include "mpe/mpemodule.h"
 #include "importexport/musicxml/internal/import/importmusicxml.h"
 #include "importexport/musicxml/internal/export/exportmusicxml.h"
-#include "importexport/musicxml/internal/musicxmlconfiguration.h"
 #include "importexport/midi/internal/midiexport/exportmidi.h"
 #include <iostream>
 #include <memory>
@@ -57,62 +49,6 @@ void check_zip(ZipReader& zip) {
         total += entry.size;
     }
     if (zip.hasError()) throw std::invalid_argument("Invalid archive");
-}
-
-// Context-scoped module setups (modularity::IContextSetup) belong to the
-// process-wide context and are never destroyed while the engine lives.
-std::vector<std::unique_ptr<modularity::IContextSetup> > s_contextSetups;
-
-// The Qt-free part of AppFactory::addConsoleModules(): the framework "mpe"
-// module, then the engraving module, then the import/export modules. DrawModule
-// is not instantiated: the host installs its own font database/engine through
-// install_runtime_font_services() (retained runtime fonts, 1200 DPI provider),
-// and DrawModule::registerExports() would fill the same IoC slots with the plain
-// FT ones. "audio" is registered by engine_audio.cpp through EngineGlobalSetup,
-// and "midi" has no compiled module (the MIDI import/export path is a direct
-// function call).
-void setup_modules(const std::vector<modularity::IModuleSetup*>& modules,
-                   const std::shared_ptr<iex::musicxml::MusicXmlConfiguration>& musicXml,
-                   const IApplication::RunMode runMode)
-{
-    // Phase order and grouping follow BaseApplication::doSetup(): every module
-    // registers its resources and exports first, only then imports are resolved,
-    // then onPreInit -> onInit -> onAllInited run over the whole list.
-    for (auto* module : modules) module->registerResources();
-    for (auto* module : modules) module->registerExports();
-
-    for (auto* module : modules) module->resolveImports();
-
-    for (auto* module : modules) module->onPreInit(runMode);
-
-    for (auto* module : modules) module->onInit(runMode);
-    // MusicXmlModule::onInit() does exactly this. MUSICXML_NO_INTERNAL leaves that
-    // module empty, so the host creates and initialises the configuration itself.
-    if (musicXml) musicXml->init();
-
-    for (auto* module : modules) module->onAllInited(runMode);
-}
-
-// BaseApplication::setupContext(): the context-scoped setups, in the same phase
-// order as the global ones. With engraving internals compiled in this registers
-// the palette score provider, the context configuration and the elements
-// provider; under ENGRAVING_NO_INTERNAL every EngravingContext hook is empty.
-void setup_context_modules(const std::vector<modularity::IModuleSetup*>& modules,
-                           const modularity::ContextPtr& ctx,
-                           const IApplication::RunMode runMode)
-{
-    std::vector<modularity::IContextSetup*> setups;
-    for (auto* module : modules) {
-        if (auto* setup = module->newContext(ctx)) {
-            s_contextSetups.emplace_back(setup);
-            setups.push_back(setup);
-        }
-    }
-    for (auto* setup : setups) setup->registerExports();
-    for (auto* setup : setups) setup->resolveImports();
-    for (auto* setup : setups) setup->onPreInit(runMode);
-    for (auto* setup : setups) setup->onInit(runMode);
-    for (auto* setup : setups) setup->onAllInited(runMode);
 }
 
 void finish_load(engraving::EngravingProject& project) {
@@ -153,36 +89,9 @@ void initialize_native_runtime(const std::string& assets) {
     const auto root = std::filesystem::u8path(assets);
     if (!std::filesystem::is_regular_file(root / "engraving/instruments/instruments.xml"))
         throw std::invalid_argument("Missing native resources: " + assets);
-    // Once IoC mutation begins, a failed initialization cannot safely be retried.
+    // Once engine state is built, a failed initialization cannot safely be retried.
     initialized = true;
 
-    const IApplication::RunMode runMode = IApplication::RunMode::ConsoleApp;
-
-    // Host-owned exports come first, like BaseApplication::doSetup() registering
-    // IApplication before any module's exports.
-    modularity::globalIoc()->registerExport<io::IFileSystem>("native", new NativeFileSystem(root));
-    install_runtime_font_services();
-    modularity::globalIoc()->registerExport<draw::IFontProvider>("native", std::make_shared<draw::FontProvider>(modularity::globalCtx()));
-    // Writer, MusicXML export, and the $v header macro resolve IApplication
-    // through the project IoC; without it application() is null and export crashes.
-    auto application = std::make_shared<NoQtApplication>();
-    modularity::globalIoc()->registerExport<IApplication>("native", application);
-
-    // Module services live in the process-wide IoC; no desktop application is created.
-    mpe::MpeModule mpe;
-    engraving::EngravingModule engraving;
-    std::vector<modularity::IModuleSetup*> modules{ &mpe, &engraving };
-    auto musicXml = std::make_shared<iex::musicxml::MusicXmlConfiguration>();
-    modularity::globalIoc()->registerExport<iex::musicxml::IMusicXmlConfiguration>("native", musicXml);
-
-    setup_modules(modules, musicXml, runMode);
-
-    // BaseApplication::setupNewContext() creates the context and runs the context
-    // setups after the global ones; NoQtApplication's single context is globalCtx.
-    const modularity::ContextPtr ctx = application->setupNewContext();
-    setup_context_modules(modules, ctx, runMode);
-
-    engraving::loadInstrumentTemplates(":/engraving/instruments/instruments.xml");
 }
 
 void apply_score_versions(engraving::MasterScore* score, const std::string& version,
@@ -200,13 +109,13 @@ void copy_score_versions(engraving::MasterScore* source, engraving::MasterScore*
                          source->mscoreRevision(), source->mscVersion());
 }
 
-ScoreProject load_native_score(const std::string& input, const std::string& format) {
+ScoreProject load_native_score(const EngineContext& context, const std::string& input, const std::string& format) {
     if (input.empty() || input.size() > 8 * 1024 * 1024) throw std::invalid_argument("Input must contain 1..8388608 bytes");
     // Like NotationProject::doImport (project/internal/notationproject.cpp:304) and
     // importMusicXmlfromBuffer, the whole reading + setup phase is a load: layout
     // inside it runs outside a transaction and must not push undo commands or warn.
     engraving::ScoreLoad scoreLoad;
-    auto project = engraving::EngravingProject::create(modularity::globalCtx());
+    auto project = engraving::EngravingProject::create(context.engraving());
     project->setFileInfoProvider(std::make_shared<engraving::LocalFileInfoProvider>("Untitled.mscz"));
     ByteArray data = byte_array(input);
     if (format == "mxl" || format == "mscz") {
@@ -261,7 +170,7 @@ ScoreProject load_native_score(const std::string& input, const std::string& form
                 throw std::invalid_argument("Embedded score images are not yet supported by the native backend");
         }
         if (scan.error() != XmlStreamReader::NoError) throw std::invalid_argument("Malformed MusicXML");
-        if (iex::musicxml::importMusicXmlfromBuffer(project->masterScore(), u"input.musicxml", data) != engraving::Err::NoError)
+        if (iex::musicxml::importMusicXmlfromBuffer(project->masterScore(), u"input.musicxml", data, context.musicXml()) != engraving::Err::NoError)
             throw std::runtime_error("MusicXML import failed");
     } else if (format == "mid" || format == "midi" || format == "kar") {
         if (import_midi_score(project->masterScore(), input) != engraving::Err::NoError)
@@ -274,9 +183,9 @@ ScoreProject load_native_score(const std::string& input, const std::string& form
     return project;
 }
 
-ScoreProject load_native_score_dir(const std::string& mscx_path) {
+ScoreProject load_native_score_dir(const EngineContext& context, const std::string& mscx_path) {
     engraving::ScoreLoad scoreLoad;
-    auto project = engraving::EngravingProject::create(modularity::globalCtx());
+    auto project = engraving::EngravingProject::create(context.engraving());
     project->setFileInfoProvider(std::make_shared<engraving::LocalFileInfoProvider>("Untitled.mscz"));
     engraving::MscReader::Params params;
     params.filePath = io::path_t(mscx_path);
@@ -290,14 +199,16 @@ ScoreProject load_native_score_dir(const std::string& mscx_path) {
     return project;
 }
 
-std::string export_native_score(const ScoreProject& project, const std::string& format, int page, const std::string& soundfont) {
+std::string export_native_score(const EngineContext& context, const ScoreProject& project,
+                                const std::string& format, int page, const std::string& soundfont) {
     ExportOptions options;
     options.page = page;
-    return export_native_score(project, format, options, soundfont);
+    return export_native_score(context, project, format, options, soundfont);
 }
 
-std::string export_native_score(const ScoreProject& project, const std::string& format,
-                                const ExportOptions& options, const std::string& soundfont) {
+std::string export_native_score(const EngineContext& context, const ScoreProject& project,
+                                const std::string& format, const ExportOptions& options,
+                                const std::string& soundfont) {
     // Audio formats are rendered by the worker's MuseScore engine; the
     // SoundFont parameter is retained for source compatibility.
     (void)soundfont;
@@ -305,14 +216,14 @@ std::string export_native_score(const ScoreProject& project, const std::string& 
     if (format == "metadata") return score_metadata(score).dump();
     if (format == "measurePositions" || format == "segmentPositions")
         return score_positions(score, format == "segmentPositions").dump();
-    if (format == "svg" || format == "png" || format == "pdf") return render_score(score, format, options);
+    if (format == "svg" || format == "png" || format == "pdf") return render_score(context, score, format, options);
 
     ByteArray data;
     io::Buffer buffer(&data);
     buffer.open(io::IODevice::WriteOnly);
     bool success = false;
-    if (format == "musicxml") success = iex::musicxml::saveXml(score, &buffer);
-    else if (format == "mxl") success = iex::musicxml::saveMxl(score, &buffer);
+    if (format == "musicxml") success = iex::musicxml::saveXml(score, &buffer, context.musicXml());
+    else if (format == "mxl") success = iex::musicxml::saveMxl(score, &buffer, context.musicXml());
     else if (format == "mscz" || format == "mscx") {
         // Writer::writeScore stamps the writing program's version into every score it
         // writes; an export is read-only for the document, so restore the file's values

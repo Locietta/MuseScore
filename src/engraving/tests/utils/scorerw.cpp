@@ -40,9 +40,7 @@ using namespace muse::io;
 using namespace mu::engraving;
 
 String ScoreRW::m_rootPath;
-
-//! NOTE Temporary for testing
-static const muse::modularity::ContextPtr utestCtx = std::make_shared<muse::modularity::Context>(1);
+const EngravingServices* ScoreRW::m_services = nullptr;
 
 void ScoreRW::setRootPath(const String& path)
 {
@@ -54,13 +52,20 @@ String ScoreRW::rootPath()
     return m_rootPath;
 }
 
-MasterScore* ScoreRW::readScore(const String& name, bool isAbsolutePath, ImportFunc importFunc,
-                                const muse::modularity::ContextPtr& iocCtx_)
+void ScoreRW::setServices(const EngravingServices* services)
 {
-    const muse::modularity::ContextPtr iocCtx = iocCtx_ ? iocCtx_ : utestCtx;
+    m_services = services;
+}
 
+const EngravingServices& ScoreRW::services()
+{
+    return *m_services;
+}
+
+MasterScore* ScoreRW::readScore(const String& name, bool isAbsolutePath, ImportFunc importFunc)
+{
     muse::io::path_t path = isAbsolutePath ? name : (rootPath() + u"/" + name);
-    MasterScore* score = compat::ScoreAccess::createMasterScoreWithBaseStyle(iocCtx);
+    MasterScore* score = compat::ScoreAccess::createMasterScoreWithBaseStyle(services());
     score->setFileInfoProvider(std::make_shared<LocalFileInfoProvider>(path));
     std::string suffix = muse::io::suffix(path);
 

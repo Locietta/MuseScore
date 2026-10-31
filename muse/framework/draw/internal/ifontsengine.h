@@ -24,15 +24,13 @@
 #include <string>
 
 #include "global/io/path.h"
-#include "global/modularity/imoduleinterface.h"
 #include "types/font.h"
 #include "types/geometry.h"
 #include "types/fontstypes.h"
 
 namespace muse::draw {
-class IFontsEngine : MODULE_GLOBAL_INTERFACE
+class IFontsEngine
 {
-    INTERFACE_ID(muse::draw::IFontsEngine)
 public:
     virtual ~IFontsEngine() = default;
 

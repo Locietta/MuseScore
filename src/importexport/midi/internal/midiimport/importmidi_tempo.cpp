@@ -33,8 +33,6 @@
 #include "engraving/types/constants.h"
 #include "importmidi_operations.h"
 
-#include "modularity/ioc.h"
-#include "imidiconfiguration.h"
 
 #include "global/realfn.h"
 #include "global/log.h"
@@ -166,8 +164,8 @@ static void applyAllTempoEvents(const std::multimap<int, MTrack>& tracks, Score*
 
 void setTempo(const std::multimap<int, MTrack>& tracks, Score* score)
 {
-    muse::GlobalInject<mu::iex::midi::IMidiImportExportConfiguration> configuration;
-    const bool roundTempo = configuration() ? configuration()->roundTempo() : true;
+    // The engine has no MIDI import preferences: the upstream default rounds tempi.
+    const bool roundTempo = true;
 
     auto* midiData = midiImportOperations.data();
     std::set<ReducedFraction> beats = midiData->humanBeatData.beatSet;      // copy

@@ -27,19 +27,19 @@
 
 #include "../../../isynthresolver.h"
 
-#include "global/async/asyncable.h"
-#include "global/modularity/ioc.h"
+#include "../../../iaudioengineconfiguration.h"
 #include "../../../isoundfontrepository.h"
 
 #include "fluidsynth.h"
 
 namespace muse::audio::synth {
-class FluidResolver : public ISynthResolver::IResolver, public async::Asyncable
+class FluidResolver : public ISynthResolver::IResolver
 {
-    muse::GlobalInject<ISoundFontRepository> soundFontRepository;
-
 public:
-    FluidResolver();
+    // The repository, configuration and MIDI port (optional: it receives the
+    // events every synthesizer handles) must outlive the resolver.
+    FluidResolver(const ISoundFontRepository& soundFontRepository, const engine::IAudioEngineConfiguration& config,
+                  midi::IMidiOutPort* midiOutPort);
     ~FluidResolver() override;
 
     ISynthesizerPtr resolveSynth(const audio::TrackId trackId, const audio::AudioInputParams& params,
@@ -61,6 +61,9 @@ private:
         AudioResourceMeta meta;
     };
 
+    const ISoundFontRepository& m_soundFontRepository;
+    const engine::IAudioEngineConfiguration& m_config;
+    midi::IMidiOutPort* m_midiOutPort = nullptr;
     std::unordered_map<AudioResourceId, SoundFontResource> m_resourcesCache;
 };
 }

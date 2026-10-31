@@ -12,8 +12,8 @@ when configuring this checkout.
 
 `framework_config.h` supplies stable offline audio features to the generated
 `muse_framework_config.h`. Version and Git metadata are generated separately into
-`engrave_version.h`, included only by `noqt_application.cpp`; it also implements
-the version accessor used by the public capabilities API.
+`engrave_version.h`, included only by `muse/framework/global/appinfo.cpp`, which
+also backs the version accessor used by the public capabilities API.
 
 The remaining Q_OS_WIN definition serves audio headers owned by C4. Non-audio
 sources use compiler platform definitions directly.

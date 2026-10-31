@@ -248,11 +248,6 @@ void PageLayout::collectPage(LayoutContext& ctx)
             }
         }
 
-        if (ctx.dom().lastSegment()) {
-            float curPercent = static_cast<float>(ctx.state().measureNumber()) / ctx.dom().lastSegment()->measure()->index();
-            page->score()->layoutProgressChannel().send(curPercent);
-        }
-
         ctx.mutState().setPrevSystem(ctx.mutState().curSystem());
         assert(ctx.state().curSystem() != nextSystem);
         ctx.mutState().setCurSystem(nextSystem);

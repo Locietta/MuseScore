@@ -23,29 +23,26 @@
 #ifndef MUSE_MPE_ARTICULATIONPROFILESREPOSITORY_H
 #define MUSE_MPE_ARTICULATIONPROFILESREPOSITORY_H
 
-#include "modularity/ioc.h"
 #include "io/ifilesystem.h"
-#include "async/asyncable.h"
 #include "serialization/json.h"
 
-#include "iarticulationprofilesrepository.h"
+#include "mpe/iarticulationprofilesrepository.h"
 
 namespace muse::mpe {
-class ArticulationProfilesRepository : public IArticulationProfilesRepository, public Contextable, public async::Asyncable
+class ArticulationProfilesRepository : public IArticulationProfilesRepository
 {
-    GlobalInject<io::IFileSystem> fileSystem;
-
 public:
-    ArticulationProfilesRepository(const modularity::ContextPtr& iocCtx)
-        : Contextable(iocCtx) {}
+    explicit ArticulationProfilesRepository(io::IFileSystem& fileSystem)
+        : m_fileSystem(fileSystem) {}
 
     ArticulationsProfilePtr createNew() const override;
     ArticulationsProfilePtr defaultProfile(const ArticulationFamily family) const override;
     ArticulationsProfilePtr loadProfile(const io::path_t& path) const override;
     void saveProfile(const io::path_t& path, const ArticulationsProfilePtr profilePtr) override;
-    async::Channel<io::path_t> profileChanged() const override;
 
 private:
+    io::IFileSystem* fileSystem() const { return &m_fileSystem; }
+
     std::vector<ArticulationFamily> supportedFamiliesFromJson(const JsonArray& array) const;
     JsonArray supportedFamiliesToJson(const std::vector<ArticulationFamily>& families) const;
 
@@ -63,7 +60,7 @@ private:
 
     mutable std::unordered_map<ArticulationFamily, ArticulationsProfilePtr> m_defaultProfiles;
 
-    async::Channel<io::path_t> m_profileChanged;
+    io::IFileSystem& m_fileSystem;
 };
 }
 

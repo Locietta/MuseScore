@@ -1,3 +1,4 @@
+#include "engrave/src/runtime/engine_context.h"
 #include "engrave/src/runtime/noqt_runtime.h"
 #include "engrave/src/audio/score_audio.h"
 
@@ -35,7 +36,7 @@ int main(int argc, char** argv)
 {
     try {
         if (argc != 3) throw std::invalid_argument("Usage: score_audio_test ASSETS UPSTREAM_ROOT");
-        music::initialize_native_runtime(argv[1]);
+        music::EngineContext context(argv[1]);
 
         // Default mix: a document opened from MSCZ carries the archive's
         // audiosettings.json values, matched by (partId, instrumentId).
@@ -50,7 +51,7 @@ int main(int argc, char** argv)
         expect(!defaults.is_neutral(), "MSCZ audiosettings.json was not read");
         expect(defaults.master.volume_db == 0.0 && defaults.master.balance == 0.0,
                "Unexpected fixture master defaults");
-        auto mix_project = music::load_native_score(mix_bytes, "mscz");
+        auto mix_project = music::load_native_score(context, mix_bytes, "mscz");
         const auto mix_tracks = music::score_audio_track_info(mix_project->masterScore());
         expect(mix_tracks.size() == 3, "Mix fixture must expose three tracks");
         std::size_t muted_tracks = 0;
@@ -131,7 +132,7 @@ int main(int argc, char** argv)
         }
 
         // Every InstrumentTrackId is listed once, in deterministic score order.
-        auto project = music::load_native_score(fixture, "musicxml");
+        auto project = music::load_native_score(context, fixture, "musicxml");
         auto* score = project->masterScore();
         const auto info = music::score_audio_track_info(score);
         expect(info.size() == 2, "Two parts must expose one track each");
@@ -146,7 +147,7 @@ int main(int argc, char** argv)
         std::ifstream stream(path, std::ios::binary);
         expect(bool(stream), "Missing pinned instrument-change fixture");
         const std::string bytes{std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>()};
-        auto changed = music::load_native_score(bytes, "mscx");
+        auto changed = music::load_native_score(context, bytes, "mscx");
         const auto changed_tracks = music::score_audio_track_info(changed->masterScore());
         expect(changed_tracks.size() == 3,
                "Flute part with an Oboe change plus the Oboe part must expose three instrument tracks");

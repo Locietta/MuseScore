@@ -23,7 +23,6 @@
 #define MUSE_IO_DIR_H
 
 #include "global/types/retval.h"
-#include "global/modularity/ioc.h"
 
 #include "path.h"
 #include "ioenums.h"
@@ -32,8 +31,6 @@
 namespace muse::io {
 class Dir
 {
-    static inline GlobalInject<IFileSystem> fileSystem;
-
 public:
     Dir() = default;
     Dir(const path_t& path);

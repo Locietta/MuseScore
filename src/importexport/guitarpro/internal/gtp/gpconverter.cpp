@@ -206,8 +206,13 @@ static void setPitchByOttavaType(mu::engraving::Note* note, mu::engraving::Ottav
 
 static std::unordered_map<uint64_t, mu::engraving::StringData> stringDatas;
 
-GPConverter::GPConverter(Score* score, std::unique_ptr<GPDomModel>&& gpDom, const muse::modularity::ContextPtr& iocCtx)
-    : muse::Contextable(iocCtx), _score(score), _gpDom(std::move(gpDom))
+const std::shared_ptr<IEngravingConfiguration>& GPConverter::engravingConfiguration() const
+{
+    return _score->configuration();
+}
+
+GPConverter::GPConverter(Score* score, std::unique_ptr<GPDomModel>&& gpDom)
+    : _score(score), _gpDom(std::move(gpDom))
 {
     _drumExtension = {
         { 91, 40 }, //Snare(rim shot)

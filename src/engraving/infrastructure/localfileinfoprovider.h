@@ -24,14 +24,11 @@
 
 #include "ifileinfoprovider.h"
 
-#include "modularity/ioc.h"
 #include "io/ifilesystem.h"
 
 namespace mu::engraving {
 class LocalFileInfoProvider : public IFileInfoProvider
 {
-    muse::GlobalInject<muse::io::IFileSystem> fileSystem;
-
 public:
     explicit LocalFileInfoProvider(const muse::io::path_t& filePath);
 

@@ -64,11 +64,12 @@ struct muse::audio::synth::Fluid {
     }
 };
 
-FluidSynth::FluidSynth(const AudioSourceParams& params)
-    : AbstractSynthesizer(params)
+FluidSynth::FluidSynth(const AudioSourceParams& params, const engine::IAudioEngineConfiguration& config,
+                       midi::IMidiOutPort* midiOutPort)
+    : AbstractSynthesizer(params, config)
 {
     m_fluid = std::make_shared<Fluid>();
-    m_midiOutPort = midiOutPort();
+    m_midiOutPort = midiOutPort;
 }
 
 bool FluidSynth::isValid() const
@@ -139,11 +140,6 @@ Ret FluidSynth::init(const OutputSpec& spec)
     fluid_settings_setstr(m_fluid->settings, "audio.sample-format", "float");
 
     createFluidInstance();
-
-    config()->useSoundFontLowPassFilterChanged().onReceive(this, [this](bool use) {
-        fluid_settings_setint(m_fluid->settings, "synth.iir-lowpass-filter.active", use ? 1 : 0);
-        m_flushSoundRequested = true;
-    });
 
     m_sequencer.setOnOffStreamFlushed([this]() {
         m_flushSoundRequested = true;
@@ -356,8 +352,7 @@ void FluidSynth::setupSound(const PlaybackSetupData& setupData)
         fluid_synth_activate_tuning(m_fluid->synth, channelIdx, 0, 0, 0);
     };
 
-    m_sequencer.channelAdded().onReceive(this, setupChannel,
-                                         async::Asyncable::Mode::SetReplace);
+    m_sequencer.setOnChannelAdded(setupChannel);
 
     m_sequencer.init(setupData, m_preset, setupData.supportsSingleNoteDynamics, MIDI_CHANNEL_COUNT);
 

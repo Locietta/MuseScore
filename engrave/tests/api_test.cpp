@@ -271,6 +271,12 @@ int main(int argc, char** argv) {
         const std::string_view arg = argv[i];
         if (arg.starts_with("--assets=")) g_resources = std::filesystem::path(arg.substr(9));
     }
+    // Failure before binding services must leave startup retryable.
+    auto missing = engrave::Engine::create({.resources = g_resources / "c5-missing-resources"});
+    if (missing || missing.error().code != ErrorCode::NotFound) {
+        std::fprintf(stderr, "C5 startup failure did not leave services unbound\n");
+        return 1;
+    }
     auto engine = engrave::Engine::create({.resources = g_resources});
     if (!engine) {
         std::fprintf(stderr, "Engine::create: %s (pass --assets=<resources>)\n", engine.error().message.c_str());

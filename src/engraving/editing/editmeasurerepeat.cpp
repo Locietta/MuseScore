@@ -125,7 +125,7 @@ bool EditMeasureRepeat::makeMeasureRepeatGroup(Transaction&, Score* score, Measu
     }
 
     if (!empty) {
-        auto b = MessageBox(score->iocContext()).warning(muse::trc("engraving", "Current contents of measures will be replaced"),
+        auto b = MessageBox().warning(muse::trc("engraving", "Current contents of measures will be replaced"),
                                                          muse::trc("engraving", "Continue with inserting measure repeat?"));
         if (b == MessageBox::Button::Cancel) {
             return false;

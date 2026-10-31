@@ -148,6 +148,30 @@ namespace {
 namespace detail = music::test::detail;
 using music::test::g_soundfonts;
 
+TEST(Audio, EditThenRenderInvalidatesPlayback) {
+    auto document = detail::open_score("chordline_path.mscx");
+    ASSERT_TRUE(document);
+    engrave::RenderOptions renderOptions;
+    renderOptions.format = engrave::RenderFormat::Svg;
+    const auto beforeRender = document->render(renderOptions);
+    ASSERT_TRUE(beforeRender);
+    const auto beforeAudio = detail::render_audio(*document, {});
+    ASSERT_FALSE(beforeAudio.bytes.empty());
+    const auto notes = document->query(engrave::Query{ .types = { "Note" }, .limit = 1 });
+    ASSERT_TRUE(notes);
+    ASSERT_FALSE(notes->elements.empty());
+    const auto edited = document->edit(engrave::Batch{{engrave::SetPitch{notes->elements.front().id, 85, std::nullopt}}});
+    ASSERT_TRUE(edited) << edited.error().message;
+    const auto afterRender = document->render(renderOptions);
+    ASSERT_TRUE(afterRender);
+    EXPECT_NE(beforeRender->pages, afterRender->pages);
+    const auto afterAudio = detail::render_audio(*document, {});
+    ASSERT_FALSE(afterAudio.bytes.empty());
+    EXPECT_NE(beforeAudio.bytes, afterAudio.bytes);
+    const auto repeated = detail::render_audio(*document, {});
+    EXPECT_EQ(afterAudio.bytes, repeated.bytes);
+}
+
 TEST(Audio, EachEncoderWritesItsContainer) {
     auto document = detail::open_score(detail::audio_score());
     ASSERT_TRUE(document) << "the corpus has no " << detail::audio_score();

@@ -22,16 +22,15 @@
 
  #pragma once
 
- #include "modularity/ioc.h"
+ #include "../engravingservices.h"
  #include "../ipalettescoreprovider.h"
- #include "../iengravingfontsprovider.h"
 
 namespace mu::engraving {
-class PaletteScoreProvider : public IPaletteScoreProvider, public muse::Contextable
+class PaletteScoreProvider : public IPaletteScoreProvider
 {
-    muse::GlobalInject<IEngravingFontsProvider> engravingfonts;
 public:
-    PaletteScoreProvider(const muse::modularity::ContextPtr& iocCtx);
+    // The palette score is built with services, which must outlive it.
+    explicit PaletteScoreProvider(const EngravingServices& services);
     ~PaletteScoreProvider() override;
 
     void init();
@@ -40,6 +39,7 @@ public:
     MasterScore* paletteScore() const override;
 
 private:
+    const EngravingServices& m_services;
     MasterScore* m_paletteScore = nullptr;
 };
 }

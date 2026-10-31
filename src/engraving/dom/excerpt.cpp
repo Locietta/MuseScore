@@ -142,7 +142,6 @@ void Excerpt::setName(const String& name, bool saveAndNotify)
 
     if (saveAndNotify) {
         writeNameToMetaTags();
-        m_nameChanged.notify();
     }
 }
 
@@ -154,11 +153,6 @@ void Excerpt::writeNameToMetaTags()
             score->setMetaTag(u"partName", m_name);
         }
     }
-}
-
-muse::async::Notification Excerpt::nameChanged() const
-{
-    return m_nameChanged;
 }
 
 bool Excerpt::hasFileName() const

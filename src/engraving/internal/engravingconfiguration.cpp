@@ -87,34 +87,18 @@ void EngravingConfiguration::init()
     };
 
     settings()->setDefaultValue(DEFAULT_STYLE_FILE_PATH, Val(muse::io::path_t()));
-    settings()->valueChanged(DEFAULT_STYLE_FILE_PATH).onReceive(this, [this](const Val& val) {
-        m_defaultStyleFilePathChanged.send(val.toPath());
-    });
 
     settings()->setDefaultValue(PART_STYLE_FILE_PATH, Val(muse::io::path_t()));
-    settings()->valueChanged(PART_STYLE_FILE_PATH).onReceive(this, [this](const Val& val) {
-        m_partStyleFilePathChanged.send(val.toPath());
-    });
 
     settings()->setDefaultValue(DISPLAYED_DEFAULT_COLOR, colorValue(defaultColor()));
     settings()->setDescription(DISPLAYED_DEFAULT_COLOR, muse::trc("engraving", "Displayed default color"));
     settings()->setCanBeManuallyEdited(DISPLAYED_DEFAULT_COLOR, true);
-    settings()->valueChanged(DISPLAYED_DEFAULT_COLOR).onReceive(this, [this](const Val& val) {
-        const Color color = colorFromValue(val);
-        m_cachedDisplayedDefaultColor = color;
-        m_displayedDefaultColorChanged.send(false, color);
-    });
     m_cachedDisplayedDefaultColor = colorFromValue(settings()->value(DISPLAYED_DEFAULT_COLOR));
 
     settings()->setDefaultValue(INVERTED_DISPLAYED_DEFAULT_COLOR, colorValue(Color(DEFAULT_DISPLAYED_INVERTED_COLOR)));
     settings()->setDescription(INVERTED_DISPLAYED_DEFAULT_COLOR,
                                muse::trc("engraving", "Displayed default color when score colors are inverted"));
     settings()->setCanBeManuallyEdited(INVERTED_DISPLAYED_DEFAULT_COLOR, true);
-    settings()->valueChanged(INVERTED_DISPLAYED_DEFAULT_COLOR).onReceive(this, [this](const Val& val) {
-        const Color color = colorFromValue(val);
-        m_cachedInvertedDisplayedDefaultColor = color;
-        m_displayedDefaultColorChanged.send(true, color);
-    });
     m_cachedInvertedDisplayedDefaultColor = colorFromValue(settings()->value(INVERTED_DISPLAYED_DEFAULT_COLOR));
 
     for (voice_idx_t voice = 0; voice < VOICES; ++voice) {
@@ -123,11 +107,6 @@ void EngravingConfiguration::init()
         settings()->setDefaultValue(key, colorValue(DEFAULT_VOICE_COLORS[voice]));
         settings()->setDescription(key, "Voice " + std::to_string(voice + 1) + " color");
         settings()->setCanBeManuallyEdited(key, true);
-        settings()->valueChanged(key).onReceive(this, [this, voice](const Val& val) {
-            Color color = colorFromValue(val);
-            VOICE_COLORS[voice].color = color;
-            m_voiceColorChanged.send(voice, color);
-        });
 
         Color currentColor = colorFromValue(settings()->value(key));
         VOICE_COLORS[voice] = VoiceColor { std::move(key), currentColor };
@@ -137,30 +116,16 @@ void EngravingConfiguration::init()
     settings()->setDefaultValue(ALL_VOICES_COLOR, colorValue(DEFAULT_VOICE_COLORS[ALL_VOICES_IDX]));
     settings()->setDescription(ALL_VOICES_COLOR, muse::trc("engraving", "All voices color"));
     settings()->setCanBeManuallyEdited(ALL_VOICES_COLOR, true);
-    settings()->valueChanged(ALL_VOICES_COLOR).onReceive(this, [&](const Val& val) {
-        Color color = colorFromValue(val);
-        VOICE_COLORS[ALL_VOICES_IDX].color = color;
-        m_voiceColorChanged.send(ALL_VOICES_IDX, color);
-    });
     Color currentColor = colorFromValue(settings()->value(ALL_VOICES_COLOR));
     VOICE_COLORS[ALL_VOICES_IDX] = VoiceColor { std::move(ALL_VOICES_COLOR), currentColor };
 
     settings()->setDefaultValue(DYNAMICS_APPLY_TO_ALL_VOICES, Val(true));
-    settings()->valueChanged(DYNAMICS_APPLY_TO_ALL_VOICES).onReceive(this, [this](const Val& val) {
-        m_dynamicsApplyToAllVoicesChanged.send(val.toBool());
-    });
 
     settings()->setDefaultValue(FRETBOARD_DIAGRAMS_AUTO_UPDATE, Val(true));
-    settings()->valueChanged(FRETBOARD_DIAGRAMS_AUTO_UPDATE).onReceive(this, [this](const Val& val) {
-        m_fretboardDiagramsAutoUpdateChanged.send(val.toBool());
-    });
 
     settings()->setDefaultValue(FRAME_COLOR, colorValue(Color("#A0A0A4")));
     settings()->setDescription(FRAME_COLOR, muse::trc("engraving", "Frame color"));
     settings()->setCanBeManuallyEdited(FRAME_COLOR, true);
-    settings()->valueChanged(FRAME_COLOR).onReceive(nullptr, [this](const Val& val) {
-        m_frameColorChanged.send(colorFromValue(val));
-    });
 
     settings()->setDefaultValue(SCORE_GREY_COLOR, colorValue(Color("#A0A0A4")));
     settings()->setDescription(SCORE_GREY_COLOR, muse::trc("engraving", "Score grey color"));
@@ -169,28 +134,20 @@ void EngravingConfiguration::init()
     settings()->setDefaultValue(FORMATTING_COLOR, colorValue(Color("#C31989")));
     settings()->setDescription(FORMATTING_COLOR, muse::trc("engraving", "Formatting color"));
     settings()->setCanBeManuallyEdited(FORMATTING_COLOR, true);
-    settings()->valueChanged(FORMATTING_COLOR).onReceive(nullptr, [this](const Val& val) {
-        m_formattingColorChanged.send(colorFromValue(val));
-    });
 
     settings()->setDefaultValue(INVISIBLE_COLOR, colorValue(Color("#808080")));
     settings()->setDescription(INVISIBLE_COLOR, muse::trc("engraving", "Invisible color"));
     settings()->setCanBeManuallyEdited(INVISIBLE_COLOR, true);
-    settings()->valueChanged(INVISIBLE_COLOR).onReceive(nullptr, [this](const Val& val) {
-        m_invisibleColorChanged.send(colorFromValue(val));
-    });
 
     settings()->setDefaultValue(UNLINKED_COLOR, colorValue(Color(UNLINKED_ITEM_COLOR)));
     settings()->setDescription(UNLINKED_COLOR, muse::trc("engraving", "Desynchronized color"));
     settings()->setCanBeManuallyEdited(UNLINKED_COLOR, true);
-    settings()->valueChanged(UNLINKED_COLOR).onReceive(nullptr, [this](const Val& val) {
-        m_unlinkedColorChanged.send(colorFromValue(val));
-    });
 }
 
 muse::io::path_t EngravingConfiguration::appDataPath() const
 {
-    return globalConfiguration() ? globalConfiguration()->appDataPath() : muse::io::path_t();
+    // The engine has no application data directory.
+    return muse::io::path_t();
 }
 
 muse::io::path_t EngravingConfiguration::defaultStyleFilePath() const
@@ -203,11 +160,6 @@ void EngravingConfiguration::setDefaultStyleFilePath(const muse::io::path_t& pat
     settings()->setSharedValue(DEFAULT_STYLE_FILE_PATH, Val(path.toStdString()));
 }
 
-async::Channel<muse::io::path_t> EngravingConfiguration::defaultStyleFilePathChanged() const
-{
-    return m_defaultStyleFilePathChanged;
-}
-
 muse::io::path_t EngravingConfiguration::partStyleFilePath() const
 {
     return settings()->value(PART_STYLE_FILE_PATH).toPath();
@@ -216,11 +168,6 @@ muse::io::path_t EngravingConfiguration::partStyleFilePath() const
 void EngravingConfiguration::setPartStyleFilePath(const muse::io::path_t& path)
 {
     settings()->setSharedValue(PART_STYLE_FILE_PATH, Val(path.toStdString()));
-}
-
-async::Channel<muse::io::path_t> EngravingConfiguration::partStyleFilePathChanged() const
-{
-    return m_partStyleFilePathChanged;
 }
 
 static bool defaultPageSizeIsLetter()
@@ -268,20 +215,19 @@ void EngravingConfiguration::setDisplayedDefaultColor(Color color, bool inverted
 {
     if (inverted) {
         settings()->setSharedValue(INVERTED_DISPLAYED_DEFAULT_COLOR, colorValue(color));
+        m_cachedInvertedDisplayedDefaultColor = color;
     } else {
         settings()->setSharedValue(DISPLAYED_DEFAULT_COLOR, colorValue(color));
+        m_cachedDisplayedDefaultColor = color;
     }
-}
-
-muse::async::Channel<bool, Color> EngravingConfiguration::displayedDefaultColorChanged() const
-{
-    return m_displayedDefaultColorChanged;
 }
 
 void EngravingConfiguration::resetDisplayedDefaultColors()
 {
     settings()->setSharedValue(DISPLAYED_DEFAULT_COLOR, settings()->defaultValue(DISPLAYED_DEFAULT_COLOR));
     settings()->setSharedValue(INVERTED_DISPLAYED_DEFAULT_COLOR, settings()->defaultValue(INVERTED_DISPLAYED_DEFAULT_COLOR));
+    m_cachedDisplayedDefaultColor = colorFromValue(settings()->value(DISPLAYED_DEFAULT_COLOR));
+    m_cachedInvertedDisplayedDefaultColor = colorFromValue(settings()->value(INVERTED_DISPLAYED_DEFAULT_COLOR));
 }
 
 Color EngravingConfiguration::indicatorIconInvertedSelectionColor() const
@@ -359,11 +305,7 @@ Color EngravingConfiguration::selectionColor(voice_idx_t voice, bool itemVisible
 void EngravingConfiguration::setSelectionColor(voice_idx_t voiceIndex, Color color)
 {
     settings()->setSharedValue(VOICE_COLORS[voiceIndex].key, colorValue(color));
-}
-
-muse::async::Channel<voice_idx_t, Color> EngravingConfiguration::selectionColorChanged() const
-{
-    return m_voiceColorChanged;
+    VOICE_COLORS[voiceIndex].color = color;
 }
 
 Color EngravingConfiguration::highlightSelectionColor(voice_idx_t voice) const
@@ -383,11 +325,6 @@ void EngravingConfiguration::setDynamicsApplyToAllVoices(bool v)
     settings()->setSharedValue(DYNAMICS_APPLY_TO_ALL_VOICES, Val(v));
 }
 
-muse::async::Channel<bool> EngravingConfiguration::dynamicsApplyToAllVoicesChanged() const
-{
-    return m_dynamicsApplyToAllVoicesChanged;
-}
-
 bool EngravingConfiguration::autoUpdateFretboardDiagrams() const
 {
     return settings()->value(FRETBOARD_DIAGRAMS_AUTO_UPDATE).toBool();
@@ -398,29 +335,14 @@ void EngravingConfiguration::setAutoUpdateFretboardDiagrams(bool v)
     settings()->setSharedValue(FRETBOARD_DIAGRAMS_AUTO_UPDATE, Val(v));
 }
 
-muse::async::Channel<bool> EngravingConfiguration::autoUpdateFretboardDiagramsChanged() const
-{
-    return m_fretboardDiagramsAutoUpdateChanged;
-}
-
 Color EngravingConfiguration::formattingColor() const
 {
     return colorFromValue(settings()->value(FORMATTING_COLOR));
 }
 
-muse::async::Channel<Color> EngravingConfiguration::formattingColorChanged() const
-{
-    return m_formattingColorChanged;
-}
-
 Color EngravingConfiguration::frameColor() const
 {
     return colorFromValue(settings()->value(FRAME_COLOR));
-}
-
-muse::async::Channel<Color> EngravingConfiguration::frameColorChanged() const
-{
-    return m_frameColorChanged;
 }
 
 Color EngravingConfiguration::scoreGreyColor() const
@@ -433,34 +355,19 @@ Color EngravingConfiguration::invisibleColor() const
     return colorFromValue(settings()->value(INVISIBLE_COLOR));
 }
 
-muse::async::Channel<Color> EngravingConfiguration::invisibleColorChanged() const
-{
-    return m_invisibleColorChanged;
-}
-
 Color EngravingConfiguration::unlinkedColor() const
 {
     return colorFromValue(settings()->value(UNLINKED_COLOR));
 }
 
-muse::async::Channel<Color> EngravingConfiguration::unlinkedColorChanged() const
-{
-    return m_unlinkedColorChanged;
-}
-
 const IEngravingConfiguration::DebuggingOptions& EngravingConfiguration::debuggingOptions() const
 {
-    return m_debuggingOptions.val;
+    return m_debuggingOptions;
 }
 
 void EngravingConfiguration::setDebuggingOptions(const DebuggingOptions& options)
 {
-    m_debuggingOptions.set(options);
-}
-
-muse::async::Notification EngravingConfiguration::debuggingOptionsChanged() const
-{
-    return m_debuggingOptions.notification;
+    m_debuggingOptions = options;
 }
 
 bool EngravingConfiguration::allowReadingImagesFromOutsideMscz() const
@@ -470,7 +377,8 @@ bool EngravingConfiguration::allowReadingImagesFromOutsideMscz() const
 
 bool EngravingConfiguration::guitarProImportExperimental() const
 {
-    return guitarProConfiguration() ? guitarProConfiguration()->experimental() : false;
+    // The experimental Guitar Pro import is a desktop preference the engine does not offer.
+    return false;
 }
 
 bool EngravingConfiguration::negativeFretsAllowed() const

@@ -57,7 +57,8 @@ namespace mu::iex::musicxml {
 //   importMusicXmlfromBuffer
 //---------------------------------------------------------
 
-Err importMusicXmlfromBuffer(Score* score, const String& /*name*/, const ByteArray& data)
+Err importMusicXmlfromBuffer(Score* score, const String& /*name*/, const ByteArray& data,
+                             const IMusicXmlConfiguration& configuration)
 {
     MusicXmlLogger logger;
     logger.setLoggingLevel(MusicXmlLogger::Level::MXML_ERROR);   // errors only
@@ -65,7 +66,7 @@ Err importMusicXmlfromBuffer(Score* score, const String& /*name*/, const ByteArr
     //logger.setLoggingLevel(MusicXmlLogger::Level::MXML_TRACE); // also include tracing
 
     // pass 1
-    MusicXmlParserPass1 pass1(score, &logger);
+    MusicXmlParserPass1 pass1(score, configuration, &logger);
     Err res = pass1.parse(data);
     const String pass1_errors = pass1.errors();
 
@@ -157,7 +158,8 @@ static bool extractRootfile(const String& name, ByteArray& data)
  Validate and import MusicXML data from file \a name contained in ByteArray \a data into score \a score.
  */
 
-static Err doValidateAndImport(Score* score, const String& name, const ByteArray& data, bool forceMode)
+static Err doValidateAndImport(Score* score, const String& name, const ByteArray& data, bool forceMode,
+                               const IMusicXmlConfiguration& configuration)
 {
     Err res;
 
@@ -170,7 +172,7 @@ static Err doValidateAndImport(Score* score, const String& name, const ByteArray
     }
 
     // actually do the import
-    res = importMusicXmlfromBuffer(score, name, data);
+    res = importMusicXmlfromBuffer(score, name, data, configuration);
     //LOGD("res %d", static_cast<int>(res));
     return res;
 }
@@ -180,7 +182,7 @@ static Err doValidateAndImport(Score* score, const String& name, const ByteArray
 //    return Err::File* errors
 //---------------------------------------------------------
 
-Err importMusicXml(MasterScore* score, const String& name, bool forceMode)
+Err importMusicXml(MasterScore* score, const String& name, bool forceMode, const IMusicXmlConfiguration& configuration)
 {
     ScoreLoad sl;     // suppress warnings for undo push/pop
 
@@ -201,7 +203,7 @@ Err importMusicXml(MasterScore* score, const String& name, bool forceMode)
     xmlFile.close();
 
     // and import it
-    return doValidateAndImport(score, name, data, forceMode);
+    return doValidateAndImport(score, name, data, forceMode, configuration);
 }
 
 //---------------------------------------------------------
@@ -213,7 +215,8 @@ Err importMusicXml(MasterScore* score, const String& name, bool forceMode)
  Import compressed MusicXML file \a name into the Score.
  */
 
-Err importCompressedMusicXml(MasterScore* score, const String& name, bool forceMode)
+Err importCompressedMusicXml(MasterScore* score, const String& name, bool forceMode,
+                             const IMusicXmlConfiguration& configuration)
 {
     //LOGD("importCompressedMusicXml(%p, %s)", score, muPrintable(name));
 
@@ -228,6 +231,6 @@ Err importCompressedMusicXml(MasterScore* score, const String& name, bool forceM
     }
 
     // and import it
-    return doValidateAndImport(score, name, data, forceMode);
+    return doValidateAndImport(score, name, data, forceMode, configuration);
 }
 } // namespace Ms

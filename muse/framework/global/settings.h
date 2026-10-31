@@ -25,7 +25,6 @@
 #include <string>
 
 #include "types/val.h"
-#include "async/channel.h"
 #include "io/path.h"
 
 #include "muse_framework_config.h"
@@ -99,7 +98,6 @@ public:
     void commitTransaction(bool notifyToOtherInstances = true);
     void rollbackTransaction(bool notifyToOtherInstances = true);
 
-    async::Channel<Val> valueChanged(const Key& key) const;
 
     io::path_t filePath() const;
 
@@ -108,7 +106,6 @@ private:
     ~Settings();
 
     Item& findItem(const Key& key) const;
-    async::Channel<Val>& findChannel(const Key& key) const;
 
     void insertNewItem(const Key& key, const Val& value);
 
@@ -120,7 +117,6 @@ private:
     mutable Items m_items;
     mutable Items m_localSettings;
     mutable bool m_isTransactionStarted = false;
-    mutable std::map<Key, async::Channel<Val> > m_channels;
 };
 
 inline Settings* settings()

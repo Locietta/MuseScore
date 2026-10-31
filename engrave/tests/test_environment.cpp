@@ -11,17 +11,20 @@
 #include "global/stringutils.h"
 
 #if defined(TEST_HAS_ENGRAVING)
-#include "engrave/src/runtime/noqt_runtime.h"
+#include "engrave/src/runtime/engine_context.h"
 #include "engraving/dom/mscore.h"
 #include "utils/scorerw.h"
 #include "mocks/engravingconfigurationmock.h"
-#include "global/modularity/ioc.h"
+#include "engraving/engravingservices.h"
 #include <gmock/gmock.h>
 #endif
 
 namespace music::test {
 
 namespace {
+#if defined(TEST_HAS_ENGRAVING)
+std::unique_ptr<music::EngineContext> s_context;
+#endif
 
 bool is_valid_assets_dir(const std::filesystem::path& p)
 {
@@ -231,9 +234,9 @@ void setup_test_environment(const TestEnvironmentConfig& config)
                                  "Pass --engraving-data=<path> or set ENGRAVING_TESTS_DATA_ROOT.");
     }
 
-    // 1. Initialize native runtime (sets up NativeFileSystem, font services, NoQtApplication,
-    //    EngravingModule, MpeModule, MusicXmlConfiguration, and loads instruments.xml).
-    music::initialize_native_runtime(config.assets_dir);
+    // 1. The engine context (file system, fonts, engraving services, MusicXML
+    //    configuration, instrument templates), torn down by teardown_test_environment().
+    s_context = std::make_unique<music::EngineContext>(config.assets_dir);
 
     // 2. Set MScore test flags
     mu::engraving::MScore::testMode = true;
@@ -252,8 +255,8 @@ void setup_test_environment(const TestEnvironmentConfig& config)
     ON_CALL(*configurator, debuggingOptions()).WillByDefault(::testing::ReturnRef(s_debugOpt));
     ON_CALL(*configurator, allowReadingImagesFromOutsideMscz()).WillByDefault(::testing::Return(true));
 
-    muse::modularity::globalIoc()->unregister<mu::engraving::IEngravingConfiguration>("utests");
-    muse::modularity::globalIoc()->registerExport<mu::engraving::IEngravingConfiguration>("utests", configurator);
+    s_context->engraving().configuration = configurator;
+    mu::engraving::ScoreRW::setServices(&s_context->engraving());
 #else
     (void)config;
 #endif
@@ -262,7 +265,8 @@ void setup_test_environment(const TestEnvironmentConfig& config)
 void teardown_test_environment()
 {
 #if defined(TEST_HAS_ENGRAVING)
-    muse::modularity::globalIoc()->unregister<mu::engraving::IEngravingConfiguration>("utests");
+    mu::engraving::ScoreRW::setServices(nullptr);
+    s_context.reset();
 #endif
 }
 

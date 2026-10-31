@@ -140,14 +140,6 @@ add_adapter_binary("score_positions_test", "score_positions_test.cpp")
 add_adapter_binary("semantic_dump", "semantic_dump.cpp")
 add_adapter_binary("noqt_probe", "noqt_probe.cpp")
 
--- The IoC contract test calls a real entry point that requires the file-system
--- service (initialize_engine_audio, which guards on it in engine_audio.cpp);
--- ioc_tu2.cpp is its second translation unit.
-add_adapter_binary("noqt_support_test", "noqt_support_test.cpp")
-target("noqt_support_test")
-    add_files(path.join(tests_dir, "ioc_tu2.cpp"))
-target_end()
-
 -- Dev-only probe used by the engine_audio lane; built explicitly.
 add_adapter_binary("engine_audio_probe", "engine_audio_probe.cpp")
 target("engine_audio_probe")

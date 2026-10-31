@@ -23,7 +23,6 @@
 #ifndef MUSE_AUDIO_FLUIDSEQUENCER_H
 #define MUSE_AUDIO_FLUIDSEQUENCER_H
 
-#include "global/async/channel.h"
 #include "midi/midievent.h"
 #include "mpe/events.h"
 
@@ -46,9 +45,9 @@ public:
     std::vector<ChannelExpressionLevel> currentExpressionLevels() const;
     int naturalExpressionLevel() const;
 
-    async::Channel<midi::channel_t, midi::Program> channelAdded() const;
 
     const ChannelMap& channels() const;
+    void setOnChannelAdded(std::function<void(midi::channel_t, const midi::Program&)> onChannelAdded);
     int lastStaff() const;
 
 private:

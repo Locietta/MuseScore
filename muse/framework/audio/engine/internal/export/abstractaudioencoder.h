@@ -25,7 +25,7 @@
 #include <cstddef>
 #include <memory>
 
-#include "global/progress.h"
+
 
 #include "audio/common/audiotypes.h"
 
@@ -50,10 +50,6 @@ public:
         return m_format;
     }
 
-    Progress progress()
-    {
-        return m_progress;
-    }
 
 protected:
     explicit AbstractAudioEncoder(const SoundTrackFormat& format)
@@ -62,7 +58,6 @@ protected:
     }
 
     SoundTrackFormat m_format;
-    Progress m_progress;
 };
 
 using AbstractAudioEncoderPtr = std::unique_ptr<AbstractAudioEncoder>;

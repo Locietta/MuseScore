@@ -107,14 +107,14 @@ void FluidSequencer::updateOffStreamEvents(const mpe::PlaybackEventsMap& events)
     updateOffSequenceIterator();
 }
 
-muse::async::Channel<channel_t, Program> FluidSequencer::channelAdded() const
-{
-    return m_channels.channelAdded;
-}
-
 const ChannelMap& FluidSequencer::channels() const
 {
     return m_channels;
+}
+
+void FluidSequencer::setOnChannelAdded(std::function<void(midi::channel_t, const midi::Program&)> onChannelAdded)
+{
+    m_channels.onChannelAdded = std::move(onChannelAdded);
 }
 
 int FluidSequencer::lastStaff() const

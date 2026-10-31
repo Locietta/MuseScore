@@ -21,14 +21,11 @@
  */
  #pragma once
 
- #include "modularity/imoduleinterface.h"
 
 namespace mu::engraving {
 class MasterScore;
-class IPaletteScoreProvider : MODULE_CONTEXT_INTERFACE
+class IPaletteScoreProvider
 {
-    INTERFACE_ID(IPaletteScoreProvider)
-
 public:
     virtual ~IPaletteScoreProvider() = default;
 

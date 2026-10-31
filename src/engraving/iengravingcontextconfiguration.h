@@ -22,12 +22,10 @@
 
 #pragma once
 
-#include "modularity/imoduleinterface.h"
 
 namespace mu::engraving {
-class IEngravingContextConfiguration : MODULE_CONTEXT_INTERFACE
+class IEngravingContextConfiguration
 {
-    INTERFACE_ID(IEngravingContextConfiguration)
 public:
     virtual ~IEngravingContextConfiguration() = default;
 

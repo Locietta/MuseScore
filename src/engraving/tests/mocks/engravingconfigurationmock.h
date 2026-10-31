@@ -34,11 +34,9 @@ public:
 
     MOCK_METHOD(muse::io::path_t, defaultStyleFilePath, (), (const, override));
     MOCK_METHOD(void, setDefaultStyleFilePath, (const muse::io::path_t&), (override));
-    MOCK_METHOD(muse::async::Channel<muse::io::path_t>, defaultStyleFilePathChanged, (), (const, override));
 
     MOCK_METHOD(muse::io::path_t, partStyleFilePath, (), (const, override));
     MOCK_METHOD(void, setPartStyleFilePath, (const muse::io::path_t&), (override));
-    MOCK_METHOD(muse::async::Channel<muse::io::path_t>, partStyleFilePathChanged, (), (const, override));
 
     MOCK_METHOD(SizeF, defaultPageSize, (), (const, override));
 
@@ -48,7 +46,6 @@ public:
     MOCK_METHOD(Color, defaultColor, (), (const, override));
     MOCK_METHOD(Color, displayedDefaultColor, (bool), (const, override));
     MOCK_METHOD(void, setDisplayedDefaultColor, (Color, bool), (override));
-    MOCK_METHOD((muse::async::Channel<bool, Color>), displayedDefaultColorChanged, (), (const, override));
     MOCK_METHOD(void, resetDisplayedDefaultColors, (), (override));
 
     MOCK_METHOD(Color, indicatorIconInvertedSelectionColor, (), (const, override));
@@ -65,35 +62,27 @@ public:
 
     MOCK_METHOD(Color, selectionColor, (engraving::voice_idx_t, bool, bool), (const, override));
     MOCK_METHOD(void, setSelectionColor, (engraving::voice_idx_t, Color), (override));
-    MOCK_METHOD((muse::async::Channel<engraving::voice_idx_t, Color>), selectionColorChanged, (), (const, override));
 
     MOCK_METHOD(bool, dynamicsApplyToAllVoices, (), (const, override));
     MOCK_METHOD(void, setDynamicsApplyToAllVoices, (bool), (override));
-    MOCK_METHOD((muse::async::Channel<bool>), dynamicsApplyToAllVoicesChanged, (), (const, override));
 
     MOCK_METHOD(bool, autoUpdateFretboardDiagrams, (), (const, override));
     MOCK_METHOD(void, setAutoUpdateFretboardDiagrams, (bool), (override));
-    MOCK_METHOD((muse::async::Channel<bool>), autoUpdateFretboardDiagramsChanged, (), (const, override));
 
     MOCK_METHOD(Color, formattingColor, (), (const, override));
-    MOCK_METHOD(muse::async::Channel<Color>, formattingColorChanged, (), (const, override));
 
     MOCK_METHOD(Color, frameColor, (), (const, override));
-    MOCK_METHOD(muse::async::Channel<Color>, frameColorChanged, (), (const, override));
 
     MOCK_METHOD(Color, scoreGreyColor, (), (const, override));
 
     MOCK_METHOD(Color, invisibleColor, (), (const, override));
-    MOCK_METHOD(muse::async::Channel<Color>, invisibleColorChanged, (), (const, override));
 
     MOCK_METHOD(Color, unlinkedColor, (), (const, override));
-    MOCK_METHOD(muse::async::Channel<Color>, unlinkedColorChanged, (), (const, override));
 
     MOCK_METHOD(Color, highlightSelectionColor, (engraving::voice_idx_t), (const, override));
 
     MOCK_METHOD(const DebuggingOptions&, debuggingOptions, (), (const, override));
     MOCK_METHOD(void, setDebuggingOptions, (const DebuggingOptions&), (override));
-    MOCK_METHOD(muse::async::Notification, debuggingOptionsChanged, (), (const, override));
 
     MOCK_METHOD(bool, allowReadingImagesFromOutsideMscz, (), (const, override));
 

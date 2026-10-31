@@ -55,16 +55,11 @@ void Settings::reset(bool keepDefaultSettings, bool notifyAboutChanges, bool not
 {
     (void)keepDefaultSettings;
     (void)notifyOtherInstances;
-    const Items previous = items();
+    (void)notifyAboutChanges;
     m_localSettings.clear();
     m_isTransactionStarted = false;
     for (auto& [k, item] : m_items) {
         item.value = item.defaultValue;
-    }
-    if (notifyAboutChanges) {
-        for (const auto& [k, item] : previous) {
-            if (item.value != value(k)) findChannel(k).send(value(k));
-        }
     }
 }
 
@@ -100,7 +95,6 @@ void Settings::setLocalValue(const Key& key, const Val& value)
     if (!m_isTransactionStarted) {
         writeValue(key, value);
     }
-    findChannel(key).send(value);
 }
 
 void Settings::setDefaultValue(const Key& key, const Val& value)
@@ -157,21 +151,9 @@ void Settings::rollbackTransaction(bool notifyToOtherInstances)
 {
     (void)notifyToOtherInstances;
     m_isTransactionStarted = false;
-    for (auto it = m_localSettings.begin(); it != m_localSettings.end(); ++it) {
-        Item item = findItem(it->first);
-        if (item.value == it->second.value) {
-            continue;
-        }
-        async::Channel<Val>& channel = findChannel(it->first);
-        channel.send(item.value);
-    }
     m_localSettings.clear();
 }
 
-async::Channel<Val> Settings::valueChanged(const Key& key) const
-{
-    return m_channels[key];
-}
 
 io::path_t Settings::filePath() const
 {
@@ -189,10 +171,6 @@ Settings::Item& Settings::findItem(const Key& key) const
     return it->second;
 }
 
-async::Channel<Val>& Settings::findChannel(const Settings::Key& key) const
-{
-    return m_channels[key];
-}
 
 void Settings::insertNewItem(const Settings::Key& key, const Val& value)
 {

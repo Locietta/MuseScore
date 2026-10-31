@@ -21,7 +21,6 @@
  */
 #pragma once
 
-#include "global/modularity/ioc.h"
 #include "ifilesystem.h"
 
 #include "iodevice.h"
@@ -30,8 +29,6 @@
 namespace muse::io {
 class FileStream : public IODevice
 {
-    static inline GlobalInject<IFileSystem> fileSystem;
-
 public:
     FileStream() = default;
     explicit FileStream(const path_t& filePath);

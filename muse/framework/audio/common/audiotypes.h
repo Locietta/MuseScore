@@ -35,7 +35,6 @@
 #include "global/types/secs.h"
 #include "global/types/ratio.h"
 #include "global/types/string.h"
-#include "global/async/channel.h"
 #include "global/io/iodevice.h"
 
 #include "mpe/events.h"
@@ -513,14 +512,11 @@ struct AudioSignalVal {
 };
 
 using AudioSignalValuesMap = std::map<audioch_t, AudioSignalVal>;
-using AudioSignalChanges = async::Channel<AudioSignalValuesMap>;
 
 struct AutomatedControlParams {
     volume_db_t volume = 0.f;
     balance_t balance = 0.f;
 };
-
-using AutomatedControlParamsChanges = async::Channel<AutomatedControlParams>;
 
 enum class PlaybackStatus {
     Stopped = 0,
@@ -620,25 +616,7 @@ struct InputProcessingProgress {
         StatusData data;
     };
 
-    void start()
-    {
-        isStarted = true;
-        processedChannel.send({ Status::Started, 0, {}, {} }, {}, {});
-    }
-
-    void process(const ChunkInfoList& chunks, int64_t current, int64_t total)
-    {
-        processedChannel.send({ Status::Processing, 0, {}, {} }, chunks, { current, total });
-    }
-
-    void finish(int errcode, const std::string& err = {}, const StatusInfo::StatusData& data = {})
-    {
-        isStarted = false;
-        processedChannel.send({ Status::Finished, errcode, err, data }, {}, {});
-    }
-
     bool isStarted = false;
-    async::Channel<StatusInfo, ChunkInfoList, ProgressInfo> processedChannel;
 };
 
 enum SaveSoundTrackStage {
@@ -646,8 +624,6 @@ enum SaveSoundTrackStage {
     ProcessingOnlineSounds,
     WritingSoundTrack,
 };
-
-using SaveSoundTrackProgress = async::Channel<int64_t /*current*/, int64_t /*total*/, SaveSoundTrackStage>;
 
 struct TransportEvent {
     enum class Type : unsigned char {

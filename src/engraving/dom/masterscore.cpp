@@ -21,6 +21,8 @@
  */
 #include "masterscore.h"
 
+#include <algorithm>
+
 #include "io/buffer.h"
 
 #include "compat/writescorehook.h"
@@ -63,8 +65,8 @@ using namespace mu::engraving;
 //   MasterScore
 //---------------------------------------------------------
 
-MasterScore::MasterScore(const muse::modularity::ContextPtr& iocCtx, std::weak_ptr<engraving::EngravingProject> project)
-    : Score(iocCtx)
+MasterScore::MasterScore(const EngravingServices& services, std::weak_ptr<engraving::EngravingProject> project)
+    : Score(services)
 {
     m_project = project;
     m_transactionManager = std::make_unique<TransactionManager>(this);
@@ -97,8 +99,8 @@ MasterScore::MasterScore(const muse::modularity::ContextPtr& iocCtx, std::weak_p
     metaTags().insert({ u"creationDate", muse::Date::currentDate().toString(muse::DateFormat::ISODate) });
 }
 
-MasterScore::MasterScore(const muse::modularity::ContextPtr& iocCtx, const MStyle& s, std::weak_ptr<engraving::EngravingProject> project)
-    : MasterScore{iocCtx, project}
+MasterScore::MasterScore(const EngravingServices& services, const MStyle& s, std::weak_ptr<engraving::EngravingProject> project)
+    : MasterScore{services, project}
 {
     setStyle(s);
 }
@@ -301,7 +303,7 @@ MasterScore* MasterScore::clone()
     buffer.close();
 
     muse::ByteArray scoreData = buffer.data();
-    MasterScore* score = new MasterScore(iocContext(), style(), m_project);
+    MasterScore* score = new MasterScore(services(), style(), m_project);
 
     XmlReader r(scoreData);
     MscLoader().readMasterScore(score, r, true);
@@ -346,11 +348,29 @@ void MasterScore::setLoopBoundaryTick(LoopBoundaryType type, Fraction tick)
     }
 
     m_loopBoundaries[size_t(type)] = tick;
-    // even though tick position might not have changed, layout might have
-    // so we should update cursor here
-    // however, we must be careful not to call setLoopBoundaryTick() again while handling posChanged, or recursion results
-    for (Score* s : scoreList()) {
-        s->notifyLoopBoundaryTickChanged(type, unsigned(tick.ticks()));
+}
+
+void MasterScore::addChangesListener(IScoreChangesListener* listener)
+{
+    if (std::find(m_changesListeners.begin(), m_changesListeners.end(), listener) == m_changesListeners.end()) {
+        m_changesListeners.push_back(listener);
+    }
+}
+
+void MasterScore::removeChangesListener(IScoreChangesListener* listener)
+{
+    m_changesListeners.erase(std::remove(m_changesListeners.begin(), m_changesListeners.end(), listener),
+                             m_changesListeners.end());
+}
+
+void MasterScore::notifyChanges(const ScoreChanges& changes)
+{
+    // A listener may detach while it handles the changes.
+    const std::vector<IScoreChangesListener*> listeners = m_changesListeners;
+    for (IScoreChangesListener* listener : listeners) {
+        if (std::find(m_changesListeners.begin(), m_changesListeners.end(), listener) != m_changesListeners.end()) {
+            listener->onScoreChanges(changes);
+        }
     }
 }
 

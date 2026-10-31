@@ -29,8 +29,6 @@
 #include "types/bytearray.h"
 #include "io/path.h"
 
-#include "modularity/ioc.h"
-#include "global/icryptographichash.h"
 
 namespace mu::engraving {
 class Image;
@@ -42,8 +40,6 @@ class Score;
 
 class ImageStoreItem
 {
-    muse::GlobalInject<muse::ICryptographicHash> cryptographicHash;
-
 public:
     ImageStoreItem(const std::string& p);
     void dereference(Image*);
@@ -64,7 +60,7 @@ private:
     std::list<Image*> m_references;
     std::string m_type; // image type (file extension)
     muse::ByteArray m_buffer;
-    muse::ByteArray m_hash; // 16 byte md4 hash of _buffer
+    muse::ByteArray m_hash; // 16 byte content key of m_buffer
 };
 
 //---------------------------------------------------------
@@ -73,8 +69,6 @@ private:
 
 class ImageStore
 {
-    muse::GlobalInject<muse::ICryptographicHash> cryptographicHash;
-
 public:
     ImageStore() = default;
     ImageStore(const ImageStore&) = delete;

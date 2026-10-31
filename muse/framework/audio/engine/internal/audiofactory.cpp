@@ -70,10 +70,9 @@ void AudioFactory::clearSynthSources()
 }
 
 RetVal<AudioSourceNodePtr> AudioFactory::makeEventSource(const TrackId trackId, const mpe::PlaybackData& playbackData,
-                                                         const AudioInputParams& params,
-                                                         const std::function<void()> onOffStreamReceived) const
+                                                         const AudioInputParams& params) const
 {
-    EventAudioNodePtr source = std::make_shared<EventAudioNode>(trackId, playbackData, onOffStreamReceived);
+    EventAudioNodePtr source = std::make_shared<EventAudioNode>(*this, trackId, playbackData);
     source->setOutputSpec(m_spec);
     source->applyInputParams(params);
     return RetVal<AudioSourceNodePtr>::make_ok(source);

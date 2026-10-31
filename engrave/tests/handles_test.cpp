@@ -274,7 +274,8 @@ std::map<std::string, std::string> unzip_entries(std::string_view zip_bytes) {
 std::string export_mscx(engrave::Document& document, int excerpt_id = -1) {
     music::ExportOptions options;
     options.excerpt_id = excerpt_id;
-    return music::export_native_score(engrave::DocumentAccess::project(document), "mscx", options, {});
+    return music::export_native_score(engrave::DocumentAccess::context(document), engrave::DocumentAccess::project(document),
+                                     "mscx", options, {});
 }
 
 /// The snapshot path: write the score and read it back into a new document.

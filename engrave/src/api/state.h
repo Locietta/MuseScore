@@ -14,6 +14,7 @@
 
 #include "engrave/src/api/batch.h"
 #include "engrave/src/audio/score_audio.h"
+#include "engrave/src/runtime/engine_context.h"
 #include "engrave/src/runtime/noqt_runtime.h"
 
 namespace mu::engraving {
@@ -34,6 +35,8 @@ struct EngineState {
     std::int32_t audio_sample_rate = 44100;
     std::size_t live_documents = 0;
     unsigned audio_render_index = 0; // names the temporary files of one process
+    // The engine's services; destroyed with the Engine, after its last Document.
+    std::unique_ptr<music::EngineContext> context;
 
     void check_thread() const noexcept {
         check(std::this_thread::get_id() == owner, "engrave called from a thread other than the Engine's");
@@ -68,6 +71,7 @@ struct DocumentAccess {
     static mu::engraving::MasterScore* master_score(Document& document);
     static music::ScoreProject& project(Document& document);
     static api::EditHooks& edit_hooks(Document& document);
+    static music::EngineContext& context(Document& document);
 };
 
 // The path as UTF-8 with '/' separators: the engine's path type reads

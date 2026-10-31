@@ -106,8 +106,12 @@ const char* const GuitarPro::errmsg[] = {
 //   GuitarPro
 //---------------------------------------------------------
 
-GuitarPro::GuitarPro(MasterScore* s, int v, const modularity::ContextPtr& iocCtx)
-    : muse::Contextable(iocCtx)
+const std::shared_ptr<IEngravingConfiguration>& GuitarPro::engravingConfiguration() const
+{
+    return score->configuration();
+}
+
+GuitarPro::GuitarPro(MasterScore* s, int v)
 {
     score   = s;
     version = v;
@@ -2899,7 +2903,7 @@ static void addMetaInfo(MasterScore* score, GuitarPro* gp, bool experimental)
 //   importGTP
 //---------------------------------------------------------
 
-Err importGTP(MasterScore* score, muse::io::IODevice* io, const muse::modularity::ContextPtr& iocCtx, bool experimental)
+Err importGTP(MasterScore* score, muse::io::IODevice* io, bool experimental)
 {
     if (!score || !io) {
         return Err::FileBadFormat;
@@ -2932,13 +2936,13 @@ Err importGTP(MasterScore* score, muse::io::IODevice* io, const muse::modularity
     try {
         // check to see if we are dealing with a GP file via the extension
         if (strcmp(header, "PK\x3\x4") == 0) {
-            gp = std::make_unique<GuitarPro7>(score, iocCtx);
+            gp = std::make_unique<GuitarPro7>(score);
             readResult = gp->read(io);
             isVersionAbove6 = true;
         }
         // check to see if we are dealing with a GPX file via the extension
         else if (strcmp(header, "BCFZ") == 0) {
-            gp = std::make_unique<GuitarPro6>(score, iocCtx);
+            gp = std::make_unique<GuitarPro6>(score);
             drumset::initGuitarProDrumset();
             readResult = gp->read(io);
             isVersionAbove6 = true;
@@ -2971,15 +2975,15 @@ Err importGTP(MasterScore* score, muse::io::IODevice* io, const muse::modularity
             int b = s.mid(2).toInt();
             int version = a * 100 + b;
             if (a == 1) {
-                gp = std::make_unique<GuitarPro1>(score, version, iocCtx);
+                gp = std::make_unique<GuitarPro1>(score, version);
             } else if (a == 2) {
-                gp = std::make_unique<GuitarPro2>(score, version, iocCtx);
+                gp = std::make_unique<GuitarPro2>(score, version);
             } else if (a == 3) {
-                gp = std::make_unique<GuitarPro3>(score, version, iocCtx);
+                gp = std::make_unique<GuitarPro3>(score, version);
             } else if (a == 4) {
-                gp = std::make_unique<GuitarPro4>(score, version, iocCtx);
+                gp = std::make_unique<GuitarPro4>(score, version);
             } else if (a == 5) {
-                gp = std::make_unique<GuitarPro5>(score, version, iocCtx);
+                gp = std::make_unique<GuitarPro5>(score, version);
             } else {
                 LOGD("unknown gtp format %d", version);
                 return Err::FileBadFormat;

@@ -25,8 +25,6 @@
 #include <cmath>
 #include <memory>
 
-#include "async/asyncable.h"
-#include "async/channel.h"
 #include "mpe/tests/utils/articulationutils.h"
 #include "mpe/tests/mocks/articulationprofilesrepositorymock.h"
 
@@ -53,7 +51,7 @@ static constexpr duration_t QUARTER_NOTE_DURATION = 500000; // duration in micro
 static constexpr duration_t HALF_NOTE_DURATION = QUARTER_NOTE_DURATION * 2; // duration in microseconds for 1/2 120BPM
 static constexpr duration_t WHOLE_NOTE_DURATION = QUARTER_NOTE_DURATION * 4; // duration in microseconds for 4/4 120BPM
 
-class Engraving_PlaybackModelTests : public ::testing::Test, public muse::async::Asyncable
+class Engraving_PlaybackModelTests : public ::testing::Test
 {
 protected:
     void SetUp() override
@@ -113,8 +111,7 @@ TEST_F(Engraving_PlaybackModelTests, SimpleRepeat)
     EXPECT_CALL(*m_repositoryMock, defaultProfile(_)).WillRepeatedly(Return(m_defaultProfile));
 
     // [WHEN] The playback model requested to be loaded
-    PlaybackModel model(modularity::globalCtx());
-    model.profilesRepository.set(m_repositoryMock);
+    PlaybackModel model(m_repositoryMock.get());
     model.load(score);
 
     const PlaybackEventsMap& result = model.resolveTrackPlaybackData(part->id(), part->instrumentId()).originEvents;
@@ -148,8 +145,7 @@ TEST_F(Engraving_PlaybackModelTests, Two_Ending_Repeat)
     EXPECT_CALL(*m_repositoryMock, defaultProfile(_)).WillRepeatedly(Return(m_defaultProfile));
 
     // [WHEN] The playback model requested to be loaded
-    PlaybackModel model(modularity::globalCtx());
-    model.profilesRepository.set(m_repositoryMock);
+    PlaybackModel model(m_repositoryMock.get());
     model.load(score);
 
     const PlaybackEventsMap& result = model.resolveTrackPlaybackData(part->id(), part->instrumentId()).originEvents;
@@ -205,8 +201,7 @@ TEST_F(Engraving_PlaybackModelTests, Repeat_And_Tremolo)
     EXPECT_CALL(*m_repositoryMock, defaultProfile(_)).WillRepeatedly(Return(m_defaultProfile));
 
     // [WHEN] The playback model requested to be loaded
-    PlaybackModel model(modularity::globalCtx());
-    model.profilesRepository.set(m_repositoryMock);
+    PlaybackModel model(m_repositoryMock.get());
     model.load(score);
 
     const PlaybackEventsMap& result = model.resolveTrackPlaybackData(part->id(), part->instrumentId()).originEvents;
@@ -265,8 +260,7 @@ TEST_F(Engraving_PlaybackModelTests, Repeat_Tempo_Changes_And_Tie)
     EXPECT_CALL(*m_repositoryMock, defaultProfile(_)).WillRepeatedly(Return(m_defaultProfile));
 
     // [WHEN] The playback model requested to be loaded
-    PlaybackModel model(modularity::globalCtx());
-    model.profilesRepository.set(m_repositoryMock);
+    PlaybackModel model(m_repositoryMock.get());
     model.load(score);
 
     const PlaybackEventsMap& result = model.resolveTrackPlaybackData(part->id(), part->instrumentId()).originEvents;
@@ -313,8 +307,7 @@ TEST_F(Engraving_PlaybackModelTests, Da_Capo_Al_Fine)
     EXPECT_CALL(*m_repositoryMock, defaultProfile(_)).WillRepeatedly(Return(m_defaultProfile));
 
     // [WHEN] The playback model requested to be loaded
-    PlaybackModel model(modularity::globalCtx());
-    model.profilesRepository.set(m_repositoryMock);
+    PlaybackModel model(m_repositoryMock.get());
     model.load(score);
 
     const PlaybackEventsMap& result = model.resolveTrackPlaybackData(part->id(), part->instrumentId()).originEvents;
@@ -349,8 +342,7 @@ TEST_F(Engraving_PlaybackModelTests, Dal_Segno_Al_Coda)
     EXPECT_CALL(*m_repositoryMock, defaultProfile(_)).WillRepeatedly(Return(m_defaultProfile));
 
     // [WHEN] The playback model requested to be loaded
-    PlaybackModel model(modularity::globalCtx());
-    model.profilesRepository.set(m_repositoryMock);
+    PlaybackModel model(m_repositoryMock.get());
     model.load(score);
 
     const PlaybackEventsMap& result = model.resolveTrackPlaybackData(part->id(), part->instrumentId()).originEvents;
@@ -384,8 +376,7 @@ TEST_F(Engraving_PlaybackModelTests, Dal_Segno_Al_Fine)
     EXPECT_CALL(*m_repositoryMock, defaultProfile(_)).WillRepeatedly(Return(m_defaultProfile));
 
     // [WHEN] The playback model requested to be loaded
-    PlaybackModel model(modularity::globalCtx());
-    model.profilesRepository.set(m_repositoryMock);
+    PlaybackModel model(m_repositoryMock.get());
     model.load(score);
 
     const PlaybackEventsMap& result = model.resolveTrackPlaybackData(part->id(), part->instrumentId()).originEvents;
@@ -419,8 +410,7 @@ TEST_F(Engraving_PlaybackModelTests, Da_Capo_Al_Coda)
     EXPECT_CALL(*m_repositoryMock, defaultProfile(_)).WillRepeatedly(Return(m_defaultProfile));
 
     // [WHEN] The playback model requested to be loaded
-    PlaybackModel model(modularity::globalCtx());
-    model.profilesRepository.set(m_repositoryMock);
+    PlaybackModel model(m_repositoryMock.get());
     model.load(score);
 
     const PlaybackEventsMap& result = model.resolveTrackPlaybackData(part->id(), part->instrumentId()).originEvents;
@@ -458,8 +448,7 @@ TEST_F(Engraving_PlaybackModelTests, Spanners)
     EXPECT_CALL(*m_repositoryMock, defaultProfile(_)).WillRepeatedly(Return(m_defaultProfile));
 
     // [WHEN] The playback model requested to be loaded
-    PlaybackModel model(modularity::globalCtx());
-    model.profilesRepository.set(m_repositoryMock);
+    PlaybackModel model(m_repositoryMock.get());
     model.load(score);
 
     const PlaybackEventsMap& result = model.resolveTrackPlaybackData(part->id(), part->instrumentId()).originEvents;
@@ -536,8 +525,7 @@ TEST_F(Engraving_PlaybackModelTests, Dynamics)
     score->initAutomation();
 
     // [WHEN] The playback model requested to be loaded
-    PlaybackModel model(modularity::globalCtx());
-    model.profilesRepository.set(m_repositoryMock);
+    PlaybackModel model(m_repositoryMock.get());
     model.load(score);
 
     const DynamicAutomationLayers& dynamics = model.resolveTrackPlaybackData(part->id(), part->instrumentId()).dynamics;
@@ -614,8 +602,7 @@ TEST_F(Engraving_PlaybackModelTests, Pizz_To_Arco_Technique)
     EXPECT_CALL(*m_repositoryMock, defaultProfile(_)).WillRepeatedly(Return(m_defaultProfile));
 
     // [WHEN] The playback model requested to be loaded
-    PlaybackModel model(modularity::globalCtx());
-    model.profilesRepository.set(m_repositoryMock);
+    PlaybackModel model(m_repositoryMock.get());
     model.load(score);
 
     const PlaybackEventsMap& result = model.resolveTrackPlaybackData(part->id(), part->instrumentId()).originEvents;
@@ -675,8 +662,7 @@ TEST_F(Engraving_PlaybackModelTests, FallbackToStandardArticulation)
     EXPECT_CALL(*m_repositoryMock, defaultProfile(_)).WillRepeatedly(Return(m_defaultProfile));
 
     // [WHEN] The playback model requested to be loaded
-    PlaybackModel model(modularity::globalCtx());
-    model.profilesRepository.set(m_repositoryMock);
+    PlaybackModel model(m_repositoryMock.get());
     model.load(score);
 
     // [WHEN] Request events for Winds
@@ -749,8 +735,7 @@ TEST_F(Engraving_PlaybackModelTests, Single_Measure_Repeat)
     EXPECT_CALL(*m_repositoryMock, defaultProfile(_)).WillRepeatedly(Return(m_defaultProfile));
 
     // [WHEN] The playback model requested to be loaded
-    PlaybackModel model(modularity::globalCtx());
-    model.profilesRepository.set(m_repositoryMock);
+    PlaybackModel model(m_repositoryMock.get());
     model.load(score);
 
     const PlaybackEventsMap& result = model.resolveTrackPlaybackData(part->id(), part->instrumentId()).originEvents;
@@ -786,8 +771,7 @@ TEST_F(Engraving_PlaybackModelTests, Multi_Measure_Repeat)
     EXPECT_CALL(*m_repositoryMock, defaultProfile(_)).WillRepeatedly(Return(m_defaultProfile));
 
     // [WHEN] The playback model requested to be loaded
-    PlaybackModel model(modularity::globalCtx());
-    model.profilesRepository.set(m_repositoryMock);
+    PlaybackModel model(m_repositoryMock.get());
     model.load(score);
 
     const PlaybackEventsMap& result = model.resolveTrackPlaybackData(part->id(), part->instrumentId()).originEvents;
@@ -812,8 +796,7 @@ TEST_F(Engraving_PlaybackModelTests, MeasureRepeat_TiedNotes)
     EXPECT_CALL(*m_repositoryMock, defaultProfile(_)).WillRepeatedly(Return(m_defaultProfile));
 
     // [WHEN] The playback model requested to be loaded
-    PlaybackModel model(modularity::globalCtx());
-    model.profilesRepository.set(m_repositoryMock);
+    PlaybackModel model(m_repositoryMock.get());
     model.setPlayRepeats(true);
     model.load(score);
 
@@ -884,8 +867,7 @@ TEST_F(Engraving_PlaybackModelTests, SimpleRepeat_Changes_Notification)
     ON_CALL(*m_repositoryMock, defaultProfile(_)).WillByDefault(Return(m_defaultProfile));
 
     // [GIVEN] The playback model requested to be loaded
-    PlaybackModel model(modularity::globalCtx());
-    model.profilesRepository.set(m_repositoryMock);
+    PlaybackModel model(m_repositoryMock.get());
     model.load(score);
 
     InstrumentTrackId trackId {
@@ -897,60 +879,20 @@ TEST_F(Engraving_PlaybackModelTests, SimpleRepeat_Changes_Notification)
     size_t expectedEventCount = 24;
     EXPECT_EQ(result.originEvents.size(), expectedEventCount);
 
-    // [WHEN] Notify on score change
-    size_t receivedEventCount = 0;
-    model.setSendEventsOnScoreChange(trackId, true);
-
-    // [THEN] Updated events map will match our expectations
-    result.mainStream.onReceive(this, [&receivedEventCount](const PlaybackEventsMap& updatedEvents, const DynamicAutomationLayers&) {
-        receivedEventCount = updatedEvents.size();
-    });
-
-    // [WHEN] Score has been changed: the range starts ouside the repeat and ends inside it
     ScoreChanges changes;
-    changes.tickFrom = 480; // 2nd note of the 1st measure (outside the repeat)
-    changes.tickTo = 3840; // 1st note of the 3rd measure (inside the repeat)
+    changes.tickFrom = 480;
+    changes.tickTo = 3840;
     changes.staffIdxFrom = 0;
     changes.staffIdxTo = 0;
     changes.changedTypes = { ElementType::NOTE };
-
-    score->changesChannel().send(changes);
-
-    // [THEN] Main stream events received
-    EXPECT_EQ(receivedEventCount, expectedEventCount);
-
-    // [WHEN] Notify on score change
-    receivedEventCount = 0;
-    model.setSendEventsOnScoreChange(trackId, false);
-
-    // [WHEN] Score has been changed: the range is inside the repeat and tickTo == the end tick of the repeat
-    // See: https://github.com/musescore/MuseScore/issues/25899
-    changes.tickFrom = 4800; // 3rd note of the 3rd measure (inside the repeat)
-    changes.tickTo = 5760; // end tick of the repeat
-    changes.staffIdxFrom = 0;
-    changes.staffIdxTo = 0;
+    score->masterScore()->notifyChanges(changes);
+    EXPECT_EQ(model.resolveTrackPlaybackData(trackId).originEvents.size(), expectedEventCount);
+    changes.tickFrom = 4800;
+    changes.tickTo = 5760;
     changes.changedTypes = { ElementType::PEDAL };
+    score->masterScore()->notifyChanges(changes);
+    EXPECT_EQ(model.resolveTrackPlaybackData(trackId).originEvents.size(), expectedEventCount);
 
-    score->changesChannel().send(changes);
-
-    // [THEN] Events not sent despite score change
-    EXPECT_EQ(receivedEventCount, 0);
-
-    // [WHEN] Send events
-    model.sendEventsForChangedTracks();
-
-    // [THEN] Events received
-    EXPECT_EQ(receivedEventCount, expectedEventCount);
-
-    // [WHEN] Send score changes
-    score->changesChannel().send(changes);
-
-    // [WHEN] Re-enable sending events on score change
-    receivedEventCount = 0;
-    model.setSendEventsOnScoreChange(trackId, true);
-
-    // [THEN] Events are sent and received immediately
-    EXPECT_EQ(receivedEventCount, expectedEventCount);
 }
 
 /**
@@ -976,8 +918,7 @@ TEST_F(Engraving_PlaybackModelTests, TempoChangesDuringNotes)
     EXPECT_CALL(*m_repositoryMock, defaultProfile(_)).WillRepeatedly(Return(m_defaultProfile));
 
     // [WHEN] The playback model requested to be loaded
-    PlaybackModel model(modularity::globalCtx());
-    model.profilesRepository.set(m_repositoryMock);
+    PlaybackModel model(m_repositoryMock.get());
     model.load(score);
 
     const PlaybackEventsMap& result = model.resolveTrackPlaybackData(part->id(), part->instrumentId()).originEvents;
@@ -1102,8 +1043,7 @@ TEST_F(Engraving_PlaybackModelTests, Metronome_4_4)
     EXPECT_CALL(*m_repositoryMock, defaultProfile(_)).WillRepeatedly(Return(m_defaultProfile));
 
     // [WHEN] The playback model requested to be loaded with Metronome enabled
-    PlaybackModel model(modularity::globalCtx());
-    model.profilesRepository.set(m_repositoryMock);
+    PlaybackModel model(m_repositoryMock.get());
     model.setIsMetronomeEnabled(true);
     model.load(score);
 
@@ -1123,7 +1063,7 @@ TEST_F(Engraving_PlaybackModelTests, Metronome_4_4)
     changes.staffIdxTo = 0;
     changes.changedTypes = { ElementType::NOTE };
 
-    score->changesChannel().send(changes);
+    score->masterScore()->notifyChanges(changes);
 
     // [THEN] Amount of events does match expectations
     const PlaybackEventsMap& eventsAfterScoreChange = model.resolveTrackPlaybackData(model.metronomeTrackId()).originEvents;
@@ -1169,8 +1109,7 @@ TEST_F(Engraving_PlaybackModelTests, Metronome_6_4_Repeat)
     EXPECT_CALL(*m_repositoryMock, defaultProfile(_)).WillRepeatedly(Return(m_defaultProfile));
 
     // [WHEN] The playback model requested to be loaded
-    PlaybackModel model(modularity::globalCtx());
-    model.profilesRepository.set(m_repositoryMock);
+    PlaybackModel model(m_repositoryMock.get());
     model.setIsMetronomeEnabled(true);
     model.load(score);
 
@@ -1222,8 +1161,7 @@ TEST_F(Engraving_PlaybackModelTests, Note_Entry_Playback_Note)
     score->initAutomation();
 
     // [GIVEN] The playback model requested to be loaded
-    PlaybackModel model(modularity::globalCtx());
-    model.profilesRepository.set(m_repositoryMock);
+    PlaybackModel model(m_repositoryMock.get());
     model.load(score);
 
     PlaybackData result = model.resolveTrackPlaybackData(part->id(), part->instrumentId());
@@ -1232,8 +1170,7 @@ TEST_F(Engraving_PlaybackModelTests, Note_Entry_Playback_Note)
     const mpe::NoteEvent& expectedEvent = std::get<mpe::NoteEvent>(result.originEvents.at(firstNoteTimestamp).front());
 
     // [THEN] Triggered events map will match our expectations
-    result.offStream.onReceive(this, [firstNoteTimestamp, expectedEvent](const PlaybackEventsMap& triggeredEvents,
-                                                                         bool flushOffstream) {
+    auto checkEvents = [firstNoteTimestamp, expectedEvent](const PlaybackEventsMap& triggeredEvents) {
         ASSERT_EQ(triggeredEvents.size(), 1);
         const PlaybackEventList& eventList = triggeredEvents.at(firstNoteTimestamp);
 
@@ -1246,11 +1183,10 @@ TEST_F(Engraving_PlaybackModelTests, Note_Entry_Playback_Note)
         EXPECT_EQ(noteEvent.expressionCtx(), expectedEvent.expressionCtx());
         EXPECT_EQ(noteEvent.pitchCtx(), expectedEvent.pitchCtx());
 
-        EXPECT_TRUE(flushOffstream);
-    });
+    };
 
     // [WHEN] User has clicked on the first note
-    model.triggerEventsForItems({ firstNote }, QUARTER_NOTE_DURATION, true /*flushSounds*/);
+    checkEvents(model.triggerEventsForItems({ firstNote }, QUARTER_NOTE_DURATION));
 
     delete score;
 }
@@ -1291,8 +1227,7 @@ TEST_F(Engraving_PlaybackModelTests, Note_Entry_Playback_Chord)
     ASSERT_TRUE(thirdChord->notes().size() == expectedNoteCount);
 
     // [GIVEN] The playback model requested to be loaded
-    PlaybackModel model(modularity::globalCtx());
-    model.profilesRepository.set(m_repositoryMock);
+    PlaybackModel model(m_repositoryMock.get());
     model.load(score);
 
     PlaybackData result = model.resolveTrackPlaybackData(part->id(), part->instrumentId());
@@ -1301,8 +1236,7 @@ TEST_F(Engraving_PlaybackModelTests, Note_Entry_Playback_Chord)
     const PlaybackEventList& expectedEvents = result.originEvents.at(thirdChordTimestamp);
 
     // [THEN] Triggered events map will match our expectations
-    result.offStream.onReceive(this, [expectedEvents](const PlaybackEventsMap& triggeredEvents,
-                                                      bool flushOffstream) {
+    auto checkEvents = [expectedEvents](const PlaybackEventsMap& triggeredEvents) {
         ASSERT_EQ(triggeredEvents.size(), 1);
         const PlaybackEventList& actualEvents = triggeredEvents.at(0);
         ASSERT_EQ(actualEvents.size(), expectedEvents.size());
@@ -1315,15 +1249,14 @@ TEST_F(Engraving_PlaybackModelTests, Note_Entry_Playback_Chord)
             EXPECT_FALSE(actualNoteEvent.expressionCtx() == expectedNoteEvent.expressionCtx());
             EXPECT_TRUE(actualNoteEvent.pitchCtx() == expectedNoteEvent.pitchCtx());
 
-            EXPECT_TRUE(flushOffstream);
         }
-    });
+    };
 
     // [WHEN] Don't use the score dynamics
     model.setUseScoreDynamicsForOffstreamPlayback(false);
 
     // [WHEN] User has clicked on the first note
-    model.triggerEventsForItems({ thirdChord }, QUARTER_NOTE_DURATION, true /*flushSounds*/);
+    checkEvents(model.triggerEventsForItems({ thirdChord }, QUARTER_NOTE_DURATION));
 }
 
 /**
@@ -1383,8 +1316,7 @@ TEST_F(Engraving_PlaybackModelTests, Playback_Setup_Data_MultiInstrument)
     EXPECT_CALL(*m_repositoryMock, defaultProfile(_)).WillRepeatedly(Return(m_defaultProfile));
 
     // [WHEN] The playback model requested to be loaded
-    PlaybackModel model(modularity::globalCtx());
-    model.profilesRepository.set(m_repositoryMock);
+    PlaybackModel model(m_repositoryMock.get());
     model.load(score);
 
     // [THEN] Result matches with our expectations
@@ -1422,14 +1354,16 @@ TEST_F(Engraving_PlaybackModelTests, Score_Changes_Track_Range)
     ON_CALL(*m_repositoryMock, defaultProfile(_)).WillByDefault(Return(m_defaultProfile));
 
     // [GIVEN] The playback model is loaded
-    PlaybackModel model(modularity::globalCtx());
-    model.profilesRepository.set(m_repositoryMock);
+    PlaybackModel model(m_repositoryMock.get());
     model.load(score);
 
+    // The tracks that the model re-rendered for the last change: the changed set,
+    // which a send of the events empties for the next change.
     InstrumentTrackIdSet changedTracks;
-    model.tracksDataChanged().onReceive(this, [&changedTracks](const InstrumentTrackIdSet& tracks) {
-        changedTracks = tracks;
-    });
+    const auto takeChangedTracks = [&model, &changedTracks]() {
+        changedTracks = model.changedTrackIdSet();
+        model.sendEventsForChangedTracks();
+    };
 
     // [WHEN] A score-level change (e.g. inserting a measure) with a narrow range on the 1st staff
     ScoreChanges changes;
@@ -1440,7 +1374,8 @@ TEST_F(Engraving_PlaybackModelTests, Score_Changes_Track_Range)
     changes.changedTypes = { ElementType::SCORE, ElementType::MEASURE };
     changes.changedObjects = { { score, { CommandType::InsertTime } } };
 
-    score->changesChannel().send(changes);
+    score->masterScore()->notifyChanges(changes);
+    takeChangedTracks();
 
     // [THEN] All tracks are re-rendered
     EXPECT_TRUE(muse::contains(changedTracks, firstTrackId));
@@ -1451,7 +1386,8 @@ TEST_F(Engraving_PlaybackModelTests, Score_Changes_Track_Range)
     changes.changedTypes = { ElementType::SCORE };
     changes.changedObjects = { { score, { CommandType::EditAutomationPoints } } };
 
-    score->changesChannel().send(changes);
+    score->masterScore()->notifyChanges(changes);
+    takeChangedTracks();
 
     // [THEN] Only the tracks of the 1st staff are re-rendered
     EXPECT_TRUE(muse::contains(changedTracks, firstTrackId));
@@ -1461,7 +1397,8 @@ TEST_F(Engraving_PlaybackModelTests, Score_Changes_Track_Range)
     changedTracks.clear();
     changes.changedObjects = { { score, { CommandType::EditAutomationPoints, CommandType::InsertTime } } };
 
-    score->changesChannel().send(changes);
+    score->masterScore()->notifyChanges(changes);
+    takeChangedTracks();
 
     // [THEN] All tracks are re-rendered
     EXPECT_TRUE(muse::contains(changedTracks, firstTrackId));

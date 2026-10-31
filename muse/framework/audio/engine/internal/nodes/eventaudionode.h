@@ -24,35 +24,26 @@
 
 #include "audiosourcenode.h"
 
-#include "global/async/asyncable.h"
-#include "global/modularity/ioc.h"
 #include "mpe/events.h"
 
 #include "audio/common/audiotypes.h"
 #include "../iaudiofactory.h"
 
 namespace muse::audio::engine {
-class EventAudioNode : public AudioSourceNode, public async::Asyncable
+class EventAudioNode : public AudioSourceNode
 {
-    GlobalInject<IAudioFactory> audioFactory;
-
 public:
-    using OnOffStreamEventsReceived = std::function<void ()>;
-
-    explicit EventAudioNode(TrackId trackId, const mpe::PlaybackData& playbackData, OnOffStreamEventsReceived onOffStreamReceived);
-
-    ~EventAudioNode() override;
+    // audioFactory makes the synthesizer for the input params; it must outlive the node.
+    EventAudioNode(const IAudioFactory& audioFactory, TrackId trackId, const mpe::PlaybackData& playbackData);
 
     void seek(const TimePosition& position, const bool flushSound = true) override;
     void flush() override;
 
     const AudioInputParams& inputParams() const override;
     void applyInputParams(const AudioInputParams& requiredParams) override;
-    async::Channel<AudioInputParams> inputParamsChanged() const override;
 
     void prepareToPlay() override;
     bool readyToPlay() const override;
-    async::Notification readyToPlayChanged() const override;
 
     bool hasPendingChunks() const override;
     void processInput() override;
@@ -77,11 +68,13 @@ private:
     SynthCtx currentSynthCtx() const;
     void restoreSynthCtx(const SynthCtx& ctx);
 
+    const IAudioFactory* audioFactory() const { return &m_audioFactory; }
+
+    const IAudioFactory& m_audioFactory;
     TrackId m_trackId = -1;
     mpe::PlaybackData m_playbackData;
     synth::ISynthesizerPtr m_synth = nullptr;
     AudioInputParams m_params;
-    async::Channel<AudioInputParams> m_paramsChanges;
 };
 
 using EventAudioNodePtr = std::shared_ptr<EventAudioNode>;

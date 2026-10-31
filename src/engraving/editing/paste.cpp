@@ -24,7 +24,6 @@
 
 #include "draw/iimageprovider.h"
 #include "io/buffer.h"
-#include "modularity/ioc.h"
 
 #include "imimedata.h"
 
@@ -575,9 +574,8 @@ bool Paste::paste(Transaction& tx, Score* score, const IMimeData* ms, MuseScoreV
         muse::ByteArray ba;
         auto buffer = Buffer::opened(IODevice::WriteOnly, &ba);
 
-        muse::GlobalInject<muse::draw::IImageProvider> imageProvider;
         auto px = ms->imageData();
-        imageProvider()->saveAsPng(px, &buffer);
+        score->services().imageProvider->saveAsPng(px, &buffer);
 
         std::unique_ptr<Image> image(new Image(score->dummy()));
         image->setImageType(ImageType::RASTER);

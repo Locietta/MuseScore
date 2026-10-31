@@ -32,10 +32,10 @@ class ScoreAccess
 {
 public:
 
-    static MasterScore* createMasterScore(const muse::modularity::ContextPtr& iocCtx);
-    static MasterScore* createMasterScoreWithBaseStyle(const muse::modularity::ContextPtr& iocCtx);
-    static MasterScore* createMasterScoreWithDefaultStyle(const muse::modularity::ContextPtr& iocCtx);
-    static MasterScore* createMasterScore(const muse::modularity::ContextPtr& iocCtx, const MStyle& style);
+    static MasterScore* createMasterScore(const EngravingServices& services);
+    static MasterScore* createMasterScoreWithBaseStyle(const EngravingServices& services);
+    static MasterScore* createMasterScoreWithDefaultStyle(const EngravingServices& services);
+    static MasterScore* createMasterScore(const EngravingServices& services, const MStyle& style);
 };
 }
 

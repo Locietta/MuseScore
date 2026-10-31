@@ -103,7 +103,9 @@ public:
     TransactionManager* transactionManager() const { return m_transactionManager.get(); }
     UndoStack* undoStack() const { return m_undoStack; }
     TimeSigMap* sigmap() const override { return m_sigmap; }
-    muse::async::Channel<ScoreChanges> changesChannel() const override { return m_changesChannel; }
+    void addChangesListener(IScoreChangesListener* listener);
+    void removeChangesListener(IScoreChangesListener* listener);
+    void notifyChanges(const ScoreChanges& changes);
 
     AutomationDataConstPtr automationData() const override;
     void setAutomationData(AutomationDataPtr data);
@@ -217,8 +219,8 @@ private:
     friend class read400::Read400;
     friend class TransactionManager;
 
-    MasterScore(const muse::modularity::ContextPtr& iocCtx, std::weak_ptr<EngravingProject> project = std::weak_ptr<EngravingProject>());
-    MasterScore(const muse::modularity::ContextPtr& iocCtx, const MStyle&,
+    MasterScore(const EngravingServices& services, std::weak_ptr<EngravingProject> project = std::weak_ptr<EngravingProject>());
+    MasterScore(const EngravingServices& services, const MStyle&,
                 std::weak_ptr<EngravingProject> project  = std::weak_ptr<EngravingProject>());
 
     void initParts(Excerpt*);
@@ -235,7 +237,7 @@ private:
     std::vector<Excerpt*> m_excerpts;
     std::vector<PartChannelSettingsLink> m_playbackSettingsLinks;
     Score* m_playbackScore = nullptr;
-    muse::async::Channel<ScoreChanges> m_changesChannel;
+    std::vector<IScoreChangesListener*> m_changesListeners;
 
     bool m_readOnly = false;
 

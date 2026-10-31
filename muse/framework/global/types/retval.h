@@ -23,8 +23,6 @@
 #define MUSE_GLOBAL_RETVAL_H
 
 #include "ret.h"
-#include "../async/channel.h"
-#include "../async/notification.h"
 
 namespace muse {
 template<typename T>
@@ -96,37 +94,6 @@ struct RetVal2 {
     }
 };
 
-template<typename T>
-struct RetValCh {
-    Ret ret;
-    T val;
-    async::Channel<T> ch;
-    RetValCh() = default;
-    RetValCh(const Ret& r)
-        : ret(r) {}
-};
-
-template<typename T>
-struct RetCh {
-    Ret ret;
-    async::Channel<T> ch;
-};
-
-template<typename T>
-struct ValCh {
-    T val = T();
-    async::Channel<T> ch;
-
-    void set(const T& v) { val = v; ch.send(v); }
-};
-
-template<typename T>
-struct ValNt {
-    T val = T();
-    async::Notification notification;
-
-    void set(const T& v) { val = v; notification.notify(); }
-};
 }
 
 #endif // MUSE_GLOBAL_RETVAL_H

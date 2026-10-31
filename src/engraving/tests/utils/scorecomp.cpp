@@ -133,13 +133,13 @@ bool ScoreComp::compareFiles(const String& fullPath1, const String& fullPath2)
 {
     TRACEFUNC;
 
-    RetVal<ByteArray> rv1 = fileSystem()->readFile(fullPath1);
+    RetVal<ByteArray> rv1 = muse::io::fileSystem()->readFile(fullPath1);
     if (!rv1.ret) {
         LOGE() << "Failed to read: " << fullPath1 << ", err: " << rv1.ret.toString();
         return false;
     }
 
-    RetVal<ByteArray> rv2 = fileSystem()->readFile(fullPath2);
+    RetVal<ByteArray> rv2 = muse::io::fileSystem()->readFile(fullPath2);
     if (!rv2.ret) {
         LOGE() << "Failed to read: " << fullPath2 << ", err: " << rv2.ret.toString();
         return false;

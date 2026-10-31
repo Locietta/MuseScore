@@ -24,7 +24,6 @@
 
 #include <memory>
 
-#include "global/async/channel.h"
 
 #include "audio/common/audiotypes.h"
 
@@ -43,7 +42,6 @@ public:
     //! return substream count for this source: 1 for mono, 2 for stereo, 6 for surround
     virtual unsigned int audioChannelsCount() const = 0;
 
-    virtual async::Channel<unsigned int> audioChannelsCountChanged() const = 0;
 
     //! move buffer forward for sampleCount samples
     virtual samples_t process(float* buffer, samples_t samplesPerChannel) = 0;

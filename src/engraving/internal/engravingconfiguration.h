@@ -22,21 +22,12 @@
 
 #pragma once
 
-#include "async/asyncable.h"
-
-#include "modularity/ioc.h"
-#include "global/iglobalconfiguration.h"
-#include "global/types/retval.h"
-#include "importexport/guitarpro/iguitarproconfiguration.h"
 
 #include "../iengravingconfiguration.h"
 
 namespace mu::engraving {
-class EngravingConfiguration : public IEngravingConfiguration, public muse::async::Asyncable
+class EngravingConfiguration : public IEngravingConfiguration
 {
-    muse::GlobalInject<muse::IGlobalConfiguration> globalConfiguration;
-    muse::GlobalInject<iex::guitarpro::IGuitarProConfiguration> guitarProConfiguration;
-
 public:
     EngravingConfiguration();
 
@@ -46,11 +37,9 @@ public:
 
     muse::io::path_t defaultStyleFilePath() const override;
     void setDefaultStyleFilePath(const muse::io::path_t& path) override;
-    muse::async::Channel<muse::io::path_t> defaultStyleFilePathChanged() const override;
 
     muse::io::path_t partStyleFilePath() const override;
     void setPartStyleFilePath(const muse::io::path_t& path) override;
-    muse::async::Channel<muse::io::path_t> partStyleFilePathChanged() const override;
 
     SizeF defaultPageSize() const override;
 
@@ -61,7 +50,6 @@ public:
 
     Color displayedDefaultColor(bool inverted) const override;
     void setDisplayedDefaultColor(Color color, bool inverted) override;
-    muse::async::Channel<bool, Color> displayedDefaultColorChanged() const override;
     void resetDisplayedDefaultColors() override;
 
     Color indicatorIconInvertedSelectionColor() const override;
@@ -78,35 +66,27 @@ public:
 
     Color selectionColor(voice_idx_t voiceIndex = 0, bool itemVisible = true, bool itemIsUnlinkedFromScore = false) const override;
     void setSelectionColor(voice_idx_t voiceIndex, Color color) override;
-    muse::async::Channel<voice_idx_t, Color> selectionColorChanged() const override;
 
     Color highlightSelectionColor(voice_idx_t voice = 0) const override;
 
     bool dynamicsApplyToAllVoices() const override;
     void setDynamicsApplyToAllVoices(bool v) override;
-    muse::async::Channel<bool> dynamicsApplyToAllVoicesChanged() const override;
 
     bool autoUpdateFretboardDiagrams() const override;
     void setAutoUpdateFretboardDiagrams(bool v) override;
-    muse::async::Channel<bool> autoUpdateFretboardDiagramsChanged() const override;
 
     Color formattingColor() const override;
-    muse::async::Channel<Color> formattingColorChanged() const override;
 
     Color frameColor() const override;
-    muse::async::Channel<Color> frameColorChanged() const override;
 
     Color scoreGreyColor() const override;
 
     Color invisibleColor() const override;
-    muse::async::Channel<Color> invisibleColorChanged() const override;
 
     Color unlinkedColor() const override;
-    muse::async::Channel<Color> unlinkedColorChanged() const override;
 
     const DebuggingOptions& debuggingOptions() const override;
     void setDebuggingOptions(const DebuggingOptions& options) override;
-    muse::async::Notification debuggingOptionsChanged() const override;
 
     bool allowReadingImagesFromOutsideMscz() const override;
 
@@ -121,18 +101,8 @@ public:
     bool keepDeadNotesUnchangedOnTranspose() const override;
 
 private:
-    muse::async::Channel<bool, Color> m_displayedDefaultColorChanged;
-    muse::async::Channel<voice_idx_t, Color> m_voiceColorChanged;
-    muse::async::Channel<bool> m_dynamicsApplyToAllVoicesChanged;
-    muse::async::Channel<bool> m_fretboardDiagramsAutoUpdateChanged;
-    muse::async::Channel<Color> m_formattingColorChanged;
-    muse::async::Channel<Color> m_frameColorChanged;
-    muse::async::Channel<Color> m_invisibleColorChanged;
-    muse::async::Channel<Color> m_unlinkedColorChanged;
-    muse::async::Channel<muse::io::path_t> m_defaultStyleFilePathChanged;
-    muse::async::Channel<muse::io::path_t> m_partStyleFilePathChanged;
 
-    muse::ValNt<DebuggingOptions> m_debuggingOptions;
+    DebuggingOptions m_debuggingOptions;
 
     Color m_cachedDisplayedDefaultColor;
     Color m_cachedInvertedDisplayedDefaultColor;

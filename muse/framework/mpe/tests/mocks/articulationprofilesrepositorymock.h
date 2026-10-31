@@ -35,7 +35,6 @@ public:
     MOCK_METHOD(ArticulationsProfilePtr, defaultProfile, (const ArticulationFamily), (const, override));
     MOCK_METHOD(ArticulationsProfilePtr, loadProfile, (const io::path_t&), (const, override));
     MOCK_METHOD(void, saveProfile, (const io::path_t&, const ArticulationsProfilePtr), (override));
-    MOCK_METHOD(async::Channel<io::path_t>, profileChanged, (), (const, override));
 };
 }
 

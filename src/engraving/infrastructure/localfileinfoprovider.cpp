@@ -58,12 +58,12 @@ String LocalFileInfoProvider::displayName() const
 
 DateTime LocalFileInfoProvider::birthTime() const
 {
-    return fileSystem()->birthTime(m_path);
+    return muse::io::fileSystem()->birthTime(m_path);
 }
 
 DateTime LocalFileInfoProvider::lastModified() const
 {
-    return fileSystem()->lastModified(m_path);
+    return muse::io::fileSystem()->lastModified(m_path);
 }
 
 bool LocalFileInfoProvider::isNewlyCreated() const

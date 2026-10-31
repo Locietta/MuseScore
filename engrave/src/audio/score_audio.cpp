@@ -20,7 +20,6 @@
 #include <vector>
 
 #include "global/io/buffer.h"
-#include "global/modularity/ioc.h"
 #include "global/serialization/json.h"
 #include "global/serialization/zipreader.h"
 
@@ -82,7 +81,7 @@ std::vector<ScoreAudioTrackInfo> score_audio_track_info(Score* score)
     }
 
     // The id helpers on an unloaded model are cheap and need no playback data.
-    const mu::engraving::PlaybackModel model(muse::modularity::globalCtx());
+    const mu::engraving::PlaybackModel model(nullptr);
 
     std::vector<ScoreAudioTrackInfo> result;
     std::size_t part_index = 0;

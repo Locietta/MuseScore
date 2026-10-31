@@ -48,6 +48,10 @@ music::ScoreProject& DocumentAccess::project(Document& document) {
     return document.impl_->project;
 }
 
+music::EngineContext& DocumentAccess::context(Document& document) {
+    return *document.impl_->engine->context;
+}
+
 api::EditHooks& DocumentAccess::edit_hooks(Document& document) {
     return document.impl_->edit_hooks;
 }
@@ -85,7 +89,7 @@ Result<std::vector<std::byte>> Document::export_score(const ExportOptions& optio
     music::ExportOptions backend;
     backend.midi_expand_repeats = options.midi_expand_repeats;
     backend.midi_export_rpns = options.midi_rpns;
-    const std::string data = music::export_native_score(impl_->project, name, backend, {});
+    const std::string data = music::export_native_score(*impl_->engine->context, impl_->project, name, backend, {});
     const auto* bytes = reinterpret_cast<const std::byte*>(data.data());
     return std::vector<std::byte>(bytes, bytes + data.size());
 }

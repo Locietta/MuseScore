@@ -30,7 +30,6 @@
 #include <cmath>
 #include <map>
 
-#include "async/channel.h"
 #include "containers.h"
 
 #include "iengravingconfiguration.h" // IWYU pragma: keep
@@ -162,18 +161,11 @@ static void markInstrumentsAsPrimary(std::vector<Part*>& parts)
 //   Score
 //---------------------------------------------------------
 
-Score::Score(const modularity::ContextPtr& iocCtx)
-    : EngravingObject(ElementType::SCORE, nullptr), muse::Contextable(iocCtx),
-    contextConfiguration{this},
-    elementsProvider{this},
-    paletteScoreProvider{this},
-    m_selection(this),
-    m_elementDestroyed(muse::async::makeOpt().disableWaitPendingsOnSend())
+Score::Score(const EngravingServices& services)
+    : EngravingObject(ElementType::SCORE, nullptr),
+    m_services(services),
+    m_selection(this)
 {
-    if (elementsProvider()) {
-        elementsProvider()->reg(this);
-    }
-
     Score::validScores.insert(this);
     m_masterScore = nullptr;
 
@@ -195,7 +187,7 @@ Score::Score(const modularity::ContextPtr& iocCtx)
 }
 
 Score::Score(MasterScore* parent, bool forcePartStyle /* = true */)
-    : Score{parent->iocContext()}
+    : Score{parent->services()}
 {
     Score::validScores.insert(this);
     m_masterScore = parent;
@@ -313,26 +305,6 @@ Score::~Score()
     m_dummy = nullptr;
 }
 
-muse::async::Channel<LoopBoundaryType, unsigned> Score::loopBoundaryTickChanged() const
-{
-    return m_loopBoundaryTickChanged;
-}
-
-void Score::notifyLoopBoundaryTickChanged(LoopBoundaryType type, unsigned ticks)
-{
-    m_loopBoundaryTickChanged.send(type, ticks);
-}
-
-muse::async::Channel<EngravingItem*> Score::elementDestroyed()
-{
-    return m_elementDestroyed;
-}
-
-muse::async::Channel<float> Score::layoutProgressChannel() const
-{
-    return m_layoutProgressChannel;
-}
-
 //---------------------------------------------------------
 //   Score::clone
 //         To create excerpt clone to show when changing PageSettings
@@ -367,7 +339,7 @@ Score* Score::clone()
 
 Score* Score::paletteScore() const
 {
-    return paletteScoreProvider() ? paletteScoreProvider()->paletteScore() : nullptr;
+    return m_services.paletteScoreProvider ? m_services.paletteScoreProvider->paletteScore() : nullptr;
 }
 
 bool Score::isPaletteScore() const
@@ -426,7 +398,6 @@ void Score::onElementDestruction(EngravingItem* e)
 
     score->selection().remove(e);
     score->cmdState().unsetElement(e);
-    score->elementDestroyed().send(e);
 }
 
 //---------------------------------------------------------
@@ -5285,7 +5256,6 @@ const RepeatList& Score::expandedRepeatList() const
 }
 
 TimeSigMap* Score::sigmap() const { return m_masterScore->sigmap(); }
-muse::async::Channel<ScoreChanges> Score::changesChannel() const { return m_masterScore->changesChannel(); }
 
 void Score::setUpdateAll() { m_masterScore->setUpdateAll(); }
 

@@ -7,14 +7,14 @@
 #include "engraving/dom/instrument.h"
 #include "engraving/dom/mscore.h"
 #include "engraving/infrastructure/localfileinfoprovider.h"
-#include "modularity/ioc.h"
+#include "engrave/src/runtime/engine_context.h"
 namespace engrave {
-music::ScoreProject open_mnx(const std::string& bytes) {
+music::ScoreProject open_mnx(music::EngineContext& context, const std::string& bytes) {
     auto doc = mnx::Document::create(bytes.data(), bytes.size());
     if (!mnx::validation::schemaValidate(doc) || doc.global().measures().empty() || doc.parts().empty())
         throw std::invalid_argument("Invalid MNX schema or empty score");
     mu::engraving::ScoreLoad loading;
-    auto owned = mu::engraving::EngravingProject::create(muse::modularity::globalCtx());
+    auto owned = mu::engraving::EngravingProject::create(context.engraving());
     owned->setFileInfoProvider(std::make_shared<mu::engraving::LocalFileInfoProvider>("Untitled.mnx"));
     mu::iex::mnxio::MnxImporter importer(owned->masterScore(), std::move(doc));
     importer.importMnx();

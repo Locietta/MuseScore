@@ -23,17 +23,13 @@
 #ifndef MUSE_MPE_IARTICULATIONPROFILESREPOSITORY_H
 #define MUSE_MPE_IARTICULATIONPROFILESREPOSITORY_H
 
-#include "modularity/imoduleinterface.h"
-#include "async/channel.h"
 #include "io/path.h"
 
 #include "mpetypes.h"
 
 namespace muse::mpe {
-class IArticulationProfilesRepository : MODULE_GLOBAL_INTERFACE
+class IArticulationProfilesRepository
 {
-    INTERFACE_ID(IArticulationProfilesRepository)
-
 public:
     virtual ~IArticulationProfilesRepository() = default;
 
@@ -41,7 +37,6 @@ public:
     virtual ArticulationsProfilePtr defaultProfile(const ArticulationFamily family) const = 0;
     virtual ArticulationsProfilePtr loadProfile(const io::path_t& path) const = 0;
     virtual void saveProfile(const io::path_t& path, const ArticulationsProfilePtr profilePtr) = 0;
-    virtual async::Channel<io::path_t> profileChanged() const = 0;
 };
 }
 

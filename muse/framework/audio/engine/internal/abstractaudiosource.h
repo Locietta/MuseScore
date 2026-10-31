@@ -35,12 +35,10 @@ public:
 
     virtual void setOutputSpec(const OutputSpec& spec) override;
 
-    async::Channel<unsigned int> audioChannelsCountChanged() const override;
 
 protected:
     ProcessMode m_mode = ProcessMode::Undefined;
     OutputSpec m_outputSpec;
-    async::Channel<unsigned int> m_streamsCountChanged;
 };
 }
 

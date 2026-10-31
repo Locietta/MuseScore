@@ -23,7 +23,6 @@
 
 #include <variant>
 
-#include "modularity/imoduleinterface.h"
 
 #include "../types/types.h"
 
@@ -95,10 +94,8 @@ class TimeSig;
 }
 
 namespace mu::engraving::rendering {
-class IScoreRenderer : MODULE_GLOBAL_INTERFACE
+class IScoreRenderer
 {
-    INTERFACE_ID(IScoreRenderer)
-
 public:
     virtual ~IScoreRenderer() = default;
 

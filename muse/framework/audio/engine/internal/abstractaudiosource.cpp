@@ -39,8 +39,3 @@ void AbstractAudioSource::setOutputSpec(const OutputSpec& spec)
 {
     m_outputSpec = spec;
 }
-
-async::Channel<unsigned int> AbstractAudioSource::audioChannelsCountChanged() const
-{
-    return m_streamsCountChanged;
-}

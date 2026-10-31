@@ -9,13 +9,11 @@
 #include "engraving/editing/editstyle.h"
 #include "engraving/editing/transaction/transaction.h"
 #include "engraving/engravingerrors.h"
-#include "modularity/ioc.h"
 
 namespace mu::iex::guitarpro {
 // The public importgtp.h declaration is stale; this is the signature implemented
 // by importgtp.cpp and used by guitarproreader.cpp.
-extern mu::engraving::Err importGTP(mu::engraving::MasterScore*, muse::io::IODevice*,
-                                    const muse::modularity::ContextPtr&, bool experimental);
+extern mu::engraving::Err importGTP(mu::engraving::MasterScore*, muse::io::IODevice*, bool experimental);
 }
 
 namespace music {
@@ -49,7 +47,7 @@ void import_guitarpro_score(mu::engraving::MasterScore* score, const std::string
 
     mu::engraving::Err err = mu::engraving::Err::FileBadFormat;
     try {
-        err = mu::iex::guitarpro::importGTP(score, &buffer, score->iocContext(), false);
+        err = mu::iex::guitarpro::importGTP(score, &buffer, false);
     } catch (const std::exception& e) {
         throw std::runtime_error(std::string("Guitar Pro import failed: ") + e.what());
     }

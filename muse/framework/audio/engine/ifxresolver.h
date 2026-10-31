@@ -24,16 +24,13 @@
 
 #include <memory>
 
-#include "modularity/imoduleinterface.h"
 
 #include "audio/common/audiotypes.h"
 #include "ifxprocessor.h"
 
 namespace muse::audio::fx {
-class IFxResolver : MODULE_GLOBAL_INTERFACE
+class IFxResolver
 {
-    INTERFACE_ID(IFxResolver)
-
 public:
     virtual ~IFxResolver() = default;
 

@@ -232,7 +232,7 @@ class MusicXmlParserLyric
 {
 public:
     MusicXmlParserLyric(const LyricNumberHandler lyricNumberHandler, muse::XmlStreamReader& e, engraving::Score* score,
-                        MusicXmlLogger* logger, bool isVoiceStaff);
+                        const IMusicXmlConfiguration& configuration, MusicXmlLogger* logger, bool isVoiceStaff);
     std::set<engraving::Lyrics*> extendedLyrics() const { return m_extendedLyrics; }
     std::map<int, engraving::Lyrics*> numberedLyrics() const { return m_numberedLyrics; }
     std::vector<engraving::Sticking*> inferredStickings() const { return m_inferredStickings; }
@@ -243,6 +243,7 @@ private:
     const LyricNumberHandler m_lyricNumberHandler;
     muse::XmlStreamReader& m_e;
     const engraving::Score* m_score = nullptr;            // the score
+    const IMusicXmlConfiguration& m_configuration;
     MusicXmlLogger* m_logger = nullptr;            // Error logger
     std::map<int, engraving::Lyrics*> m_numberedLyrics;   // lyrics with valid number
     std::set<engraving::Lyrics*> m_extendedLyrics;        // lyrics with the extend flag set
@@ -411,6 +412,7 @@ class MusicXmlParserPass2
 {
 public:
     MusicXmlParserPass2(engraving::Score* score, MusicXmlParserPass1& pass1, MusicXmlLogger* logger);
+    const IMusicXmlConfiguration* configuration() const { return m_pass1.configuration(); }
     engraving::Err parse(const muse::ByteArray& data);
     muse::String errors() const { return m_errors; }
 
@@ -557,6 +559,7 @@ class MusicXmlParserDirection
 public:
     MusicXmlParserDirection(muse::XmlStreamReader& e, engraving::Score* score, MusicXmlParserPass1& pass1, MusicXmlParserPass2& pass2,
                             MusicXmlLogger* logger);
+    const IMusicXmlConfiguration* configuration() const { return m_pass1.configuration(); }
     void direction(const muse::String& partId, engraving::Measure* measure, const engraving::Fraction& tick, MusicXmlSpannerMap& spanners,
                    DelayedDirectionsList& delayedDirections, InferredFingeringsList& inferredFingerings, HarmonyMap& harmonyMap,
                    bool& measureHasCoda, SegnoStack& segnos);
@@ -702,7 +705,8 @@ class MusicXmlInferredFingering
 {
 public:
     MusicXmlInferredFingering(double totalY, engraving::EngravingItem* element, muse::String& text, engraving::track_idx_t track,
-                              muse::String placement, engraving::Measure* measure, engraving::Fraction tick);
+                              muse::String placement, engraving::Measure* measure, engraving::Fraction tick,
+                              bool needUseDefaultFont);
     double totalY() const { return m_totalY; }
     engraving::Fraction tick() const { return m_tick; }
     engraving::track_idx_t track() const { return m_track; }
@@ -719,6 +723,7 @@ private:
     muse::String m_placement;
     engraving::Measure* m_measure;
     engraving::Fraction m_tick;
+    bool m_needUseDefaultFont = false;
 
     void roundTick(engraving::Measure* measure);
     void addToNotes(std::vector<engraving::Note*>& notes) const;
