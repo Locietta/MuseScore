@@ -26,7 +26,8 @@ def checked(data, entry, name):
 
 
 def install(destination, verify=False):
-    manifest_bytes = MANIFEST.read_bytes()
+    # Git checkouts may use CRLF; the installed manifest is portable LF UTF-8.
+    manifest_bytes = MANIFEST.read_text(encoding='utf-8').encode('utf-8')
     manifest = json.loads(manifest_bytes)
     if manifest['version'] != 1:
         raise ValueError('Unsupported asset manifest version')

@@ -9,6 +9,18 @@ import install_assets as assets
 
 
 class InstallTests(unittest.TestCase):
+    def test_manifest_is_portable_across_checkout_newlines(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            manifest = root / 'manifest.json'
+            manifest.write_bytes(b'{\r\n  "version": 1,\r\n  "files": {}\r\n}\r\n')
+            with patch.object(assets, 'MANIFEST', manifest):
+                assets.install(root / 'installed')
+                expected = manifest.read_bytes().replace(b'\r\n', b'\n')
+                self.assertEqual((root / 'installed/assets.json').read_bytes(), expected)
+                manifest.write_bytes(expected)
+                assets.install(root / 'installed', verify=True)
+
     def test_install_verify_and_failures(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
