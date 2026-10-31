@@ -1344,7 +1344,7 @@ TEST_F(Engraving_PartsTests, partTies) {
 }
 
 TEST_F(Engraving_PartsTests, partVisibleTracks) {
-    Score* score = ScoreRW::readScore(PARTS_DATA_DIR + u"part-visible-tracks.mscx");
+    Score* score = ScoreRW::readScore(PARTS_DATA_DIR + u"part-visible-tracks.mscz");
     ASSERT_TRUE(score);
 
     Score* part = nullptr;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <museScore version="5.00">
   <Score>
-    <eid>L_L</eid>
+    <eid>ecWMw45ojWP_ecWMw45ojWP</eid>
     <name>Flute</name>
     <Division>480</Division>
     <Style>
@@ -13,10 +13,10 @@
     <showMargins>0</showMargins>
     <metaTag name="partName">Flute</metaTag>
     <Part id="1">
-      <eid>M_M</eid>
+      <eid>fcWMw45ojWP_fcWMw45ojWP</eid>
       <Staff>
-        <eid>N_N</eid>
-        <linkedTo>D_D</linkedTo>
+        <eid>gcWMw45ojWP_gcWMw45ojWP</eid>
+        <linkedTo>IvZZHFzSKgO_om1CRoYRByM</linkedTo>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
@@ -40,44 +40,44 @@
     <Staff id="1">
       <VBox>
         <height>10</height>
-        <eid>O_O</eid>
-        <linkedTo>E_E</linkedTo>
+        <eid>hcWMw45ojWP_hcWMw45ojWP</eid>
+        <linkedTo>dcWMw45ojWP_dcWMw45ojWP</linkedTo>
         <Text>
           <style>instrument_excerpt</style>
-          <eid>P_P</eid>
+          <eid>icWMw45ojWP_icWMw45ojWP</eid>
           <text>Flute</text>
           </Text>
         </VBox>
       <Measure>
-        <eid>Q_Q</eid>
+        <eid>jcWMw45ojWP_jcWMw45ojWP</eid>
         <voice>
           <KeySig>
-            <eid>R_R</eid>
-            <linkedTo>G_G</linkedTo>
+            <eid>kcWMw45ojWP_kcWMw45ojWP</eid>
+            <linkedTo>oMnycG9bG0_ymfiMXeTPLC</linkedTo>
             <concertKey>0</concertKey>
             </KeySig>
           <TimeSig>
-            <eid>S_S</eid>
-            <linkedTo>H_H</linkedTo>
+            <eid>lcWMw45ojWP_lcWMw45ojWP</eid>
+            <linkedTo>oL1fsuF02dM_CSQi1/JxHqG</linkedTo>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Dynamic>
             <subtype>mf</subtype>
             <velocity>80</velocity>
-            <eid>T_T</eid>
-            <linkedTo>I_I</linkedTo>
+            <eid>mcWMw45ojWP_mcWMw45ojWP</eid>
+            <linkedTo>XYO4+3NnUlD_q7O2ZuMNfsH</linkedTo>
             <positionLinkedToMaster>0</positionLinkedToMaster>
             <appearanceLinkedToMaster>0</appearanceLinkedToMaster>
             <musicalSymbolsScale>1.2</musicalSymbolsScale>
             </Dynamic>
           <Chord>
-            <eid>U_U</eid>
-            <linkedTo>J_J</linkedTo>
+            <eid>ncWMw45ojWP_ncWMw45ojWP</eid>
+            <linkedTo>6ofxKW6zS2M_ccWMw45ojWP</linkedTo>
             <durationType>whole</durationType>
             <Note>
-              <eid>V_V</eid>
-              <linkedTo>K_K</linkedTo>
+              <eid>ocWMw45ojWP_ocWMw45ojWP</eid>
+              <linkedTo>Zuj+/mEgSmL_1FKt4bJOCGK</linkedTo>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>

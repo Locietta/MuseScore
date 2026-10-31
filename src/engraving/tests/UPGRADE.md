@@ -173,3 +173,18 @@ Same baseline engine and method; MSCZ inputs remain MSCZ archives.
 - src/engraving/tests/playback/playbackcontext_data/sound_flags/cancel_playing_technique.mscx: 5a63a4bb0a93fc8f8b33263b146e4c5c259441e034eb62226bf741ec24140d69 -> bf34f080ff7c3318c19169f5bb7b001ceca347a9654a5e7143248ca5b921aef6
 - src/engraving/tests/playback/playbackcontext_data/sound_flags/sound_flags.mscx: 7bf6e32ac8c78b2a265527f306c217e403c05ff37ce8a662000a2245298d3652 -> 42a0651e653f3a61a030411fa87709d6d4286324a15c7bb7e1800f7be3e89cbb
 - src/engraving/tests/playback/playbackcontext_data/sound_flags/sound_flags_measure_repeats.mscx: af373aa89294957769295740bfc212424b08d0c266e677c27a08cd22a5ab8fdb -> ddd09405ef9a6f5d1cb7cfeec44e13112dbfacc4053242a22069ccb8b5e8a889
+
+part-visible-tracks.mscx was converted to part-visible-tracks.mscz from the
+original engrave-4 input, preserving its inline excerpt (current MSCX omits it).
+Reference outputs for upgraded part inputs were regenerated with the baseline
+engine; exact SHA256 changes are recorded below.
+
+- src\engraving\tests\parts_data\linked-ties-1.mscx: 40896d4f2bc59ff964e70e5bf2022254c3c78c3740943cc14ab22cb2905c5102 -> ee4fcfc55ca8f66fe6740e35a4ed6c7bba6c1db0f3a10b5b131769ad7c75703c
+- src\engraving\tests\parts_data\linked-ties-parts.mscx: 5e06b437c72eef2fca29132370a7be9656a7bd6563adcf4789688bb18f2bf85a -> fb5faeb4a9ed49d9cadba74bc786f0cd4387f309067b560924dc0b4e85cddaa3
+- src\engraving\tests\parts_data\partExclusion-part-0.mscx: f8923b346a55c5a5da07f46fe159e0a3933f1af97b78953ec01343df894e9dbd -> 3753ec7cc33e5bbbf437126e3b36d22ea5dd05b144cceee789d0a7537a215cc2
+- src\engraving\tests\parts_data\partExclusion-part-1.mscx: f123ba9b4843ad077dba9cf25159392d0fed32a74cc9fa2546826a16dee7772e -> 5cd5f29bcbc84b18a90e9160d8b8b2ee7732b7a3d4c56507e1a68ba3a4c99481
+- src\engraving\tests\parts_data\partPropertyLinking-part-0.mscx: c84f7d39053c266489060360e3be55abaf631347478d8db563b42575aeeaf15d -> 95a912c79162bbe0d196c92c731d3dee5a18b3ddcb6989d409e8c97b248d9d2d
+- src\engraving\tests\parts_data\partPropertyLinking-part-1.mscx: 26d6ba52fad93f62799a180f7829956e16778941728def758679a9ce0df3c258 -> 3b64cf0bfb2742216f4f9744e2d4d3846de9ed4b274694bcf3415c3fd85be5ee
+- src\engraving\tests\parts_data\partStyle-score-ref.mscx: 90a27489cca478e0e03570a7f58067a7f789cb80fe53aa2cb6d2fde074dc2fa4 -> 10b5efa1b5234829f8cb1a8a8f6e4bdc4073ee84c28d889f9584ca2b7fda396d
+- src\engraving\tests\parts_data\partStyle-score-reload-ref.mscx: 02664f31d5a3c3bd58622f7ff2bd47261a1c04bb51617285c8db0cc800f395ab -> 9177fe058cd9567a5156e53a0f08cf9d80a3ce2a7672067b3aa764ca37e5a5d5
+- src\engraving\tests\parts_data\voices-ref.mscx: d1c08a0e82e7ed9061ec70858e8211704864fcb22066cbadb480a2b899cd26d4 -> c7e1bd42fff4e8e3c610a618d050ba4611c6eb755769cd4791adc1fed9e4fa7f
