@@ -705,7 +705,7 @@ void MnxImporter::createVolta(engraving::Measure* measure, const mnx::global::En
             if (!text.empty()) {
                 text += u", ";
             }
-            text += String("%1").arg(number);
+            text += String(u"%1").arg(number);
         }
         text += u".";
         volta->setText(text);
