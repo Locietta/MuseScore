@@ -27,11 +27,6 @@
 #include "modularity/imoduleinterface.h"
 #include "async/channel.h"
 
-#ifndef NO_QT_SUPPORT
-#include <QEvent>
-
-class QObject;
-#endif
 
 namespace muse {
 class IApplicationEventController : MODULE_GLOBAL_INTERFACE
@@ -41,19 +36,5 @@ public:
 
     virtual ~IApplicationEventController() = default;
 
-#ifndef NO_QT_SUPPORT
-
-    struct EventData {
-        QObject* watched = nullptr;
-        QEvent* event = nullptr;
-    };
-
-    virtual async::Channel<EventData> eventReceived() const = 0;
-    virtual void setPendingEventTypes(const std::vector<QEvent::Type>& types) = 0;
-
-    //! NOTE The watched object is deliberately not returned.
-    //! By the time the events are taken it may already be destroyed.
-    virtual std::vector<std::unique_ptr<QEvent> > takePendingEvents() = 0;
-#endif
 };
 }

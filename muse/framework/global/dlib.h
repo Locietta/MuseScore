@@ -23,7 +23,7 @@
 #ifndef MUSE_GLOBAL_DLIB_H
 #define MUSE_GLOBAL_DLIB_H
 
-#if defined(Q_OS_WIN) && !defined(__MINGW64__)
+#if defined(_WIN32) && !defined(__MINGW64__)
 #include <windows.h>
 #else
 #include <dlfcn.h>
@@ -36,7 +36,7 @@
 namespace muse {
 inline void* loadLib(const io::path_t& path)
 {
-#if defined(Q_OS_WIN) && !defined(__MINGW64__)
+#if defined(_WIN32) && !defined(__MINGW64__)
     return LoadLibrary(io::toNativeSeparators(path).toStdWString().data());
 #else
     return dlopen(io::toNativeSeparators(path).toStdString().data(), RTLD_LAZY);
@@ -45,7 +45,7 @@ inline void* loadLib(const io::path_t& path)
 
 inline void* getLibFunc(void* libHandle, const char* funcName)
 {
-#if defined(Q_OS_WIN) && !defined(__MINGW64__)
+#if defined(_WIN32) && !defined(__MINGW64__)
     return GetProcAddress((HINSTANCE)libHandle, funcName);
 #else
     return dlsym(libHandle, funcName);
@@ -54,7 +54,7 @@ inline void* getLibFunc(void* libHandle, const char* funcName)
 
 inline void closeLib(void* libHandle)
 {
-#if defined(Q_OS_WIN) && !defined(__MINGW64__)
+#if defined(_WIN32) && !defined(__MINGW64__)
     UNUSED(libHandle);
     return;
 #else

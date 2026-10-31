@@ -201,18 +201,6 @@ void PaintDebugger::drawTiledPixmap(const RectF& rect, const Pixmap& pm, const P
     m_real->drawTiledPixmap(rect, pm, offset);
 }
 
-#ifndef NO_QT_SUPPORT
-void PaintDebugger::drawPixmap(const PointF& point, const QPixmap& pm)
-{
-    m_real->drawPixmap(point, pm);
-}
-
-void PaintDebugger::drawTiledPixmap(const RectF& rect, const QPixmap& pm, const PointF& offset)
-{
-    m_real->drawTiledPixmap(rect, pm, offset);
-}
-
-#endif
 
 bool PaintDebugger::hasClipping() const
 {

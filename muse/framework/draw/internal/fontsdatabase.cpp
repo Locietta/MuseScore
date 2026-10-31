@@ -23,10 +23,6 @@
 
 #include "muse_framework_config.h"
 
-#ifdef MUSE_MODULE_DRAW_USE_QTFONTMETRICS
-#include <QFontDatabase>
-#include <QFont>
-#endif
 
 #include "global/io/file.h"
 
@@ -35,9 +31,7 @@
 using namespace muse;
 using namespace muse::draw;
 
-#ifndef MUSE_MODULE_DRAW_USE_QTFONTMETRICS
 static int s_fontID = -1;
-#endif
 
 void FontsDatabase::setDefaultFont(Font::Type type, const FontDataKey& key)
 {
@@ -51,9 +45,6 @@ void FontsDatabase::insertSubstitution(const String& familyName, const String& s
     FontDataKey substituteKey(substituteName);
     m_familySubstitutions[familyKey].push_back(substituteKey);
 
-#ifdef MUSE_MODULE_DRAW_USE_QTFONTMETRICS
-    QFont::insertSubstitution(familyName, substituteName);
-#endif
 
     m_changed.notify();
 }
@@ -75,12 +66,6 @@ void FontsDatabase::removeSubstitutions(const String& familyName, const std::vec
         return;
     }
 
-#ifdef MUSE_MODULE_DRAW_USE_QTFONTMETRICS
-    QFont::removeSubstitutions(familyName);
-    for (const FontDataKey& key : substitutes) {
-        QFont::insertSubstitution(familyName, key.family().id().toQString());
-    }
-#endif
 
     if (substitutes.empty()) {
         m_familySubstitutions.erase(it);
@@ -131,17 +116,7 @@ int FontsDatabase::addFont(const FontDataKey& key, std::shared_ptr<io::IODevice>
         return -1;
     }
 
-#ifdef MUSE_MODULE_DRAW_USE_QTFONTMETRICS
-    const int id = filePath.empty()
-                   ? QFontDatabase::addApplicationFontFromData(data.toQByteArray())
-                   : QFontDatabase::addApplicationFont(QString::fromStdString(filePath));
-    if (id < 0) {
-        LOGW() << "failed register font: " << key.family().id();
-        return id;
-    }
-#else
     const int id = ++s_fontID;
-#endif
 
     auto it = m_fonts.find(key);
     if (it != m_fonts.end()) {
@@ -169,13 +144,7 @@ void FontsDatabase::removeFont(const FontDataKey& key)
 
 void FontsDatabase::release(const FontInfo& fi)
 {
-#ifdef MUSE_MODULE_DRAW_USE_QTFONTMETRICS
-    if (fi.valid()) {
-        QFontDatabase::removeApplicationFont(fi.id);
-    }
-#else
     UNUSED(fi);
-#endif
 }
 
 FontDataKey FontsDatabase::actualFont(const FontDataKey& requireKey, Font::Type type) const

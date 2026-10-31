@@ -1,7 +1,8 @@
 -- Qt-free xmake build for the engrave engine library (MuseScore 5.0 sources).
 --
 -- Standalone build:
---   xmake f -m release && xmake build -a
+--   xmake f -m release && xmake build
+-- Tests: xmake f --engrave_tests=y && xmake build c0_gate
 --
 -- The engine targets themselves live in xmake/engrave.lua, which is also the
 -- file the musescore-mcp superproject includes from its pinned vendor/musescore
@@ -79,35 +80,21 @@ else
     target_end()
 end
 
--- Qt platform macros normally come from <QtGlobal>; the engine branches on them
--- under NO_QT_SUPPORT.  Defined once for every target compiled from the engine:
---   engraving/dom/masterscore.cpp        platform metaTag
---   framework/global/io/fileinfo.cpp     Windows drive-letter branches
---   framework/global/io/dir.cpp          Windows separator normalization
---   framework/global/runtime.cpp         POSIX thread names
---   engraving/editing/textedit.cpp and
---   engraving/editing/editdata.h         platform key handling
---   engraving/rendering/score/tdraw.cpp
--- The compiled files behind those branches include no Qt headers.  The
--- superproject sets the same values project-wide for its host targets.
+-- Native platform/toolchain configuration.
 if is_plat("windows") then
     set_runtimes("MD")
     set_exceptions("cxx")
     add_defines("WIN32", "_WINDOWS", "NOMINMAX", "_USE_MATH_DEFINES", "UNICODE", "_UNICODE",
         "_CRT_SECURE_NO_WARNINGS", "_CRT_NONSTDC_NO_WARNINGS",
         "_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING")
-    add_defines("Q_OS_WIN", "Q_OS_WIN32", "Q_OS_WINDOWS")
-    if is_arch("x64", "x86_64") then
-        add_defines("Q_OS_WIN64")
-    end
+    -- C4 owns audio headers that still consume this alias.
+    add_defines("Q_OS_WIN")
     add_cxflags("/utf-8", "/bigobj", "/Zc:__cplusplus", {tools = {"cl", "clang_cl"}})
     add_cflags("/utf-8", {tools = {"cl", "clang_cl"}})
 elseif is_plat("macosx") then
-    add_defines("Q_OS_MAC", "Q_OS_MACOS", "Q_OS_DARWIN", "Q_OS_UNIX")
     add_cxflags("-fPIC", "-pthread")
     add_ldflags("-pthread")
 elseif is_plat("linux") then
-    add_defines("Q_OS_LINUX", "Q_OS_UNIX")
     add_cxflags("-fPIC", "-pthread")
     add_ldflags("-pthread")
 else

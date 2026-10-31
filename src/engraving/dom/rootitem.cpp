@@ -25,9 +25,6 @@
 #include "page.h"
 #include "score.h"
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-#include "../accessibility/accessibleroot.h"
-#endif
 
 using namespace mu::engraving;
 
@@ -57,15 +54,4 @@ EngravingItemList RootItem::accessibleChildren() const
 
 void RootItem::init()
 {
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-    setupAccessible();
-#endif
 }
-
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-AccessibleItemPtr RootItem::createAccessible()
-{
-    return std::make_shared<AccessibleRoot>(this, AccessibleItem::Group);
-}
-
-#endif

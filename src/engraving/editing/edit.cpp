@@ -4786,7 +4786,6 @@ void Score::undoAddCR(ChordRest* cr, Measure* measure, const Fraction& tick)
         newcr->setTrack(linkedTrack);
         newcr->setOwnershipParent(seg);
 
-#ifndef QT_NO_DEBUG
         if (newcr->isChord()) {
             Chord* chord = toChord(newcr);
             // setTpcFromPitch needs to know the note tick position
@@ -4796,7 +4795,6 @@ void Score::undoAddCR(ChordRest* cr, Measure* measure, const Fraction& tick)
                 assert(note->tpc() != Tpc::TPC_INVALID);
             }
         }
-#endif
         // Climb up the (possibly nested) tuplets from this chordRest
         // Make sure all tuplets are cloned and correctly nested
         DurationElement* elementBelow = cr;

@@ -29,9 +29,6 @@
 
 #include "rgba.h"
 
-#ifndef NO_QT_SUPPORT
-#include <QColor>
-#endif
 
 namespace muse {
 class Color
@@ -44,16 +41,10 @@ public:
 
     Color(const char* color);
 
-#ifndef NO_QT_SUPPORT
-    Color(const QColor& color);
-#endif
 
     ~Color() = default;
 
     Color& operator=(const Color& other);
-#ifndef NO_QT_SUPPORT
-    Color& operator=(const QColor& other);
-#endif
 
     bool operator<(const Color& other) const;
 
@@ -83,10 +74,6 @@ public:
     int blue() const;
     int alpha() const;
 
-#ifndef NO_QT_SUPPORT
-    static Color fromQColor(const QColor& color);
-    QColor toQColor() const;
-#endif
 
     static constexpr int DEFAULT_ALPHA = 255;
 
@@ -142,35 +129,4 @@ inline Color blendColors(const Color& c1, const Color& c2, float alpha)
     return Color(r, g, b, 255);
 }
 
-#ifndef NO_QT_SUPPORT
-inline QColor blendQColors(const QColor& c1, const QColor& c2)
-{
-    float alpha1 = c1.alphaF();
-    float alpha2 = c2.alphaF();
-
-    float alphaOut = alpha2 + alpha1 * (1 - alpha2);
-
-    if (is_zero(alphaOut)) {
-        return QColor(0, 0, 0, 0);
-    }
-    int r = (c2.red() * alpha2 + c1.red() * alpha1 * (1 - alpha2)) / alphaOut;
-    int g = (c2.green() * alpha2 + c1.green() * alpha1 * (1 - alpha2)) / alphaOut;
-    int b = (c2.blue() * alpha2 + c1.blue() * alpha1 * (1 - alpha2)) / alphaOut;
-
-    return QColor(r, g, b, alphaOut * 255);
-}
-
-inline QColor blendQColors(const QColor& c1, const QColor& c2, float alpha)
-{
-    float alpha1 = 1.0;
-    float alpha2 = alpha;
-
-    int r = (c2.red() * alpha2 + c1.red() * alpha1 * (1 - alpha2));
-    int g = (c2.green() * alpha2 + c1.green() * alpha1 * (1 - alpha2));
-    int b = (c2.blue() * alpha2 + c1.blue() * alpha1 * (1 - alpha2));
-
-    return QColor(r, g, b, 255);
-}
-
-#endif
 }

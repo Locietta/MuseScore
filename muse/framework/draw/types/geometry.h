@@ -32,14 +32,6 @@
 #include "global/logstream.h"
 #include "global/types/number.h"
 
-#ifndef NO_QT_SUPPORT
-#include <QPair>
-#include <QRectF>
-#include <QSizeF>
-#include <QPointF>
-#include <QLineF>
-#include <QPolygonF>
-#endif
 
 namespace muse {
 template<typename T>
@@ -112,13 +104,6 @@ public:
         return copy;
     }
 
-#ifndef NO_QT_SUPPORT
-    static PointX<T> fromQPointF(const QPointF& p) { return PointX<T>(p.x(), p.y()); }
-    inline QPointF toQPointF() const { return QPointF(m_x, m_y); }
-    inline QPoint toQPoint() const { return QPoint(m_x, m_y); }
-
-    inline PointX<T>& operator=(const QPointF& p) { m_x = p.x(); m_y = p.y(); return *this; }
-#endif
 
 private:
     //! NOTE We should not swap fields
@@ -153,9 +138,6 @@ inline PointX<T> operator/(const PointX<T>& p, T c) { return PointX<T>(p.x() / c
 using PointF = PointX<double>;
 using Point = PointX<int>;
 
-#ifndef NO_QT_SUPPORT
-inline QPointF operator+(const QPointF& p1, const PointF& p2) { return QPointF(p1.x() + p2.x(), p1.y() + p2.y()); }
-#endif
 
 // ====================================
 // PairF
@@ -198,10 +180,6 @@ public:
     inline void translate(const PointX<T>& point) { m_p1 += point; m_p2 += point; }
     inline LineX<T> translated(const PointX<T>& p) const { return LineX<T>(m_p1 + p, m_p2 + p); }
 
-#ifndef NO_QT_SUPPORT
-    static LineX<T> fromQLineF(const QLineF& l) { return LineX<T>(l.x1(), l.y1(), l.x2(), l.y2()); }
-    inline QLineF toQLineF() const { return QLineF(m_p1.toQPointF(), m_p2.toQPointF()); }
-#endif
 
 private:
     PointX<T> m_p1;
@@ -235,10 +213,6 @@ public:
 
     inline SizeX<T> transposed() const { return SizeX<T>(m_h, m_w); }
 
-#ifndef NO_QT_SUPPORT
-    static SizeX<T> fromQSizeF(const QSizeF& s) { return SizeX<T>(s.width(), s.height()); }
-    inline QSizeF toQSizeF() const { return QSizeF(m_w, m_h); }
-#endif
 
 private:
     number_t<T> m_w;
@@ -264,9 +238,6 @@ public:
     ScaleF(double w, double h)
         : SizeX<double>(w, h) {}
 
-#ifndef NO_QT_SUPPORT
-    static ScaleF fromQSizeF(const QSizeF& s) { return ScaleF(s.width(), s.height()); }
-#endif
 };
 
 // ====================================
@@ -383,15 +354,6 @@ public:
 
     RectX<T> normalized() const;
 
-#ifndef NO_QT_SUPPORT
-    static RectX<T> fromQRectF(const QRectF& r) { return RectX<T>(r.x(), r.y(), r.width(), r.height()); }
-    inline QRectF toQRectF() const { return QRectF(m_x, m_y, m_w, m_h); }
-    inline QRect toQRect() const { return QRect(m_x, m_y, m_w, m_h); }
-
-    inline RectX<T>& operator=(const QRectF& r) { m_x = r.x(); m_y = r.y(); m_w = r.width(); m_h = r.height(); return *this; }
-
-    inline RectX<T> united(const QRectF& r) const { return united(RectX<T>(r)); }
-#endif
 
 private:
     number_t<T> m_x;
@@ -420,10 +382,6 @@ class Rect : public RectX<int>
 public:
     inline Rect()
         :  RectX<int>() {}
-#ifndef NO_QT_SUPPORT
-    inline Rect(const QRect& r)
-        : RectX<int>(r.x(), r.y(), r.width(), r.height()) {}
-#endif
     inline Rect(int x, int y, int w, int h)
         : RectX<int>(x, y, w, h) {}
 

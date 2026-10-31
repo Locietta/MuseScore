@@ -77,10 +77,6 @@ public:
     void drawPixmap(const muse::PointF& p, const muse::draw::Pixmap& pm) override;
     void drawTiledPixmap(const muse::RectF& rect, const muse::draw::Pixmap& pm, const muse::PointF& offset = muse::PointF()) override;
 
-#ifndef NO_QT_SUPPORT
-    void drawPixmap(const muse::PointF& point, const QPixmap& pm) override;
-    void drawTiledPixmap(const muse::RectF& rect, const QPixmap& pm, const muse::PointF& offset = muse::PointF()) override;
-#endif
 
     bool hasClipping() const override;
 

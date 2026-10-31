@@ -100,21 +100,3 @@ std::string ID::toStdString() const
 {
     return std::to_string(m_id);
 }
-
-#ifndef NO_QT_SUPPORT
-ID::ID(const QString& id)
-    : m_id(id.toULongLong())
-{
-}
-
-ID::ID(const QVariant& id)
-    : m_id(id.toULongLong())
-{
-}
-
-QString ID::toQString() const
-{
-    return QString::number(m_id);
-}
-
-#endif

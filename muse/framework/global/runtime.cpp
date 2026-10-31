@@ -22,14 +22,14 @@
 
 #include "runtime.h"
 
-#if defined(Q_OS_LINUX) || defined(Q_OS_MACOS)
+#if defined(__linux__) || defined(__APPLE__)
 #include <pthread.h>
 #endif
-#if defined(Q_OS_FREEBSD)
+#if defined(__FreeBSD__)
 #include <pthread_np.h> // Needed for pthread_setname_np on FreeBSD
 #endif
 
-#ifdef Q_OS_LINUX
+#ifdef __linux__
 #include "log.h"
 #endif
 
@@ -38,7 +38,7 @@ static thread_local std::string s_threadName;
 void muse::runtime::setThreadName(const std::string& name)
 {
     s_threadName = name;
-#if defined(Q_OS_LINUX) || defined(Q_OS_FREEBSD)
+#if defined(__linux__) || defined(__FreeBSD__)
     // Set thread name through pthreads to aid debuggers that display such names.
     // Thread names are limited to 16 bytes on Linux, including the
     // terminating null.
@@ -47,7 +47,7 @@ void muse::runtime::setThreadName(const std::string& name)
     if (pthread_setname_np(pthread_self(), truncated_name.c_str()) > 0) {
         LOGW() << "Couldn't set thread name through pthreads";
     }
-#elif defined(Q_OS_MACOS)
+#elif defined(__APPLE__)
     pthread_setname_np(name.c_str());
 #endif
 }

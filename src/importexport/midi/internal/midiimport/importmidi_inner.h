@@ -34,7 +34,6 @@
 // native host (NO_QT_SUPPORT).  Keep the debug macros local to this module
 // instead of pulling in QtGlobal for the Qt-free build.  Release builds retain
 // the upstream behavior: assertions compile away.
-#ifdef NO_QT_SUPPORT
 #ifndef Q_ASSERT
 #define Q_ASSERT(condition) assert(condition)
 #endif
@@ -43,7 +42,6 @@
 #endif
 #ifndef Q_UNUSED
 #define Q_UNUSED(value) (void)(value)
-#endif
 #endif
 
 #include "importmidi_chord.h"

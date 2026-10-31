@@ -2247,17 +2247,6 @@ void CairoPainter::drawTiledPixmap(const RectF& rect, const Pixmap& pm, const Po
     m_impl->drawTiledPixmap(rect, pm, offset);
 }
 
-#ifndef NO_QT_SUPPORT
-void CairoPainter::drawPixmap(const PointF&, const QPixmap&)
-{
-    throw std::runtime_error("CairoPainter: QPixmap drawing is not supported by the Qt-free Cairo backend");
-}
-
-void CairoPainter::drawTiledPixmap(const RectF&, const QPixmap&, const PointF&)
-{
-    throw std::runtime_error("CairoPainter: tiled QPixmap drawing is not supported by the Qt-free Cairo backend");
-}
-#endif
 
 bool CairoPainter::hasClipping() const
 {

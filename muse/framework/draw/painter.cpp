@@ -24,9 +24,6 @@
 #include "types/brush.h"
 #include "types/painterpath.h"
 
-#ifndef NO_QT_SUPPORT
-#include "internal/qpainterprovider.h"
-#endif
 
 #include "log.h"
 
@@ -42,22 +39,6 @@ Painter::Painter(IPaintProviderPtr provider, const std::string& name)
     init();
 }
 
-#ifndef NO_QT_SUPPORT
-Painter::Painter(QPaintDevice* dp, const std::string& name)
-    : m_name(name)
-{
-    m_provider = QPainterProvider::make(dp);
-    init();
-}
-
-Painter::Painter(QPainter* qp, const std::string& name, bool ownsQPainter)
-    : m_name(name)
-{
-    m_provider = QPainterProvider::make(qp, ownsQPainter);
-    init();
-}
-
-#endif
 
 Painter::~Painter()
 {
@@ -493,24 +474,6 @@ void Painter::drawTiledPixmap(const RectF& rect, const Pixmap& pm, const PointF&
     }
 }
 
-#ifndef NO_QT_SUPPORT
-void Painter::drawPixmap(const PointF& point, const QPixmap& pm)
-{
-    m_provider->drawPixmap(point, pm);
-    if (extended) {
-        extended->drawPixmap(point, pm);
-    }
-}
-
-void Painter::drawTiledPixmap(const RectF& rect, const QPixmap& pm, const PointF& offset)
-{
-    m_provider->drawTiledPixmap(rect, pm, offset);
-    if (extended) {
-        extended->drawTiledPixmap(rect, pm, offset);
-    }
-}
-
-#endif
 
 Painter::State& Painter::editableState()
 {

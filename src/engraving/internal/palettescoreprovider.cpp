@@ -21,9 +21,6 @@
  */
  #include "palettescoreprovider.h"
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-#include "../accessibility/accessibleitem.h"
-#endif
 
  #include "../compat/scoreaccess.h"
  #include "../infrastructure/localfileinfoprovider.h"
@@ -43,15 +40,9 @@ PaletteScoreProvider::~PaletteScoreProvider()
 
 void PaletteScoreProvider::init()
 {
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-    AccessibleItem::enabled = false;
-#endif
     m_paletteScore = compat::ScoreAccess::createMasterScore(iocContext());
     m_paletteScore->setFileInfoProvider(std::make_shared<LocalFileInfoProvider>(""));
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-    AccessibleItem::enabled = true;
-#endif
 
     if (m_paletteScore->elementsProvider()) {
         m_paletteScore->elementsProvider()->unreg(m_paletteScore);

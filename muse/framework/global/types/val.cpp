@@ -27,9 +27,6 @@
 #include <iomanip>
 #include <string_view>
 
-#ifndef NO_QT_SUPPORT
-#include <QMetaType>
-#endif
 
 #include "log.h"
 
@@ -349,97 +346,6 @@ bool Val::operator <(const Val& v) const
     return m_val < v.m_val;
 }
 
-#ifndef NO_QT_SUPPORT
-Val::Val(const QString& str)
-    : m_val(str.toStdString()), m_type(Type::String) {}
-
-Val::Val(const QColor& color)
-    : m_val(color.name().toStdString()), m_type(Type::Color) {}
-
-QString Val::toQString() const
-{
-    return QString::fromStdString(toString());
-}
-
-QColor Val::toQColor() const
-{
-    std::string str = toString();
-    return QColor(str.c_str());
-}
-
-QVariant Val::toQVariant() const
-{
-    switch (m_type) {
-    case Val::Type::Undefined: return QVariant();
-    case Val::Type::Bool: return QVariant(toBool());
-    case Val::Type::Int: return QVariant(toInt());
-    case Val::Type::Int64: return QVariant(static_cast<qlonglong>(toInt64()));
-    case Val::Type::Double: return QVariant(toDouble());
-    case Val::Type::String: return QVariant(toQString());
-    case Val::Type::Color: return QVariant(toQColor());
-    case Val::Type::List: {
-        QVariantList vl;
-        ValList l = toList();
-        for (const Val& v : l) {
-            vl << v.toQVariant();
-        }
-        return vl;
-    }
-    case Val::Type::Map: {
-        QVariantMap vm;
-        ValMap m = toMap();
-        for (const auto& p : m) {
-            vm.insert(QString::fromStdString(p.first), p.second.toQVariant());
-        }
-        return vm;
-    }
-    }
-    return QVariant();
-}
-
-Val Val::fromQVariant(const QVariant& var)
-{
-    if (!var.isValid()) {
-        return Val();
-    }
-
-    switch (var.typeId()) {
-    case QMetaType::Bool: return Val(var.toBool());
-    case QMetaType::Int: return Val(var.toInt());
-    case QMetaType::UInt: return Val(var.toInt());
-    case QMetaType::LongLong: return Val(static_cast<int64_t>(var.toLongLong()));
-    case QMetaType::ULongLong: return Val(static_cast<int64_t>(var.toLongLong()));
-    case QMetaType::Double: return Val(var.toDouble());
-    case QMetaType::QString: return Val(var.toString().toStdString());
-    case QMetaType::QVariantList:
-    case QMetaType::QStringList: {
-        ValList l;
-        QVariantList vl = var.toList();
-        for (const QVariant& v : vl) {
-            l.push_back(fromQVariant(v));
-        }
-        return Val(l);
-    }
-    case QMetaType::QVariantMap: {
-        ValMap m;
-        QVariantMap vm = var.toMap();
-        QVariantMap::const_iterator i = vm.constBegin();
-        while (i != vm.constEnd()) {
-            m.insert({ i.key().toStdString(), fromQVariant(i.value()) });
-            ++i;
-        }
-        return Val(m);
-    }
-    case QMetaType::QColor: return Val(var.value<QColor>());
-    default: {
-        LOGE() << "Not supported type: " << var.typeName();
-        //UNREACHABLE;
-        return Val();
-    }
-    }
-}
-
-#endif // NO_QT_SUPPORT
 
 static void appendQuoted(std::ostream& out, std::string_view text)
 {

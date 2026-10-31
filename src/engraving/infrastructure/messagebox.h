@@ -27,16 +27,10 @@
 
 #include "modularity/ioc.h"
 
-#ifndef ENGRAVING_NO_INTERACTIVE
-#include "interactive/iinteractive.h"
-#endif
 
 namespace mu::engraving {
 class MessageBox : public muse::Contextable
 {
-#ifndef ENGRAVING_NO_INTERACTIVE
-    muse::ContextInject<muse::IInteractive> interactive = { this };
-#endif
 public:
 
     MessageBox(const muse::modularity::ContextPtr& iocCtx)

@@ -30,11 +30,6 @@
 #include "geometry.h"
 #include "global/realfn.h"
 
-#ifndef NO_QT_SUPPORT
-#include <QBrush>
-#include <QGradient>
-#include <QLinearGradient>
-#endif
 
 namespace muse::draw {
 class LinearGradient
@@ -97,10 +92,6 @@ public:
     Brush(const LinearGradient& gradient)
         : m_style(BrushStyle::LinearGradientPattern), m_linearGradient(gradient) {}
 
-#ifndef NO_QT_SUPPORT
-    Brush(const QColor& color)
-        : m_color(Color::fromQColor(color)) {}
-#endif
 
     inline bool operator==(const Brush& o) const
     {
@@ -128,38 +119,6 @@ public:
         m_linearGradient = gradient;
     }
 
-#ifndef NO_QT_SUPPORT
-    static QBrush toQBrush(const Brush& brush)
-    {
-        if (brush.m_style == BrushStyle::LinearGradientPattern) {
-            QLinearGradient gradient(brush.m_linearGradient.start().toQPointF(), brush.m_linearGradient.finalStop().toQPointF());
-            for (const LinearGradient::ColorStop& stop : brush.m_linearGradient.colorStops()) {
-                gradient.setColorAt(stop.position, stop.color.toQColor());
-            }
-            return QBrush(gradient);
-        }
-
-        return QBrush(brush.m_color.toQColor(), static_cast<Qt::BrushStyle>(brush.m_style));
-    }
-
-    static Brush fromQBrush(const QBrush& qbrush)
-    {
-        if (qbrush.style() == Qt::LinearGradientPattern && qbrush.gradient()
-            && qbrush.gradient()->type() == QGradient::LinearGradient) {
-            const QLinearGradient* qgradient = static_cast<const QLinearGradient*>(qbrush.gradient());
-            LinearGradient gradient(PointF::fromQPointF(qgradient->start()), PointF::fromQPointF(qgradient->finalStop()));
-            for (const QGradientStop& stop : qgradient->stops()) {
-                gradient.setColorAt(stop.first, Color::fromQColor(stop.second));
-            }
-            return Brush(gradient);
-        }
-
-        Brush brush(Color::fromQColor(qbrush.color()));
-        brush.setStyle(static_cast<BrushStyle>(qbrush.style()));
-        return brush;
-    }
-
-#endif
 
 private:
     Color m_color = Color::BLACK;

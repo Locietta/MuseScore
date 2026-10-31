@@ -27,9 +27,6 @@
 #include <map>
 #include <any>
 
-#ifndef NO_QT_SUPPORT
-#include <QString>
-#endif
 
 #include "global/log.h"
 
@@ -200,13 +197,6 @@ inline muse::Ret make_ret(int e, const std::string& text)
     return Ret(e, text);
 }
 
-#ifndef NO_QT_SUPPORT
-inline muse::Ret make_ret(Ret::Code e, const QString& text)
-{
-    return Ret(static_cast<int>(e), text.toStdString());
-}
-
-#endif
 
 inline bool check_ret(const Ret& r, Ret::Code c)
 {

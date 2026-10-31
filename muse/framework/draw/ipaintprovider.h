@@ -82,10 +82,6 @@ public:
     virtual void drawPixmap(const PointF& point, const Pixmap& pm) = 0;
     virtual void drawTiledPixmap(const RectF& rect, const Pixmap& pm, const PointF& offset = PointF()) = 0;
 
-#ifndef NO_QT_SUPPORT
-    virtual void drawPixmap(const PointF& point, const QPixmap& pm) = 0;
-    virtual void drawTiledPixmap(const RectF& rect, const QPixmap& pm, const PointF& offset = PointF()) = 0;
-#endif
 
     virtual bool hasClipping() const = 0;
 

@@ -93,10 +93,6 @@ public:
     Transform& shear(double sh, double sv);
     Transform inverted() const;
 
-#ifndef NO_QT_SUPPORT
-    static QTransform toQTransform(const Transform& transform);
-    static Transform fromQTransform(const QTransform& transform);
-#endif
 
 private:
 
@@ -123,9 +119,6 @@ private:
 
     void mapElement(double& nx, double& ny, TransformationType t) const;
 
-#ifdef MUSE_MODULE_DRAW_TRACE
-    static void nanWarning(const std::string& func);
-#endif
 
     Matrix m_affine { 1.0, 0.0, 0.0, 1.0, 0.0, 0.0 };
     double m_13 = 0.0;

@@ -36,7 +36,7 @@
 #include "engrave/src/runtime/noqt_runtime.h"
 #include "engrave/src/score/score_excerpts.h"
 
-#ifdef Q_OS_WIN
+#ifdef _WIN32
 #include <windows.h>
 #include <psapi.h>
 #endif
@@ -155,7 +155,7 @@ std::string read_file(const fs::path& path)
 
 std::uint64_t peak_working_set_bytes()
 {
-#ifdef Q_OS_WIN
+#ifdef _WIN32
     PROCESS_MEMORY_COUNTERS_EX counters{};
     if (!GetProcessMemoryInfo(GetCurrentProcess(), reinterpret_cast<PROCESS_MEMORY_COUNTERS*>(&counters),
                               sizeof(counters))) {

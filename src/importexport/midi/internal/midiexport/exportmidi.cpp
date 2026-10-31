@@ -40,9 +40,7 @@
 
 #include "log.h"
 
-#ifdef NO_QT_SUPPORT
 #include "io/file.h"
-#endif
 
 using namespace mu::engraving;
 
@@ -431,19 +429,11 @@ bool ExportMidi::write(MidiIODevice* device, bool midiExpandRepeats, bool export
 
 bool ExportMidi::write(const MidiPath& name, bool midiExpandRepeats, bool exportRPNs, const SynthesizerState& synthState)
 {
-#ifdef NO_QT_SUPPORT
     muse::io::File file(name);
     if (!file.open(muse::io::IODevice::WriteOnly)) {
         return false;
     }
     return write(&file, midiExpandRepeats, exportRPNs, synthState);
-#else
-    m_file.setFileName(name);
-    if (!m_file.open(QIODevice::WriteOnly)) {
-        return false;
-    }
-    return write(&m_file, midiExpandRepeats, exportRPNs, synthState);
-#endif
 }
 
 bool ExportMidi::write(MidiIODevice* device, bool midiExpandRepeats, bool exportRPNs)

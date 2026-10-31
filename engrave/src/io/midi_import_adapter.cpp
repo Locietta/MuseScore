@@ -269,14 +269,6 @@ mu::engraving::Err import_midi_score(mu::engraving::MasterScore* score, const st
         return mu::engraving::Err::FileBadFormat;
     }
 
-#ifdef NO_QT_SUPPORT
     return mu::iex::midi::importMidiFromBuffer(score, bytes);
-#else
-    // The native adapter is built into the Qt-free host.  In a Qt build the
-    // original importMidi(MasterScore*, const QString&) entry remains the
-    // supported filesystem path.
-    (void)bytes;
-    return mu::engraving::Err::FileBadFormat;
-#endif
 }
 }

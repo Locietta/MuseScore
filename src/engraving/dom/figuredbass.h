@@ -334,10 +334,5 @@ private:
 };
 } // namespace mu::engraving
 
-#ifndef NO_QT_SUPPORT
-Q_DECLARE_METATYPE(mu::engraving::FiguredBassItem::Modifier)
-Q_DECLARE_METATYPE(mu::engraving::FiguredBassItem::Parenthesis)
-Q_DECLARE_METATYPE(mu::engraving::FiguredBassItem::ContLine)
-#endif
 
 #endif

@@ -215,11 +215,5 @@ void Settings::writeValue(const Key& key, const Val& value)
     (void)value;
 }
 
-#ifndef NO_QT_SUPPORT
-QString Settings::dataPath() const
-{
-    return QString();
-}
-#endif
 
 } // namespace muse

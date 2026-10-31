@@ -30,9 +30,6 @@
 #include "geometry.h"
 #include "bezier.h"
 
-#ifndef NO_QT_SUPPORT
-#include <QPainterPath>
-#endif
 
 namespace muse::draw {
 class PainterPath
@@ -128,10 +125,6 @@ public:
     PainterPath::FillRule fillRule() const;
     void setFillRule(PainterPath::FillRule fillRule);
 
-#ifndef NO_QT_SUPPORT
-    QPainterPath toQPainterPath() const { return toQPainterPath(*this); }
-    static QPainterPath toQPainterPath(const PainterPath& path);
-#endif
 
 private:
 
@@ -198,8 +191,5 @@ inline std::string dump(const PainterPath& p)
     return ss.str();
 }
 }
-#ifndef NO_QT_SUPPORT
-Q_DECLARE_METATYPE(muse::draw::PainterPath)
-#endif
 
 #endif // MUSE_DRAW_PAINTERPATH_H

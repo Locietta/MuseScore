@@ -86,9 +86,6 @@
 #include "tupletmap.h"
 #include "utils.h"
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-#include "accessibility/accessibleitem.h"
-#endif
 
 #include "log.h"
 
@@ -361,13 +358,6 @@ Measure::~Measure()
     muse::DeleteAll(m_mstaves);
 }
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-AccessibleItemPtr Measure::createAccessible()
-{
-    return std::make_shared<AccessibleItem>(this, AccessibleItem::Group);
-}
-
-#endif
 
 //---------------------------------------------------------
 //   findAccidental

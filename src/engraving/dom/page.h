@@ -101,9 +101,6 @@ public:
     bool isLocked() const;
     const RangeLock* pageLock() const;
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-    AccessibleItemPtr createAccessible() override;
-#endif
 
 private:
     friend class Factory;

@@ -26,13 +26,6 @@ Color::Color(const char* color)
     setNamedColor(color);
 }
 
-#ifndef NO_QT_SUPPORT
-Color::Color(const QColor& color)
-    : m_rgba(color.rgba()), m_isValid(color.isValid())
-{
-}
-
-#endif
 
 Color& Color::operator=(const Color& other)
 {
@@ -41,14 +34,6 @@ Color& Color::operator=(const Color& other)
     return *this;
 }
 
-#ifndef NO_QT_SUPPORT
-Color& Color::operator=(const QColor& other)
-{
-    *this = fromQColor(other);
-    return *this;
-}
-
-#endif
 
 bool Color::operator==(const Color& other) const
 {
@@ -114,21 +99,6 @@ int Color::alpha() const
     return getAlpha(m_rgba);
 }
 
-#ifndef NO_QT_SUPPORT
-Color Color::fromQColor(const QColor& color)
-{
-    Color c;
-    c.m_rgba = color.rgba();
-    c.m_isValid = color.isValid();
-    return c;
-}
-
-QColor Color::toQColor() const
-{
-    return QColor::fromRgba(m_rgba);
-}
-
-#endif
 
 void Color::setNamedColor(const std::string& color)
 {

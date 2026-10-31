@@ -22,12 +22,7 @@
 #include "fontsengine.h"
 
 #include "ifontface.h"
-#ifdef MUSE_MODULE_DRAW_USE_FONTFACE_FT
 #include "fontfaceft.h"
-#endif
-#ifdef MUSE_MODULE_DRAW_USE_FONTFACE_XT
-#include "fontfacext.h"
-#endif
 #include "fontfacedu.h"
 
 #include "log.h"
@@ -37,12 +32,8 @@ using namespace muse::draw;
 
 static bool isFtx(const ByteArray& data)
 {
-#ifdef MUSE_MODULE_DRAW_USE_FONTFACE_XT
-    return FontFaceXT::isFtx(data);
-#else
     UNUSED(data);
     return false;
-#endif
 }
 
 static const double DEFAULT_PIXEL_SIZE = 100.0;
@@ -468,52 +459,6 @@ std::vector<GlyphImage> FontsEngine::render(const Font& f, const std::u32string&
         return images;
     }
 
-#ifndef MUSE_MODULE_DRAW_USE_QTTEXTDRAW
-    double glyphLeft = 0;
-
-    TextBlock textBlock;
-    textBlock.text = &text[0];
-    textBlock.lenght = static_cast<int>(text.size());
-
-    std::vector<FontFaceTextBlock> fontFaceBlocks = splitTextByFontFaces(rf, textBlock);
-    for (const FontFaceTextBlock& ffBlock : fontFaceBlocks) {
-        const IFontFace* layoutFace = ffBlock.face;
-        if (!layoutFace) {
-            if (isZeroAdvanceText(ffBlock.text.text, ffBlock.text.lenght)) {
-                continue;
-            }
-
-            layoutFace = rf->face;
-        }
-
-        const IFontFace* sdfFace = sdfFontFaceFor(layoutFace);
-        if (!sdfFace) {
-            //! NOTE Fall back to the layout face itself rather than dropping this run's glyphs
-            sdfFace = layoutFace;
-        }
-
-        double layoutScale = rf->pixelScaleFor(layoutFace);
-        double sdfToLayoutScale = rf->pixelScaleFor(sdfFace);
-        std::vector<ShapedGlyph> glyphs = layoutFace->glyphs(ffBlock.text.text, ffBlock.text.lenght);
-
-        for (const ShapedGlyph& g : glyphs) {
-            if (!layoutFace->glyphBbox(g.idx).isEmpty()) {
-                GlyphImage image = m_renderCache.load(sdfFace->key(), g.idx);
-                if (image.isNull()) {
-                    image = sdfFace->glyphImage(g.idx);
-                    m_renderCache.store(sdfFace->key(), g.idx, image);
-                }
-
-                image.rect = scaleRect(image.rect, sdfToLayoutScale);
-                image.rect.translate(glyphLeft, 0);
-
-                images.push_back(std::move(image));
-            }
-
-            glyphLeft += from_f26d6(g.x_advance) * layoutScale;
-        }
-    }
-#endif
 
     return images;
 }
@@ -532,19 +477,10 @@ IFontFace* FontsEngine::createFontFace(const FontData& fontData, Font::Type type
 
     IFontFace* origin = nullptr;
     if (isFtx(fontData.data)) {
-#ifdef MUSE_MODULE_DRAW_USE_FONTFACE_XT
-        origin = new FontFaceXT();
-#else
         LOGE() << "XT font face backend is disabled: " << dataKey.family().id();
         return nullptr;
-#endif
     } else {
-#ifdef MUSE_MODULE_DRAW_USE_FONTFACE_FT
         origin = new FontFaceFT();
-#else
-        LOGE() << "FreeType font face backend is disabled: " << dataKey.family().id();
-        return nullptr;
-#endif
     }
 
     return new FontFaceDU(origin);

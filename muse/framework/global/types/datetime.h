@@ -22,9 +22,6 @@
 #ifndef MUSE_GLOBAL_DATETIME_H
 #define MUSE_GLOBAL_DATETIME_H
 
-#ifndef NO_QT_SUPPORT
-#include <QDateTime>
-#endif
 
 #include "string.h"
 
@@ -56,10 +53,6 @@ public:
     String toString(DateFormat format = DateFormat::ISODate) const;
     static Date fromStringISOFormat(const String& str);
 
-#ifndef NO_QT_SUPPORT
-    QDate toQDate() const { return QDate(m_year, m_month, m_day); }
-    static Date fromQDate(const QDate& d) { return Date(d.year(), d.month(), d.day()); }
-#endif
 
 private:
     int m_year = 0;
@@ -86,10 +79,6 @@ public:
     String toString(DateFormat format = DateFormat::ISODate) const;
     static Time fromStringISOFormat(const String& str);
 
-#ifndef NO_QT_SUPPORT
-    QTime toQTime() const { return QTime(m_hour, m_minute, m_second); }
-    static Time fromQTime(const QTime& t) { return Time(t.hour(), t.minute(), t.second()); }
-#endif
 
 private:
     int m_hour = 0;
@@ -114,10 +103,6 @@ public:
     String toString(DateFormat format = DateFormat::ISODate) const;
     static DateTime fromStringISOFormat(const String& str);
 
-#ifndef NO_QT_SUPPORT
-    QDateTime toQDateTime() const { return QDateTime(m_date.toQDate(), m_time.toQTime()); }
-    static DateTime fromQDateTime(const QDateTime& dt) { return DateTime(Date::fromQDate(dt.date()), Time::fromQTime(dt.time())); }
-#endif
 
 private:
 

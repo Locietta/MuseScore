@@ -1,10 +1,13 @@
 #include "noqt_application.h"
+#include "version.h"
 
-#include "muse_framework_config.h"
+#include "engrave_version.h"
 
 using namespace muse;
 
 namespace music {
+const char* engine_version() { return MUSE_APP_VERSION; }
+
 String NoQtApplication::name() const
 {
 #ifdef MUSE_APP_NAME

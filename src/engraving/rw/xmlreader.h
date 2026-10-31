@@ -40,10 +40,6 @@ public:
     XmlReader(muse::io::IODevice* d)
         : XmlStreamReader(d) {}
 
-#ifndef NO_QT_SUPPORT
-    XmlReader(const QByteArray& d)
-        : XmlStreamReader(d) {}
-#endif
 
     XmlReader(const XmlReader&) = delete;
     XmlReader& operator=(const XmlReader&) = delete;

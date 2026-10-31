@@ -23,10 +23,6 @@
 
 #include <cstdlib>
 
-#ifndef NO_QT_SUPPORT
-#include <QLocale>
-#include <QPageSize>
-#endif
 
 #include "global/settings.h"
 #include "draw/types/color.h"
@@ -42,20 +38,12 @@ using namespace mu::engraving;
 
 static Val colorValue(const Color& color)
 {
-#ifndef NO_QT_SUPPORT
-    return Val(color.toQColor());
-#else
     return Val(color.toString());
-#endif
 }
 
 static Color colorFromValue(const Val& value)
 {
-#ifndef NO_QT_SUPPORT
-    return Color::fromQColor(value.toQColor());
-#else
     return Color(value.toString().c_str());
-#endif
 }
 
 static const Settings::Key DEFAULT_STYLE_FILE_PATH("engraving", "engraving/style/defaultStyleFile");
@@ -133,11 +121,7 @@ void EngravingConfiguration::init()
         Settings::Key key("engraving", "engraving/colors/voice" + std::to_string(voice + 1));
 
         settings()->setDefaultValue(key, colorValue(DEFAULT_VOICE_COLORS[voice]));
-#ifndef NO_QT_SUPPORT
-        settings()->setDescription(key, muse::qtrc("engraving", "Voice %1 color").arg(voice + 1).toStdString());
-#else
         settings()->setDescription(key, "Voice " + std::to_string(voice + 1) + " color");
-#endif
         settings()->setCanBeManuallyEdited(key, true);
         settings()->valueChanged(key).onReceive(this, [this, voice](const Val& val) {
             Color color = colorFromValue(val);
@@ -246,57 +230,25 @@ static bool defaultPageSizeIsLetter()
     if (papersize) {
         return strcmp(papersize, "letter") == 0;
     }
-#ifndef NO_QT_SUPPORT
-    // try locale
-    switch (QLocale::system().territory()) {
-    case QLocale::UnitedStates:
-    case QLocale::Canada:
-    case QLocale::Mexico:
-    case QLocale::Chile:
-    case QLocale::Colombia:
-    case QLocale::CostaRica:
-    case QLocale::Panama:
-    case QLocale::Guatemala:
-    case QLocale::DominicanRepublic:
-    case QLocale::Philippines:
-        return true;
-    default:
-        return false;
-    }
-#else
     return false;
-#endif
 }
 
 SizeF EngravingConfiguration::defaultPageSize() const
 {
     // Needs to be determined only once, therefore static
-#ifndef NO_QT_SUPPORT
-    static SizeF size = SizeF::fromQSizeF(
-        QPageSize::size(defaultPageSizeIsLetter() ? QPageSize::Letter : QPageSize::A4, QPageSize::Inch));
-#else
     static SizeF size = defaultPageSizeIsLetter() ? SizeF(8.5, 11.0) : SizeF(210.0 / 25.4, 297.0 / 25.4);
-#endif
 
     return size;
 }
 
 bool EngravingConfiguration::canLayoutIcons() const
 {
-#ifndef NO_QT_SUPPORT
-    return uiConfiguration() != nullptr;
-#else
     return false;
-#endif
 }
 
 muse::String EngravingConfiguration::iconsFontFamily() const
 {
-#ifndef NO_QT_SUPPORT
-    return uiConfiguration() ? String::fromStdString(uiConfiguration()->iconsFontFamily()) : String();
-#else
     return String();
-#endif
 }
 
 Color EngravingConfiguration::defaultColor() const
@@ -334,13 +286,9 @@ void EngravingConfiguration::resetDisplayedDefaultColors()
 
 Color EngravingConfiguration::indicatorIconInvertedSelectionColor() const
 {
-#ifndef NO_QT_SUPPORT
-    return Color::fromQColor(voiceColor(0).toQColor().lighter(135));
-#else
     Color color = voiceColor(0);
     color.applyTint(0.35f);
     return color;
-#endif
 }
 
 Color EngravingConfiguration::lassoColor() const
@@ -385,13 +333,7 @@ Color EngravingConfiguration::noteBackgroundColor() const
 
 Color EngravingConfiguration::fontPrimaryColor() const
 {
-#ifndef NO_QT_SUPPORT
-    return uiConfiguration()
-           ? Color(uiConfiguration()->currentTheme().values[muse::ui::ThemeStyleKey::FONT_PRIMARY_COLOR].toString())
-           : Color::BLACK;
-#else
     return Color::BLACK;
-#endif
 }
 
 Color EngravingConfiguration::voiceColor(voice_idx_t voiceIdx) const
@@ -426,13 +368,9 @@ muse::async::Channel<voice_idx_t, Color> EngravingConfiguration::selectionColorC
 
 Color EngravingConfiguration::highlightSelectionColor(voice_idx_t voice) const
 {
-#ifndef NO_QT_SUPPORT
-    return Color::fromQColor(selectionColor(voice).toQColor().lighter(135));
-#else
     Color color = selectionColor(voice);
     color.applyTint(0.35f);
     return color;
-#endif
 }
 
 bool EngravingConfiguration::dynamicsApplyToAllVoices() const

@@ -55,9 +55,6 @@ public:
 
 private:
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-    AccessibleItemPtr createAccessible() override;
-#endif
 
     Kind m_kind = Kind::Score;
 };

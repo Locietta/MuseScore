@@ -126,18 +126,11 @@ char Char::toAscii(char16_t c, bool* ok)
 bool Char::isLetter(char16_t c)
 {
     //! TODO
-#ifndef NO_QT_SUPPORT
-    return QChar::isLetter(c);
-#else
     return std::isalpha(static_cast<unsigned char>(c));
-#endif
 }
 
 bool Char::isSpace(char16_t c)
 {
-#ifndef NO_QT_SUPPORT
-    return QChar::isSpace(c);
-#else
     //! Mirrors the code points QChar::isSpace() accepts above ASCII; keeping the
     //! set here explicit avoids narrowing c to unsigned char, which would alias
     //! non-Latin1 code points onto ASCII ones (u'\u4f20' onto a space, for instance).
@@ -151,7 +144,6 @@ bool Char::isSpace(char16_t c)
         return c == u' ' || (c >= u'\t' && c <= u'\r');
     }
     return std::binary_search(std::begin(NON_ASCII_SPACES), std::end(NON_ASCII_SPACES), c);
-#endif
 }
 
 bool Char::isDigit(char16_t c)
@@ -169,31 +161,19 @@ int Char::digitValue() const
 
 bool Char::isPunct(char16_t ch)
 {
-#ifndef NO_QT_SUPPORT
-    return QChar::isPunct(ch);
-#else
     return std::ispunct(static_cast<unsigned char>(ch));
-#endif
 }
 
 char16_t Char::toLower(char16_t ch)
 {
     //! TODO
-#ifndef NO_QT_SUPPORT
-    return QChar::toLower(ch);
-#else
     return std::tolower(static_cast<unsigned char>(ch));
-#endif
 }
 
 char16_t Char::toUpper(char16_t ch)
 {
     //! TODO
-#ifndef NO_QT_SUPPORT
-    return QChar::toUpper(ch);
-#else
     return std::toupper(static_cast<unsigned char>(ch));
-#endif
 }
 
 // ============================
@@ -722,25 +702,6 @@ const String String::fromStdWString(const std::wstring& str)
     return s;
 }
 
-#ifndef NO_QT_SUPPORT
-String String::fromQString(const QString& str)
-{
-    const QChar* qu = str.unicode();
-    static_assert(sizeof(QChar) == sizeof(char16_t));
-    const char16_t* u = reinterpret_cast<const char16_t*>(qu);
-
-    String s;
-    s.mutStr() = std::u16string(u, u + str.size());
-    return s;
-}
-
-QString String::toQString() const
-{
-    static_assert(sizeof(QChar) == sizeof(char16_t));
-    return QString(reinterpret_cast<const QChar*>(constStr().data()), static_cast<int>(size()));
-}
-
-#endif
 
 size_t String::size() const
 {
@@ -1279,11 +1240,7 @@ String String::trimmed() const
 String String::simplified() const
 {
     //! TODO
-#ifndef NO_QT_SUPPORT
-    return String::fromQString(toQString().simplified());
-#else
     return *this;
-#endif
 }
 
 String String::toXmlEscaped(char16_t c)
@@ -1342,29 +1299,19 @@ String String::decodeXmlEntities(const String& src_)
 String String::toLower() const
 {
     //! TODO
-#ifndef NO_QT_SUPPORT
-    QString qs = toQString();
-    return String::fromQString(qs.toLower());
-#else
     String s = *this;
     std::u16string& us = s.mutStr();
     std::transform(us.begin(), us.end(), us.begin(), [](char16_t c){ return Char::toLower(c); });
     return s;
-#endif
 }
 
 String String::toUpper() const
 {
     //! TODO
-#ifndef NO_QT_SUPPORT
-    QString qs = toQString();
-    return String::fromQString(qs.toUpper());
-#else
     String s = *this;
     std::u16string& us = s.mutStr();
     std::transform(us.begin(), us.end(), us.begin(), [](char16_t c){ return Char::toUpper(c); });
     return s;
-#endif
 }
 
 int String::toInt(bool* ok, int base) const
@@ -1519,26 +1466,6 @@ std::vector<std::string> StringList::toStdStringList() const
     return result;
 }
 
-#ifndef NO_QT_SUPPORT
-StringList::StringList(const QStringList& l)
-{
-    reserve(l.size());
-    for (const QString& s : l) {
-        push_back(String::fromQString(s));
-    }
-}
-
-QStringList StringList::toQStringList() const
-{
-    QStringList l;
-    l.reserve(static_cast<int>(size()));
-    for (size_t i = 0; i < size(); ++i) {
-        l << at(i).toQString();
-    }
-    return l;
-}
-
-#endif
 // ============================
 // AsciiChar
 // ============================

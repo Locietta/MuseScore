@@ -37,9 +37,6 @@
 
 class QPaintDevice;
 
-#ifndef NO_QT_SUPPORT
-class QPainter;
-#endif
 
 namespace muse::draw {
 class Painter
@@ -47,10 +44,6 @@ class Painter
 public:
     Painter(IPaintProviderPtr provider, const std::string& name);
 
-#ifndef NO_QT_SUPPORT
-    Painter(QPaintDevice* dp, const std::string& name);
-    Painter(QPainter* qp, const std::string& name, bool ownsQPainter = false);
-#endif
 
     ~Painter();
 
@@ -141,10 +134,6 @@ public:
     void drawPixmap(const PointF& point, const Pixmap& pm);
     void drawTiledPixmap(const RectF& rect, const Pixmap& pm, const PointF& offset = PointF());
 
-#ifndef NO_QT_SUPPORT
-    void drawPixmap(const PointF& point, const QPixmap& pm);
-    void drawTiledPixmap(const RectF& rect, const QPixmap& pm, const PointF& offset = PointF());
-#endif
 
     bool hasClipping() const;
 
@@ -277,17 +266,6 @@ private:
 };
 }
 
-#ifdef MUSE_MODULE_DRAW_TRACE
-    #define TRACE_ITEM_DRAW \
-    muse::draw::PainterItemMarker __drawItemMarker(painter, typeName())
-
-    #define TRACE_DRAW_ITEM \
-    muse::draw::PainterItemMarker __drawItemMarker(painter, item->typeName())
-
-    #define TRACE_ITEM_DRAW_C(painter, itemName) \
-    muse::draw::PainterItemMarker __drawItemMarker(painter, itemName)
-#else
     #define TRACE_ITEM_DRAW
     #define TRACE_DRAW_ITEM
     #define TRACE_ITEM_DRAW_C(painter, objName)
-#endif

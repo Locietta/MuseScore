@@ -12,7 +12,6 @@ class MasterScore;
 }
 
 namespace mu::iex::midi {
-#ifdef NO_QT_SUPPORT
 //! Import a complete Standard MIDI File / Karaoke file from memory.
 //!
 //! The entry is Qt-free and performs a one-shot import: it installs a temporary
@@ -20,7 +19,6 @@ namespace mu::iex::midi {
 //! converter pipeline, and removes the entry before returning (including when
 //! a conversion exception unwinds).  No filesystem access is performed.
 engraving::Err importMidiFromBuffer(engraving::MasterScore* score, const std::string& bytes);
-#endif
 } // namespace mu::iex::midi
 
 #endif // IMPORTMIDI_H

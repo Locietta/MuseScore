@@ -46,10 +46,6 @@
 #include "rendering/score/chordlayout.h"
 #include "rendering/score/tlayout.h"
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-#include "accessibility/accessibleitem.h"
-#include "accessibility/accessibleroot.h"
-#endif
 
 #include "../editing/addremoveelement.h"
 #include "../editing/editdata.h"
@@ -137,26 +133,6 @@ EngravingItem::~EngravingItem()
     delete m_layoutData;
 }
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-void EngravingItem::setupAccessible()
-{
-    if (m_accessible) {
-        return;
-    }
-
-    static const std::set<ElementType> accessibleDisabled = {
-        ElementType::LEDGER_LINE
-    };
-
-    if (score() && !score()->isPaletteScore()) {
-        if (!muse::contains(accessibleDisabled, type())) {
-            m_accessible = createAccessible();
-            m_accessible->setup();
-        }
-    }
-}
-
-#endif
 
 bool EngravingItem::accessibleEnabled() const
 {
@@ -223,25 +199,6 @@ const std::shared_ptr<rendering::IScoreRenderer>& EngravingItem::renderer() cons
     return score()->renderer.get();
 }
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-AccessibleItemPtr EngravingItem::createAccessible()
-{
-    return std::make_shared<AccessibleItem>(this);
-}
-
-void EngravingItem::notifyAboutNameChanged()
-{
-    if (!selected()) {
-        return;
-    }
-
-    if (m_accessible) {
-        doInitAccessible();
-        m_accessible->accessibleRoot()->notifyAboutFocusedElementNameChanged();
-    }
-}
-
-#endif
 
 //---------------------------------------------------------
 //   spatiumChanged
@@ -2202,13 +2159,6 @@ EngravingItem* EngravingItem::prevSegmentElement()
     return Navigation::firstElement(score());
 }
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-AccessibleItemPtr EngravingItem::accessible() const
-{
-    return m_accessible;
-}
-
-#endif
 
 String EngravingItem::accessibleInfo() const
 {
@@ -2766,37 +2716,6 @@ void EngravingItem::setVisible(bool f)
     }
 }
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-void EngravingItem::initAccessibleIfNeed()
-{
-    if (!contextConfiguration() || !contextConfiguration()->isAccessibleEnabled()) {
-        return;
-    }
-
-    if (!m_accessibleEnabled) {
-        return;
-    }
-
-    doInitAccessible();
-}
-
-void EngravingItem::doInitAccessible()
-{
-    EngravingItemList parents;
-    EngravingItem* parent = accessibleParentItem();
-    while (parent) {
-        parents.push_back(parent);
-        parent = parent->accessibleParentItem();
-    }
-
-    for (auto it = parents.rbegin(); it != parents.rend(); ++it) {
-        (*it)->setupAccessible();
-    }
-
-    setupAccessible();
-}
-
-#endif // ENGRAVING_NO_ACCESSIBILITY
 
 String EngravingItem::formatBarsAndBeats() const
 {

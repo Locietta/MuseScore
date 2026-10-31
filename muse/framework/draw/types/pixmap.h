@@ -26,11 +26,6 @@
 
 #include "geometry.h"
 
-#ifndef NO_QT_SUPPORT
-#include <QPixmap>
-#include <QImage>
-#include <QBuffer>
-#endif
 
 namespace muse::draw {
 class Pixmap
@@ -57,54 +52,6 @@ public:
     bool operator==(const Pixmap& o) const { return m_size == o.m_size && m_key == o.m_key && m_data == o.m_data; }
     bool operator!=(const Pixmap& o) const { return !this->operator==(o); }
 
-#ifndef NO_QT_SUPPORT
-    static Pixmap fromQImage(const QImage& qim)
-    {
-        QByteArray bytes;
-        QBuffer buffer(&bytes);
-        buffer.open(QIODevice::WriteOnly);
-        qim.save(&buffer, "PNG");
-
-        Pixmap px(qim.width(), qim.height());
-        px.setData(ByteArray::fromQByteArray(bytes));
-
-        return px;
-    }
-
-    static QImage toQImage(const Pixmap& px)
-    {
-        QImage qim(px.width(), px.height(), QImage::Format_ARGB32_Premultiplied);
-        ByteArray data = px.data();
-        if (!data.empty()) {
-            qim.loadFromData(data.toQByteArrayNoCopy());
-        }
-        return qim;
-    }
-
-    static Pixmap fromQPixmap(const QPixmap& qpx)
-    {
-        QByteArray bytes;
-        QBuffer buffer(&bytes);
-        buffer.open(QIODevice::WriteOnly);
-        qpx.save(&buffer, "PNG");
-
-        Pixmap px(qpx.width(), qpx.height());
-        px.setData(ByteArray::fromQByteArray(bytes));
-
-        return px;
-    }
-
-    static QPixmap toQPixmap(const Pixmap& px)
-    {
-        QPixmap qpx(px.width(), px.height());
-        ByteArray data = px.data();
-        if (!data.empty()) {
-            qpx.loadFromData(data.toQByteArrayNoCopy());
-        }
-        return qpx;
-    }
-
-#endif
 
 private:
 
@@ -129,8 +76,5 @@ private:
 };
 }
 
-#ifndef NO_QT_SUPPORT
-Q_DECLARE_METATYPE(muse::draw::Pixmap)
-#endif
 
 #endif // MUSE_DRAW_PIXMAP_H

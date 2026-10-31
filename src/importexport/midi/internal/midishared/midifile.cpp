@@ -34,17 +34,10 @@
 using namespace mu::engraving;
 
 namespace {
-#ifdef NO_QT_SUPPORT
 [[noreturn]] void throwMidiError(const std::string& msg)
 {
     throw std::runtime_error(msg);
 }
-#else
-[[noreturn]] void throwMidiError(const QString& msg)
-{
-    throw msg;
-}
-#endif
 }
 
 namespace mu::iex::midi {
@@ -187,17 +180,9 @@ bool MidiFile::writeTrack(const MidiTrack& t)
     put(0x2f);          // EOT
     putvl(0);           // len 0
     int64_t endpos = static_cast<int64_t>(fp->pos());
-#ifdef NO_QT_SUPPORT
     fp->seek(static_cast<size_t>(lenpos));
-#else
-    fp->seek(lenpos);
-#endif
     writeLong(static_cast<int>(endpos - lenpos - 4)); // tracklen
-#ifdef NO_QT_SUPPORT
     fp->seek(static_cast<size_t>(endpos));
-#else
-    fp->seek(endpos);
-#endif
     return _writeError;
 }
 
@@ -260,11 +245,7 @@ bool MidiFile::read(MidiIODevice* in)
     }
 
     if (len > 6) {
-#ifdef NO_QT_SUPPORT
         throwMidiError("unsupported MIDI header data size: " + std::to_string(len) + " instead of 6");
-#else
-        throwMidiError(QString("unsupported MIDI header data size: %1 instead of 6").arg(len));
-#endif
     }
 
     _format     = readShort();
@@ -317,11 +298,7 @@ bool MidiFile::read(MidiIODevice* in)
         }
         break;
     default:
-#ifdef NO_QT_SUPPORT
         throwMidiError("midi file format " + std::to_string(_format) + " not implemented");
-#else
-        throwMidiError(QString("midi file format %1 not implemented").arg(_format));
-#endif
 
         // Prevent "unreachable code" warning
         // return false;
@@ -370,11 +347,7 @@ bool MidiFile::readTrack()
              static_cast<long long>(endPos - curPos));
         if (curPos < endPos) {
             LOGW("  skip %lld\n", static_cast<long long>(endPos - curPos));
-#ifdef NO_QT_SUPPORT
             fp->seek(static_cast<size_t>(endPos));
-#else
-            fp->skip(endPos - curPos);
-#endif
         }
     }
     return false;
@@ -388,17 +361,10 @@ bool MidiFile::readTrack()
 void MidiFile::read(void* p, int64_t len)
 {
     curPos += len;
-#ifdef NO_QT_SUPPORT
     const size_t rv = fp->read(static_cast<uint8_t*>(p), static_cast<size_t>(len));
     if (rv != static_cast<size_t>(len)) {
         throwMidiError("bad midifile: unexpected EOF");
     }
-#else
-    const int64_t rv = fp->read(static_cast<char*>(p), len);
-    if (rv != len) {
-        throwMidiError("bad midifile: unexpected EOF");
-    }
-#endif
 }
 
 //---------------------------------------------------------
@@ -407,21 +373,12 @@ void MidiFile::read(void* p, int64_t len)
 
 bool MidiFile::write(const void* p, int64_t len)
 {
-#ifdef NO_QT_SUPPORT
     const size_t rv = fp->write(static_cast<const uint8_t*>(p), static_cast<size_t>(len));
     if (rv == static_cast<size_t>(len)) {
         return false;
     }
     _writeError = true;
     LOGD("write midifile failed: %s", fp->errorString().c_str());
-#else
-    const int64_t rv = fp->write(static_cast<const char*>(p), len);
-    if (rv == len) {
-        return false;
-    }
-    _writeError = true;
-    LOGD("write midifile failed: %s", fp->errorString().toLatin1().data());
-#endif
     return true;
 }
 

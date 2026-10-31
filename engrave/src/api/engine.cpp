@@ -9,7 +9,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include "muse_framework_config.h"
+#include "engrave/src/runtime/version.h"
 #include "engraving/dom/masterscore.h"
 #include "engraving/dom/mscore.h"
 #include "engraving/dom/text.h"
@@ -140,7 +140,7 @@ Engine::~Engine() {
 Capabilities Engine::capabilities() const {
     impl_->state.check_thread();
     return {
-        .engine_version = MUSE_APP_VERSION,
+        .engine_version = music::engine_version(),
         .import_formats = {Format::Mscz, Format::Mscx, Format::MusicXml, Format::Mxl, Format::Midi, Format::GuitarPro},
         .export_formats = {Format::Mscz, Format::MusicXml, Format::Mxl, Format::Midi},
         .render_formats = {RenderFormat::Pdf, RenderFormat::Png, RenderFormat::Svg},

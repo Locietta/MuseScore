@@ -27,10 +27,6 @@
 #include "global/types/string.h"
 #include "global/logstream.h"
 
-#ifndef NO_QT_SUPPORT
-#include <QString>
-#include <QUrl>
-#endif
 
 namespace muse::io {
 struct path_t;
@@ -71,16 +67,6 @@ struct path_t {
     const std::string& toStdString() const;
     const char* c_str() const;
 
-#ifndef NO_QT_SUPPORT
-    path_t(const QString& s);
-    explicit path_t(const QUrl& u);
-    inline path_t& operator=(const QString& other) { m_path = other.toStdString(); return *this; }
-    inline path_t operator+(const QString& other) const { path_t p = *this; p += String::fromQString(other); return p; }
-    inline path_t& operator+=(const QString& other) { m_path += other.toStdString(); return *this; }
-    QString toQString() const;
-    QUrl toQUrl() const;
-    std::wstring toStdWString() const;
-#endif
 
 private:
     std::string m_path;
@@ -89,9 +75,6 @@ private:
 inline path_t operator+(const String& one, const path_t& other) { return path_t(one) + other; }
 inline path_t operator+(const char* one, const path_t& other) { return path_t(one) + other; }
 
-#ifndef NO_QT_SUPPORT
-inline path_t operator+(const QString& one, const path_t& other) { return path_t(one) + other; }
-#endif
 
 inline muse::logger::Stream& operator<<(muse::logger::Stream& s, const muse::io::path_t& p)
 {

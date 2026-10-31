@@ -69,9 +69,6 @@
 #include "tuplet.h"
 #include "utils.h"
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-#include "accessibility/accessibleitem.h"
-#endif
 
 #include "log.h"
 
@@ -481,13 +478,6 @@ Chord::~Chord()
     muse::DeleteAll(m_noteParens);
 }
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-AccessibleItemPtr Chord::createAccessible()
-{
-    return std::make_shared<AccessibleItem>(this, AccessibleItem::Group);
-}
-
-#endif
 
 //---------------------------------------------------------
 //   noteHeadWidth

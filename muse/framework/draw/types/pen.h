@@ -22,9 +22,6 @@
 #ifndef MUSE_DRAW_PEN_H
 #define MUSE_DRAW_PEN_H
 
-#ifndef NO_QT_SUPPORT
-#include <QPen>
-#endif
 
 #include "global/realfn.h"
 
@@ -164,30 +161,6 @@ public:
         m_miterLimit = limit;
     }
 
-#ifndef NO_QT_SUPPORT
-    static QPen toQPen(const Pen& pen)
-    {
-        QPen p(pen.m_color.toQColor(), pen.m_width, static_cast<Qt::PenStyle>(pen.m_style),
-               static_cast<Qt::PenCapStyle>(pen.m_capStyle),
-               static_cast<Qt::PenJoinStyle>(pen.m_joinStyle));
-        p.setMiterLimit(pen.m_miterLimit);
-        p.setDashPattern(QVector<double>(pen.m_dashPattern.cbegin(), pen.m_dashPattern.cend()));
-        return p;
-    }
-
-    static Pen fromQPen(const QPen& pen)
-    {
-        Pen p(pen.color(), pen.widthF(), static_cast<PenStyle>(pen.style()),
-              static_cast<PenCapStyle>(pen.capStyle()),
-              static_cast<PenJoinStyle>(pen.joinStyle()));
-        p.m_miterLimit = pen.miterLimit();
-
-        QVector<double> dp = pen.dashPattern();
-        p.m_dashPattern = std::vector<double>(dp.cbegin(), dp.cend());
-        return p;
-    }
-
-#endif
 
 private:
 

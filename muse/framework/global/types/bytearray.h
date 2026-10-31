@@ -26,9 +26,6 @@
 #include <memory>
 #include <vector>
 
-#ifndef NO_QT_SUPPORT
-#include <QByteArray>
-#endif
 
 namespace muse {
 class ByteArray
@@ -73,28 +70,6 @@ public:
     ByteArray left(size_t len) const;
     ByteArray right(size_t len) const;
 
-#ifndef NO_QT_SUPPORT
-    static ByteArray fromQByteArray(const QByteArray& ba)
-    {
-        return ByteArray(reinterpret_cast<const uint8_t*>(ba.constData()), ba.size());
-    }
-
-    static ByteArray fromQByteArrayNoCopy(const QByteArray& ba)
-    {
-        return fromRawData(reinterpret_cast<const uint8_t*>(ba.constData()), ba.size());
-    }
-
-    QByteArray toQByteArray() const
-    {
-        return QByteArray(reinterpret_cast<const char*>(constData()), static_cast<int>(size()));
-    }
-
-    QByteArray toQByteArrayNoCopy() const
-    {
-        return QByteArray::fromRawData(reinterpret_cast<const char*>(constData()), static_cast<int>(size()));
-    }
-
-#endif
 
 private:
     using Data = std::vector<uint8_t>;

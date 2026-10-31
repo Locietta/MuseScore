@@ -58,9 +58,6 @@
 #include "tuplet.h"
 #include "utils.h"
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-#include "accessibility/accessibleitem.h"
-#endif
 
 #include "log.h"
 
@@ -240,13 +237,6 @@ Segment::~Segment()
     muse::DeleteAll(m_annotations);
 }
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-AccessibleItemPtr Segment::createAccessible()
-{
-    return std::make_shared<AccessibleItem>(this, AccessibleItem::Group);
-}
-
-#endif
 
 //---------------------------------------------------------
 //   init

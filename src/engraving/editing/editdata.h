@@ -43,7 +43,7 @@ enum KeyboardModifier {
 DECLARE_FLAGS(KeyboardModifiers, KeyboardModifier)
 DECLARE_OPERATORS_FOR_FLAGS(KeyboardModifiers)
 
-#ifdef Q_OS_MAC
+#ifdef __APPLE__
 constexpr KeyboardModifier TextEditingControlModifier = AltModifier;
 #else
 constexpr KeyboardModifier TextEditingControlModifier = ControlModifier;

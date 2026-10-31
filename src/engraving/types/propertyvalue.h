@@ -24,9 +24,6 @@
 #include <memory>
 #include <cassert>
 
-#ifndef NO_QT_SUPPORT
-#include <QVariant>
-#endif
 
 #include "global/types/string.h"
 #include "global/logstream.h"
@@ -167,10 +164,6 @@ public:
     PropertyValue(const String& v)
         : m_type(P_TYPE::STRING), m_data(make_data<String>(v)) {}
 
-#ifndef NO_QT_SUPPORT
-    PropertyValue(const QString& v)
-        : m_type(P_TYPE::STRING), m_data(make_data<String>(String::fromQString(v))) {}
-#endif
 
     // Geometry
     PropertyValue(const PointF& v)
@@ -465,19 +458,6 @@ public:
                 }
             }
 
-#ifndef NO_QT_SUPPORT
-            if constexpr (std::is_same<T, QString>::value) {
-                //! HACK Temporary hack for Fraction to String
-                if (P_TYPE::FRACTION == m_type) {
-                    return value<Fraction>().toString();
-                }
-
-                //! HACK Temporary hack for String to QString
-                if (P_TYPE::STRING == m_type) {
-                    return value<String>().toQString();
-                }
-            }
-#endif
         }
 
         assert(at);
@@ -498,11 +478,6 @@ public:
     template<typename T>
     static PropertyValue fromValue(const T& v) { return PropertyValue(v); }
 
-#ifndef NO_QT_SUPPORT
-    //! NOTE compat
-    QVariant toQVariant() const;
-    static PropertyValue fromQVariant(const QVariant& v, P_TYPE type);
-#endif
 
 private:
     struct IArg {
