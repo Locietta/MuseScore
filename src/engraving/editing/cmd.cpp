@@ -881,12 +881,11 @@ void Score::createCRSequence(const Fraction& f, ChordRest* cr, const Fraction& t
 //    return segment of last created note/rest
 //---------------------------------------------------------
 
-Segment* Score::setNoteRest(Segment* segment, track_idx_t track, NoteVal nval, Fraction sd, DirectionV stemDirection,
-                            bool forceAccidental, const std::set<SymId>& articulationIds, bool rhythmic, InputState* externalInputState)
+Segment* Score::setNoteRestAt(Segment* segment, track_idx_t track, NoteVal nval, Fraction sd,
+                            DirectionV stemDirection, bool forceAccidental,
+                            const std::set<SymId>& articulationIds, bool rhythmic, EngravingItem** lastEntered)
 {
     assert(segment->segmentType() == SegmentType::ChordRest);
-    InputState& is = externalInputState ? (*externalInputState) : m_is;
-
     bool isRest   = nval.isRest();
     Fraction tick = segment->tick();
     EngravingItem* nr   = nullptr;
@@ -1049,6 +1048,19 @@ Segment* Score::setNoteRest(Segment* segment, track_idx_t track, NoteVal nval, F
     if (tie) {
         connectTies();
     }
+
+    if (lastEntered) *lastEntered = nr;
+    return segment;
+}
+
+Segment* Score::setNoteRest(Segment* segment, track_idx_t track, NoteVal nval, Fraction sd, DirectionV stemDirection,
+                            bool forceAccidental, const std::set<SymId>& articulationIds, bool rhythmic, InputState* externalInputState)
+{
+    assert(segment->segmentType() == SegmentType::ChordRest);
+    InputState& is = externalInputState ? (*externalInputState) : m_is;
+    EngravingItem* nr = nullptr;
+    segment = setNoteRestAt(segment, track, nval, sd, stemDirection, forceAccidental, articulationIds, rhythmic, &nr);
+    ChordRest* cr = nullptr;
 
     if (nr) {
         if (is.slur() && nr->isNote()) {
@@ -1467,8 +1479,6 @@ void Score::changeCRlen(ChordRest* cr, const Fraction& dstF, bool fillWithRest)
         return;
     }
 
-    //keep selected element if any
-    EngravingItem* selElement = selection().isSingle() ? getSelectedElement() : 0;
 
     track_idx_t track = cr->track();
     Tuplet* tuplet = cr->tuplet();
@@ -1477,7 +1487,6 @@ void Score::changeCRlen(ChordRest* cr, const Fraction& dstF, bool fillWithRest)
         //
         // make shorter and fill with rest
         //
-        deselectAll();
         if (cr->isChord()) {
             //
             // remove ties and tremolo between 2 notes
@@ -1517,9 +1526,6 @@ void Score::changeCRlen(ChordRest* cr, const Fraction& dstF, bool fillWithRest)
             setRest(cr->endTick(), track, srcF - dstF, false, tuplet);
         }
 
-        if (selElement) {
-            select(selElement, SelectType::SINGLE, 0);
-        }
         return;
     }
 
@@ -1532,8 +1538,6 @@ void Score::changeCRlen(ChordRest* cr, const Fraction& dstF, bool fillWithRest)
         return;
     }
 
-    deselectAll();
-    EngravingItem* elementToSelect = nullptr;
 
     Fraction tick  = cr->tick();
     Fraction f     = dstF;
@@ -1567,7 +1571,6 @@ void Score::changeCRlen(ChordRest* cr, const Fraction& dstF, bool fillWithRest)
                 r = setRest(tick, track, f2, false, tuplet);
             }
             if (first) {
-                elementToSelect = r;
                 first = false;
             }
             tick += actualTicks(f2, tuplet, timeStretch);
@@ -1588,7 +1591,6 @@ void Score::changeCRlen(ChordRest* cr, const Fraction& dstF, bool fillWithRest)
                         oc = cc;
                     }
                     if (oc && first) {
-                        elementToSelect = selElement ? selElement : oc;
                         first = false;
                     }
                     if (oc) {
@@ -1607,7 +1609,6 @@ void Score::changeCRlen(ChordRest* cr, const Fraction& dstF, bool fillWithRest)
                         oc = cc;
                     }
                     if (first) {
-                        elementToSelect = selElement;
                         first = false;
                     }
                     tick += oc->actualTicks();
@@ -1629,11 +1630,6 @@ void Score::changeCRlen(ChordRest* cr, const Fraction& dstF, bool fillWithRest)
     }
     connectTies();
 
-    if (elementToSelect) {
-        if (canReselectItem(elementToSelect)) {
-            select(elementToSelect, SelectType::SINGLE, 0);
-        }
-    }
 }
 
 //---------------------------------------------------------

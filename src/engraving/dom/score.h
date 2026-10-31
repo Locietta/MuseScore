@@ -409,6 +409,11 @@ public:
 
     GuitarBend* addGuitarBend(GuitarBendType type, Note* note, Note* endNote = nullptr);
 
+    // Musical insertion with explicit targets; no selection or input cursor changes.
+    Segment* setNoteRestAt(Segment*, track_idx_t track, NoteVal nval, Fraction,
+                          DirectionV stemDirection = DirectionV::AUTO, bool forceAccidental = false,
+                          const std::set<SymId>& articulationIds = {}, bool rhythmic = false,
+                          EngravingItem** lastEntered = nullptr);
     Segment* setNoteRest(Segment*, track_idx_t track, NoteVal nval, Fraction, DirectionV stemDirection = DirectionV::AUTO,
                          bool forceAccidental = false, const std::set<SymId>& articulationIds = {}, bool rhythmic = false,
                          InputState* externalInputState = nullptr);

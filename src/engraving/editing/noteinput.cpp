@@ -305,11 +305,9 @@ NoteVal NoteInput::noteValForPosition(const Score* score, Position pos, Accident
 //   addNote from NoteVal
 //---------------------------------------------------------
 
-Note* NoteInput::addNote(Transaction&, Score* score, Chord* chord, const NoteVal& noteVal, bool forceAccidental,
-                         const std::set<SymId>& articulationIds, InputState* externalInputState)
+Note* NoteInput::addNoteToChord(Score* score, Chord* chord, const NoteVal& noteVal,
+                                bool forceAccidental, const std::set<SymId>& articulationIds)
 {
-    InputState& is = externalInputState ? (*externalInputState) : score->inputState();
-
     Note* note = Factory::createNote(chord);
     note->setTrack(chord->track());
     note->setNval(noteVal);
@@ -330,6 +328,16 @@ Note* NoteInput::addNote(Transaction&, Score* score, Chord* chord, const NoteVal
 
     score->setPlayNote(true);
     score->setPlayChord(true);
+
+    return note;
+}
+
+Note* NoteInput::addNote(Transaction&, Score* score, Chord* chord, const NoteVal& noteVal, bool forceAccidental,
+                         const std::set<SymId>& articulationIds, InputState* externalInputState)
+{
+    InputState& is = externalInputState ? (*externalInputState) : score->inputState();
+
+    Note* note = addNoteToChord(score, chord, noteVal, forceAccidental, articulationIds);
 
     if (externalInputState) {
         is.setTrack(note->track());

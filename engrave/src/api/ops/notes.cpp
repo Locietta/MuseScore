@@ -12,7 +12,6 @@
 #include "engraving/dom/chord.h"
 #include "engraving/dom/engravingitem.h"
 #include "engraving/dom/engravingobject.h"
-#include "engraving/dom/input.h"
 #include "engraving/dom/interval.h"
 #include "engraving/dom/mscore.h"
 #include "engraving/dom/note.h"
@@ -35,13 +34,11 @@ using mu::engraving::Chord;
 using mu::engraving::ChordRest;
 using mu::engraving::DirectionV;
 using mu::engraving::EngravingItem;
-using mu::engraving::InputState;
 using mu::engraving::Note;
 using mu::engraving::NoteVal;
 using mu::engraving::Score;
 using mu::engraving::Segment;
 using mu::engraving::Staff;
-using mu::engraving::Transaction;
 using mu::engraving::Transpose;
 
 std::unexpected<Error> invalid(std::string message) {
@@ -140,12 +137,8 @@ Result<Step> prepare(EditContext& context, const EnterNotes& op) {
         // back as another one, so the segment is looked up again by its tick.
         const mu::engraving::Fraction tick = start->tick();
         const mu::engraving::track_idx_t track = mu::engraving::staff2track(at.staff, at.voice);
-        Transaction& tx = score->transactionManager()->currentOrDummyTransaction();
-        // The score's own input state is its cursor: the API brings its own, so note
-        // entry moves nothing of the score's outside the transaction.
-        InputState input;
         NoteVal first = pitches.empty() ? NoteVal() : note_value(pitches.front());
-        if (!score->setNoteRest(start, track, first, duration, DirectionV::AUTO, false, {}, false, &input))
+        if (!score->setNoteRestAt(start, track, first, duration))
             return std::unexpected(Error{ErrorCode::EditRejected, "the engine could not enter a note at this position"});
         // The first piece of the entry sits where the address points; the rest of a
         // duration that reached past a barline is tied to it.
@@ -167,7 +160,7 @@ Result<Step> prepare(EditContext& context, const EnterNotes& op) {
         }
         for (std::size_t i = 1; i < pitches.size(); ++i) {
             NoteVal value = note_value(pitches[i]);
-            if (!mu::engraving::NoteInput::addNote(tx, score, chord, value, false, {}, &input))
+            if (!mu::engraving::NoteInput::addNoteToChord(score, chord, value))
                 return std::unexpected(
                     Error{ErrorCode::EditRejected, std::format("the engine could not add pitch {}", pitches[i].pitch)});
         }
@@ -206,18 +199,7 @@ Result<Step> prepare(EditContext& context, const SetDuration& op) {
         if (!(*item)->isChordRest()) return invalid("SetDuration changes the length of a chord or of a rest");
         ChordRest* chord_rest = mu::engraving::toChordRest(*item);
         Score* score = chord_rest->score();
-        // changeCRlen works through the selection: it drops it first and selects what it
-        // changed at the end, and the selection moves the score's input cursor with it.
-        // The edit API hands a score back without a selection, so the step drops the one
-        // the engine made and puts the cursor back; C2 of the harness keeps this honest.
-        // A command that fails throws out of changeCRlen before it selects, so a rollback
-        // never has a selection to undo.
-        const mu::engraving::track_idx_t cursor = score->inputState().track();
         score->changeCRlen(chord_rest, duration);
-        if (!score->selection().isNone()) {
-            score->deselectAll();
-            score->inputState().setTrack(cursor);
-        }
         return {};
     };
 }
