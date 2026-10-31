@@ -13,7 +13,6 @@ namespace mu::engraving {
 class IEngravingConfiguration;
 class IEngravingContextConfiguration;
 class IEngravingFontsProvider;
-class IPaletteScoreProvider;
 namespace rendering {
 class IScoreRenderer;
 }
@@ -30,6 +29,5 @@ struct EngravingServices {
     // not reached.
     std::shared_ptr<muse::draw::IImageProvider> imageProvider;
     // Null until the palette score exists (it is built with these services).
-    IPaletteScoreProvider* paletteScoreProvider = nullptr;
 };
 }

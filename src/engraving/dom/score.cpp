@@ -34,7 +34,6 @@
 
 #include "iengravingconfiguration.h" // IWYU pragma: keep
 #include "iengravingcontextconfiguration.h" // IWYU pragma: keep
-#include "ipalettescoreprovider.h"
 
 #include "editing/addremoveelement.h"
 #include "editing/editclef.h"
@@ -335,16 +334,6 @@ Score* Score::clone()
     masterScore()->removeExcerpt(excerpt);
 
     return excerpt->excerptScore();
-}
-
-Score* Score::paletteScore() const
-{
-    return m_services.paletteScoreProvider ? m_services.paletteScoreProvider->paletteScore() : nullptr;
-}
-
-bool Score::isPaletteScore() const
-{
-    return this == paletteScore();
 }
 
 //! A bracket is a rendering of its bracket item, rebuilt from it on every layout, so

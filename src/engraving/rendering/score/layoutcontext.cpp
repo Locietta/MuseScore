@@ -65,7 +65,7 @@ bool LayoutConfiguration::isPaletteMode() const
         return false;
     }
 
-    return score()->isPaletteScore();
+    return false;
 }
 
 bool LayoutConfiguration::isPrintingMode() const

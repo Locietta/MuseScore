@@ -584,10 +584,6 @@ void TWrite::writeScoreSpanners(const Score* score, track_idx_t startTrack, trac
 
 void TWrite::writeItemEid(const EngravingObject* item, XmlWriter& xml)
 {
-    if (item->score()->isPaletteScore()) {
-        return;
-    }
-
     EID eid = item->eid();
     if (!eid.isValid()) {
         eid = item->assignNewEID();
@@ -1677,7 +1673,7 @@ void TWrite::writeProperties(const Spanner* item, XmlWriter& xml, WriteContext& 
 
         const bool isPartialTieOrLV = item->isPartialTie() || item->isLaissezVib();
         const bool hasStartEndElements = item->startElement() && item->endElement();
-        IF_ASSERT_FAILED(item->score()->isPaletteScore() || isPartialTieOrLV || hasStartEndElements) {
+        IF_ASSERT_FAILED(isPartialTieOrLV || hasStartEndElements) {
             writeItemProperties(item, xml, ctx);
             return;
         }

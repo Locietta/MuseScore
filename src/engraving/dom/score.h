@@ -302,8 +302,6 @@ public:
     virtual ~Score();
     Score* clone();
 
-    Score* paletteScore() const;
-    bool isPaletteScore() const;
 
     virtual bool isMaster() const { return false; }
     virtual bool readOnly() const;

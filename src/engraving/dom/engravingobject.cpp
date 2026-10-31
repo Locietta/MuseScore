@@ -98,7 +98,6 @@ EngravingObject::~EngravingObject()
     }
 
     {
-        bool isPaletteScore = score()->isPaletteScore();
         bool canMoveToDummy = !this->isType(ElementType::ROOT_ITEM)
                               && !this->isType(ElementType::DUMMY)
                               && !this->isType(ElementType::SCORE)
@@ -109,10 +108,8 @@ EngravingObject::~EngravingObject()
         for (EngravingObject* c : children) {
             if (canMoveToDummy) {
                 c->moveToDummy();
-            } else if (!isPaletteScore) {
-                delete c;
             } else {
-                c->m_parent = nullptr;
+                delete c;
             }
         }
 

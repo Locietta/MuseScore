@@ -1071,7 +1071,7 @@ void FretDiagram::scanElements(std::function<void(EngravingItem*)> func)
     func(this);
 
     // don't display harmony in palette
-    if (m_harmony && !score()->isPaletteScore()) {
+    if (m_harmony) {
         func(m_harmony);
     }
 }
