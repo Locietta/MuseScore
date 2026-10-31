@@ -94,8 +94,8 @@ struct Document {
     // A failed batch always restores the score's content and ids. Its layout is
     // restored exactly too, unless the engine threw or an operation whose rollback
     // policy is Snapshot had run: the document is then reloaded from a copy taken
-    // before the batch, and is laid out as if saved and reopened, which for a score
-    // written by an older version can place elements a few units differently.
+    // before the batch, and is laid out as if saved and reopened, which can place
+    // elements differently even for scores written in the current format.
     Result<EditResult> edit(const Batch& batch, std::optional<std::uint64_t> expected_revision = {});
 
 private:

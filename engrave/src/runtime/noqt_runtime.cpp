@@ -258,7 +258,10 @@ ScoreProject load_native_score(const std::string& input, const std::string& form
         if (!reader.imageFileNames().empty()) throw std::invalid_argument("Embedded score images are not yet supported by the native backend");
         engraving::rw::ReadInOutData inout;
         inout.forcePageMode = true;
-        check(project->loadMscz(reader, &inout, false));
+        const auto loaded = project->loadMscz(reader, &inout, false);
+        if (loaded.code() == static_cast<int>(engraving::Err::FileTooOld))
+            throw UnsupportedScoreVersion(loaded.toString());
+        check(loaded);
     } else if (format == "musicxml" || format == "xml" || format == "mxl") {
         XmlStreamReader scan(data);
         while (!scan.atEnd()) {

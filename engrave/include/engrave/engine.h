@@ -105,7 +105,9 @@ struct Engine {
     // file's order.
     std::vector<TemplateInfo> templates() const;
 
+    // Unsupported for MSCX/MSCZ written before MuseScore 4.6 (mscVersion < 460).
     Result<std::unique_ptr<Document>> open(std::span<const std::byte> data, const OpenOptions& options = {});
+    // Unsupported for MSCX/MSCZ written before MuseScore 4.6 (mscVersion < 460).
     Result<std::unique_ptr<Document>> open(const std::filesystem::path& file, const OpenOptions& options = {});
 
     // A new score from a template, at revision 1.

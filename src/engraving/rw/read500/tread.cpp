@@ -145,7 +145,6 @@
 #include "../../editing/editstaffbrackets.h"
 
 #include "../xmlreader.h"
-#include "../read206/read206.h"
 #include "../compat/compatutils.h"
 #include "../compat/tremolocompat.h"
 #include "readcontext.h"

@@ -60,6 +60,17 @@ std::string exported(engrave::Document& document, Format format) {
     return bytes ? text_of(*bytes) : std::string{};
 }
 
+TEST(Open, RejectsPreMuseScore4) {
+    for (const std::string version : {"1.14", "2.07", "3.00", "3.02", "4.00", "4.10", "4.40", "4.50"}) {
+        const auto xml = bytes_of("<museScore version=\"" + version + "\"><Score/></museScore>");
+        auto result = g_engine->open(xml, {.format = Format::Mscx});
+        ASSERT_FALSE(result) << version;
+        EXPECT_EQ(result.error().code, ErrorCode::Unsupported);
+        EXPECT_NE(result.error().message.find("written by MuseScore " + version
+                  + "; scores from before MuseScore 4.6 are not supported"), std::string::npos);
+    }
+}
+
 TEST(Capabilities, ListsFormatsAndVersion) {
     const auto capabilities = g_engine->capabilities();
     EXPECT_FALSE(capabilities.engine_version.empty());
