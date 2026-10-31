@@ -12,6 +12,10 @@ ENGRAVE_OP(ResetProperty, Transaction)
 ENGRAVE_OP(SetStyle, Transaction)
 
 // notes (ops/notes.cpp)
+ENGRAVE_OP(EnterNotes, Snapshot)
+ENGRAVE_OP(SetPitch, Snapshot)
+ENGRAVE_OP(SetDuration, Snapshot)
+ENGRAVE_OP(Remove, Snapshot)
 
 // measures (ops/measures.cpp)
 
