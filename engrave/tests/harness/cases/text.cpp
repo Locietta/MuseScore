@@ -1,5 +1,6 @@
 // Evidence cases of AddText and Add.
 
+#include <cmath>
 #include <format>
 #include <functional>
 #include <memory>
@@ -25,6 +26,7 @@
 #include "engraving/dom/score.h"
 #include "engraving/dom/segment.h"
 #include "engraving/dom/staff.h"
+#include "engraving/dom/tempotext.h"
 #include "engraving/dom/textbase.h"
 #include "engraving/types/symnames.h"
 #include "engraving/types/typesconv.h"
@@ -150,6 +152,19 @@ std::string expect_fermata(Document& document, const SegmentAddress& at, std::st
     return std::format("the segment has no '{}' fermata", symbol);
 }
 
+// A tempo text: the text it was made with, and the tempo it derived from it.
+std::string expect_tempo_text(Document& document, const SegmentAddress& at, std::string_view text, double bpm) {
+    Segment& segment = segment_of(document, at);
+    for (EngravingItem* item : segment.findAnnotations(ElementType::TEMPO_TEXT, track_of(at), track_of(at))) {
+        const auto& tempo = *mu::engraving::toTempoText(item);
+        if (tempo.xmlText().toStdString() != text) continue;
+        if (!item->eid().isValid()) return "the new tempo text has no id";
+        const double derived = tempo.tempoBpm();
+        return std::abs(derived - bpm) < 0.01 ? std::string{} : std::format("the tempo is {}, not {}", derived, bpm);
+    }
+    return "the segment has no tempo text with the new text";
+}
+
 std::string expect_dynamic(Document& document, const SegmentAddress& at, DynamicType type, std::string_view text) {
     Segment& segment = segment_of(document, at);
     for (EngravingItem* item : segment.findAnnotations(ElementType::DYNAMIC, track_of(at), track_of(at))) {
@@ -233,9 +248,10 @@ const bool registered = register_cases({
                   [](Document& document, const SegmentAddress& at) {
                       return expect_lyrics(document, at, "la", 1);
                   }),
-    add_text_case("AddText tempo text", "repeat_with_2_voltas.mscx", 0, 0, 0, {0, 1}, "tempo", "Allegro",
+    add_text_case("AddText tempo text", "repeat_with_2_voltas.mscx", 0, 0, 0, {0, 1}, "tempo",
+                  "<sym>metNoteQuarterUp</sym> = 90",
                   [](Document& document, const SegmentAddress& at) {
-                      return expect_text(document, at, ElementType::TEMPO_TEXT, "Allegro");
+                      return expect_tempo_text(document, at, "<sym>metNoteQuarterUp</sym> = 90", 90.0);
                   }),
     add_text_case("AddText system text in linked parts", "linked_parts.mscx", 0, 0, 0, {0, 1}, "system", "solo",
                   [](Document& document, const SegmentAddress& at) {
