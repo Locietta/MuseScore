@@ -24,7 +24,6 @@
 
 #include "iaudiofactory.h"
 
-#include "global/modularity/ioc.h"
 #include "../isynthresolver.h"
 #include "../ifxresolver.h"
 
@@ -32,10 +31,16 @@ namespace muse::audio::engine {
 class AudioFactory : public IAudioFactory
 {
     OutputSpec m_spec;
-    GlobalInject<synth::ISynthResolver> synthResolver;
-    GlobalInject<fx::IFxResolver> fxResolver;
+    synth::ISynthResolver& m_synthResolver;
+    fx::IFxResolver& m_fxResolver;
+
+    synth::ISynthResolver* synthResolver() const { return &m_synthResolver; }
+    fx::IFxResolver* fxResolver() const { return &m_fxResolver; }
 
 public:
+    // Both resolvers must outlive the factory.
+    AudioFactory(synth::ISynthResolver& synthResolver, fx::IFxResolver& fxResolver)
+        : m_synthResolver(synthResolver), m_fxResolver(fxResolver) {}
     void setOutputSpec(const OutputSpec& spec) { m_spec = spec; }
 
     // Available resources
@@ -49,8 +54,8 @@ public:
     RetVal<synth::ISynthesizerPtr> makeDefaultSynth(const TrackId trackId) const override;
     void clearSynthSources() override;
 
-    RetVal<AudioSourceNodePtr> makeEventSource(const TrackId trackId, const mpe::PlaybackData& playbackData, const AudioInputParams& params,
-                                               const std::function<void()> onOffStreamReceived = nullptr) const override;
+    RetVal<AudioSourceNodePtr> makeEventSource(const TrackId trackId, const mpe::PlaybackData& playbackData,
+                                               const AudioInputParams& params) const override;
 
     // Make FX
     FxChainPtr makeMasterFxChain(const AudioFxChain& fxChain) const override;

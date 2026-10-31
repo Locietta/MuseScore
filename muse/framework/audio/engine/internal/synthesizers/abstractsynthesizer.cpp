@@ -29,8 +29,8 @@ using namespace muse::mpe;
 using namespace muse::audio;
 using namespace muse::audio::synth;
 
-AbstractSynthesizer::AbstractSynthesizer(const AudioInputParams& params)
-    : m_params(params)
+AbstractSynthesizer::AbstractSynthesizer(const AudioInputParams& params, const engine::IAudioEngineConfiguration& config)
+    : m_params(params), m_config(config)
 {
     ONLY_AUDIO_ENGINE_THREAD;
 }
@@ -56,13 +56,6 @@ const AudioInputParams& AbstractSynthesizer::params() const
     return m_params;
 }
 
-async::Channel<AudioInputParams> AbstractSynthesizer::paramsChanged() const
-{
-    ONLY_AUDIO_ENGINE_THREAD;
-
-    return m_paramsChanges;
-}
-
 void AbstractSynthesizer::setup(const mpe::PlaybackData& playbackData)
 {
     ONLY_AUDIO_ENGINE_THREAD;
@@ -83,13 +76,6 @@ bool AbstractSynthesizer::readyToPlay() const
     ONLY_AUDIO_ENGINE_THREAD;
 
     return true;
-}
-
-async::Notification AbstractSynthesizer::readyToPlayChanged() const
-{
-    ONLY_AUDIO_ENGINE_THREAD;
-
-    return m_readyToPlayChanged;
 }
 
 bool AbstractSynthesizer::hasPendingChunks() const

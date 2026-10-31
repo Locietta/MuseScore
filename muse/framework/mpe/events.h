@@ -24,7 +24,6 @@
 #include <variant>
 #include <vector>
 
-#include "async/channel.h"
 #include "realfn.h"
 #include "global/types/number.h"
 #include "types/flags.h"
@@ -345,16 +344,12 @@ using PlaybackEventsMap = SharedMap<timestamp_t, PlaybackEventList>;
 using DynamicAutomationMap = AutomationCurve<timestamp_t>;
 using DynamicAutomationLayers = SharedMap<layer_idx_t, DynamicAutomationMap>;
 
-using MainStreamChanges = async::Channel<PlaybackEventsMap, DynamicAutomationLayers>;
-using OffStreamChanges = async::Channel<PlaybackEventsMap, bool /*flushOffstream*/>;
 
 struct PlaybackData {
     PlaybackEventsMap originEvents;
     PlaybackSetupData setupData;
     DynamicAutomationLayers dynamics;
 
-    MainStreamChanges mainStream;
-    OffStreamChanges offStream;
 
     bool operator==(const PlaybackData& other) const
     {

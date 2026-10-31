@@ -33,15 +33,13 @@ using namespace muse::audio::synth;
 
 static const AudioResourceVendor FLUID_VENDOR_NAME = "Fluid";
 
-FluidResolver::FluidResolver()
+FluidResolver::FluidResolver(const ISoundFontRepository& soundFontRepository,
+                             const engine::IAudioEngineConfiguration& config, midi::IMidiOutPort* midiOutPort)
+    : m_soundFontRepository(soundFontRepository), m_config(config), m_midiOutPort(midiOutPort)
 {
     ONLY_AUDIO_ENGINE_THREAD;
 
     fluid::FluidVorbisDecoder::decoder = new codec::VorbisDecoder();
-
-    soundFontRepository()->soundFontsChanged().onNotify(this, [this]() {
-        refresh();
-    });
 
     refresh();
 }
@@ -62,7 +60,7 @@ ISynthesizerPtr FluidResolver::resolveSynth(const TrackId /*trackId*/, const Aud
         return nullptr;
     }
 
-    FluidSynthPtr synth = std::make_shared<FluidSynth>(params);
+    FluidSynthPtr synth = std::make_shared<FluidSynth>(params, m_config, m_midiOutPort);
     synth->init(spec);
     synth->addSoundFonts({ search->second.path });
     synth->setPreset(search->second.preset);
@@ -105,7 +103,7 @@ void FluidResolver::refresh()
 
     m_resourcesCache.clear();
 
-    for (const auto& pair : soundFontRepository()->soundFonts()) {
+    for (const auto& pair : m_soundFontRepository.soundFonts()) {
         const SoundFontMeta& soundFont = pair.second;
 
         {

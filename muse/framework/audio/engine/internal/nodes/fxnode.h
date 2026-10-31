@@ -43,7 +43,6 @@ public:
     void setPlayheadPosition(PlayheadPositionPtr playheadPosition);
 
     const AudioFxParams& params() const;
-    async::Channel<audio::AudioFxParams> paramsChanged() const;
 
     bool shouldProcessDuringSilence() const;
 

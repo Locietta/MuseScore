@@ -25,7 +25,6 @@
 #include <vector>
 #include <functional>
 
-#include "global/async/asyncable.h"
 
 
 #include "audio/common/audiotypes.h"
@@ -38,7 +37,7 @@ class IODevice;
 }
 
 namespace muse::audio::soundtrack {
-class SoundTrackWriter : public async::Asyncable
+class SoundTrackWriter
 {
 
 public:

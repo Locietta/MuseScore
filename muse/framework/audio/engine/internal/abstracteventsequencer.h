@@ -22,10 +22,10 @@
 
 #pragma once
 
+#include <functional>
 #include <map>
 #include <set>
 
-#include "global/async/asyncable.h"
 #include "mpe/events.h"
 
 #include "audio/common/audiosanitizer.h"
@@ -33,7 +33,7 @@
 
 namespace muse::audio::engine {
 template<class ... Types>
-class AbstractEventSequencer : public async::Asyncable
+class AbstractEventSequencer
 {
 public:
     using EventType = std::variant<Types...>;
@@ -48,37 +48,13 @@ public:
         resetAllIterators();
     }
 
-    virtual ~AbstractEventSequencer()
-    {
-        m_playbackData.mainStream.disconnect(this);
-        m_playbackData.offStream.disconnect(this);
-    }
+    virtual ~AbstractEventSequencer() = default;
 
     void load(const mpe::PlaybackData& data)
     {
         ONLY_AUDIO_ENGINE_THREAD;
 
         m_playbackData = data;
-
-        m_playbackData.mainStream.onReceive(this, [this](const mpe::PlaybackEventsMap& events,
-                                                         const mpe::DynamicAutomationLayers& dynamics) {
-            m_playbackData.originEvents = events;
-            m_playbackData.dynamics = dynamics;
-            m_shouldUpdateMainStreamEvents = true;
-
-            if (m_isActive || m_updateMainStreamWhenInactive) {
-                updateMainStream();
-            }
-        });
-
-        m_playbackData.offStream.onReceive(this, [this](const mpe::PlaybackEventsMap& events,
-                                                        bool flush) {
-            if (flush) {
-                flushOffstream();
-            }
-
-            updateOffStreamEvents(events);
-        });
 
         updateMainStreamEvents(data.originEvents, data.dynamics);
     }

@@ -23,7 +23,7 @@
 #ifndef MUSE_AUDIO_SOUNDMAPPING_H
 #define MUSE_AUDIO_SOUNDMAPPING_H
 
-#include "global/async/channel.h"
+#include <functional>
 #include "mpe/events.h"
 #include "midi/miditypes.h"
 
@@ -1179,7 +1179,9 @@ struct ChannelMap {
         return m_data;
     }
 
-    async::Channel<midi::channel_t, midi::Program> channelAdded;
+    // Called when a new channel is mapped, before its first event; the
+    // synthesizer that owns the mapping programs the channel.
+    std::function<void(midi::channel_t, const midi::Program&)> onChannelAdded;
 
 private:
     //! Resolves the channel for a (layer, articulation) pair. Same-program articulations share a channel;
@@ -1205,7 +1207,9 @@ private:
         if (m_channelCount < m_maxChannels) {
             const midi::channel_t channelIdx = m_channelCount++;
             mapping.insert({ type, { channelIdx, program } });
-            channelAdded.send(channelIdx, program);
+            if (onChannelAdded) {
+                onChannelAdded(channelIdx, program);
+            }
             return channelIdx;
         }
 

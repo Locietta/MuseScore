@@ -24,18 +24,14 @@
 
 #include <memory>
 
-#include "modularity/imoduleinterface.h"
-#include "modularity/ioc.h"
 
 #include "audio/common/audiotypes.h"
 
 #include "isynthesizer.h"
 
 namespace muse::audio::synth {
-class ISynthResolver : MODULE_GLOBAL_INTERFACE
+class ISynthResolver
 {
-    INTERFACE_ID(ISynthResolver)
-
 public:
     virtual ~ISynthResolver() = default;
 

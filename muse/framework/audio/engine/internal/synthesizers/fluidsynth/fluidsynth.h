@@ -29,7 +29,6 @@
 
 #include "global/io/path.h"
 
-#include "global/modularity/ioc.h"
 #include "midi/imidioutport.h"
 
 #include "../abstractsynthesizer.h"
@@ -39,10 +38,11 @@ namespace muse::audio::synth {
 struct Fluid;
 class FluidSynth : public AbstractSynthesizer
 {
-    GlobalInject<midi::IMidiOutPort> midiOutPort;
-
 public:
-    FluidSynth(const audio::AudioSourceParams& params);
+    // midiOutPort, when given, receives every event the synthesizer handles; it
+    // and config must outlive the synthesizer.
+    FluidSynth(const audio::AudioSourceParams& params, const engine::IAudioEngineConfiguration& config,
+               midi::IMidiOutPort* midiOutPort);
 
     Ret init(const OutputSpec& spec);
 
@@ -111,7 +111,7 @@ private:
     OutputSpec m_outputSpec;
 
     std::shared_ptr<Fluid> m_fluid;
-    std::shared_ptr<midi::IMidiOutPort> m_midiOutPort;
+    midi::IMidiOutPort* m_midiOutPort = nullptr;
 
     FluidSequencer m_sequencer;
     std::set<io::path_t> m_sfontPaths;

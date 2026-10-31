@@ -34,7 +34,6 @@
 using namespace muse;
 using namespace muse::audio;
 using namespace muse::audio::synth;
-using namespace muse::async;
 
 bool SoundFontRepository::isSoundFontLoaded(const std::string& name) const
 {
@@ -59,10 +58,16 @@ const SoundFontsMap& SoundFontRepository::soundFonts() const
     return m_soundFonts;
 }
 
-Notification SoundFontRepository::soundFontsChanged() const
+void SoundFontRepository::setOnSoundFontsChanged(std::function<void()> onSoundFontsChanged)
 {
-    ONLY_AUDIO_ENGINE_THREAD;
-    return m_soundFontsChanged;
+    m_onSoundFontsChanged = std::move(onSoundFontsChanged);
+}
+
+void SoundFontRepository::notifySoundFontsChanged()
+{
+    if (m_onSoundFontsChanged) {
+        m_onSoundFontsChanged();
+    }
 }
 
 void SoundFontRepository::addSoundFont(const SoundFontUri& uri)
@@ -72,7 +77,7 @@ void SoundFontRepository::addSoundFont(const SoundFontUri& uri)
     m_loadingSoundFontCount++;
     doAddSoundFont(uri, nullptr, [this]() {
         --m_loadingSoundFontCount;
-        m_soundFontsChanged.notify();
+        notifySoundFontsChanged();
     });
 }
 
@@ -111,7 +116,7 @@ void SoundFontRepository::addSoundFontData(const SoundFontUri& uri, const ByteAr
         LOGE() << "Failed parse SoundFont presets for " << fileName << ": " << meta.ret.toString();
     }
 
-    m_soundFontsChanged.notify();
+    notifySoundFontsChanged();
 }
 
 void SoundFontRepository::doAddSoundFont(const SoundFontUri& uri, const SoundFontsMap* cache, std::function<void()> onFinished)
@@ -190,7 +195,7 @@ void SoundFontRepository::loadSoundFonts(const std::vector<SoundFontUri>& uris)
             LOGI() << "remaining: " << m_loadingSoundFontCount << ", total: " << total;
             if (m_loadingSoundFontCount == 0) {
                 delete cache;
-                m_soundFontsChanged.notify();
+                notifySoundFontsChanged();
                 LOGI() << "all added notify about sound fonts changed";
             }
         });

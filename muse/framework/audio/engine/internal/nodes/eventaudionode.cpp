@@ -33,23 +33,10 @@ using namespace muse::audio::engine;
 using namespace muse::audio::synth;
 using namespace muse::mpe;
 
-EventAudioNode::EventAudioNode(TrackId trackId, const mpe::PlaybackData& playbackData,
-                               OnOffStreamEventsReceived onOffStreamReceived)
-    : m_trackId(trackId), m_playbackData(playbackData)
+EventAudioNode::EventAudioNode(const IAudioFactory& audioFactory, TrackId trackId, const mpe::PlaybackData& playbackData)
+    : m_audioFactory(audioFactory), m_trackId(trackId), m_playbackData(playbackData)
 {
     ONLY_AUDIO_ENGINE_THREAD;
-
-    if (onOffStreamReceived) {
-        m_playbackData.offStream.onReceive(this, [onOffStreamReceived](const PlaybackEventsMap&,
-                                                                       bool) {
-            onOffStreamReceived();
-        });
-    }
-}
-
-EventAudioNode::~EventAudioNode()
-{
-    m_playbackData.offStream.disconnect(this);
 }
 
 void EventAudioNode::onModeChanged(const ProcessMode mode)
@@ -148,10 +135,6 @@ void EventAudioNode::applyInputParams(const AudioInputParams& requiredParams)
 
     m_synth = synth.val;
 
-    m_synth->paramsChanged().onReceive(this, [this](const AudioInputParams& params) {
-        m_paramsChanges.send(params);
-    });
-
     setupSource();
 
     if (ctx.isValid()) {
@@ -163,12 +146,6 @@ void EventAudioNode::applyInputParams(const AudioInputParams& requiredParams)
     setName(std::string("Source[") + m_synth->name() + "]");
 
     m_params = m_synth->params();
-    m_paramsChanges.send(m_params);
-}
-
-async::Channel<AudioInputParams> EventAudioNode::inputParamsChanged() const
-{
-    return m_paramsChanges;
 }
 
 void EventAudioNode::prepareToPlay()
@@ -191,17 +168,6 @@ bool EventAudioNode::readyToPlay() const
     }
 
     return m_synth->readyToPlay();
-}
-
-async::Notification EventAudioNode::readyToPlayChanged() const
-{
-    ONLY_AUDIO_ENGINE_THREAD;
-
-    IF_ASSERT_FAILED(m_synth) {
-        return {};
-    }
-
-    return m_synth->readyToPlayChanged();
 }
 
 bool EventAudioNode::hasPendingChunks() const

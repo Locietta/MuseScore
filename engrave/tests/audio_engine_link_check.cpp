@@ -7,12 +7,12 @@
 #include <iostream>
 #include <memory>
 
-#include "global/modularity/ioc.h"
+
 
 #include "engrave/src/audio/engine_audio.h"
 
 
-#include "audio/engine/enginesetup.h"
+#include "audio/engine/audioservices.h"
 #include "audio/engine/iaudioengineconfiguration.h"
 #include "audio/engine/isynthresolver.h"
 #include "audio/engine/internal/offlinerendersession.h"
@@ -20,9 +20,7 @@
 
 int main()
 {
-    muse::audio::engine::EngineGlobalSetup setup;
-    setup.registerExports();
-    setup.resolveImports();
+    muse::audio::engine::AudioServices setup(nullptr);
 
 
     muse::audio::OutputSpec spec;
@@ -32,13 +30,12 @@ int main()
 
     muse::audio::AudioEngineConfig config;
     config.useSoundFontLowPassFilter = true;
-    auto configuration = muse::modularity::globalIoc()->resolve<muse::audio::engine::IAudioEngineConfiguration>("audio_engine_link_check");
+    auto configuration = &setup.configuration();
     configuration->setConfig(config);
-    muse::modularity::globalIoc()->resolve<muse::audio::synth::ISynthResolver>("audio_engine_link_check")->init(configuration->defaultAudioInputParams(), spec);
+    setup.synthResolver().init(configuration->defaultAudioInputParams(), spec);
 
 
-    auto factory = std::dynamic_pointer_cast<muse::audio::engine::AudioFactory>(
-        muse::modularity::globalIoc()->resolve<muse::audio::engine::IAudioFactory>("audio_engine_link_check"));
+    auto factory = &setup.factory();
     factory->setOutputSpec(spec);
     muse::audio::engine::OfflineRenderSession session(*factory, spec);
 

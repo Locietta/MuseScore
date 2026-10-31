@@ -88,9 +88,9 @@ public:
     muse::mpe::PlaybackData& resolveTrackPlaybackData(const InstrumentTrackId& trackId);
     muse::mpe::PlaybackData& resolveTrackPlaybackData(const ID& partId, const String& instrumentId);
 
-    void triggerEventsForItems(const std::vector<const EngravingItem*>& items, muse::mpe::duration_t duration, bool flushSound);
-    void triggerMetronome(int tick);
-    void triggerCountIn(int tick, muse::mpe::duration_t& countInDuration);
+    muse::mpe::PlaybackEventsMap triggerEventsForItems(const std::vector<const EngravingItem*>& items, muse::mpe::duration_t duration);
+    muse::mpe::PlaybackEventsMap triggerMetronome(int tick);
+    muse::mpe::PlaybackEventsMap triggerCountIn(int tick, muse::mpe::duration_t& countInDuration);
 
     InstrumentTrackIdSet existingTrackIdSet() const;
 

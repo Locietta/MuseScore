@@ -22,17 +22,13 @@
 
 #pragma once
 
-#include "modularity/imoduleinterface.h"
 
-#include "global/async/notification.h"
 
 #include "audio/common/soundfonttypes.h"
 
 namespace muse::audio::synth {
-class ISoundFontRepository : MODULE_GLOBAL_INTERFACE
+class ISoundFontRepository
 {
-    INTERFACE_ID(ISoundFontRepository)
-
 public:
     virtual ~ISoundFontRepository() = default;
 
@@ -44,6 +40,5 @@ public:
     virtual bool isLoadingSoundFonts() const = 0;
 
     virtual const SoundFontsMap& soundFonts() const = 0;
-    virtual async::Notification soundFontsChanged() const = 0;
 };
 }

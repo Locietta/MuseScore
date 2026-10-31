@@ -21,6 +21,7 @@ class IMusicXmlConfiguration;
 
 namespace music {
 class RuntimeAssets;
+class EngineAudio;
 
 // The engine's services, owned in a fixed initialisation order and destroyed in
 // the reverse order (see notes/cleanup/c5/DESIGN.md in the superproject). One
@@ -42,6 +43,7 @@ public:
 
     muse::io::IFileSystem& fileSystem() const;
     RuntimeAssets& assets() const;
+    EngineAudio& audio() const;
     muse::draw::IFontsDatabase& fontsDatabase() const;
     // The services every score of this engine is built with. Tests may replace
     // a service before they create scores.

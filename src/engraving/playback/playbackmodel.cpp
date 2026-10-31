@@ -43,7 +43,6 @@
 using namespace mu;
 using namespace mu::engraving;
 using namespace muse::mpe;
-using namespace muse::async;
 
 static const String METRONOME_INSTRUMENT_ID(u"metronome");
 static const String CHORD_SYMBOLS_INSTRUMENT_ID(u"chord_symbols");
@@ -161,9 +160,6 @@ void PlaybackModel::reload()
 
     update(tickFrom, tickTo, trackFrom, trackTo);
 
-    for (auto& pair : m_playbackDataMap) {
-        pair.second.mainStream.send(pair.second.originEvents, pair.second.dynamics);
-    }
 
     m_changedTrackIdSet.clear();
 }
@@ -293,20 +289,20 @@ PlaybackData& PlaybackModel::resolveTrackPlaybackData(const ID& partId, const St
     return resolveTrackPlaybackData(idKey(partId, instrumentId));
 }
 
-void PlaybackModel::triggerEventsForItems(const std::vector<const EngravingItem*>& items, muse::mpe::duration_t duration, bool flushSound)
+PlaybackEventsMap PlaybackModel::triggerEventsForItems(const std::vector<const EngravingItem*>& items, muse::mpe::duration_t duration)
 {
     if (items.empty()) {
-        return;
+        return {};
     }
 
     InstrumentTrackId trackId = idKey(items);
     if (!trackId.isValid()) {
-        return;
+        return {};
     }
 
     auto trackPlaybackDataIt = m_playbackDataMap.find(trackId);
     if (trackPlaybackDataIt == m_playbackDataMap.cend()) {
-        return;
+        return {};
     }
 
     PlaybackData& trackPlaybackData = trackPlaybackDataIt->second;
@@ -314,7 +310,7 @@ void PlaybackModel::triggerEventsForItems(const std::vector<const EngravingItem*
         = profilesRepository() ? profilesRepository()->defaultProfile(trackPlaybackData.setupData.category) : nullptr;
     if (!profile) {
         LOGE() << "unsupported instrument family: " << trackId.partId.toUint64();
-        return;
+        return {};
     }
 
     const RepeatList& repeats = repeatList();
@@ -359,35 +355,35 @@ void PlaybackModel::triggerEventsForItems(const std::vector<const EngravingItem*
         m_renderer.render(item, timestamp, duration, dynamicLevel, m_playbackCtx, profile, result);
     }
 
-    trackPlaybackData.offStream.send(result, flushSound);
+    return result;
 }
 
-void PlaybackModel::triggerMetronome(int tick)
+PlaybackEventsMap PlaybackModel::triggerMetronome(int tick)
 {
     auto trackPlaybackData = m_playbackDataMap.find(METRONOME_TRACK_ID);
     if (trackPlaybackData == m_playbackDataMap.cend()) {
-        return;
+        return {};
     }
 
     const ArticulationsProfilePtr profile = defaultActiculationProfile(METRONOME_TRACK_ID);
 
     PlaybackEventsMap result;
     m_renderer.renderMetronome(m_score, tick, 0, profile, result);
-    trackPlaybackData->second.offStream.send(result, true /*flushOffstream*/);
+    return result;
 }
 
-void PlaybackModel::triggerCountIn(int tick, muse::mpe::duration_t& countInDuration)
+PlaybackEventsMap PlaybackModel::triggerCountIn(int tick, muse::mpe::duration_t& countInDuration)
 {
     auto trackPlaybackData = m_playbackDataMap.find(METRONOME_TRACK_ID);
     if (trackPlaybackData == m_playbackDataMap.cend()) {
-        return;
+        return {};
     }
 
     const ArticulationsProfilePtr profile = defaultActiculationProfile(METRONOME_TRACK_ID);
 
     PlaybackEventsMap result;
     m_renderer.renderCountIn(m_score, tick, 0, profile, result, countInDuration);
-    trackPlaybackData->second.offStream.send(result, true /*flushOffstream*/);
+    return result;
 }
 
 InstrumentTrackIdSet PlaybackModel::existingTrackIdSet() const
@@ -695,7 +691,6 @@ void PlaybackModel::reloadMetronomeEvents()
     metronomeData.originEvents.clear();
 
     if (!m_metronomeEnabled) {
-        metronomeData.mainStream.send(metronomeData.originEvents, metronomeData.dynamics);
         return;
     }
 
@@ -709,7 +704,6 @@ void PlaybackModel::reloadMetronomeEvents()
         }
     }
 
-    metronomeData.mainStream.send(metronomeData.originEvents, metronomeData.dynamics);
     muse::remove(m_changedTrackIdSet, METRONOME_TRACK_ID);
 }
 
@@ -955,7 +949,6 @@ void PlaybackModel::sendEvents(const InstrumentTrackId& trackId)
     }
 
     PlaybackData& data = it->second;
-    data.mainStream.send(data.originEvents, data.dynamics);
 }
 
 void PlaybackModel::removeTrackEvents(const InstrumentTrackId& trackId, const muse::mpe::timestamp_t timestampFrom,

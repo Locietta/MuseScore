@@ -22,7 +22,7 @@
 #include "audio/common/audiosanitizer.h"
 #include "audio/common/audioutils.h"
 #include "audio/common/soundfonttypes.h"
-#include "audio/engine/enginesetup.h"
+#include "audio/engine/audioservices.h"
 #include "audio/engine/iaudioengineconfiguration.h"
 #include "audio/engine/isynthresolver.h"
 #include "audio/engine/internal/export/soundtrackwriter.h"
@@ -47,7 +47,6 @@
 #include "global/io/iodevice.h"
 #include "global/io/ioretcodes.h"
 #include "global/io/path.h"
-#include "global/modularity/ioc.h"
 #include "global/types/ret.h"
 #include "global/types/string.h"
 #include "global/types/uri.h"
@@ -58,7 +57,6 @@
 
 using namespace muse;
 using namespace muse::audio;
-using namespace muse::modularity;
 using namespace mu::engraving;
 
 namespace music {
@@ -73,35 +71,33 @@ constexpr const char* kMetronomeTrackName = "Metronome";
 constexpr const char* kChordsTrackNamePrefix = "Chords.";
 // Capturing midi::IMidiOutPort. FluidSynth sends every event it handles (after
 // the staff -> channel remap), which is the event stream later golden tests
-// compare. A global hook keeps the sink reusable by the probe and by tests.
-// s_rendered_frames is the number of output frames already encoded: the writer
+// compare. The hook keeps the sink reusable by the probe and by tests.
+// renderedFrames is the number of output frames already encoded: the writer
 // reports completed frames after each chunk, so this is the start of the
 // chunk currently being rendered.
-EngineAudioMidiEventHook s_midi_event_hook;
-std::uint64_t s_rendered_frames = 0;
-
 class CapturingMidiOutPort final : public midi::IMidiOutPort
 {
 public:
     midi::MidiDeviceList availableDevices() const override { return {}; }
-    async::Notification availableDevicesChanged() const override { return {}; }
 
     Ret connect(const midi::MidiDeviceID&) override { return make_ok(); }
     void disconnect() override {}
     bool isConnected() const override { return true; }
     midi::MidiDeviceID deviceID() const override { return "engine-capture"; }
-    async::Notification deviceChanged() const override { return {}; }
 
     bool supportsMIDI20Output() const override { return false; }
 
     Ret sendEvent(const midi::Event& event) override
     {
-        if (s_midi_event_hook) {
-            s_midi_event_hook(event, s_rendered_frames);
+        if (hook) {
+            hook(event, renderedFrames);
         }
 
         return make_ok();
     }
+
+    EngineAudioMidiEventHook hook;
+    std::uint64_t renderedFrames = 0;
 };
 
 // Encoder destination. 5.0's encoders write through muse::io::IODevice
@@ -193,15 +189,19 @@ private:
     size_t m_streamPos = 0;
 };
 
-// Process-wide state. The registered services are intentionally
-// leaked: the engine owns global IoC exports and static synthesizer state, and
-// must outlive every static destructor (FluidResolver's Vorbis decoder is a
-// process-wide pointer, fluidresolver.cpp:44-53).
-struct EngineState {
-    std::shared_ptr<CapturingMidiOutPort> midiOutPort;
-    engine::EngineGlobalSetup* engineSetup = nullptr;
+} // namespace
+
+// The engine's audio state. The services are built on first initialisation and
+// destroyed with the EngineContext, before the resources they read (FluidResolver
+// owns the process-wide Vorbis decoder, fluidresolver.cpp:36-48).
+struct EngineAudio::State {
+    explicit State(const muse::mpe::IArticulationProfilesRepository& profiles) : profiles(profiles) {}
+
+    const muse::mpe::IArticulationProfilesRepository& profiles;
+    CapturingMidiOutPort midiOutPort;
+    std::unique_ptr<engine::AudioServices> services;
     bool servicesInitialized = false;
-    std::shared_ptr<engine::AudioFactory> factory;
+    engine::AudioFactory* factory = nullptr;
     int sampleRate = kDefaultSampleRate;
     // One entry per SoundFont of the setup, in its order; the first is the
     // default.
@@ -213,16 +213,18 @@ struct EngineState {
     std::string soundfontId;
 };
 
-EngineState& engine_state()
+EngineAudio::EngineAudio(const muse::mpe::IArticulationProfilesRepository& profiles)
+    : m_state(std::make_unique<State>(profiles))
 {
-    static EngineState state;
-    return state;
 }
 
-OutputSpec output_spec()
+EngineAudio::~EngineAudio() = default;
+
+namespace {
+OutputSpec output_spec(int sampleRate)
 {
     OutputSpec spec;
-    spec.sampleRate = engine_state().sampleRate;
+    spec.sampleRate = sampleRate;
     spec.samplesPerChannel = kSamplesPerChannel;
     spec.audioChannelCount = kAudioChannelCount;
     return spec;
@@ -244,10 +246,10 @@ AudioFxChain make_reverb_fx_chain()
     return chain;
 }
 
-SoundTrackFormat make_soundtrack_format(EngineAudioFormat format, const AudioRenderRequest& request)
+SoundTrackFormat make_soundtrack_format(EngineAudioFormat format, const AudioRenderRequest& request, const OutputSpec& spec)
 {
     SoundTrackFormat result;
-    result.outputSpec = output_spec();
+    result.outputSpec = spec;
 
     switch (format) {
     case EngineAudioFormat::Wav:
@@ -357,7 +359,7 @@ void set_track_control(ControlParams& control, const EngineAudioTrackParams& par
 
 // The public master controls wrap the neutral session master chain. Keeping
 // both chains preserves existing gain initialization and sample arithmetic.
-engine::TrackChainPtr make_master_chain(const IAudioNodePtr& context,
+engine::TrackChainPtr make_master_chain(const IAudioNodePtr& context, const OutputSpec& spec,
                                         const AudioRenderRequest& request, std::string& error)
 {
     IAudioNodePtr contextNode = std::dynamic_pointer_cast<IAudioNode>(context);
@@ -373,7 +375,7 @@ engine::TrackChainPtr make_master_chain(const IAudioNodePtr& context,
     // node it adds (nodes/chainnode.h:70-80), so the control node computes its
     // channel gains once, and only the explicit set* calls below can retarget
     // them.
-    chain->setOutputSpec(output_spec());
+    chain->setOutputSpec(spec);
     chain->setMode(ProcessMode::Idle);
 
     chain->setSource(contextNode);
@@ -427,14 +429,14 @@ void fluid_log_to_logger(int level, const char* message, void*)
 }
 } // namespace
 
-void set_engine_audio_midi_event_hook(EngineAudioMidiEventHook hook)
+void set_engine_audio_midi_event_hook(EngineAudio& audio, EngineAudioMidiEventHook hook)
 {
-    s_midi_event_hook = std::move(hook);
+    audio.state().midiOutPort.hook = std::move(hook);
 }
 
-bool initialize_engine_audio(const EngineAudioSetup& setup, std::string* error)
+bool initialize_engine_audio(EngineAudio& audio, const EngineAudioSetup& setup, std::string* error)
 {
-    EngineState& state = engine_state();
+    EngineAudio::State& state = audio.state();
     const auto fail = [error](std::string message) {
         if (error) {
             *error = std::move(message);
@@ -477,34 +479,24 @@ bool initialize_engine_audio(const EngineAudioSetup& setup, std::string* error)
     AudioSanitizer::setupMainThread();
     AudioSanitizer::setupEngineThread();
 
-    // Capturing MIDI output for deterministic event diagnostics.
-    state.midiOutPort = std::make_shared<CapturingMidiOutPort>();
-    globalIoc()->unregister<midi::IMidiOutPort>("engine_audio");
-    globalIoc()->registerExport<midi::IMidiOutPort>("engine_audio", state.midiOutPort);
-
-    // Register the retained factory, configuration, SoundFont repository and
-    // synth/effect resolvers. Their initialization sequence is explicit below.
-    state.engineSetup = new engine::EngineGlobalSetup();
-    state.engineSetup->registerExports();
-    state.engineSetup->resolveImports();
+    // The factory, configuration, SoundFont repository and synth/effect
+    // resolvers; synthesizers send their events to the capturing MIDI output.
+    state.services = std::make_unique<engine::AudioServices>(&state.midiOutPort);
 
     state.servicesInitialized = true;
     AudioEngineConfig config;
     config.useSoundFontLowPassFilter = true;
     state.sampleRate = setup.sample_rate;
-    auto configuration = globalIoc()->resolve<engine::IAudioEngineConfiguration>("engine_audio");
-    configuration->setConfig(config);
-    globalIoc()->resolve<synth::ISynthResolver>("engine_audio")->init(configuration->defaultAudioInputParams(), output_spec());
-    state.factory = std::dynamic_pointer_cast<engine::AudioFactory>(globalIoc()->resolve<engine::IAudioFactory>("engine_audio"));
-    state.factory->setOutputSpec(output_spec());
+    engine::AudioEngineConfiguration& configuration = state.services->configuration();
+    configuration.setConfig(config);
+    state.services->synthResolver().init(configuration.defaultAudioInputParams(), output_spec(state.sampleRate));
+    state.factory = &state.services->factory();
+    state.factory->setOutputSpec(output_spec(state.sampleRate));
 
     // 4. SoundFonts. addSoundFont() is synchronous for file: URIs
     // (soundfontrepository.cpp:68-77, 117-168) and refreshes FluidResolver
     // through soundFontsChanged (fluidresolver.cpp:44-50, 102-145).
-    auto repository = globalIoc()->resolve<synth::ISoundFontRepository>("engine_audio");
-    if (!repository) {
-        return fail("audio engine SoundFont repository is not registered");
-    }
+    auto* repository = &state.services->soundFontRepository();
 
     // The pinned FluidSynth default sink writes parser errors to stdout, which
     // corrupts a JSON CLI's output. FluidSynth::init() installs its own
@@ -558,29 +550,28 @@ bool initialize_engine_audio(const EngineAudioSetup& setup, std::string* error)
     return true;
 }
 
-bool initialize_engine_audio(const std::string& soundfont_path, std::string* error)
+bool initialize_engine_audio(EngineAudio& audio, const std::string& soundfont_path, std::string* error)
 {
-    return initialize_engine_audio(EngineAudioSetup{ { soundfont_path }, kDefaultSampleRate }, error);
+    return initialize_engine_audio(audio, EngineAudioSetup{ { soundfont_path }, kDefaultSampleRate }, error);
 }
 
-bool engine_audio_initialized()
+bool engine_audio_initialized(const EngineAudio& audio)
 {
-    const EngineState& state = engine_state();
+    EngineAudio::State& state = audio.state();
     return state.servicesInitialized && !state.soundfontId.empty();
 }
 
-std::string engine_soundfont_resource_id()
+std::string engine_soundfont_resource_id(const EngineAudio& audio)
 {
-    return engine_state().soundfontId;
+    return audio.state().soundfontId;
 }
 
-std::string engine_soundfont_uri()
+std::string engine_soundfont_uri(const EngineAudio& audio)
 {
-    return engine_state().soundfontUri;
+    return audio.state().soundfontUri;
 }
 
-AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderRequest& request,
-                                     const muse::mpe::IArticulationProfilesRepository& profiles)
+AudioRenderResult export_score_audio(EngineAudio& audio, MasterScore* master, const AudioRenderRequest& request)
 {
     OfflineTimingReport timingReport;
     AudioRenderResult result;
@@ -591,7 +582,7 @@ AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderReque
         return result;
     };
 
-    const EngineState& state = engine_state();
+    EngineAudio::State& state = audio.state();
     if (!state.servicesInitialized || !state.factory || state.soundfontId.empty()) {
         return fail(AudioRenderResult::Failure::EngineFailure, "audio engine is not initialised");
     }
@@ -638,7 +629,7 @@ AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderReque
 
     // PlaybackModel stays alive until the render has consumed the playback data
     // streams; the audio tracks reference them.
-    PlaybackModel model(&profiles);
+    PlaybackModel model(&state.profiles);
     model.setPlayRepeats(request.use_repeats);
     model.setPlayChordSymbols(false);
     model.setIsMetronomeEnabled(false);
@@ -691,9 +682,9 @@ AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderReque
                     + " MiB) exceeds the 1 GiB audio export limit");
     }
 
-    engine::OfflineRenderSession context(*state.factory, output_spec());
+    engine::OfflineRenderSession context(*state.factory, output_spec(state.sampleRate));
     std::string chainError;
-    engine::TrackChainPtr masterChain = make_master_chain(context.output(), request, chainError);
+    engine::TrackChainPtr masterChain = make_master_chain(context.output(), output_spec(state.sampleRate), request, chainError);
     if (!masterChain) {
         return fail(AudioRenderResult::Failure::EngineFailure, std::move(chainError));
     }
@@ -815,7 +806,7 @@ AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderReque
     std::srand(0);
 
     // The writer reports completed frames after each successfully encoded block.
-    s_rendered_frames = 0;
+    state.midiOutPort.renderedFrames = 0;
 
     StreamingFileDevice device(io::path_t(request.output_path));
     if (!device.open(io::IODevice::WriteOnly)) {
@@ -827,8 +818,8 @@ AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderReque
     // The writer owns the render loop (soundtrackwriter.cpp:133-207): it sets
     // the source to PlayingOffline, renders in 4096-frame chunks, encodes them
     // and reports the completed frame count after each one.
-    soundtrack::SoundTrackWriter writer(device, make_soundtrack_format(request.format, request), renderSecs, masterChain,
-        [](uint64_t frames) { s_rendered_frames = frames; });
+    soundtrack::SoundTrackWriter writer(device, make_soundtrack_format(request.format, request, output_spec(state.sampleRate)), renderSecs, masterChain,
+        [&state](uint64_t frames) { state.midiOutPort.renderedFrames = frames; });
     const Ret writeRet = writer.write();
 
     // Flush before the FileSystem size check below.

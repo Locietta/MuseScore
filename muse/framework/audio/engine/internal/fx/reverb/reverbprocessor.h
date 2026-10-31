@@ -42,7 +42,6 @@ public:
     AudioFxType type() const override;
     std::string name() const override;
     const AudioFxParams& params() const override;
-    async::Channel<audio::AudioFxParams> paramsChanged() const override;
     void setOutputSpec(const OutputSpec& spec) override;
 
     bool active() const override;
@@ -148,7 +147,6 @@ private:
     int m_delays = 16;
 
     AudioFxParams m_params;
-    async::Channel<audio::AudioFxParams> m_paramsChanged;
 
     float** m_signalBuffers = nullptr;
 };

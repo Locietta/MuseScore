@@ -881,60 +881,20 @@ TEST_F(Engraving_PlaybackModelTests, SimpleRepeat_Changes_Notification)
     size_t expectedEventCount = 24;
     EXPECT_EQ(result.originEvents.size(), expectedEventCount);
 
-    // [WHEN] Notify on score change
-    size_t receivedEventCount = 0;
-    model.setSendEventsOnScoreChange(trackId, true);
-
-    // [THEN] Updated events map will match our expectations
-    result.mainStream.onReceive(this, [&receivedEventCount](const PlaybackEventsMap& updatedEvents, const DynamicAutomationLayers&) {
-        receivedEventCount = updatedEvents.size();
-    });
-
-    // [WHEN] Score has been changed: the range starts ouside the repeat and ends inside it
     ScoreChanges changes;
-    changes.tickFrom = 480; // 2nd note of the 1st measure (outside the repeat)
-    changes.tickTo = 3840; // 1st note of the 3rd measure (inside the repeat)
+    changes.tickFrom = 480;
+    changes.tickTo = 3840;
     changes.staffIdxFrom = 0;
     changes.staffIdxTo = 0;
     changes.changedTypes = { ElementType::NOTE };
-
     score->masterScore()->notifyChanges(changes);
-
-    // [THEN] Main stream events received
-    EXPECT_EQ(receivedEventCount, expectedEventCount);
-
-    // [WHEN] Notify on score change
-    receivedEventCount = 0;
-    model.setSendEventsOnScoreChange(trackId, false);
-
-    // [WHEN] Score has been changed: the range is inside the repeat and tickTo == the end tick of the repeat
-    // See: https://github.com/musescore/MuseScore/issues/25899
-    changes.tickFrom = 4800; // 3rd note of the 3rd measure (inside the repeat)
-    changes.tickTo = 5760; // end tick of the repeat
-    changes.staffIdxFrom = 0;
-    changes.staffIdxTo = 0;
+    EXPECT_EQ(model.resolveTrackPlaybackData(trackId).originEvents.size(), expectedEventCount);
+    changes.tickFrom = 4800;
+    changes.tickTo = 5760;
     changes.changedTypes = { ElementType::PEDAL };
-
     score->masterScore()->notifyChanges(changes);
+    EXPECT_EQ(model.resolveTrackPlaybackData(trackId).originEvents.size(), expectedEventCount);
 
-    // [THEN] Events not sent despite score change
-    EXPECT_EQ(receivedEventCount, 0);
-
-    // [WHEN] Send events
-    model.sendEventsForChangedTracks();
-
-    // [THEN] Events received
-    EXPECT_EQ(receivedEventCount, expectedEventCount);
-
-    // [WHEN] Send score changes
-    score->masterScore()->notifyChanges(changes);
-
-    // [WHEN] Re-enable sending events on score change
-    receivedEventCount = 0;
-    model.setSendEventsOnScoreChange(trackId, true);
-
-    // [THEN] Events are sent and received immediately
-    EXPECT_EQ(receivedEventCount, expectedEventCount);
 }
 
 /**
@@ -1212,8 +1172,7 @@ TEST_F(Engraving_PlaybackModelTests, Note_Entry_Playback_Note)
     const mpe::NoteEvent& expectedEvent = std::get<mpe::NoteEvent>(result.originEvents.at(firstNoteTimestamp).front());
 
     // [THEN] Triggered events map will match our expectations
-    result.offStream.onReceive(this, [firstNoteTimestamp, expectedEvent](const PlaybackEventsMap& triggeredEvents,
-                                                                         bool flushOffstream) {
+    auto checkEvents = [firstNoteTimestamp, expectedEvent](const PlaybackEventsMap& triggeredEvents) {
         ASSERT_EQ(triggeredEvents.size(), 1);
         const PlaybackEventList& eventList = triggeredEvents.at(firstNoteTimestamp);
 
@@ -1226,11 +1185,10 @@ TEST_F(Engraving_PlaybackModelTests, Note_Entry_Playback_Note)
         EXPECT_EQ(noteEvent.expressionCtx(), expectedEvent.expressionCtx());
         EXPECT_EQ(noteEvent.pitchCtx(), expectedEvent.pitchCtx());
 
-        EXPECT_TRUE(flushOffstream);
-    });
+    };
 
     // [WHEN] User has clicked on the first note
-    model.triggerEventsForItems({ firstNote }, QUARTER_NOTE_DURATION, true /*flushSounds*/);
+    checkEvents(model.triggerEventsForItems({ firstNote }, QUARTER_NOTE_DURATION));
 
     delete score;
 }
@@ -1280,8 +1238,7 @@ TEST_F(Engraving_PlaybackModelTests, Note_Entry_Playback_Chord)
     const PlaybackEventList& expectedEvents = result.originEvents.at(thirdChordTimestamp);
 
     // [THEN] Triggered events map will match our expectations
-    result.offStream.onReceive(this, [expectedEvents](const PlaybackEventsMap& triggeredEvents,
-                                                      bool flushOffstream) {
+    auto checkEvents = [expectedEvents](const PlaybackEventsMap& triggeredEvents) {
         ASSERT_EQ(triggeredEvents.size(), 1);
         const PlaybackEventList& actualEvents = triggeredEvents.at(0);
         ASSERT_EQ(actualEvents.size(), expectedEvents.size());
@@ -1294,15 +1251,14 @@ TEST_F(Engraving_PlaybackModelTests, Note_Entry_Playback_Chord)
             EXPECT_FALSE(actualNoteEvent.expressionCtx() == expectedNoteEvent.expressionCtx());
             EXPECT_TRUE(actualNoteEvent.pitchCtx() == expectedNoteEvent.pitchCtx());
 
-            EXPECT_TRUE(flushOffstream);
-        }
-    });
+            }
+    };
 
     // [WHEN] Don't use the score dynamics
     model.setUseScoreDynamicsForOffstreamPlayback(false);
 
     // [WHEN] User has clicked on the first note
-    model.triggerEventsForItems({ thirdChord }, QUARTER_NOTE_DURATION, true /*flushSounds*/);
+    checkEvents(model.triggerEventsForItems({ thirdChord }, QUARTER_NOTE_DURATION));
 }
 
 /**

@@ -26,7 +26,6 @@
 #include <vector>
 #include <map>
 
-#include "async/channel.h"
 #include "types/retval.h"
 #include "midievent.h"
 
@@ -89,37 +88,6 @@ struct MidiMapping {
         return division == other.division
                && tempo == other.tempo
                && programms == other.programms;
-    }
-};
-
-struct MidiStream {
-    tick_t lastTick = 0;
-
-    ValCh<std::vector<Event> > controlEventsStream;
-    async::Channel<Events, tick_t /*endTick*/> mainStream;
-    async::Channel<Events, tick_t /*endTick*/> backgroundStream;
-    async::Channel<tick_t /*from*/, tick_t /*from*/> eventsRequest;
-
-    bool operator==(const MidiStream& other) const
-    {
-        return lastTick == other.lastTick
-               && controlEventsStream.val == other.controlEventsStream.val;
-    }
-};
-
-struct MidiData {
-    MidiMapping mapping;
-    MidiStream stream;
-
-    bool isValid() const
-    {
-        return mapping.isValid() && stream.lastTick > 0;
-    }
-
-    bool operator==(const MidiData& other) const
-    {
-        return mapping == other.mapping
-               && stream == other.stream;
     }
 };
 

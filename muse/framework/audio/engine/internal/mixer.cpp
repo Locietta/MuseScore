@@ -31,11 +31,9 @@
 #include "log.h"
 
 using namespace muse;
-using namespace muse::async;
 using namespace muse::audio;
 using namespace muse::audio::engine;
 
-constexpr size_t MIN_TRACK_COUNT_FOR_MULTITHREADING = 2;
 
 static bool isChainSilent(const TrackChainPtr& chain)
 {
@@ -65,7 +63,6 @@ Ret Mixer::addTrack(TrackChainPtr trackChain, const AuxSendsParams& auxSends)
     trackData.buffer.resize(outBufferSize);
 
     m_tracks.emplace_back(std::move(trackData));
-    m_trackTasks.reserve(m_tracks.size());
 
     setAuxSends(trackData.trackId, auxSends);
 
@@ -190,64 +187,20 @@ void Mixer::processTrackChannels(size_t outBufferSize,
 
     bool filterTracks = (m_mode == ProcessMode::Idle) && !m_tracksToProcessWhenIdle.empty();
 
-#ifdef MUSE_THREADS_SUPPORT
-    if (useMultithreading()) {
-        m_trackTasks.clear();
-        for (auto& t : m_tracks) {
-            t.processed = false;
+    for (auto& t : m_tracks) {
+        t.processed = false;
 
-            if (filterTracks && !muse::contains(m_tracksToProcessWhenIdle, t.trackId)) {
-                continue;
-            }
-
-            m_trackTasks.emplace_back([tPtr = &t, processChannel] {
-                processChannel(*tPtr);
-            });
+        if (filterTracks && !muse::contains(m_tracksToProcessWhenIdle, t.trackId)) {
+            continue;
         }
-        audioTaskScheduler()->submitRealtimeTasksAndWait(m_trackTasks);
-    } else
-#endif
-    {
-        for (auto& t : m_tracks) {
-            t.processed = false;
 
-            if (filterTracks && !muse::contains(m_tracksToProcessWhenIdle, t.trackId)) {
-                continue;
-            }
-
-            processChannel(t);
-        }
+        processChannel(t);
     }
 }
 
 void Mixer::setNonMutedTrackCount(size_t count)
 {
     m_nonMutedTrackCount = count;
-}
-
-bool Mixer::useMultithreading() const
-{
-#ifdef MUSE_THREADS_SUPPORT
-    //! NOTE Offline the render runs on the engine thread while it holds its async queue lock,
-    //! and a pool worker needs that same lock to register a channel port, which deadlocks.
-    if (m_mode == ProcessMode::PlayingOffline) {
-        return false;
-    }
-
-    if (m_nonMutedTrackCount < MIN_TRACK_COUNT_FOR_MULTITHREADING) {
-        return false;
-    }
-
-    if (m_mode == ProcessMode::Idle) {
-        if (m_tracksToProcessWhenIdle.size() < MIN_TRACK_COUNT_FOR_MULTITHREADING) {
-            return false;
-        }
-    }
-
-    return true;
-#else
-    return false;
-#endif
 }
 
 void Mixer::setTracksToProcessWhenIdle(const std::unordered_set<TrackId>& trackIds)

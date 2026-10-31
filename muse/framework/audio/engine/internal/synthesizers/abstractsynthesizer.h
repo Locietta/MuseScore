@@ -22,37 +22,30 @@
 
 #pragma once
 
-#include "global/async/channel.h"
-#include "global/async/asyncable.h"
 #include "mpe/events.h"
 
-#include "global/modularity/ioc.h"
 #include "../../iaudioengineconfiguration.h"
 
 #include "audio/common/audiotypes.h"
 #include "../../isynthesizer.h"
 
 namespace muse::audio::synth {
-class AbstractSynthesizer : public ISynthesizer, public async::Asyncable
+class AbstractSynthesizer : public ISynthesizer
 {
 public:
-    muse::GlobalInject<engine::IAudioEngineConfiguration> config;
-
-public:
-    AbstractSynthesizer(const audio::AudioInputParams& params);
+    // config must outlive the synthesizer.
+    AbstractSynthesizer(const audio::AudioInputParams& params, const engine::IAudioEngineConfiguration& config);
     virtual ~AbstractSynthesizer() = default;
 
     virtual void setMode(const ProcessMode mode) override;
     ProcessMode mode() const override;
 
     const audio::AudioInputParams& params() const override;
-    async::Channel<audio::AudioInputParams> paramsChanged() const override;
 
     void setup(const mpe::PlaybackData& playbackData) override;
 
     void prepareToPlay() override;
     bool readyToPlay() const override;
-    async::Notification readyToPlayChanged() const override;
 
     bool hasPendingChunks() const override;
     void processInput() override;
@@ -61,6 +54,8 @@ public:
     void clearCache() override;
 
 protected:
+    const engine::IAudioEngineConfiguration* config() const { return &m_config; }
+
     virtual void setupSound(const mpe::PlaybackSetupData& setupData) = 0;
     virtual void setupEvents(const mpe::PlaybackData& playbackData) = 0;
 
@@ -72,9 +67,7 @@ protected:
     mpe::PlaybackSetupData m_setupData;
 
     audio::AudioInputParams m_params;
-    async::Channel<audio::AudioInputParams> m_paramsChanges;
-
-    async::Notification m_readyToPlayChanged;
+    const engine::IAudioEngineConfiguration& m_config;
 
     InputProcessingProgress m_inputProcessingProgress;
     bool m_hasPendingChunks = false;

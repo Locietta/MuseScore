@@ -1,4 +1,5 @@
 #include "engine_context.h"
+#include "engrave/src/audio/engine_audio.h"
 
 #include <cstdio>
 #include <filesystem>
@@ -129,6 +130,7 @@ struct EngineContext::Impl {
     EngravingServices engraving;
     std::unique_ptr<PaletteScoreProvider> palette;
 
+    std::unique_ptr<EngineAudio> audio;
     void teardown() noexcept;
 };
 
@@ -136,6 +138,7 @@ struct EngineContext::Impl {
 void EngineContext::Impl::teardown() noexcept
 {
     try {
+        audio.reset();
         if (palette) palette->deinit();
         engraving.paletteScoreProvider = nullptr;
         palette.reset();
@@ -178,6 +181,7 @@ EngineContext::EngineContext(const std::string& assets, const std::string& cache
         d.configuration = std::make_shared<EngravingConfiguration>();
         d.renderer = std::make_shared<rendering::score::ScoreRenderer>();
         d.articulationProfiles = std::make_unique<mpe::ArticulationProfilesRepository>(*d.fileSystem);
+        d.audio = std::make_unique<EngineAudio>(*d.articulationProfiles);
         d.musicXml = std::make_unique<mu::iex::musicxml::MusicXmlConfiguration>();
         d.contextConfiguration = std::make_shared<EngravingContextConfiguration>();
         d.engraving.configuration = d.configuration;
@@ -221,6 +225,7 @@ EngineContext::~EngineContext()
 }
 
 io::IFileSystem& EngineContext::fileSystem() const { return *m_impl->fileSystem; }
+EngineAudio& EngineContext::audio() const { return *m_impl->audio; }
 RuntimeAssets& EngineContext::assets() const { return *m_impl->assets; }
 IFontsDatabase& EngineContext::fontsDatabase() const { return m_impl->assets->fontsDatabase(); }
 EngravingServices& EngineContext::engraving() const { return m_impl->engraving; }

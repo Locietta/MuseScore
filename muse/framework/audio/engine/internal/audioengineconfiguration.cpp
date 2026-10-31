@@ -47,25 +47,18 @@ void AudioEngineConfiguration::setConfig(const AudioEngineConfig& conf)
 
     if (conf.autoProcessOnlineSoundsInBackground != m_conf.autoProcessOnlineSoundsInBackground) {
         m_conf.autoProcessOnlineSoundsInBackground = conf.autoProcessOnlineSoundsInBackground;
-        m_autoProcessOnlineSoundsInBackgroundChanged.send(m_conf.autoProcessOnlineSoundsInBackground);
     }
 
     setIsLazyProcessingOfOnlineSoundsEnabled(conf.isLazyProcessingOfOnlineSoundsEnabled);
 
     if (conf.useSoundFontLowPassFilter != m_conf.useSoundFontLowPassFilter) {
         m_conf.useSoundFontLowPassFilter = conf.useSoundFontLowPassFilter;
-        m_useSoundFontLowPassFilterChanged.send(m_conf.useSoundFontLowPassFilter);
     }
 }
 
 bool AudioEngineConfiguration::autoProcessOnlineSoundsInBackground() const
 {
     return m_conf.autoProcessOnlineSoundsInBackground;
-}
-
-async::Channel<bool> AudioEngineConfiguration::autoProcessOnlineSoundsInBackgroundChanged() const
-{
-    return m_autoProcessOnlineSoundsInBackgroundChanged;
 }
 
 void AudioEngineConfiguration::setIsLazyProcessingOfOnlineSoundsEnabled(bool enabled)
@@ -75,7 +68,6 @@ void AudioEngineConfiguration::setIsLazyProcessingOfOnlineSoundsEnabled(bool ena
     }
 
     m_conf.isLazyProcessingOfOnlineSoundsEnabled = enabled;
-    m_isLazyProcessingOfOnlineSoundsEnabledChanged.send(enabled);
 }
 
 bool AudioEngineConfiguration::isLazyProcessingOfOnlineSoundsEnabled() const
@@ -83,19 +75,9 @@ bool AudioEngineConfiguration::isLazyProcessingOfOnlineSoundsEnabled() const
     return m_conf.isLazyProcessingOfOnlineSoundsEnabled;
 }
 
-async::Channel<bool> AudioEngineConfiguration::isLazyProcessingOfOnlineSoundsEnabledChanged() const
-{
-    return m_isLazyProcessingOfOnlineSoundsEnabledChanged;
-}
-
 bool AudioEngineConfiguration::useSoundFontLowPassFilter() const
 {
     return m_conf.useSoundFontLowPassFilter;
-}
-
-async::Channel<bool> AudioEngineConfiguration::useSoundFontLowPassFilterChanged() const
-{
-    return m_useSoundFontLowPassFilterChanged;
 }
 
 AudioInputParams AudioEngineConfiguration::defaultAudioInputParams() const

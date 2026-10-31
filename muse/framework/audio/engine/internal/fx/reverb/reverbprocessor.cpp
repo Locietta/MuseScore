@@ -315,11 +315,6 @@ const AudioFxParams& ReverbProcessor::params() const
     return m_params;
 }
 
-async::Channel<audio::AudioFxParams> ReverbProcessor::paramsChanged() const
-{
-    return m_paramsChanged;
-}
-
 void ReverbProcessor::setOutputSpec(const OutputSpec& spec)
 {
     IF_ASSERT_FAILED(spec.isValid()) {

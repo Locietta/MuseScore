@@ -287,12 +287,12 @@ int main(int argc, char** argv)
 
         auto engineStart = std::chrono::steady_clock::now();
         std::string bootstrapError;
-        const bool engineReady = music::initialize_engine_audio(soundfont, &bootstrapError);
+        const bool engineReady = music::initialize_engine_audio(context.audio(), soundfont, &bootstrapError);
         out["engineSeconds"] = seconds_since(engineStart);
         out["soundfont"] = {
             { "path", soundfont },
-            { "resourceId", music::engine_soundfont_resource_id() },
-            { "uri", music::engine_soundfont_uri() },
+            { "resourceId", music::engine_soundfont_resource_id(context.audio()) },
+            { "uri", music::engine_soundfont_uri(context.audio()) },
             { "uriRoundTrip", false },
         };
         if (!engineReady) {
@@ -303,7 +303,7 @@ int main(int argc, char** argv)
             // Windows drive letters and non-ASCII names must survive
             // Uri::fromLocalFile()/toLocalFile() (fromLocalFile percent-encodes
             // ':' and non-safe bytes, uri.cpp:117-154).
-            const muse::Uri uri(music::engine_soundfont_uri());
+            const muse::Uri uri(music::engine_soundfont_uri(context.audio()));
             const std::string roundTripped = uri.toLocalFile().toStdString();
             std::error_code ec;
             const fs::path expected = fs::absolute(fs::u8path(soundfont), ec).lexically_normal();
@@ -343,7 +343,7 @@ int main(int argc, char** argv)
         if (captureMidi) {
             constexpr std::size_t kMaxMidiEvents = 1000000;
             midiEvents.reserve(4096);
-            music::set_engine_audio_midi_event_hook(
+            music::set_engine_audio_midi_event_hook(context.audio(),
                 [&midiEventCount, &midiEvents](const muse::midi::Event& event, std::uint64_t frame) {
                     ++midiEventCount;
                     if (midiEvents.size() < kMaxMidiEvents) {
@@ -353,9 +353,9 @@ int main(int argc, char** argv)
                     }
                 });
         }
-        const music::AudioRenderResult result = music::export_score_audio(master, request, context.articulationProfiles());
+        const music::AudioRenderResult result = music::export_score_audio(context.audio(), master, request);
         if (captureMidi) {
-            music::set_engine_audio_midi_event_hook(nullptr);
+            music::set_engine_audio_midi_event_hook(context.audio(), nullptr);
         }
         out["exportSeconds"] = seconds_since(exportStart);
 
