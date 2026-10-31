@@ -12,6 +12,7 @@
 
 #include "output_fixture.h"
 
+#include <stdexcept>
 #include <engrave/engrave.h>
 
 #include <cmath>
@@ -218,6 +219,20 @@ TEST(Audio, TheSinkReceivesTheStreamInChunks) {
 // D4: the engine keeps state between renders (tracks, synthesizer instances,
 // reverb tails). render_audio drops it before every render, so the second
 // render in this process must equal a render in a fresh process.
+TEST(Audio, FailedSinkDoesNotPoisonNextRender) {
+    auto document = detail::open_score(detail::audio_score());
+    ASSERT_TRUE(document);
+    engrave::AudioOptions options;
+    options.format = engrave::AudioFormat::Wav;
+    const auto expected = detail::render_audio(*document, options);
+    ASSERT_FALSE(expected.bytes.empty());
+    EXPECT_THROW((void)document->render_audio(options, [](std::span<const std::byte>) {
+        throw std::runtime_error("deliberate sink failure");
+    }), std::runtime_error);
+    const auto recovered = detail::render_audio(*document, options);
+    EXPECT_EQ(expected.bytes, recovered.bytes);
+}
+
 TEST(Audio, SecondRenderEqualsAFreshProcess) {
     auto document = detail::open_score(detail::audio_score());
     ASSERT_TRUE(document) << "the corpus has no " << detail::audio_score();
