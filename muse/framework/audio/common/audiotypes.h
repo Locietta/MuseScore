@@ -78,7 +78,7 @@ static constexpr TrackId MASTER_TRACK_ID = 0;
 
 static constexpr char DEFAULT_DEVICE_ID[] = "default";
 
-#ifdef Q_OS_WIN
+#ifdef _WIN32
 static constexpr samples_t MINIMUM_BUFFER_SIZE = 256;
 #else
 static constexpr samples_t MINIMUM_BUFFER_SIZE = 128;

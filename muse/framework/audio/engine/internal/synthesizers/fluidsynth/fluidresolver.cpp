@@ -22,7 +22,6 @@
 
 #include "fluidresolver.h"
 
-#include "audio/common/audiosanitizer.h"
 
 #include "audio/engine/internal/codecs/vorbisdecoder.h"
 
@@ -37,7 +36,6 @@ FluidResolver::FluidResolver(const ISoundFontRepository& soundFontRepository,
                              const engine::IAudioEngineConfiguration& config, midi::IMidiOutPort* midiOutPort)
     : m_soundFontRepository(soundFontRepository), m_config(config), m_midiOutPort(midiOutPort)
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     fluid::FluidVorbisDecoder::decoder = new codec::VorbisDecoder();
 
@@ -52,7 +50,6 @@ FluidResolver::~FluidResolver()
 
 ISynthesizerPtr FluidResolver::resolveSynth(const TrackId /*trackId*/, const AudioInputParams& params, const OutputSpec& spec) const
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     auto search = m_resourcesCache.find(params.resourceMeta.id);
     if (search == m_resourcesCache.end()) {
@@ -75,7 +72,6 @@ bool FluidResolver::hasCompatibleResources(const PlaybackSetupData& /*setup*/) c
 
 AudioResourceMetaList FluidResolver::resolveResources() const
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     AudioResourceMetaList result;
     result.reserve(m_resourcesCache.size());
@@ -99,7 +95,6 @@ static std::string makeId(const std::string& name, int bank, int program)
 
 void FluidResolver::refresh()
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     m_resourcesCache.clear();
 

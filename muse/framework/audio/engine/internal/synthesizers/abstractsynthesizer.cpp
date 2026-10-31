@@ -22,7 +22,6 @@
 
 #include "abstractsynthesizer.h"
 
-#include "audio/common/audiosanitizer.h"
 
 using namespace muse;
 using namespace muse::mpe;
@@ -32,33 +31,28 @@ using namespace muse::audio::synth;
 AbstractSynthesizer::AbstractSynthesizer(const AudioInputParams& params, const engine::IAudioEngineConfiguration& config)
     : m_params(params), m_config(config)
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 }
 
 void AbstractSynthesizer::setMode(const ProcessMode mode)
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     m_mode = mode;
 }
 
 ProcessMode AbstractSynthesizer::mode() const
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     return m_mode;
 }
 
 const AudioInputParams& AbstractSynthesizer::params() const
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     return m_params;
 }
 
 void AbstractSynthesizer::setup(const mpe::PlaybackData& playbackData)
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     m_setupData = playbackData.setupData;
 
@@ -68,38 +62,32 @@ void AbstractSynthesizer::setup(const mpe::PlaybackData& playbackData)
 
 void AbstractSynthesizer::prepareToPlay()
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 }
 
 bool AbstractSynthesizer::readyToPlay() const
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     return true;
 }
 
 bool AbstractSynthesizer::hasPendingChunks() const
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     return m_hasPendingChunks;
 }
 
 void AbstractSynthesizer::processInput()
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 }
 
 InputProcessingProgress AbstractSynthesizer::inputProcessingProgress() const
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     return m_inputProcessingProgress;
 }
 
 void AbstractSynthesizer::clearCache()
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 }
 
 muse::audio::msecs_t AbstractSynthesizer::samplesToMsecs(const samples_t samplesPerChannel, const samples_t sampleRate) const

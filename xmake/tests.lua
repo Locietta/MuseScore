@@ -401,7 +401,7 @@ target("c0_gate")
         "engrave_gp_import_test", "engrave_mnx_import_test", "engrave_output_test", "engrave_output_probe",
         "example_embedder", "engraving_playback_tests", "mpe_tests",
         "score_edit_test", "score_audio_test", "score_positions_test",
-        "excerpts_test", "archive_test", "assets_test", "semantic_dump", "engine_audio_probe", "diagnostics_test")
+        "excerpts_test", "archive_test", "assets_test", "semantic_dump", "engine_audio_probe", "diagnostics_test", "io_boundary_test")
 target_end()
 
 -- Diagnostic control flow is independent of score initialization.

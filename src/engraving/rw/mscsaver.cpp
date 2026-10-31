@@ -21,22 +21,11 @@
  */
 #include "mscsaver.h"
 
-#include <cmath>
-
 #include "global/io/buffer.h"
-#include "muse_framework_config.h"
-
-#ifdef MUSE_THREADS_SUPPORT
-#include <future>
-#endif
-
-#include "draw/painter.h"
 
 #include "dom/masterscore.h"
 #include "dom/excerpt.h"
 #include "dom/imageStore.h"
-#include "dom/mscore.h"
-#include "dom/page.h"
 
 #include "engraving/automation/internal/automationrw.h"
 
@@ -51,8 +40,8 @@ using namespace muse::io;
 using namespace mu::engraving;
 using namespace mu::engraving::rw;
 
-bool MscSaver::writeMscz(MasterScore* score, MscWriter& mscWriter, bool createThumbnail,
-                         const write::WriteContext* ctx)
+bool MscSaver::writeMscz(MasterScore* score, MscWriter& mscWriter,
+                        const write::WriteContext* ctx)
 {
     TRACEFUNC;
 
@@ -118,27 +107,6 @@ bool MscSaver::writeMscz(MasterScore* score, MscWriter& mscWriter, bool createTh
                 return data;
             };
 
-#ifdef MUSE_THREADS_SUPPORT
-            // Parallelize excerpt serialization (CPU-bound, independent per excerpt)
-            std::vector<std::future<ExcerptData> > futures;
-            futures.reserve(excerpts.size());
-
-            for (size_t excerptIndex = 0; excerptIndex < excerpts.size(); ++excerptIndex) {
-                Excerpt* excerpt = excerpts.at(excerptIndex);
-
-                futures.push_back(std::async(std::launch::async, [serializeExcerpt, excerpt, excerptIndex]() {
-                    return serializeExcerpt(excerpt, excerptIndex);
-                }));
-            }
-
-            // Wait for all serializations to complete, then write to mscWriter sequentially
-            // (MscWriter is not thread-safe)
-            for (auto& future : futures) {
-                ExcerptData data = future.get();
-                mscWriter.addExcerptStyleFile(data.fileName, data.styleData);
-                mscWriter.addExcerptFile(data.fileName, data.scoreData);
-            }
-#else
             for (size_t excerptIndex = 0; excerptIndex < excerpts.size(); ++excerptIndex) {
                 Excerpt* excerpt = excerpts.at(excerptIndex);
 
@@ -146,7 +114,6 @@ bool MscSaver::writeMscz(MasterScore* score, MscWriter& mscWriter, bool createTh
                 mscWriter.addExcerptStyleFile(data.fileName, data.styleData);
                 mscWriter.addExcerptFile(data.fileName, data.scoreData);
             }
-#endif
         }
     }
 
@@ -172,18 +139,6 @@ bool MscSaver::writeMscz(MasterScore* score, MscWriter& mscWriter, bool createTh
         }
     }
 
-    // Write thumbnail
-    {
-        if (createThumbnail && !score->pages().empty()) {
-            auto pixmap = this->createThumbnail(score);
-
-            ByteArray ba;
-            auto b = Buffer::opened(IODevice::WriteOnly, &ba);
-            imageProvider()->saveAsPng(pixmap, &b);
-            mscWriter.writeThumbnailFile(ba);
-        }
-    }
-
     // Write automation
     {
         if (score->automationData()) {
@@ -195,91 +150,4 @@ bool MscSaver::writeMscz(MasterScore* score, MscWriter& mscWriter, bool createTh
     }
 
     return true;
-}
-
-bool MscSaver::exportPart(Score* partScore, MscWriter& mscWriter)
-{
-    // Write excerpt style as main
-    {
-        ByteArray excerptStyleData;
-        auto styleStyleBuf = Buffer::opened(IODevice::WriteOnly, &excerptStyleData);
-        partScore->style().write(&styleStyleBuf);
-
-        mscWriter.writeStyleFile(excerptStyleData);
-    }
-
-    // Add the master score's metaTags to the part
-    const std::map<String, String> partTags = partScore->metaTags();
-    std::map<String, String> effectiveTags = partScore->masterScore()->metaTags();
-    for (const auto& [key, val] : partTags) {
-        effectiveTags.insert_or_assign(key, val);
-    }
-    partScore->setMetaTags(effectiveTags);
-
-    // Write excerpt as main score
-    {
-        ByteArray excerptData;
-        auto excerptBuf = Buffer::opened(IODevice::WriteOnly, &excerptData);
-
-        rw::RWRegister::writer()->writeScore(partScore, &excerptBuf);
-
-        mscWriter.writeScoreFile(excerptData);
-    }
-
-    // restore in-memory part score's metaTags
-    partScore->setMetaTags(partTags);
-
-    // Write thumbnail
-    {
-        if (!partScore->pages().empty()) {
-            auto pixmap = createThumbnail(partScore);
-
-            ByteArray ba;
-            auto b = Buffer::opened(IODevice::WriteOnly, &ba);
-            imageProvider()->saveAsPng(pixmap, &b);
-            mscWriter.writeThumbnailFile(ba);
-        }
-    }
-
-    return true;
-}
-
-std::shared_ptr<muse::draw::Pixmap> MscSaver::createThumbnail(Score* score)
-{
-    TRACEFUNC;
-
-    LayoutMode mode = score->layoutMode();
-    score->switchToPageMode();
-
-    Page* page = score->pages().at(0);
-    RectF fr = page->pageBoundingRect();
-    double mag = 512.0 / std::max(fr.width(), fr.height());
-    int w = int(fr.width() * mag);
-    int h = int(fr.height() * mag);
-
-    int dpm = lrint(DPMM * 1000.0);
-
-    auto pixmap = imageProvider()->createPixmap(w, h, dpm, configuration()->thumbnailBackgroundColor());
-
-    auto painterProvider = imageProvider()->painterForImage(pixmap);
-    muse::draw::Painter p(painterProvider, "thumbnail");
-
-    p.setAntialiasing(true);
-    p.scale(mag, mag);
-
-    rendering::IScoreRenderer::ScorePaintOptions opt;
-    opt.isPrinting = true;
-    opt.isSetViewport = false;
-    opt.printPageBackground = false;
-    opt.fromPage = 0;
-    opt.toPage = 0;
-    scoreRenderer()->paintScore(&p, score, opt);
-
-    p.endDraw();
-
-    if (score->layoutMode() != mode) {
-        score->setLayoutMode(mode);
-        score->doLayout();
-    }
-    return pixmap;
 }

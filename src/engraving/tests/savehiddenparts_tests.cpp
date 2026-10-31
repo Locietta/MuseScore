@@ -95,7 +95,7 @@ public:
 
         MscWriter writer(params);
         EXPECT_TRUE(writer.open());
-        EXPECT_TRUE(MscSaver(score->services()).writeMscz(score, writer, /*createThumbnail*/ false));
+        EXPECT_TRUE(MscSaver().writeMscz(score, writer));
         writer.close();
 
         return data;

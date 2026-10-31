@@ -84,7 +84,7 @@ using EngineAudioMidiEventHook = std::function<void(const muse::midi::Event&, st
 void set_engine_audio_midi_event_hook(EngineAudio& audio, EngineAudioMidiEventHook hook);
 
 // Initialises the engine's audio services and loads its SoundFonts:
-//   AudioSanitizer setup, capturing MIDI output, service registration, explicit
+//   Capturing MIDI output, owned audio services, explicit
 //   configuration/synth/engine initialization, then SoundFont loading.
 // The first font of the list is the default: every track plays it unless its
 // request names another index. A SoundFont's resource id is its complete basename

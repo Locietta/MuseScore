@@ -27,7 +27,6 @@
 #include "types/val.h"
 #include "io/path.h"
 
-#include "muse_framework_config.h"
 
 //! NOTE We are gradually abandoning Qt in non-GUI classes.
 //! This settings interface is almost independent of Qt,

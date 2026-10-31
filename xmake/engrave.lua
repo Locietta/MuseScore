@@ -10,7 +10,7 @@
 --   * the pinned third-party package recipes the engine targets need (declared
 --     here with add_requires, so any project that includes this file resolves
 --     them without repeating the pins);
---   * the generated framework configuration header;
+--   * the generated version/provenance header;
 --   * the engine module targets: muse_global, muse_draw, muse_mpe, engraving,
 --     the iex_* import/export modules, native_fluidsynth and
 --     muse_audio_engine, compiled via folder globs;
@@ -56,7 +56,7 @@ add_requires("utfcpp v4.1.1", {system = false})
 add_requires("muse-picojson 111c9be", {system = false})
 
 ---------------------------------------------------------------------------
--- Generated framework configuration header
+-- Generated version/provenance header
 ---------------------------------------------------------------------------
 local function read_version(os, io)
     local text = io.readfile(engine("version.cmake")) or ""
@@ -107,19 +107,12 @@ target("muse_generated")
     set_kind("phony")
     set_default(false)
     set_targetdir("$(builddir)/xmake-generated")
-    local function generate_framework_config(target, os, io)
+    local function generate_version_header(target, os, io)
         local output_dir = target:targetdir()
         if not output_dir or output_dir == "" then
             raise("generated target requires a build directory")
         end
         os.mkdir(output_dir)
-        local template_path = path.join(fork_root, "xmake", "framework_config.h")
-        local template = io.readfile(template_path)
-        if not template then
-            raise("cannot read pinned config template: %s", template_path)
-        end
-        write_if_changed(os, io, path.join(output_dir, "muse_framework_config.h"),
-            template)
         local metadata = {}
         for name, value in pairs(read_version(os, io)) do
             if name:find("^MUSE_APP_") then
@@ -135,10 +128,10 @@ target("muse_generated")
             table.concat(metadata, "\n") .. "\n")
     end
     on_config(function (target)
-        generate_framework_config(target, os, io)
+        generate_version_header(target, os, io)
     end)
     on_build(function (target)
-        generate_framework_config(target, os, io)
+        generate_version_header(target, os, io)
     end)
 target_end()
 
@@ -148,13 +141,9 @@ target_end()
 ENGRAVE_SOURCE_ROOT = source_root
 ENGRAVE_FORK_ROOT = fork_root
 
-ENGRAVE_DEFINES = {
-    "MUSE_MODULE_AUDIO_EXPORT",
-}
-
-ENGRAVE_GLOBAL_DEFINES = {
-    "KORS_PROFILER_ENABLED",
-}
+-- Preserve the including-project interface; no engine feature defines remain.
+ENGRAVE_DEFINES = {}
+ENGRAVE_GLOBAL_DEFINES = {}
 
 ENGRAVE_INCLUDES = {
     engine("muse"),
@@ -184,7 +173,6 @@ local fluidsynth_src = path.join(fluidsynth_dir, "src")
 
 ENGRAVE_AUDIO_ENGINE = {
     defines = {
-        "KORS_PROFILER_ENABLED",
         "NO_GLIB",
         "NO_THREADS",
         "SYSTEM_LAME",
@@ -237,7 +225,6 @@ target("muse_global")
     add_deps("muse_generated")
     add_packages("muse-pugixml", "utfcpp", "muse-picojson")
     add_engine_target_defaults()
-    add_defines("KORS_PROFILER_ENABLED", "MUSE_MODULE_GLOBAL_LOGGER_DEBUGLEVEL")
     add_includedirs(
         engine("muse/framework/global"),
         engine("src"),
@@ -247,7 +234,6 @@ target("muse_global")
     add_files(
         engine("muse/framework/global/*.cpp"),
         engine("muse/framework/global/io/*.cpp"),
-        engine("muse/framework/global/io/devtools/*.cpp"),
         engine("muse/framework/global/serialization/**.cpp"),
         engine("muse/framework/global/types/*.cpp"),
         engine("muse/framework/global/thirdparty/kors_logger/src/*.cpp")
@@ -266,7 +252,6 @@ target("muse_draw")
     add_deps("muse_generated", "muse_global")
     add_packages("freetype", "muse-harfbuzz", {public = true})
     add_engine_target_defaults()
-    add_defines("KORS_PROFILER_ENABLED")
     add_includedirs(
         engine("muse/framework/draw"),
         engine("src"),
@@ -280,7 +265,6 @@ target("muse_mpe")
     set_kind("static")
     add_deps("muse_generated", "muse_global")
     add_engine_target_defaults()
-    add_defines("KORS_PROFILER_ENABLED")
     add_includedirs(
         engine("muse/framework/mpe"),
         engine("src"),
@@ -297,7 +281,6 @@ target("engraving")
     set_kind("static")
     add_deps("muse_generated", "muse_global", "muse_draw", "muse_mpe")
     add_engine_target_defaults()
-    add_defines("KORS_PROFILER_ENABLED")
     add_includedirs(
         engine("src/engraving"),
         engine("src"),
@@ -316,7 +299,6 @@ target("iex_musicxml")
     set_kind("static")
     add_deps("muse_generated", "muse_global", "engraving")
     add_engine_target_defaults()
-    add_defines("KORS_PROFILER_ENABLED")
     add_includedirs(
         engine("src/importexport/musicxml"),
         engine("src"),
@@ -335,7 +317,6 @@ target("iex_mnx")
     if is_plat("windows") then add_cxxflags("/Zc:preprocessor") end
     add_deps("muse_generated", "engraving")
     add_engine_target_defaults()
-    add_defines("KORS_PROFILER_ENABLED")
     add_includedirs(
         engine("src/importexport/mnx"),
         engine("src"),
@@ -353,7 +334,6 @@ target("iex_guitarpro")
     set_kind("static")
     add_deps("muse_generated", "engraving")
     add_engine_target_defaults()
-    add_defines("KORS_PROFILER_ENABLED")
     add_includedirs(
         engine("src/importexport/guitarpro"),
         engine("src"),
@@ -372,7 +352,6 @@ target("iex_midi")
     set_kind("static")
     add_deps("muse_generated", "engraving")
     add_engine_target_defaults()
-    add_defines("KORS_PROFILER_ENABLED")
     add_includedirs(
         engine("src/importexport/midi"),
         engine("src"),
@@ -394,7 +373,7 @@ target("native_fluidsynth")
         set_languages("gnu17", "cxx23")
     end
     add_engine_target_defaults()
-    add_defines("EXTERN_VORBIS_SUPPORT", "KORS_PROFILER_ENABLED", "NO_GLIB", "NO_THREADS")
+    add_defines("EXTERN_VORBIS_SUPPORT", "NO_GLIB", "NO_THREADS")
     add_includedirs(
         path.join(fluidsynth_dir, "include"),
         fluidsynth_src,

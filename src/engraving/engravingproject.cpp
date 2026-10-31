@@ -136,12 +136,12 @@ Ret EngravingProject::loadMscz(const MscReader& msc, rw::ReadInOutData* data, bo
     return loader.loadMscz(m_masterScore, msc, data, ignoreVersionError);
 }
 
-bool EngravingProject::writeMscz(MscWriter& writer, bool createThumbnail, const write::WriteContext* ctx)
+bool EngravingProject::writeMscz(MscWriter& writer, const write::WriteContext* ctx)
 {
     TRACEFUNC;
 
-    MscSaver saver(m_services);
-    return saver.writeMscz(m_masterScore, writer, createThumbnail, ctx);
+    MscSaver saver;
+    return saver.writeMscz(m_masterScore, writer, ctx);
 }
 
 bool EngravingProject::isCorruptedUponLoading() const

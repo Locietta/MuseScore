@@ -256,7 +256,7 @@ std::string export_native_score(const EngineContext& context, const ScoreProject
         engraving::MscWriter writer(params);
         check(writer.open());
         if (options.excerpt_id == -1) {
-            success = project->writeMscz(writer, false);
+            success = project->writeMscz(writer);
         } else {
             // Same upstream writer/style logic as MscSaver::exportPart, without a Qt thumbnail.
             const auto original_tags = score->metaTags();

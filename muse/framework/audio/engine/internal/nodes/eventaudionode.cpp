@@ -23,7 +23,6 @@
 #include "eventaudionode.h"
 #include "../offlinetiming.h"
 
-#include "audio/common/audiosanitizer.h"
 
 #include "log.h"
 
@@ -36,12 +35,10 @@ using namespace muse::mpe;
 EventAudioNode::EventAudioNode(const IAudioFactory& audioFactory, TrackId trackId, const mpe::PlaybackData& playbackData)
     : m_audioFactory(audioFactory), m_trackId(trackId), m_playbackData(playbackData)
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 }
 
 void EventAudioNode::onModeChanged(const ProcessMode mode)
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     if (!m_synth) {
         return;
@@ -53,7 +50,6 @@ void EventAudioNode::onModeChanged(const ProcessMode mode)
 
 void EventAudioNode::onOutputSpecChanged(const OutputSpec& spec)
 {
-    ONLY_AUDIO_ENGINE_THREAD;
     if (!m_synth) {
         return;
     }
@@ -63,7 +59,6 @@ void EventAudioNode::onOutputSpecChanged(const OutputSpec& spec)
 
 void EventAudioNode::doSelfProcess(float* buffer, samples_t samplesPerChannel)
 {
-    ONLY_AUDIO_PROC_THREAD;
     if (!m_synth) {
         return;
     }
@@ -74,7 +69,6 @@ void EventAudioNode::doSelfProcess(float* buffer, samples_t samplesPerChannel)
 
 void EventAudioNode::seek(const TimePosition& position, const bool flushSound)
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     IF_ASSERT_FAILED(m_synth) {
         return;
@@ -93,7 +87,6 @@ void EventAudioNode::seek(const TimePosition& position, const bool flushSound)
 
 void EventAudioNode::flush()
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     IF_ASSERT_FAILED(m_synth) {
         return;
@@ -150,7 +143,6 @@ void EventAudioNode::applyInputParams(const AudioInputParams& requiredParams)
 
 void EventAudioNode::prepareToPlay()
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     IF_ASSERT_FAILED(m_synth) {
         return;
@@ -161,7 +153,6 @@ void EventAudioNode::prepareToPlay()
 
 bool EventAudioNode::readyToPlay() const
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     IF_ASSERT_FAILED(m_synth) {
         return false;
@@ -172,7 +163,6 @@ bool EventAudioNode::readyToPlay() const
 
 bool EventAudioNode::hasPendingChunks() const
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     IF_ASSERT_FAILED(m_synth) {
         return false;
@@ -183,7 +173,6 @@ bool EventAudioNode::hasPendingChunks() const
 
 void EventAudioNode::processInput()
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     IF_ASSERT_FAILED(m_synth) {
         return;
@@ -194,7 +183,6 @@ void EventAudioNode::processInput()
 
 InputProcessingProgress EventAudioNode::inputProcessingProgress() const
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     IF_ASSERT_FAILED(m_synth) {
         return {};
@@ -205,7 +193,6 @@ InputProcessingProgress EventAudioNode::inputProcessingProgress() const
 
 void EventAudioNode::clearCache()
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     IF_ASSERT_FAILED(m_synth) {
         return;
@@ -231,7 +218,6 @@ void EventAudioNode::restoreSynthCtx(const SynthCtx& ctx)
 
 void EventAudioNode::setupSource()
 {
-    ONLY_AUDIO_ENGINE_THREAD;
 
     IF_ASSERT_FAILED(m_synth) {
         return;

@@ -87,8 +87,6 @@ if is_plat("windows") then
     add_defines("WIN32", "_WINDOWS", "NOMINMAX", "_USE_MATH_DEFINES", "UNICODE", "_UNICODE",
         "_CRT_SECURE_NO_WARNINGS", "_CRT_NONSTDC_NO_WARNINGS",
         "_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING")
-    -- C4 owns audio headers that still consume this alias.
-    add_defines("Q_OS_WIN")
     add_cxflags("/utf-8", "/bigobj", "/Zc:__cplusplus", {tools = {"cl", "clang_cl"}})
     add_cflags("/utf-8", {tools = {"cl", "clang_cl"}})
 elseif is_plat("macosx") then
