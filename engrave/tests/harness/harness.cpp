@@ -252,6 +252,9 @@ std::string check_undo(Engine& engine, const OpCase& op_case, const std::filesys
     const auto result = document->edit(op_case.make(*document));
     if (!result) return "fail: the batch failed: " + std::string(to_string(result.error().code));
     master_of(*document).undoRedo(true, nullptr);
+    // What the undone commands created stays alive, and registered, until the
+    // history that could redo it is dropped.
+    master_of(*document).undoStack()->clearHistory();
     // The engine's undo lays out the master score only.
     for (Score* score : master_of(*document).scoreList()) score->doLayout();
     const auto changed = differences(before, fingerprint(*document), {"revision", "undo"});
