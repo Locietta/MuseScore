@@ -36,10 +36,12 @@ end
 local package_dir = path.join(fork_root, "xmake", "packages")
 for _, pkg in ipairs({
     "freetype", "harfbuzz", "flac", "lame", "opus",
-    "opusenc", "fdk-aac", "pugixml", "utfcpp", "picojson",
+    "opusenc", "fdk-aac", "pugixml", "utfcpp", "picojson", "mnx-json-schema", "mnxdom",
 }) do
     includes(path.join(package_dir, pkg .. ".lua"))
 end
+
+add_requires("mnxdom 45bf462", {system = false})
 
 add_requires("freetype 2.14.1", {system = false, configs = {
     zlib = false, png = false, bzip2 = false, woff2 = false, harfbuzz = false}})
@@ -329,6 +331,26 @@ target("iex_musicxml")
     )
     add_files(engine("src/importexport/musicxml/**.cpp"))
 
+target("iex_mnx")
+    set_kind("static")
+    add_packages("mnxdom", {public = true})
+    if is_plat("windows") then add_cxxflags("/Zc:preprocessor") end
+    add_deps("muse_generated", "engraving")
+    add_engine_target_defaults()
+    add_defines("KORS_PROFILER_ENABLED")
+    add_includedirs(
+        engine("src/importexport/mnx"),
+        engine("src"),
+        engine("muse"),
+        engine("muse/framework"),
+        engine("muse/framework/global"),
+        engine("src/engraving"),
+        engine("src/engraving/infrastructure"),
+        engine("src/engraving/thirdparty/dtl")
+    )
+    add_files(engine("src/importexport/mnx/internal/import/*.cpp"), engine("src/importexport/mnx/internal/shared/*.cpp"))
+target_end()
+
 target("iex_guitarpro")
     set_kind("static")
     add_deps("muse_generated", "engraving")
@@ -439,8 +461,9 @@ end
 
 target("engrave")
     set_kind("static")
+    if is_plat("windows") then add_cxxflags("/Zc:preprocessor") end
     add_deps("muse_generated", "muse_global", "muse_draw", "muse_mpe", "engraving",
-        "iex_musicxml", "iex_guitarpro", "iex_midi", "muse_audio_engine", "native_fluidsynth")
+        "iex_musicxml", "iex_guitarpro", "iex_midi", "iex_mnx", "muse_audio_engine", "native_fluidsynth")
     add_engine_target_defaults()
     add_defines(table.unpack(ENGRAVE_GLOBAL_DEFINES))
     add_includedirs(ENGRAVE_ADAPTER_INCLUDES)

@@ -77,6 +77,7 @@ Result<std::vector<std::byte>> Document::export_score(const ExportOptions& optio
     case Format::Mxl: name = "mxl"; break;
     case Format::Midi: name = "midi"; break;
     case Format::Mscx:
+    case Format::Mnx:
     case Format::GuitarPro:
         return std::unexpected(Error{ErrorCode::Unsupported,
                                      std::format("the engine does not write {}", to_string(options.format))});

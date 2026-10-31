@@ -18,6 +18,7 @@ enum struct Format {
     Mxl,       // compressed MusicXML
     Midi,      // Standard MIDI File, including karaoke (.kar)
     GuitarPro, // Guitar Pro 1-7 and Power Tab
+    Mnx, // MNX JSON, schema 27; import only (.mnx or recognised JSON content)
 };
 
 std::string_view to_string(Format format) noexcept;
