@@ -208,8 +208,15 @@ Stream& Stream::operator<<(const std::string_view& value)
 #include "asserts.h"
 #include <cstdio>
 namespace muse::diagnostics {
+bool assertionDiagnosticsEnabled()
+{
+    return kors::logger::enabled(kors::logger::Level::Normal);
+}
 void assertionFailure(std::string_view msg, const char* file, int line)
 {
+    if (!assertionDiagnosticsEnabled()) {
+        return;
+    }
     std::fprintf(stderr, "ASSERT FAILED: %.*s    %s:%d\n", int(msg.size()), msg.data(), file, line);
 }
 }

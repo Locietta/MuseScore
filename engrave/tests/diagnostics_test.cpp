@@ -36,10 +36,11 @@ TEST(Diagnostics, AssertionsEvaluateOnceAndRetainReleaseRecovery)
     EXPECT_EQ(calls, 1);
 #ifdef NDEBUG
     testing::internal::CaptureStderr();
-    IF_ASSERT_FAILED_X(++calls == 99, "chain " << calls) { ++calls; }
-    const auto message = testing::internal::GetCapturedStderr();
+    const char* message = "chain ";
+    IF_ASSERT_FAILED_X(++calls == 99, message << calls) { ++calls; }
+    const auto captured = testing::internal::GetCapturedStderr();
     EXPECT_EQ(calls, 3);
-    EXPECT_NE(message.find("chain 2"), std::string::npos);
+    EXPECT_NE(captured.find("chain 2"), std::string::npos);
 #endif
 }
 
@@ -49,5 +50,25 @@ TEST(Diagnostics, DisabledScopedTimerDoesNotEvaluateLabel)
     int calls = 0;
     TRACEFUNC_C((++calls, "scope"))
     EXPECT_EQ(calls, 0);
+#endif
+}
+
+TEST(Diagnostics, DisabledAssertionMessagesRemainLazy)
+{
+#ifdef NDEBUG
+    auto* logger = muse::logger::Logger::instance();
+    logger->setLevel(muse::logger::Level::Off);
+    int conditions = 0;
+    int messages = 0;
+    int recoveries = 0;
+    testing::internal::CaptureStderr();
+    DO_ASSERT_X(++conditions == 99, ++messages);
+    IF_ASSERT_FAILED_X(++conditions == 99, ++messages) { ++recoveries; }
+    const auto output = testing::internal::GetCapturedStderr();
+    logger->setLevel(muse::logger::Level::Normal);
+    EXPECT_EQ(conditions, 2);
+    EXPECT_EQ(messages, 0);
+    EXPECT_EQ(recoveries, 1);
+    EXPECT_TRUE(output.empty());
 #endif
 }

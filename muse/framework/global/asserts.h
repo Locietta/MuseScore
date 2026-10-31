@@ -25,15 +25,28 @@ SOFTWARE.
 #include <cassert>
 #include <string_view>
 #include "logstream.h"
-namespace muse::diagnostics { void assertionFailure(std::string_view, const char*, int); }
+namespace muse::diagnostics {
+bool assertionDiagnosticsEnabled();
+void assertionFailure(std::string_view, const char*, int);
+}
+// Formatting remains lazy even when a failed condition is checked in release.
+#define MUSE_ASSERT_DIAGNOSTIC_IMPL(msg, stream_name) \
+    do { \
+        if (muse::diagnostics::assertionDiagnosticsEnabled()) { \
+            muse::logger::Stream stream_name; \
+            stream_name << msg; \
+            muse::diagnostics::assertionFailure(stream_name.str(), __FILE__, __LINE__); \
+        } \
+    } while (false)
+
+#define MUSE_ASSERT_DIAGNOSTIC(msg) MUSE_ASSERT_DIAGNOSTIC_IMPL(msg, UNIQUE_VAR_NAME(muse_assert_message_))
+
 //! Useful macros
 #define DO_ASSERT_X_IMPL(cond, msg, var_name) \
     { \
         const bool var_name = static_cast<bool>(cond); \
         if (!(var_name)) { \
-            muse::logger::Stream __assert_message; \
-            __assert_message << msg; \
-            muse::diagnostics::assertionFailure(__assert_message.str(), __FILE__, __LINE__); \
+            MUSE_ASSERT_DIAGNOSTIC(msg); \
             assert(var_name && #cond); \
         } \
     }
@@ -49,9 +62,7 @@ namespace muse::diagnostics { void assertionFailure(std::string_view, const char
 #define IF_ASSERT_FAILED_X_IMPL(cond, msg, var_name) \
     const bool var_name = static_cast<bool>(cond); \
     if (!(var_name)) { \
-        muse::logger::Stream __assert_message; \
-            __assert_message << msg; \
-            muse::diagnostics::assertionFailure(__assert_message.str(), __FILE__, __LINE__); \
+        MUSE_ASSERT_DIAGNOSTIC(msg); \
         assert(var_name && #cond); \
     } \
     if (!(var_name))
