@@ -16,6 +16,11 @@ ENGRAVE_OP(SetStyle, Transaction)
 // measures (ops/measures.cpp)
 
 // parts (ops/parts.cpp)
+ENGRAVE_OP(AddPart, Snapshot)
+ENGRAVE_OP(RemovePart, Transaction)
+ENGRAVE_OP(AddStaff, Snapshot)
+ENGRAVE_OP(RemoveStaff, Transaction)
+ENGRAVE_OP(GenerateExcerpts, Unexposed)
 
 // spanners (ops/spanners.cpp)
 
