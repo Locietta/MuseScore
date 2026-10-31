@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <stdexcept>
 
-#include "global/io/buffer.h"
+#include "global/io/byteview.h"
 #include "global/io/file.h"
 #include "engraving/dom/masterscore.h"
 #include "engraving/editing/editstyle.h"
@@ -42,8 +42,8 @@ void import_guitarpro_score(mu::engraving::MasterScore* score, const std::string
         throw std::invalid_argument("Input must contain 1..8388608 bytes");
     }
 
-    muse::ByteArray data(bytes.data(), bytes.size());
-    muse::io::Buffer buffer(&data);
+    muse::io::ByteView buffer(std::span<const uint8_t>(
+        reinterpret_cast<const uint8_t*>(bytes.data()), bytes.size()));
 
     mu::engraving::Err err = mu::engraving::Err::FileBadFormat;
     try {
