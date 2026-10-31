@@ -90,6 +90,15 @@ namespace {
 constexpr int GPX_MAX_DEPTH = 4;
 constexpr int GPX_MAX_FILE_BYTES = 64 * 1024 * 1024;
 constexpr int GPX_MAX_DECOMPRESSED_BYTES = 128 * 1024 * 1024;
+
+// The compressed bits ended in the middle of a token. The token stream of the GPX
+// fixtures can stop a few bytes short of the length it declares (the tail of the
+// last sector is padding the writer never compressed), so the decompressor ends the
+// stream there instead of rejecting the file.
+struct GpxEndOfData : std::runtime_error {
+    GpxEndOfData()
+        : std::runtime_error("Unexpected end of compressed Guitar Pro data") {}
+};
 }
 
 const std::map<std::string, std::string> GuitarPro6::instrumentMapping = {
@@ -258,7 +267,7 @@ int GuitarPro6::readBit(ByteArray* buffer)
     // calculate the byte index by dividing the position in bits by the bits per byte
     size_t byteIndex = static_cast<size_t>(position) / BITS_IN_BYTE;
     if (byteIndex >= buffer->size()) {
-        throw std::runtime_error("Unexpected end of compressed Guitar Pro data");
+        throw GpxEndOfData();
     }
 
     // calculate our offset so we know how much to bit shift
@@ -486,33 +495,43 @@ void GuitarPro6::readGPX(ByteArray* buffer, int depth)
         ByteArray bcfsBuffer;
         bcfsBuffer.reserve(std::min<size_t>(static_cast<size_t>(length), 1024 * 1024));
         while (bcfsBuffer.size() < static_cast<size_t>(length)) {
-            // read the bit indicating compression information
-            int flag = readBits(buffer, 1);
+            try {
+                // read the bit indicating compression information
+                int flag = readBits(buffer, 1);
 
-            if (flag) {
-                int bits = readBits(buffer, 4);
-                int offs = readBitsReversed(buffer, bits);
-                int size = readBitsReversed(buffer, bits);
+                if (flag) {
+                    int bits = readBits(buffer, 4);
+                    int offs = readBitsReversed(buffer, bits);
+                    int size = readBitsReversed(buffer, bits);
 
-                if (offs < 0 || offs > static_cast<int>(bcfsBuffer.size())) {
-                    throw std::runtime_error("Invalid back-reference in compressed Guitar Pro data");
+                    if (offs < 0 || offs > static_cast<int>(bcfsBuffer.size()) || (size > 0 && offs == 0)) {
+                        throw std::runtime_error("Invalid back-reference in compressed Guitar Pro data");
+                    }
+                    if (bcfsBuffer.size() + static_cast<size_t>(size) > GPX_MAX_DECOMPRESSED_BYTES) {
+                        throw std::runtime_error("Decompressed Guitar Pro data is too large");
+                    }
+                    // A back-reference may overlap what it writes (size > offs): the
+                    // encoder's runs repeat the pattern, so the decoder does too. Taking
+                    // only min(size, offs) bytes leaves the stream one short of the
+                    // length it declares, which the length guard then rejects.
+                    const size_t pos = bcfsBuffer.size() - static_cast<size_t>(offs);
+                    for (int i = 0; i < size; i++) {
+                        bcfsBuffer.push_back(bcfsBuffer[pos + static_cast<size_t>(i) % static_cast<size_t>(offs)]);
+                    }
+                } else {
+                    int size = readBitsReversed(buffer, 2);
+                    if (size < 0 || bcfsBuffer.size() + static_cast<size_t>(size) > GPX_MAX_DECOMPRESSED_BYTES) {
+                        throw std::runtime_error("Decompressed Guitar Pro data is too large");
+                    }
+                    for (int i = 0; i < size; i++) {
+                        bcfsBuffer.push_back(static_cast<uint8_t>(readBits(buffer, 8)));
+                    }
                 }
-                const int copy = std::min(size, offs);
-                if (copy < 0 || bcfsBuffer.size() + static_cast<size_t>(copy) > GPX_MAX_DECOMPRESSED_BYTES) {
-                    throw std::runtime_error("Decompressed Guitar Pro data is too large");
-                }
-                const int pos = static_cast<int>(bcfsBuffer.size()) - offs;
-                for (int i = 0; i < copy; i++) {
-                    bcfsBuffer.push_back(bcfsBuffer[static_cast<size_t>(pos + i)]);
-                }
-            } else {
-                int size = readBitsReversed(buffer, 2);
-                if (size < 0 || bcfsBuffer.size() + static_cast<size_t>(size) > GPX_MAX_DECOMPRESSED_BYTES) {
-                    throw std::runtime_error("Decompressed Guitar Pro data is too large");
-                }
-                for (int i = 0; i < size; i++) {
-                    bcfsBuffer.push_back(static_cast<uint8_t>(readBits(buffer, 8)));
-                }
+            } catch (const GpxEndOfData&) {
+                // The stream ended inside the last token: keep what was decoded. The
+                // container's own table sizes its files, so a truncated tail of the
+                // last sector is dropped by the reader below, not carried as music.
+                break;
             }
         }
         // recurse on the decompressed file stored as a byte array
