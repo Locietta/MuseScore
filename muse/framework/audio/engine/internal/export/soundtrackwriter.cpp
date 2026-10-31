@@ -57,8 +57,8 @@ static encode::AbstractAudioEncoderPtr createEncoder(const SoundTrackFormat& for
 }
 
 SoundTrackWriter::SoundTrackWriter(io::IODevice& dstDevice, const SoundTrackFormat& format,
-                                   const secs_t totalDuration, IAudioNodePtr source)
-    : m_source(std::move(source))
+                                   const secs_t totalDuration, IAudioNodePtr source, std::function<void(uint64_t)> blockCompleted)
+    : m_source(std::move(source)), m_blockCompleted(std::move(blockCompleted))
 {
     if (!m_source) {
         return;
@@ -157,7 +157,7 @@ Ret SoundTrackWriter::writeStreaming()
 
         framesWritten += chunk;
         sendProgress(framesWritten, m_totalSamples);
-        rpcChannel()->process();
+        if (m_blockCompleted) m_blockCompleted(framesWritten);
     }
 
     // Phase 2: actual audio data
@@ -179,7 +179,7 @@ Ret SoundTrackWriter::writeStreaming()
 
         framesWritten += chunk;
         sendProgress(framesWritten, m_totalSamples);
-        rpcChannel()->process();
+        if (m_blockCompleted) m_blockCompleted(framesWritten);
     }
 
     // Phase 3: trailing silence
@@ -196,7 +196,7 @@ Ret SoundTrackWriter::writeStreaming()
 
         framesWritten += chunk;
         sendProgress(framesWritten, m_totalSamples);
-        rpcChannel()->process();
+        if (m_blockCompleted) m_blockCompleted(framesWritten);
     }
 
     if (m_isAborted) {

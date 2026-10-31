@@ -25,12 +25,10 @@
 #include "audio/engine/itransporteventsdispatcher.h"
 #include "global/modularity/ioc.h"
 
-#include "audio/common/rpc/irpcchannel.h"
 
 namespace muse::audio::engine {
 class TransportEventsDispatcher : public ITransportEventsDispatcher, public async::Asyncable
 {
-    GlobalInject<rpc::IRpcChannel> rpcChannel;
 
 public:
     TransportEventsDispatcher();

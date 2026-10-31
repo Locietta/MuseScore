@@ -13,26 +13,19 @@
 
 #include "engrave/src/audio/engine_audio.h"
 
-#include "audio/common/rpc/irpcchannel.h"
+
 #include "audio/engine/enginesetup.h"
-#include "audio/engine/internal/enginecontroller.h"
+#include "audio/engine/iaudioengineconfiguration.h"
+#include "audio/engine/isynthresolver.h"
 #include "audio/engine/internal/iaudiocontext.h"
 #include "audio/engine/internal/iaudioengine.h"
 
 int main()
 {
-    const auto rpc = std::make_shared<music::NullRpcChannel>();
-
-    // 5.0 registers the engine services in EngineGlobalSetup (the replacement
-    // for 4.7.6 EngineController::registerExports); EngineController keeps the
-    // engine-side RPC handlers and the init sequence
-    // (muse/framework/audio/engine/enginesetup.cpp:46-74,
-    //  muse/framework/audio/engine/internal/enginecontroller.cpp:46-98).
     muse::audio::engine::EngineGlobalSetup setup;
     setup.registerExports();
     setup.resolveImports();
 
-    muse::audio::engine::EngineController controller(rpc);
 
     muse::audio::OutputSpec spec;
     spec.sampleRate = 44100;
@@ -41,7 +34,10 @@ int main()
 
     muse::audio::AudioEngineConfig config;
     config.useSoundFontLowPassFilter = true;
-    controller.init(spec, config);
+    auto configuration = muse::modularity::globalIoc()->resolve<muse::audio::engine::IAudioEngineConfiguration>("audio_engine_link_check");
+    configuration->setConfig(config);
+    muse::modularity::globalIoc()->resolve<muse::audio::synth::ISynthResolver>("audio_engine_link_check")->init(configuration->defaultAudioInputParams(), spec);
+    muse::modularity::globalIoc()->resolve<muse::audio::engine::IAudioEngine>("audio_engine_link_check")->init(spec);
 
     auto engine = muse::modularity::globalIoc()->resolve<muse::audio::engine::IAudioEngine>("audio_engine_link_check");
     if (!engine) {

@@ -23,11 +23,10 @@
 #pragma once
 
 #include <vector>
+#include <functional>
 
 #include "global/async/asyncable.h"
 
-#include "global/modularity/ioc.h"
-#include "audio/common/rpc/irpcchannel.h"
 
 #include "audio/common/audiotypes.h"
 #include "../nodes/audionode.h"
@@ -41,10 +40,10 @@ class IODevice;
 namespace muse::audio::soundtrack {
 class SoundTrackWriter : public async::Asyncable
 {
-    muse::GlobalInject<rpc::IRpcChannel> rpcChannel;
 
 public:
-    SoundTrackWriter(io::IODevice& dstDevice, const SoundTrackFormat& format, const secs_t totalDuration, IAudioNodePtr source);
+    SoundTrackWriter(io::IODevice& dstDevice, const SoundTrackFormat& format, const secs_t totalDuration, IAudioNodePtr source,
+                     std::function<void(uint64_t)> blockCompleted = {});
 
     Ret write();
     void abort();
@@ -57,6 +56,7 @@ private:
     void sendProgress(uint64_t framesWritten, uint64_t totalFrames);
 
     IAudioNodePtr m_source;
+    std::function<void(uint64_t)> m_blockCompleted;
 
     std::vector<float> m_intermBuffer;
     samples_t m_renderStep = 0;

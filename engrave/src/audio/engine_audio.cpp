@@ -23,7 +23,8 @@
 #include "audio/common/audioutils.h"
 #include "audio/common/soundfonttypes.h"
 #include "audio/engine/enginesetup.h"
-#include "audio/engine/internal/enginecontroller.h"
+#include "audio/engine/iaudioengineconfiguration.h"
+#include "audio/engine/isynthresolver.h"
 #include "audio/engine/internal/export/soundtrackwriter.h"
 #include "audio/engine/internal/iaudiocontext.h"
 #include "audio/engine/internal/iaudioengine.h"
@@ -78,7 +79,7 @@ constexpr AudioCtxId kAudioCtxId = 1;
 // the staff -> channel remap), which is the event stream later golden tests
 // compare. A global hook keeps the sink reusable by the probe and by tests.
 // s_rendered_frames is the number of output frames already encoded: the writer
-// calls rpcChannel()->process() after each chunk, so this is the start of the
+// reports completed frames after each chunk, so this is the start of the
 // chunk currently being rendered.
 EngineAudioMidiEventHook s_midi_event_hook;
 std::uint64_t s_rendered_frames = 0;
@@ -201,10 +202,9 @@ private:
 // must outlive every static destructor (FluidResolver's Vorbis decoder is a
 // process-wide pointer, fluidresolver.cpp:44-53).
 struct EngineState {
-    std::shared_ptr<NullRpcChannel> rpcChannel;
     std::shared_ptr<CapturingMidiOutPort> midiOutPort;
     engine::EngineGlobalSetup* engineSetup = nullptr;
-    engine::EngineController* controller = nullptr;
+    bool servicesInitialized = false;
     std::shared_ptr<engine::IAudioContext> context;
     int sampleRate = kDefaultSampleRate;
     // One entry per SoundFont of the setup, in its order; the first is the
@@ -456,7 +456,7 @@ bool initialize_engine_audio(const EngineAudioSetup& setup, std::string* error)
     };
 
     const std::vector<std::string>& soundfont_paths = setup.soundfonts;
-    if (state.controller) {
+    if (state.servicesInitialized) {
         if (!state.soundfontId.empty() && state.soundfontPaths == soundfont_paths
             && state.sampleRate == setup.sample_rate) {
             return true;
@@ -490,13 +490,7 @@ bool initialize_engine_audio(const EngineAudioSetup& setup, std::string* error)
     AudioSanitizer::setupMainThread();
     AudioSanitizer::setupEngineThread();
 
-    // 2. Null rpc channel + capturing MIDI out. Replace pre-registered stubs
-    // (e.g. a MIDI module) so the engine and FluidSynth resolve our exports.
-    state.rpcChannel = std::make_shared<NullRpcChannel>();
-    state.rpcChannel->onProcess = [] { s_rendered_frames += kSamplesPerChannel; };
-    globalIoc()->unregister<rpc::IRpcChannel>("engine_audio");
-    globalIoc()->registerExport<rpc::IRpcChannel>("engine_audio", state.rpcChannel);
-
+    // Capturing MIDI output for deterministic event diagnostics.
     state.midiOutPort = std::make_shared<CapturingMidiOutPort>();
     globalIoc()->unregister<midi::IMidiOutPort>("engine_audio");
     globalIoc()->registerExport<midi::IMidiOutPort>("engine_audio", state.midiOutPort);
@@ -510,16 +504,14 @@ bool initialize_engine_audio(const EngineAudioSetup& setup, std::string* error)
     state.engineSetup->registerExports();
     state.engineSetup->resolveImports();
 
-    // EngineController keeps the engine-side rpc handlers and owns the engine
-    // configuration/initialisation sequence (enginecontroller.cpp:46-98). The
-    // host never starts the rpc side, so onStartRunning() is not called.
-    auto* controller = new engine::EngineController(state.rpcChannel);
-    state.controller = controller;
-
+    state.servicesInitialized = true;
     AudioEngineConfig config;
-    config.useSoundFontLowPassFilter = true; // desktop parity
+    config.useSoundFontLowPassFilter = true;
     state.sampleRate = setup.sample_rate;
-    controller->init(output_spec(), config);
+    auto configuration = globalIoc()->resolve<engine::IAudioEngineConfiguration>("engine_audio");
+    configuration->setConfig(config);
+    globalIoc()->resolve<synth::ISynthResolver>("engine_audio")->init(configuration->defaultAudioInputParams(), output_spec());
+    globalIoc()->resolve<engine::IAudioEngine>("engine_audio")->init(output_spec());
 
     // 4. SoundFonts. addSoundFont() is synchronous for file: URIs
     // (soundfontrepository.cpp:68-77, 117-168) and refreshes FluidResolver
@@ -602,7 +594,7 @@ bool initialize_engine_audio(const std::string& soundfont_path, std::string* err
 bool engine_audio_initialized()
 {
     const EngineState& state = engine_state();
-    return state.controller != nullptr && !state.soundfontId.empty();
+    return state.servicesInitialized && !state.soundfontId.empty();
 }
 
 std::string engine_soundfont_resource_id()
@@ -626,7 +618,7 @@ AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderReque
     };
 
     const EngineState& state = engine_state();
-    if (!state.controller || !state.context || state.soundfontId.empty()) {
+    if (!state.servicesInitialized || !state.context || state.soundfontId.empty()) {
         return fail(AudioRenderResult::Failure::EngineFailure, "audio engine is not initialised");
     }
     if (!master) {
@@ -864,8 +856,7 @@ AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderReque
     // processes.
     std::srand(0);
 
-    // The writer increments this once per encoded chunk (NullRpcChannel
-    // onProcess), giving captured MIDI events their render-frame offset.
+    // The writer reports completed frames after each successfully encoded block.
     s_rendered_frames = 0;
 
     StreamingFileDevice device(io::path_t(request.output_path));
@@ -877,8 +868,9 @@ AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderReque
 
     // The writer owns the render loop (soundtrackwriter.cpp:133-207): it sets
     // the source to PlayingOffline, renders in 4096-frame chunks, encodes them
-    // and calls rpcChannel()->process() after each one.
-    soundtrack::SoundTrackWriter writer(device, make_soundtrack_format(request.format, request), renderSecs, masterChain);
+    // and reports the completed frame count after each one.
+    soundtrack::SoundTrackWriter writer(device, make_soundtrack_format(request.format, request), renderSecs, masterChain,
+        [](uint64_t frames) { s_rendered_frames = frames; });
     const Ret writeRet = writer.write();
 
     // Flush before the FileSystem size check below.

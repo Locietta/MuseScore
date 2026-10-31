@@ -22,36 +22,8 @@
 
 #include "transporteventsdispatcher.h"
 
-#include "audio/common/rpc/rpcpacker.h"
-#include "audio/common/audiosanitizer.h"
-
 using namespace muse::audio::engine;
-using namespace muse::audio::rpc;
 
-TransportEventsDispatcher::TransportEventsDispatcher()
-    : m_eventsReceived(async::makeOpt()
-                       .name("audio::engine::TransportEventsDispatcher::m_eventsReceived")
-                       .disableWaitPendingsOnSend())
-{
-}
-
-void TransportEventsDispatcher::init()
-{
-    ONLY_AUDIO_ENGINE_THREAD;
-
-    m_eventsReceived.onReceive(this, [this](const TransportEvents& events) {
-        for (const TransportEvent& event : events) {
-            //! TODO These events are contextual, we need to add context passing here
-            Msg msg = rpc::make_notification(rpc::GLOBAL_CTX_ID, MsgCode::TransportEventReceived, RpcPacker::pack(event));
-            rpcChannel()->send(msg);
-        }
-    });
-}
-
-void TransportEventsDispatcher::dispatch(const TransportEvents& events)
-{
-    ONLY_AUDIO_PROC_THREAD;
-
-    //! Transfer events to the audio engine thread
-    m_eventsReceived.send(events);
-}
+TransportEventsDispatcher::TransportEventsDispatcher() = default;
+void TransportEventsDispatcher::init() {}
+void TransportEventsDispatcher::dispatch(const TransportEvents&) {}
