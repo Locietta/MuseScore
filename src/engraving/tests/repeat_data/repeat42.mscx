@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="3.01">
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>wtr3BLE76wM_fFcvBqHmeFI</eid>
     <Division>480</Division>
-    <Style>
-      <showMeasureNumberOne>1</showMeasureNumberOne>
-      <measureNumberInterval>1</measureNumberInterval>
-      <measureNumberSystem>0</measureNumberSystem>
-      <Spatium>1.76389</Spatium>
-      </Style>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
     <showFrames>1</showFrames>
@@ -15,23 +12,28 @@
     <metaTag name="arranger"></metaTag>
     <metaTag name="composer"></metaTag>
     <metaTag name="copyright"></metaTag>
+    <metaTag name="creationDate">2026-10-31</metaTag>
     <metaTag name="lyricist"></metaTag>
     <metaTag name="movementNumber"></metaTag>
     <metaTag name="movementTitle"></metaTag>
+    <metaTag name="platform">Microsoft Windows</metaTag>
     <metaTag name="source"></metaTag>
     <metaTag name="translator"></metaTag>
     <metaTag name="workNumber"></metaTag>
     <metaTag name="workTitle">Repeat Test</metaTag>
-    <Part>
-      <Staff id="1">
+    <Part id="1">
+      <eid>u1TLiKNYVAL_f46YMXy0Jg</eid>
+      <Staff>
+        <eid>me1XHwegLKG_ZelxERHx9bK</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
-      <trackName>Piano</trackName>
-      <Instrument>
-        <longName>Piano</longName>
-        <shortName>Pno.</shortName>
+      <Instrument id="piano">
+        <InstrumentLabel>
+          <longName>Piano</longName>
+          <shortName>Pno.</shortName>
+          </InstrumentLabel>
         <trackName>Piano</trackName>
         <minPitchP>21</minPitchP>
         <maxPitchP>108</maxPitchP>
@@ -69,6 +71,7 @@
           </Articulation>
         <Channel>
           <program value="0"/>
+          <synti>Fluid</synti>
           </Channel>
         </Instrument>
       </Part>
@@ -76,43 +79,53 @@
       <VBox>
         <height>10</height>
         <bottomGap>1</bottomGap>
+        <boxAutoSize>0</boxAutoSize>
+        <sizeIsSpatiumDependent>1</sizeIsSpatiumDependent>
+        <eid>0hBXQ/RjSIJ_P6+nQ2w8j1K</eid>
         <Text>
           <style>title</style>
+          <eid>zDyR/vHPhzC_TYYyZgwHNLM</eid>
           <text>repeat42</text>
           </Text>
         <Text>
           <style>subtitle</style>
+          <eid>rip11vjLXVD_ifm7Uqjhp2L</eid>
           <text>Open Volta should end at next volta</text>
           </Text>
         </VBox>
       <TBox>
-        <height>1</height>
         <topGap>0</topGap>
         <leftMargin>1</leftMargin>
         <rightMargin>1</rightMargin>
         <topMargin>1</topMargin>
         <bottomMargin>1</bottomMargin>
+        <eid>A8MrYKvstuP_GvDtMNyBxmJ</eid>
         <Text>
-          <style>Frame</style>
-          <text>1,2   1   3   5   1   4,5
-</text>
+          <style>frame</style>
+          <eid>CszHBYT4YWN_V0Cs1PvPxN</eid>
+          <text>1,2   1   3   5   1   4,5<br/></text>
           </Text>
         </TBox>
       <Measure>
+        <eid>EbviuDrlQUM_LxQO2+EwN2P</eid>
         <startRepeat/>
         <voice>
           <TimeSig>
+            <eid>Ptj1MAMVwvB_rWUgNBEPrG</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Tempo>
             <tempo>6.66667</tempo>
             <followText>1</followText>
-            <text><b></b><font face="ScoreText"></font><b><font face="FreeSerif"></font> = 400</b></text>
+            <eid>sUa8SP4XnsD_x21RxjX2oRJ</eid>
+            <text><b/><font face="ScoreText"/><b><font face="FreeSerif"/> = 400</b></text>
             </Tempo>
           <Chord>
+            <eid>W5FaolKvfr_4m2wsbe5DVB</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>KkvFwo1lZFD_iByKvn66EcN</eid>
               <pitch>60</pitch>
               <tpc>14</tpc>
               </Note>
@@ -120,23 +133,14 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>Xqhj2L4dL9_SLEwJ91s56C</eid>
         <endRepeat>2</endRepeat>
         <voice>
-          <Spanner type="Volta">
-            <Volta>
-              <endHookType>1</endHookType>
-              <beginText>1.</beginText>
-              <endings>1</endings>
-              </Volta>
-            <next>
-              <location>
-                <measures>1</measures>
-                </location>
-              </next>
-            </Spanner>
           <Chord>
+            <eid>pdvcG+hoCkC_LE+UND0ILiC</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>hliK89dzDOC_xkgPMlUYXL</eid>
               <pitch>62</pitch>
               <tpc>16</tpc>
               </Note>
@@ -144,81 +148,48 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>NRNcARkOheI_tTwpKCPznHK</eid>
         <voice>
-          <Spanner type="Volta">
-            <prev>
-              <location>
-                <measures>-1</measures>
-                </location>
-              </prev>
-            </Spanner>
-          <Spanner type="Volta">
-            <Volta>
-              <beginText>2.</beginText>
-              <endings>2</endings>
-              </Volta>
-            <next>
-              <location>
-                <measures>1</measures>
-                </location>
-              </next>
-            </Spanner>
           <Chord>
+            <eid>jFMIcoYFZ4B_cgGrhM3vNoP</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>k68zD7vqltD_mE8Q0CluAk</eid>
               <pitch>64</pitch>
               <tpc>18</tpc>
               </Note>
             </Chord>
           <BarLine>
+            <eid>fnBCxzVvD5P_DSBrqzXbfPN</eid>
             </BarLine>
           </voice>
         </Measure>
       <Measure>
+        <eid>mG4a+gF0g7F_KARPExk5GeO</eid>
         <voice>
-          <Spanner type="Volta">
-            <prev>
-              <location>
-                <measures>-1</measures>
-                </location>
-              </prev>
-            </Spanner>
-          <Spanner type="Volta">
-            <Volta>
-              <endHookType>1</endHookType>
-              <beginText>3.</beginText>
-              <endings>3</endings>
-              </Volta>
-            <next>
-              <location>
-                <measures>1</measures>
-                </location>
-              </next>
-            </Spanner>
           <Chord>
+            <eid>XfaFDwD/ESN_ZeLRrgAHfDP</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>gnRfy6cNiAH_Yu4GX4aZJNF</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <BarLine>
+            <eid>v/pKgJ5XDLJ_3XUs9wXRxhK</eid>
             </BarLine>
           </voice>
         </Measure>
       <Measure>
+        <eid>SDIARtnwGqF_Wh6XjYcq9c</eid>
         <endRepeat>2</endRepeat>
         <voice>
-          <Spanner type="Volta">
-            <prev>
-              <location>
-                <measures>-1</measures>
-                </location>
-              </prev>
-            </Spanner>
           <Chord>
+            <eid>Tf+YtEM6nsC_mF7boPoQRsK</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>N1eHK1DtS7M_MOUShWsTcLJ</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
@@ -226,5 +197,33 @@
           </voice>
         </Measure>
       </Staff>
+    <SpannerMap>
+      <Volta>
+        <endHookType>1</endHookType>
+        <beginText>1.</beginText>
+        <startElement>Xqhj2L4dL9_SLEwJ91s56C</startElement>
+        <endElement>Xqhj2L4dL9_SLEwJ91s56C</endElement>
+        <eid>Zxda64/WPhC_82tZG6uES0J</eid>
+        <track>0</track>
+        <endings>1</endings>
+        </Volta>
+      <Volta>
+        <beginText>2.</beginText>
+        <startElement>NRNcARkOheI_tTwpKCPznHK</startElement>
+        <endElement>NRNcARkOheI_tTwpKCPznHK</endElement>
+        <eid>hZajibmHNZB_hw5/UJ0nLtL</eid>
+        <track>0</track>
+        <endings>2</endings>
+        </Volta>
+      <Volta>
+        <endHookType>1</endHookType>
+        <beginText>3.</beginText>
+        <startElement>mG4a+gF0g7F_KARPExk5GeO</startElement>
+        <endElement>mG4a+gF0g7F_KARPExk5GeO</endElement>
+        <eid>ttx5cZnR3KG_/DdmJuQUChG</eid>
+        <track>0</track>
+        <endings>3</endings>
+        </Volta>
+      </SpannerMap>
     </Score>
   </museScore>

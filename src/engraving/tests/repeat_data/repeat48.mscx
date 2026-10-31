@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="3.01">
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>Dnq0/5Z0qjD_byTJ2hsPZ8B</eid>
     <Division>480</Division>
-    <Style>
-      <showMeasureNumberOne>1</showMeasureNumberOne>
-      <measureNumberInterval>1</measureNumberInterval>
-      <measureNumberSystem>0</measureNumberSystem>
-      <Spatium>1.76389</Spatium>
-      </Style>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
     <showFrames>1</showFrames>
@@ -15,23 +12,28 @@
     <metaTag name="arranger"></metaTag>
     <metaTag name="composer"></metaTag>
     <metaTag name="copyright"></metaTag>
+    <metaTag name="creationDate">2026-10-31</metaTag>
     <metaTag name="lyricist"></metaTag>
     <metaTag name="movementNumber"></metaTag>
     <metaTag name="movementTitle"></metaTag>
+    <metaTag name="platform">Microsoft Windows</metaTag>
     <metaTag name="source"></metaTag>
     <metaTag name="translator"></metaTag>
     <metaTag name="workNumber"></metaTag>
     <metaTag name="workTitle">Repeat Test</metaTag>
-    <Part>
-      <Staff id="1">
+    <Part id="1">
+      <eid>V8wkaZe292G_ogtOiLg0psF</eid>
+      <Staff>
+        <eid>MhZcfvWFu8J_8Z2Mu7uWfbL</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
-      <trackName>Piano</trackName>
-      <Instrument>
-        <longName>Piano</longName>
-        <shortName>Pno.</shortName>
+      <Instrument id="piano">
+        <InstrumentLabel>
+          <longName>Piano</longName>
+          <shortName>Pno.</shortName>
+          </InstrumentLabel>
         <trackName>Piano</trackName>
         <minPitchP>21</minPitchP>
         <maxPitchP>108</maxPitchP>
@@ -69,6 +71,7 @@
           </Articulation>
         <Channel>
           <program value="0"/>
+          <synti>Fluid</synti>
           </Channel>
         </Instrument>
       </Part>
@@ -76,45 +79,53 @@
       <VBox>
         <height>12</height>
         <bottomGap>1</bottomGap>
+        <boxAutoSize>0</boxAutoSize>
+        <sizeIsSpatiumDependent>1</sizeIsSpatiumDependent>
+        <eid>WsPZRfbsB7H_a6YRDexYdaF</eid>
         <Text>
           <style>title</style>
+          <eid>v0nqCT5c1xM_vOTU0FOI5fD</eid>
           <text>repeat48</text>
           </Text>
         <Text>
           <style>subtitle</style>
-          <text>Jump into first Volta:
-Assume the composer is 'right' and rewind that far for 'final' playthrough
-</text>
+          <eid>IA1ht3CNbSF_sjueH7CoCWI</eid>
+          <text>Jump into first Volta:<br/>Assume the composer is 'right' and rewind that far for 'final' playthrough<br/></text>
           </Text>
         </VBox>
       <TBox>
-        <height>1</height>
         <topGap>0</topGap>
         <bottomGap>8</bottomGap>
         <leftMargin>1</leftMargin>
         <rightMargin>1</rightMargin>
         <topMargin>1</topMargin>
         <bottomMargin>1</bottomMargin>
+        <eid>aJmIIVDB+9H_Ld2qqV1m2eO</eid>
         <Text>
-          <style>Frame</style>
-          <text>1,2,3,4   1   5,6,7   3,4   1   5   8
-</text>
+          <style>frame</style>
+          <eid>vbLkMo73jwP_InfdsqgfcwB</eid>
+          <text>1,2,3,4   1   5,6,7   3,4   1   5   8<br/></text>
           </Text>
         </TBox>
       <Measure>
+        <eid>tO0eRT4xwVE_/6ZnEJFJs2</eid>
         <voice>
           <TimeSig>
+            <eid>bUntMET8wLL_pb6z7XyOmBJ</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Tempo>
             <tempo>6.66667</tempo>
             <followText>1</followText>
-            <text><b></b><font face="ScoreText"></font><b><font face="FreeSerif"></font> = 400</b></text>
+            <eid>ChQkBC7RWJJ_VKGSN5h0HyG</eid>
+            <text><b/><font face="ScoreText"/><b><font face="FreeSerif"/> = 400</b></text>
             </Tempo>
           <Chord>
+            <eid>l4z3O1yz3PG_jQoWGN0aSbP</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>ff+TQnbtMkG_KKly4I4DNRD</eid>
               <pitch>60</pitch>
               <tpc>14</tpc>
               </Note>
@@ -122,22 +133,13 @@ Assume the composer is 'right' and rewind that far for 'final' playthrough
           </voice>
         </Measure>
       <Measure>
+        <eid>e3ZmmkftRBP_ph+PFCFHovF</eid>
         <voice>
-          <Spanner type="Volta">
-            <Volta>
-              <endHookType>1</endHookType>
-              <beginText>1.</beginText>
-              <endings>1</endings>
-              </Volta>
-            <next>
-              <location>
-                <measures>3</measures>
-                </location>
-              </next>
-            </Spanner>
           <Chord>
+            <eid>l20dFsWUoYP_neur3cwzdwL</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>2Flx7G0vRfL_0tF3nSOpkHI</eid>
               <pitch>62</pitch>
               <tpc>16</tpc>
               </Note>
@@ -145,15 +147,20 @@ Assume the composer is 'right' and rewind that far for 'final' playthrough
           </voice>
         </Measure>
       <Measure>
+        <eid>mEMEU4G+mcN_SM/GNPvVf5C</eid>
         <Marker>
-          <style>Repeat Text Left</style>
+          <style>repeat_left</style>
+          <eid>gxKt5Hb9b4I_5c9G6+ommZO</eid>
           <text><sym>segno</sym></text>
           <label>segno</label>
+          <markerType>segno</markerType>
           </Marker>
         <voice>
           <Chord>
+            <eid>TsjtciDWn+K_6oMiRf8x0OP</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>3OdFlYoWL5L_/Dj1UQRFQtD</eid>
               <pitch>64</pitch>
               <tpc>18</tpc>
               </Note>
@@ -161,11 +168,14 @@ Assume the composer is 'right' and rewind that far for 'final' playthrough
           </voice>
         </Measure>
       <Measure>
+        <eid>fbVKvcPbgmF_gyLl+QecmkF</eid>
         <endRepeat>2</endRepeat>
         <voice>
           <Chord>
+            <eid>+ovpVyOpxjC_fpSw4MZ30HP</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>BHVUMGULeRO_374ya93YyZB</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
@@ -173,33 +183,20 @@ Assume the composer is 'right' and rewind that far for 'final' playthrough
           </voice>
         </Measure>
       <Measure>
+        <eid>L/BrnvnXh2D_7uPqaVPLOi</eid>
         <Marker>
-          <style>Repeat Text Right</style>
+          <style>repeat_right</style>
+          <eid>pXGsm/kvTL_snwtwIYhwTG</eid>
           <text>To Coda</text>
           <label>coda</label>
+          <markerType>coda</markerType>
           </Marker>
         <voice>
-          <Spanner type="Volta">
-            <prev>
-              <location>
-                <measures>-3</measures>
-                </location>
-              </prev>
-            </Spanner>
-          <Spanner type="Volta">
-            <Volta>
-              <beginText>2.</beginText>
-              <endings>2</endings>
-              </Volta>
-            <next>
-              <location>
-                <measures>1</measures>
-                </location>
-              </next>
-            </Spanner>
           <Chord>
+            <eid>f7eW8in/Z5G_5S8Vq9ux9xN</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>koRxClk62xG_xgd7f/PEYi</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
@@ -207,17 +204,13 @@ Assume the composer is 'right' and rewind that far for 'final' playthrough
           </voice>
         </Measure>
       <Measure>
+        <eid>X07HHZdgN3_3gxCxr/aCQ</eid>
         <voice>
-          <Spanner type="Volta">
-            <prev>
-              <location>
-                <measures>-1</measures>
-                </location>
-              </prev>
-            </Spanner>
           <Chord>
+            <eid>vTDCbKUn+uE_tHTPQ55nSXJ</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>0/BjzkTOGnI_YvGnGypiL9J</eid>
               <pitch>69</pitch>
               <tpc>17</tpc>
               </Note>
@@ -225,8 +218,10 @@ Assume the composer is 'right' and rewind that far for 'final' playthrough
           </voice>
         </Measure>
       <Measure>
+        <eid>k9WnBqflIfL_OWVxwDNxZyB</eid>
         <Jump>
-          <style>Repeat Text Right</style>
+          <style>repeat_right</style>
+          <eid>ujtAFGnjC2I_Nj52C8IFDZB</eid>
           <text>D.S. al Coda</text>
           <jumpTo>segno</jumpTo>
           <playUntil>coda</playUntil>
@@ -234,30 +229,40 @@ Assume the composer is 'right' and rewind that far for 'final' playthrough
           </Jump>
         <voice>
           <Chord>
+            <eid>N7HWGDCnN8K_Mn4aooabbBL</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>/8Eek52g2wO_cQN6fIMcaDL</eid>
               <pitch>71</pitch>
               <tpc>19</tpc>
               </Note>
             </Chord>
           <BarLine>
             <subtype>double</subtype>
+            <eid>54cmSQTjHZN_b02Z7bbj6kK</eid>
             </BarLine>
           </voice>
         </Measure>
       <HBox>
         <width>5</width>
+        <boxAutoSize>0</boxAutoSize>
+        <eid>vpNW3BlWHrI_Ot2UQTupfTG</eid>
         </HBox>
       <Measure>
+        <eid>yMbedBIRCrH_Y8ERb7tf+TO</eid>
         <Marker>
-          <style>Repeat Text Left</style>
+          <style>repeat_left</style>
+          <eid>47YezaM6xpB_x0icbHzuR2D</eid>
           <text><sym>coda</sym></text>
           <label>codab</label>
+          <markerType>codab</markerType>
           </Marker>
         <voice>
           <Chord>
+            <eid>ZFCIINBFz/F_lSavTQhXVHG</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>UE5354ViNbF_TIgshnmxs5E</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>
@@ -265,5 +270,24 @@ Assume the composer is 'right' and rewind that far for 'final' playthrough
           </voice>
         </Measure>
       </Staff>
+    <SpannerMap>
+      <Volta>
+        <endHookType>1</endHookType>
+        <beginText>1.</beginText>
+        <startElement>e3ZmmkftRBP_ph+PFCFHovF</startElement>
+        <endElement>fbVKvcPbgmF_gyLl+QecmkF</endElement>
+        <eid>W+fGZesyHtI_5/pDn0Z5EhO</eid>
+        <track>0</track>
+        <endings>1</endings>
+        </Volta>
+      <Volta>
+        <beginText>2.</beginText>
+        <startElement>L/BrnvnXh2D_7uPqaVPLOi</startElement>
+        <endElement>L/BrnvnXh2D_7uPqaVPLOi</endElement>
+        <eid>L6/Nre9fed_1CBttXwX1PE</eid>
+        <track>0</track>
+        <endings>2</endings>
+        </Volta>
+      </SpannerMap>
     </Score>
   </museScore>

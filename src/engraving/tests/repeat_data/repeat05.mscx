@@ -1,75 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="3.01">
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>h9079kY/7VJ_zquUwDvf7qE</eid>
     <Division>480</Division>
-    <Style>
-      <minSystemDistance>9.2</minSystemDistance>
-      <bracketDistance>0.2</bracketDistance>
-      <showMeasureNumberOne>1</showMeasureNumberOne>
-      <measureNumberInterval>1</measureNumberInterval>
-      <measureNumberSystem>0</measureNumberSystem>
-      <evenHeaderL>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'freeSans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</evenHeaderL>
-      <evenHeaderC>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'freeSans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</evenHeaderC>
-      <evenHeaderR>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'freeSans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</evenHeaderR>
-      <oddHeaderL>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'freeSans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oddHeaderL>
-      <oddHeaderC>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'freeSans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oddHeaderC>
-      <oddHeaderR>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'freeSans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oddHeaderR>
-      <evenFooterL>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'freeSans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;$p&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</evenFooterL>
-      <evenFooterC>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'freeSans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</evenFooterC>
-      <evenFooterR>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'freeSans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;$:copyright:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</evenFooterR>
-      <oddFooterL>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'freeSans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;$:copyright:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oddFooterL>
-      <oddFooterC>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'freeSans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oddFooterC>
-      <oddFooterR>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'freeSans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p align=&quot;right&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;$p&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oddFooterR>
-      <Spatium>1.764</Spatium>
-      </Style>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
     <showFrames>1</showFrames>
@@ -77,23 +12,28 @@ p, li { white-space: pre-wrap; }
     <metaTag name="arranger"></metaTag>
     <metaTag name="composer"></metaTag>
     <metaTag name="copyright"></metaTag>
+    <metaTag name="creationDate">2026-10-31</metaTag>
     <metaTag name="lyricist"></metaTag>
     <metaTag name="movementNumber"></metaTag>
     <metaTag name="movementTitle"></metaTag>
+    <metaTag name="platform">Microsoft Windows</metaTag>
     <metaTag name="source"></metaTag>
     <metaTag name="translator"></metaTag>
     <metaTag name="workNumber"></metaTag>
     <metaTag name="workTitle"></metaTag>
-    <Part>
-      <Staff id="1">
+    <Part id="1">
+      <eid>z2IqrFUquBJ_BIvNreXBkJJ</eid>
+      <Staff>
+        <eid>m5kCT7kgqzH_IiPfZR45lOK</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
-      <trackName>Piano</trackName>
-      <Instrument>
-        <longName>Piano</longName>
-        <shortName>Pno.</shortName>
+      <Instrument id="piano">
+        <InstrumentLabel>
+          <longName>Piano</longName>
+          <shortName>Pno.</shortName>
+          </InstrumentLabel>
         <trackName>Piano</trackName>
         <minPitchP>21</minPitchP>
         <maxPitchP>108</maxPitchP>
@@ -143,6 +83,7 @@ p, li { white-space: pre-wrap; }
           </Articulation>
         <Channel>
           <program value="0"/>
+          <synti>Fluid</synti>
           </Channel>
         </Instrument>
       </Part>
@@ -150,48 +91,58 @@ p, li { white-space: pre-wrap; }
       <VBox>
         <height>12</height>
         <bottomGap>1</bottomGap>
+        <boxAutoSize>0</boxAutoSize>
+        <sizeIsSpatiumDependent>1</sizeIsSpatiumDependent>
+        <eid>pJzyf71A2cI_PdJo/couTKL</eid>
         <Text>
           <style>title</style>
+          <eid>xcnGGRXKKuB_/yoa0dc3SrE</eid>
           <text>repeat5</text>
           </Text>
         <Text>
           <style>subtitle</style>
-          <text>multiple end repeat barlines for same start repeat barline
-measure 3 has a repeat count of 3
-</text>
+          <eid>ffvaT26M/oD_sMK+kqqsp9B</eid>
+          <text>multiple end repeat barlines for same start repeat barline<br/>measure 3 has a repeat count of 3<br/></text>
           </Text>
         </VBox>
       <TBox>
-        <height>1</height>
         <topGap>0.5</topGap>
         <leftMargin>1</leftMargin>
         <rightMargin>1</rightMargin>
         <topMargin>1</topMargin>
         <bottomMargin>1</bottomMargin>
+        <eid>5L/oZx4fypN_NOqHLPKgglL</eid>
         <Text>
-          <style>Frame</style>
+          <style>frame</style>
+          <eid>kw0x2jINueO_fC1AUVoZodK</eid>
           <text>1,2,3   2,3   2,3,4   2,3,4,5,6</text>
           </Text>
         </TBox>
       <Measure>
+        <eid>E/W6htimHdC_pOk7aHtao2O</eid>
         <voice>
           <Clef>
             <concertClefType>G</concertClefType>
             <transposingClefType>G</transposingClefType>
+            <isHeader>1</isHeader>
+            <eid>YZW3G48LCAD_cbbh9KvEZpO</eid>
             </Clef>
           <TimeSig>
+            <eid>1q5pwJdzxEF_RJk9NKksN7D</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Tempo>
             <tempo>6.66667</tempo>
             <followText>1</followText>
-            <text><b></b><font face="ScoreText"></font><b><font face="FreeSerif"></font> = 400
-</b></text>
+            <eid>Jd8m1Tzr+nG_8eLZdBa9xnG</eid>
+            <text><b/><font face="ScoreText"/><b><font face="FreeSerif"/> = 400<br/></b></text>
             </Tempo>
           <Chord>
+            <eid>OXwaI/67feL_QH3fuqxDtrE</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>WGLrBKAD/iM_8OOmDC4rmhC</eid>
               <pitch>60</pitch>
               <tpc>14</tpc>
               </Note>
@@ -199,39 +150,33 @@ measure 3 has a repeat count of 3
           </voice>
         </Measure>
       <Measure>
+        <eid>BOptSOdv84N_OKEvtpbZNaB</eid>
         <startRepeat/>
         <voice>
           <Chord>
+            <eid>BJpaFJNswmD_0WSpNW9zEkM</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>kOGS1+Ny3eC_1GDlL/1NRC</eid>
               <pitch>62</pitch>
               <tpc>16</tpc>
               </Note>
             </Chord>
           <BarLine>
             <span>1</span>
+            <eid>V1o+ldLZyQM_b23uiLBTBLF</eid>
             </BarLine>
           </voice>
         </Measure>
       <Measure>
+        <eid>S3obWHW2XtH_vOi3b04c40C</eid>
         <endRepeat>3</endRepeat>
         <voice>
-          <Spanner type="TextLine">
-            <TextLine>
-              <lineVisible>0</lineVisible>
-              <endText>3x</endText>
-              <endTextAlign>center,center</endTextAlign>
-              <lineWidth>0.149991</lineWidth>
-              </TextLine>
-            <next>
-              <location>
-                <measures>1</measures>
-                </location>
-              </next>
-            </Spanner>
           <Chord>
+            <eid>9P1DW5Bs+CM_TAIPauLqI3B</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>OekBY1YOIvD_szqgk4d/7nH</eid>
               <pitch>64</pitch>
               <tpc>18</tpc>
               </Note>
@@ -239,18 +184,14 @@ measure 3 has a repeat count of 3
           </voice>
         </Measure>
       <Measure>
+        <eid>IEoM48dsLxB_9p4f46UOO0F</eid>
         <endRepeat>2</endRepeat>
         <voice>
-          <Spanner type="TextLine">
-            <prev>
-              <location>
-                <measures>-1</measures>
-                </location>
-              </prev>
-            </Spanner>
           <Chord>
+            <eid>li3lmU0MoLM_9YKCqmVB2dG</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>n2HmaCxTdyN_6HKwqCCjPmO</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
@@ -258,10 +199,13 @@ measure 3 has a repeat count of 3
           </voice>
         </Measure>
       <Measure>
+        <eid>1M978Ch6mdN_SmZ8AKfrmqG</eid>
         <voice>
           <Chord>
+            <eid>5AX+hVFWW3H_lRiyaLDJpaF</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>ns2qskfElsL_xTwangch59P</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
@@ -269,10 +213,13 @@ measure 3 has a repeat count of 3
           </voice>
         </Measure>
       <Measure>
+        <eid>DSeBoBZsoyB_IUNs4sRrqOK</eid>
         <voice>
           <Chord>
+            <eid>EDgUCaf0hbP_yfMwDBhhA1F</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>Pw7tV99TX1B_T8vxYbUZh</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>
@@ -280,9 +227,24 @@ measure 3 has a repeat count of 3
           <BarLine>
             <subtype>end</subtype>
             <span>1</span>
+            <eid>Uz/9ymYMlJM_LQMaHTmEotH</eid>
             </BarLine>
           </voice>
         </Measure>
       </Staff>
+    <SpannerMap>
+      <TextLine>
+        <lineVisible>0</lineVisible>
+        <endText>3x</endText>
+        <track2>0</track2>
+        <startTick>2/1</startTick>
+        <ticks>1/1</ticks>
+        <eid>dmnSs7WnodP_yb/+79ByQMO</eid>
+        <track>0</track>
+        <endTextAlign>center,center</endTextAlign>
+        <endTextPosition>center</endTextPosition>
+        <lineWidth>0.149991</lineWidth>
+        </TextLine>
+      </SpannerMap>
     </Score>
   </museScore>

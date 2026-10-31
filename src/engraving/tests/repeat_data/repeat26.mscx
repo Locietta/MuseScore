@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="3.01">
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>dCat6cYd8nE_RJOo9waUysG</eid>
     <Division>480</Division>
-    <Style>
-      <lastSystemFillLimit>0</lastSystemFillLimit>
-      <showMeasureNumberOne>1</showMeasureNumberOne>
-      <measureNumberInterval>1</measureNumberInterval>
-      <measureNumberSystem>0</measureNumberSystem>
-      <Spatium>1.76389</Spatium>
-      </Style>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
     <showFrames>1</showFrames>
@@ -16,28 +12,34 @@
     <metaTag name="arranger"></metaTag>
     <metaTag name="composer">Composer</metaTag>
     <metaTag name="copyright"></metaTag>
+    <metaTag name="creationDate">2026-10-31</metaTag>
     <metaTag name="lyricist"></metaTag>
     <metaTag name="movementNumber"></metaTag>
     <metaTag name="movementTitle"></metaTag>
+    <metaTag name="platform">Microsoft Windows</metaTag>
     <metaTag name="source"></metaTag>
     <metaTag name="translator"></metaTag>
     <metaTag name="workNumber"></metaTag>
     <metaTag name="workTitle">Title</metaTag>
-    <Part>
-      <Staff id="1">
+    <Part id="1">
+      <eid>749QvkR+h5E_CSuGvAyLcYB</eid>
+      <Staff>
+        <eid>BBlAdj05yMH_usiO463jqaN</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
-      <trackName>Piano</trackName>
-      <Instrument>
-        <longName>Piano</longName>
-        <shortName>Pno.</shortName>
+      <Instrument id="piano">
+        <InstrumentLabel>
+          <longName>Piano</longName>
+          <shortName>Pno.</shortName>
+          </InstrumentLabel>
         <trackName>Piano</trackName>
         <minPitchP>21</minPitchP>
         <maxPitchP>108</maxPitchP>
         <minPitchA>21</minPitchA>
         <maxPitchA>108</maxPitchA>
+        <instrumentId>keyboard.piano</instrumentId>
         <clef staff="2">F</clef>
         <Articulation>
           <velocity>100</velocity>
@@ -69,6 +71,7 @@
           </Articulation>
         <Channel>
           <program value="0"/>
+          <synti>Fluid</synti>
           </Channel>
         </Instrument>
       </Part>
@@ -76,35 +79,44 @@
       <VBox>
         <height>10</height>
         <bottomGap>1</bottomGap>
+        <boxAutoSize>0</boxAutoSize>
+        <sizeIsSpatiumDependent>1</sizeIsSpatiumDependent>
+        <eid>R9dAjhlgxiC_HItbs4pJ9FE</eid>
         <Text>
           <style>title</style>
+          <eid>eHGDzxTBi2D_ivui/0l5wsH</eid>
           <text>repeat26</text>
           </Text>
         <Text>
           <style>subtitle</style>
+          <eid>hmU4o5eANhG_U5hateIiKCH</eid>
           <text>Process jumps to the best of our abilities; these cases result in no jump</text>
           </Text>
         </VBox>
       <TBox>
-        <height>1</height>
         <topGap>0</topGap>
         <leftMargin>1</leftMargin>
         <rightMargin>1</rightMargin>
         <topMargin>1</topMargin>
         <bottomMargin>1</bottomMargin>
+        <eid>M7BVEeb4p1I_J82mV7YyHlO</eid>
         <Text>
-          <style>Frame</style>
+          <style>frame</style>
+          <eid>VRdLzORPbjJ_4K0A43frBkI</eid>
           <text>1   1,2   2,3</text>
           </Text>
         </TBox>
       <Measure>
+        <eid>ZtI8Bs2djKG_x60/o1UhQ6G</eid>
         <startRepeat/>
         <endRepeat>2</endRepeat>
         <LayoutBreak>
+          <eid>L/+75XRh28J_JTW8R+K3h4</eid>
           <subtype>line</subtype>
           </LayoutBreak>
         <Jump>
-          <style>Repeat Text Right</style>
+          <style>repeat_right</style>
+          <eid>vlWRRP3EtKF_9jAjNKMWijI</eid>
           <text>Empty Jump</text>
           <jumpTo></jumpTo>
           <playUntil></playUntil>
@@ -112,21 +124,26 @@
           </Jump>
         <voice>
           <TimeSig>
+            <eid>Csd3nYXaiUJ_XDJPbEK5UXD</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <BarLine>
             <subtype>start-repeat</subtype>
             <span>1</span>
+            <eid>TpHOZQqUgYL_DGl25n4OsGL</eid>
             </BarLine>
           <Tempo>
             <tempo>6.66667</tempo>
             <followText>1</followText>
-            <text><b></b><font face="ScoreText"></font><b><font face="FreeSerif"></font> = 400</b></text>
+            <eid>Oi848zJMB7N_ePBZR5xklxE</eid>
+            <text><b/><font face="ScoreText"/><b><font face="FreeSerif"/> = 400</b></text>
             </Tempo>
           <Chord>
+            <eid>qSNKb2owN3C_CYm3rR71LQJ</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>7/h2MuVHB1L_u8SWm1zgOTO</eid>
               <pitch>60</pitch>
               <tpc>14</tpc>
               </Note>
@@ -134,13 +151,16 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>e1y9F2+5X6L_8xDjPSZ9sQD</eid>
         <startRepeat/>
         <endRepeat>2</endRepeat>
         <LayoutBreak>
+          <eid>sZE1RFfbZBK_zin+Vrj306D</eid>
           <subtype>line</subtype>
           </LayoutBreak>
         <Jump>
-          <style>Repeat Text Right</style>
+          <style>repeat_right</style>
+          <eid>x0WvFo993WO_6nRLXUpRfAB</eid>
           <text>Garbage Jump</text>
           <jumpTo>test</jumpTo>
           <playUntil>test</playUntil>
@@ -150,10 +170,13 @@
           <BarLine>
             <subtype>start-repeat</subtype>
             <span>1</span>
+            <eid>n4BtYR5I2PC_n6PWTiK7HuM</eid>
             </BarLine>
           <Chord>
+            <eid>2g/XeYmbCMB_s2WawwU4r3</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>2vj0bYsS8FG_GBf6e4Jz67I</eid>
               <pitch>62</pitch>
               <tpc>16</tpc>
               </Note>
@@ -161,13 +184,17 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>oPABV0K4p9H_KNPnNRklPiM</eid>
         <LayoutBreak>
+          <eid>BAx/P70ipdL_uTY1wYIoCpE</eid>
           <subtype>line</subtype>
           </LayoutBreak>
         <voice>
           <Chord>
+            <eid>MchQGoY7ZbD_7HTmq3CXv3C</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>vQg9ejCP5AO_DFUVbRKTfPI</eid>
               <pitch>64</pitch>
               <tpc>18</tpc>
               </Note>
@@ -175,6 +202,7 @@
           <BarLine>
             <subtype>end</subtype>
             <span>1</span>
+            <eid>VlhQ9S27WwL_8hikRE/G0rC</eid>
             </BarLine>
           </voice>
         </Measure>

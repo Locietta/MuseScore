@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="3.01">
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>WifFpoOIVZP_8Gs+sEcRwFK</eid>
     <Division>480</Division>
-    <Style>
-      <Spatium>1.76389</Spatium>
-      </Style>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
     <showFrames>1</showFrames>
@@ -12,26 +12,30 @@
     <metaTag name="arranger"></metaTag>
     <metaTag name="composer"></metaTag>
     <metaTag name="copyright"></metaTag>
+    <metaTag name="creationDate">2026-10-31</metaTag>
     <metaTag name="lyricist"></metaTag>
     <metaTag name="movementNumber"></metaTag>
     <metaTag name="movementTitle"></metaTag>
+    <metaTag name="platform">Microsoft Windows</metaTag>
     <metaTag name="source"></metaTag>
     <metaTag name="translator"></metaTag>
     <metaTag name="workNumber"></metaTag>
     <metaTag name="workTitle">Test</metaTag>
-    <Part>
-      <Staff id="1">
+    <Part id="1">
+      <eid>PwVXwgfgDQN_XOnTNDYsuID</eid>
+      <Staff>
+        <eid>qU5VQ0ycrVN_d5li5qgioIC</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
-      <trackName>Voice</trackName>
-      <Instrument>
+      <Instrument id="voice">
         <trackName>Voice</trackName>
         <minPitchP>36</minPitchP>
         <maxPitchP>94</maxPitchP>
         <minPitchA>40</minPitchA>
         <maxPitchA>79</maxPitchA>
+        <instrumentId>voice.vocals</instrumentId>
         <Articulation>
           <velocity>100</velocity>
           <gateTime>100</gateTime>
@@ -49,19 +53,24 @@
           <gateTime>100</gateTime>
           </Articulation>
         <Channel>
+          <program value="52"/>
+          <synti>Fluid</synti>
           </Channel>
         </Instrument>
       </Part>
-    <Part>
-      <Staff id="2">
+    <Part id="2">
+      <eid>sxPXSWfJ/hI_1+WigHGRXVB</eid>
+      <Staff>
+        <eid>V7DulMM1gmM_TARdpMcKWVI</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
-      <trackName>Voice</trackName>
-      <Instrument>
-        <longName>Voice</longName>
-        <shortName>Vo.</shortName>
+      <Instrument id="voice">
+        <InstrumentLabel>
+          <longName>Voice</longName>
+          <shortName>Vo.</shortName>
+          </InstrumentLabel>
         <trackName>Voice</trackName>
         <minPitchP>36</minPitchP>
         <maxPitchP>94</maxPitchP>
@@ -98,77 +107,79 @@
           </Articulation>
         <Channel>
           <program value="52"/>
+          <synti>Fluid</synti>
           </Channel>
         </Instrument>
       </Part>
     <Staff id="1">
       <VBox>
         <height>10</height>
+        <boxAutoSize>0</boxAutoSize>
+        <sizeIsSpatiumDependent>1</sizeIsSpatiumDependent>
+        <eid>iJfVxzMSNkJ_uhM99isWZ/P</eid>
         <Text>
           <style>title</style>
+          <eid>79Mk18HqqZN_OhXko+6Z9oL</eid>
           <text>Test</text>
           </Text>
         <Text>
           <style>subtitle</style>
+          <eid>OZ1UvO4dFZC_BsJJdlgqm3O</eid>
           <text>Split Measure+Slur</text>
           </Text>
         </VBox>
       <Measure>
+        <eid>5YEapwHH93B_pYXsq9k+UaK</eid>
         <voice>
           <TimeSig>
+            <eid>Z1q0MWdfaEI_e4OmRfXxaXL</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Tempo>
             <tempo>1.66667</tempo>
+            <eid>iV9fIA8yL/G_S9cZla5mgH</eid>
             <text>𝅘𝅥 = 100</text>
             </Tempo>
           <Chord>
+            <eid>gcpqiP5DxYJ_qbE+PYvBFSM</eid>
             <durationType>quarter</durationType>
-            <Spanner type="Slur">
-              <Slur>
-                </Slur>
-              <next>
-                <location>
-                  <fractions>3/4</fractions>
-                  </location>
-                </next>
-              </Spanner>
             <Note>
+              <eid>Z+R5dvlbhyN_dU/hZ3Lt3fJ</eid>
               <pitch>60</pitch>
               <tpc>14</tpc>
               </Note>
             </Chord>
           <Chord>
+            <eid>QdaDX/UCF3G_oqCE+2yfg0</eid>
             <durationType>quarter</durationType>
             <Note>
+              <eid>iF78wKJqVHO_d4YhGBQYP9P</eid>
               <pitch>62</pitch>
               <tpc>16</tpc>
               </Note>
             </Chord>
           <Chord>
+            <eid>3NcyWK5/5xJ_4YuVR5ejR8H</eid>
             <durationType>quarter</durationType>
             <Note>
+              <eid>EhZKXdz3bdP_eD4b6T1pZ5J</eid>
               <pitch>64</pitch>
               <tpc>18</tpc>
               </Note>
             </Chord>
           <Chord>
+            <eid>y4aWvkZ4QyE_iRiYR4rOFWJ</eid>
             <durationType>quarter</durationType>
-            <Spanner type="Slur">
-              <prev>
-                <location>
-                  <fractions>-3/4</fractions>
-                  </location>
-                </prev>
-              </Spanner>
             <Note>
+              <eid>1/QaSLWpacI_YrPJa1YgPMN</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <BarLine>
             <subtype>end</subtype>
+            <eid>Htq0XjHv+IL_jUFZKovKAY</eid>
             </BarLine>
           </voice>
         </Measure>
@@ -177,15 +188,25 @@
       <Measure>
         <voice>
           <TimeSig>
+            <eid>BLC6xM1pndO_8R/S+a30QkD</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Rest>
+            <eid>I3XL0HjfThG_xygsyzi8tNM</eid>
             <durationType>measure</durationType>
             <duration>4/4</duration>
             </Rest>
           </voice>
         </Measure>
       </Staff>
+    <SpannerMap>
+      <Slur>
+        <startElement>gcpqiP5DxYJ_qbE+PYvBFSM</startElement>
+        <endElement>y4aWvkZ4QyE_iRiYR4rOFWJ</endElement>
+        <eid>7osZfuYm7DM_yIpjm6Yr9+H</eid>
+        <track>0</track>
+        </Slur>
+      </SpannerMap>
     </Score>
   </museScore>

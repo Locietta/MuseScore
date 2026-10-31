@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="3.01">
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>bdtmixVfWgJ_EsfigaT1jOM</eid>
     <Division>480</Division>
-    <Style>
-      <pageWidth>8.27</pageWidth>
-      <pageHeight>11.69</pageHeight>
-      <pagePrintableWidth>7.4826</pagePrintableWidth>
-      <concertPitch>1</concertPitch>
-      <Spatium>1.76389</Spatium>
-      </Style>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
     <showFrames>1</showFrames>
@@ -16,23 +12,28 @@
     <metaTag name="arranger"></metaTag>
     <metaTag name="composer"></metaTag>
     <metaTag name="copyright"></metaTag>
+    <metaTag name="creationDate">2026-10-31</metaTag>
     <metaTag name="lyricist"></metaTag>
     <metaTag name="movementNumber"></metaTag>
     <metaTag name="movementTitle"></metaTag>
+    <metaTag name="platform">Microsoft Windows</metaTag>
     <metaTag name="source"></metaTag>
     <metaTag name="translator"></metaTag>
     <metaTag name="workNumber"></metaTag>
     <metaTag name="workTitle">Pickup-bug</metaTag>
-    <Part>
-      <Staff id="1">
+    <Part id="1">
+      <eid>JZjZCh3pDEE_gLHicFb6NjD</eid>
+      <Staff>
+        <eid>kuxKVpDeV+_AxgxKZsimJD</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
-      <trackName>B♭ Trumpet</trackName>
-      <Instrument>
-        <longName>B♭ Trumpet</longName>
-        <shortName>B♭ Tpt.</shortName>
+      <Instrument id="bb-trumpet">
+        <InstrumentLabel>
+          <longName>B♭ Trumpet</longName>
+          <shortName>B♭ Tpt.</shortName>
+          </InstrumentLabel>
         <trackName>B♭ Trumpet</trackName>
         <minPitchP>52</minPitchP>
         <maxPitchP>85</maxPitchP>
@@ -71,22 +72,27 @@
           </Articulation>
         <Channel>
           <program value="56"/>
+          <synti>Fluid</synti>
           </Channel>
         <Channel name="mute">
           <program value="59"/>
+          <synti>Fluid</synti>
           </Channel>
         </Instrument>
       </Part>
-    <Part>
-      <Staff id="2">
+    <Part id="2">
+      <eid>JigOaHSqzwB_arOlw8cwVWJ</eid>
+      <Staff>
+        <eid>lK+/xUGT6sB_fei12aAHH9J</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
-      <trackName>C Trumpet</trackName>
-      <Instrument>
-        <longName>C Trumpet</longName>
-        <shortName>C Tpt.</shortName>
+      <Instrument id="c-trumpet">
+        <InstrumentLabel>
+          <longName>C Trumpet</longName>
+          <shortName>C Tpt.</shortName>
+          </InstrumentLabel>
         <trackName>C Trumpet</trackName>
         <minPitchP>54</minPitchP>
         <maxPitchP>85</maxPitchP>
@@ -123,45 +129,54 @@
           </Articulation>
         <Channel>
           <program value="56"/>
+          <synti>Fluid</synti>
           </Channel>
         <Channel name="mute">
           <program value="59"/>
+          <synti>Fluid</synti>
           </Channel>
         </Instrument>
       </Part>
     <Staff id="1">
       <VBox>
         <height>10</height>
-        <linkedMain/>
+        <boxAutoSize>0</boxAutoSize>
+        <sizeIsSpatiumDependent>1</sizeIsSpatiumDependent>
+        <eid>VHJeSgwv7PN_rxMCxHC8YPN</eid>
         <Text>
-          <linkedMain/>
           <style>title</style>
+          <eid>NDCxAXf7cLF_bZFSK3m6i3M</eid>
           <text>Test</text>
           </Text>
         </VBox>
       <Measure len="1/4">
+        <eid>TS+3R/e0FAB_iJ66VMN4jGH</eid>
         <irregular>1</irregular>
         <voice>
+          <KeySig>
+            <eid>TqwgBmxiCLG_RE/c3r6UqYL</eid>
+            <concertKey>0</concertKey>
+            </KeySig>
           <TimeSig>
-            <linkedMain/>
+            <eid>2vLjrhCNlvB_qK/kSVgf5WM</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Rest>
-            <linkedMain/>
+            <eid>X5HwEFS3sZM_txC9c3R331F</eid>
             <durationType>eighth</durationType>
             </Rest>
           <StaffText>
-            <swing unit="eighth" ratio= "60"/>
-            <linkedMain/>
-            <style>Tempo</style>
+            <swing unit="eighth" ratio="60"/>
+            <style>tempo</style>
+            <eid>wagBzHiq53J_CXJe+xvgtRE</eid>
             <text>Swing</text>
             </StaffText>
           <Chord>
-            <linkedMain/>
+            <eid>a3JcnKPiYhF_nVsD3kJqX+J</eid>
             <durationType>eighth</durationType>
             <Note>
-              <linkedMain/>
+              <eid>9jdcQy86iqP_ymKVYNrzncC</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               <tpc2>16</tpc2>
@@ -170,42 +185,43 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>EEZsYEdRjhJ_cuyyAWj1cIM</eid>
         <voice>
           <Chord>
-            <linkedMain/>
+            <eid>W03m6QGALpM_LvlveBT00Q</eid>
             <durationType>quarter</durationType>
             <Note>
-              <linkedMain/>
+              <eid>U23vhXjeMjE_/XQTyGLN7yG</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               <tpc2>16</tpc2>
               </Note>
             </Chord>
           <Chord>
-            <linkedMain/>
+            <eid>BfNtXo1J+UL_3+9TUPWrbvN</eid>
             <durationType>quarter</durationType>
             <Note>
-              <linkedMain/>
+              <eid>zwR9n+FG0vO_86rh/OEUmVK</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               <tpc2>16</tpc2>
               </Note>
             </Chord>
           <Chord>
-            <linkedMain/>
+            <eid>owtC5+frtPP_rto82/t2EFO</eid>
             <durationType>quarter</durationType>
             <Note>
-              <linkedMain/>
+              <eid>PqQaHBYxCV_0RfgEeRGV5M</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               <tpc2>16</tpc2>
               </Note>
             </Chord>
           <Chord>
-            <linkedMain/>
+            <eid>ewyw1IwXoeN_8UNwmFy9xXJ</eid>
             <durationType>quarter</durationType>
             <Note>
-              <linkedMain/>
+              <eid>GJTi8XH+S3M_un1TuCPb1bL</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               <tpc2>16</tpc2>
@@ -218,12 +234,12 @@
       <Measure len="1/4">
         <voice>
           <TimeSig>
-            <linkedMain/>
+            <eid>/gy50tSw8eM_8Mmin8ignxN</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Rest>
-            <linkedMain/>
+            <eid>3bVYSB0QrLL_h5wLASXK3U</eid>
             <durationType>quarter</durationType>
             </Rest>
           </voice>
@@ -231,37 +247,37 @@
       <Measure>
         <voice>
           <Chord>
-            <linkedMain/>
+            <eid>H0zsOu3mYRO_HxGB5Vj2//J</eid>
             <durationType>quarter</durationType>
             <Note>
-              <linkedMain/>
+              <eid>vgrGz6c5LVB_AXPRom+lL8N</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>
             </Chord>
           <Chord>
-            <linkedMain/>
+            <eid>/Mzt/UM2X1I_KKy4sniTQfM</eid>
             <durationType>quarter</durationType>
             <Note>
-              <linkedMain/>
+              <eid>aG+7ZpzaS2F_Q7lLcfdOCJ</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>
             </Chord>
           <Chord>
-            <linkedMain/>
+            <eid>YvZvoGbhHa_Aovvd7z/rLK</eid>
             <durationType>quarter</durationType>
             <Note>
-              <linkedMain/>
+              <eid>MlRxlQ4c+d_fdgJbBN/vxJ</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>
             </Chord>
           <Chord>
-            <linkedMain/>
+            <eid>DKN9dXs9rbN_qdaadc3b9GN</eid>
             <durationType>quarter</durationType>
             <Note>
-              <linkedMain/>
+              <eid>B08j7PC2kzJ_qj63MvXaCfH</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>
@@ -269,352 +285,5 @@
           </voice>
         </Measure>
       </Staff>
-    <Score>
-      <Division>480</Division>
-      <Style>
-        <pageWidth>8.27</pageWidth>
-        <pageHeight>11.69</pageHeight>
-        <pagePrintableWidth>7.4826</pagePrintableWidth>
-        <createMultiMeasureRests>1</createMultiMeasureRests>
-        <Spatium>1.76389</Spatium>
-        </Style>
-      <showInvisible>1</showInvisible>
-      <showUnprintable>1</showUnprintable>
-      <showFrames>1</showFrames>
-      <showMargins>0</showMargins>
-      <metaTag name="partName">B♭ Trumpet</metaTag>
-      <Part>
-        <Staff id="1">
-          <linkedTo>1</linkedTo>
-          <StaffType group="pitched">
-            <name>stdNormal</name>
-            </StaffType>
-          </Staff>
-        <trackName>B♭ Trumpet</trackName>
-        <Instrument>
-          <longName>B♭ Trumpet</longName>
-          <shortName>B♭ Tpt.</shortName>
-          <trackName>B♭ Trumpet</trackName>
-          <minPitchP>52</minPitchP>
-          <maxPitchP>85</maxPitchP>
-          <minPitchA>52</minPitchA>
-          <maxPitchA>80</maxPitchA>
-          <transposeDiatonic>-1</transposeDiatonic>
-          <transposeChromatic>-2</transposeChromatic>
-          <instrumentId>brass.trumpet.bflat</instrumentId>
-          <Articulation>
-            <velocity>100</velocity>
-            <gateTime>100</gateTime>
-            </Articulation>
-          <Articulation name="staccatissimo">
-            <velocity>100</velocity>
-            <gateTime>33</gateTime>
-            </Articulation>
-          <Articulation name="staccato">
-            <velocity>100</velocity>
-            <gateTime>50</gateTime>
-            </Articulation>
-          <Articulation name="portato">
-            <velocity>100</velocity>
-            <gateTime>67</gateTime>
-            </Articulation>
-          <Articulation name="tenuto">
-            <velocity>100</velocity>
-            <gateTime>100</gateTime>
-            </Articulation>
-          <Articulation name="marcato">
-            <velocity>120</velocity>
-            <gateTime>67</gateTime>
-            </Articulation>
-          <Articulation name="sforzato">
-            <velocity>120</velocity>
-            <gateTime>100</gateTime>
-            </Articulation>
-          <Channel>
-            <program value="56"/>
-            </Channel>
-          <Channel name="mute">
-            <program value="59"/>
-            </Channel>
-          </Instrument>
-        </Part>
-      <Staff id="1">
-        <VBox>
-          <height>10</height>
-          <linked>
-            </linked>
-          <Text>
-            <linked>
-              </linked>
-            <style>title</style>
-            <text>Test</text>
-            </Text>
-          <Text>
-            <style>instrument_excerpt</style>
-            <text>B♭ Trumpet</text>
-            </Text>
-          </VBox>
-        <Measure len="1/4">
-          <irregular>1</irregular>
-          <voice>
-            <KeySig>
-              <accidental>2</accidental>
-              </KeySig>
-            <TimeSig>
-              <linked>
-                </linked>
-              <sigN>4</sigN>
-              <sigD>4</sigD>
-              </TimeSig>
-            <Rest>
-              <linked>
-                </linked>
-              <durationType>eighth</durationType>
-              </Rest>
-            <StaffText>
-              <swing unit="eighth" ratio= "60"/>
-              <linked>
-                </linked>
-              <style>Tempo</style>
-              <text>Swing</text>
-              </StaffText>
-            <Chord>
-              <linked>
-                </linked>
-              <durationType>eighth</durationType>
-              <Note>
-                <linked>
-                  </linked>
-                <pitch>72</pitch>
-                <tpc>14</tpc>
-                <tpc2>16</tpc2>
-                </Note>
-              </Chord>
-            </voice>
-          </Measure>
-        <Measure>
-          <voice>
-            <Chord>
-              <linked>
-                </linked>
-              <durationType>quarter</durationType>
-              <Note>
-                <linked>
-                  </linked>
-                <pitch>72</pitch>
-                <tpc>14</tpc>
-                <tpc2>16</tpc2>
-                </Note>
-              </Chord>
-            <Chord>
-              <linked>
-                </linked>
-              <durationType>quarter</durationType>
-              <Note>
-                <linked>
-                  </linked>
-                <pitch>72</pitch>
-                <tpc>14</tpc>
-                <tpc2>16</tpc2>
-                </Note>
-              </Chord>
-            <Chord>
-              <linked>
-                </linked>
-              <durationType>quarter</durationType>
-              <Note>
-                <linked>
-                  </linked>
-                <pitch>72</pitch>
-                <tpc>14</tpc>
-                <tpc2>16</tpc2>
-                </Note>
-              </Chord>
-            <Chord>
-              <linked>
-                </linked>
-              <durationType>quarter</durationType>
-              <Note>
-                <linked>
-                  </linked>
-                <pitch>72</pitch>
-                <tpc>14</tpc>
-                <tpc2>16</tpc2>
-                </Note>
-              </Chord>
-            </voice>
-          </Measure>
-        </Staff>
-      <name>B♭ Trumpet</name>
-      </Score>
-    <Score>
-      <Division>480</Division>
-      <Style>
-        <pageWidth>8.27</pageWidth>
-        <pageHeight>11.69</pageHeight>
-        <pagePrintableWidth>7.4826</pagePrintableWidth>
-        <createMultiMeasureRests>1</createMultiMeasureRests>
-        <Spatium>1.76389</Spatium>
-        </Style>
-      <showInvisible>1</showInvisible>
-      <showUnprintable>1</showUnprintable>
-      <showFrames>1</showFrames>
-      <showMargins>0</showMargins>
-      <metaTag name="partName">C Trumpet</metaTag>
-      <Part>
-        <Staff id="1">
-          <linkedTo>2</linkedTo>
-          <StaffType group="pitched">
-            <name>stdNormal</name>
-            </StaffType>
-          </Staff>
-        <trackName>C Trumpet</trackName>
-        <Instrument>
-          <longName>C Trumpet</longName>
-          <shortName>C Tpt.</shortName>
-          <trackName>C Trumpet</trackName>
-          <minPitchP>54</minPitchP>
-          <maxPitchP>85</maxPitchP>
-          <minPitchA>54</minPitchA>
-          <maxPitchA>82</maxPitchA>
-          <instrumentId>brass.trumpet.c</instrumentId>
-          <Articulation>
-            <velocity>100</velocity>
-            <gateTime>100</gateTime>
-            </Articulation>
-          <Articulation name="staccatissimo">
-            <velocity>100</velocity>
-            <gateTime>33</gateTime>
-            </Articulation>
-          <Articulation name="staccato">
-            <velocity>100</velocity>
-            <gateTime>50</gateTime>
-            </Articulation>
-          <Articulation name="portato">
-            <velocity>100</velocity>
-            <gateTime>67</gateTime>
-            </Articulation>
-          <Articulation name="tenuto">
-            <velocity>100</velocity>
-            <gateTime>100</gateTime>
-            </Articulation>
-          <Articulation name="marcato">
-            <velocity>120</velocity>
-            <gateTime>67</gateTime>
-            </Articulation>
-          <Articulation name="sforzato">
-            <velocity>120</velocity>
-            <gateTime>100</gateTime>
-            </Articulation>
-          <Channel>
-            <program value="56"/>
-            </Channel>
-          <Channel name="mute">
-            <program value="59"/>
-            </Channel>
-          </Instrument>
-        </Part>
-      <Staff id="1">
-        <VBox>
-          <height>10</height>
-          <linked>
-            <location>
-              <staves>-1</staves>
-              </location>
-            </linked>
-          <Text>
-            <linked>
-              <location>
-                <staves>-1</staves>
-                </location>
-              </linked>
-            <style>title</style>
-            <text>Test</text>
-            </Text>
-          <Text>
-            <style>instrument_excerpt</style>
-            <text>C Trumpet</text>
-            </Text>
-          </VBox>
-        <Measure len="1/4">
-          <irregular>1</irregular>
-          <voice>
-            <TimeSig>
-              <linked>
-                </linked>
-              <sigN>4</sigN>
-              <sigD>4</sigD>
-              </TimeSig>
-            <Rest>
-              <linked>
-                </linked>
-              <durationType>quarter</durationType>
-              </Rest>
-            <location>
-              <fractions>-1/8</fractions>
-              </location>
-            <StaffText>
-              <swing unit="eighth" ratio= "60"/>
-              <linked>
-                <location>
-                  <staves>-1</staves>
-                  </location>
-                </linked>
-              <style>Tempo</style>
-              <text>Swing</text>
-              </StaffText>
-            </voice>
-          </Measure>
-        <Measure>
-          <voice>
-            <Chord>
-              <linked>
-                </linked>
-              <durationType>quarter</durationType>
-              <Note>
-                <linked>
-                  </linked>
-                <pitch>72</pitch>
-                <tpc>14</tpc>
-                </Note>
-              </Chord>
-            <Chord>
-              <linked>
-                </linked>
-              <durationType>quarter</durationType>
-              <Note>
-                <linked>
-                  </linked>
-                <pitch>72</pitch>
-                <tpc>14</tpc>
-                </Note>
-              </Chord>
-            <Chord>
-              <linked>
-                </linked>
-              <durationType>quarter</durationType>
-              <Note>
-                <linked>
-                  </linked>
-                <pitch>72</pitch>
-                <tpc>14</tpc>
-                </Note>
-              </Chord>
-            <Chord>
-              <linked>
-                </linked>
-              <durationType>quarter</durationType>
-              <Note>
-                <linked>
-                  </linked>
-                <pitch>72</pitch>
-                <tpc>14</tpc>
-                </Note>
-              </Chord>
-            </voice>
-          </Measure>
-        </Staff>
-      <name>C Trumpet</name>
-      </Score>
     </Score>
   </museScore>

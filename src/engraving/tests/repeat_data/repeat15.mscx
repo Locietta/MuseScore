@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="3.01">
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>ouJrghRr+pD_lvaWMJqYT0P</eid>
     <Division>480</Division>
-    <Style>
-      <showMeasureNumberOne>1</showMeasureNumberOne>
-      <measureNumberInterval>1</measureNumberInterval>
-      <measureNumberSystem>0</measureNumberSystem>
-      <Spatium>1.76389</Spatium>
-      </Style>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
     <showFrames>1</showFrames>
@@ -15,23 +12,28 @@
     <metaTag name="arranger"></metaTag>
     <metaTag name="composer"></metaTag>
     <metaTag name="copyright"></metaTag>
+    <metaTag name="creationDate">2026-10-31</metaTag>
     <metaTag name="lyricist"></metaTag>
     <metaTag name="movementNumber"></metaTag>
     <metaTag name="movementTitle"></metaTag>
+    <metaTag name="platform">Microsoft Windows</metaTag>
     <metaTag name="source"></metaTag>
     <metaTag name="translator"></metaTag>
     <metaTag name="workNumber"></metaTag>
     <metaTag name="workTitle"></metaTag>
-    <Part>
-      <Staff id="1">
+    <Part id="1">
+      <eid>nCUxDYwH8a_HDELj2m/TpJ</eid>
+      <Staff>
+        <eid>0czB6Xa1LHH_dyrqIultiJG</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
-      <trackName>Piano</trackName>
-      <Instrument>
-        <longName>Piano</longName>
-        <shortName>Pno.</shortName>
+      <Instrument id="piano">
+        <InstrumentLabel>
+          <longName>Piano</longName>
+          <shortName>Pno.</shortName>
+          </InstrumentLabel>
         <trackName>Piano</trackName>
         <minPitchP>21</minPitchP>
         <maxPitchP>108</maxPitchP>
@@ -81,6 +83,7 @@
           </Articulation>
         <Channel>
           <program value="0"/>
+          <synti>Fluid</synti>
           </Channel>
         </Instrument>
       </Part>
@@ -88,41 +91,52 @@
       <VBox>
         <height>10</height>
         <bottomGap>1</bottomGap>
+        <boxAutoSize>0</boxAutoSize>
+        <sizeIsSpatiumDependent>1</sizeIsSpatiumDependent>
+        <eid>QsU16APJPZL_hJNAljc+TZE</eid>
         <Text>
           <style>title</style>
+          <eid>XPFBLwME+jH_Zw6+VLo1voO</eid>
           <text>repeat15</text>
           </Text>
         <Text>
           <style>subtitle</style>
+          <eid>IhtOnFGmcOG_BgxB49snEMG</eid>
           <text>Play/Repeat Count of 8</text>
           </Text>
         </VBox>
       <TBox>
-        <height>1</height>
         <topGap>0</topGap>
         <leftMargin>1</leftMargin>
         <rightMargin>1</rightMargin>
         <topMargin>1</topMargin>
         <bottomMargin>1</bottomMargin>
+        <eid>T0WwhinsZ3F_LKm+SHy95JC</eid>
         <Text>
-          <style>Frame</style>
+          <style>frame</style>
+          <eid>fnTP+bkncFJ_9AiLXwggl3G</eid>
           <text>1,2   2   2   2   2   2   2   2,3</text>
           </Text>
         </TBox>
       <Measure>
+        <eid>WlY/4tY6IZK_53KlmqYKElN</eid>
         <voice>
           <TimeSig>
+            <eid>+uDbNITEy8L_X6jTLrDfJEK</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Tempo>
             <tempo>6.66667</tempo>
             <followText>1</followText>
-            <text><b></b><font face="ScoreText"></font><b><font face="FreeSerif"></font> = 400</b></text>
+            <eid>biGF6NaKZkC_d1Nmkwa5a0J</eid>
+            <text><b/><font face="ScoreText"/><b><font face="FreeSerif"/> = 400</b></text>
             </Tempo>
           <Chord>
+            <eid>c+Btbj087EO_clO/5tEG9ZG</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>NVSikZvecdG_kccYi3ag5JI</eid>
               <pitch>60</pitch>
               <tpc>14</tpc>
               </Note>
@@ -130,33 +144,24 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>xoNAoDIj3hF_89vpblPYCGN</eid>
         <startRepeat/>
         <endRepeat>8</endRepeat>
         <voice>
-          <Spanner type="TextLine">
-            <TextLine>
-              <lineVisible>0</lineVisible>
-              <beginTextPlace>auto</beginTextPlace>
-              <endText>8x</endText>
-              <endTextAlign>center,center</endTextAlign>
-              <diagonal>1</diagonal>
-              </TextLine>
-            <next>
-              <location>
-                <measures>1</measures>
-                </location>
-              </next>
-            </Spanner>
           <Chord>
+            <eid>mKwpNd0DcCM_uJzF4sBA99K</eid>
             <durationType>half</durationType>
             <Note>
+              <eid>vHkES8RejTC_DpPjfirbEE</eid>
               <pitch>62</pitch>
               <tpc>16</tpc>
               </Note>
             </Chord>
           <Chord>
+            <eid>kqG9yoJXL+L_Hl7L8PLnx3P</eid>
             <durationType>half</durationType>
             <Note>
+              <eid>9sQB7nYZ3/P_Lz3BCCT/fMP</eid>
               <pitch>64</pitch>
               <tpc>18</tpc>
               </Note>
@@ -164,17 +169,13 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>FyNW47B3b3D_cShm7rAWeeG</eid>
         <voice>
-          <Spanner type="TextLine">
-            <prev>
-              <location>
-                <measures>-1</measures>
-                </location>
-              </prev>
-            </Spanner>
           <Chord>
+            <eid>iWkr90iZ4jC_bpGgrtyVab</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>ZqrkG7tfIAE_q321bWNn3CB</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
@@ -182,9 +183,25 @@
           <BarLine>
             <subtype>end</subtype>
             <span>1</span>
+            <eid>lkyqUAU9UwE_ojmDqUKw0/M</eid>
             </BarLine>
           </voice>
         </Measure>
       </Staff>
+    <SpannerMap>
+      <TextLine>
+        <lineVisible>0</lineVisible>
+        <beginTextPlace>auto</beginTextPlace>
+        <endText>8x</endText>
+        <track2>0</track2>
+        <startTick>1/1</startTick>
+        <ticks>1/1</ticks>
+        <eid>0d+DaM6SD7C_epElrod2tTM</eid>
+        <track>0</track>
+        <diagonal>1</diagonal>
+        <endTextAlign>center,center</endTextAlign>
+        <endTextPosition>center</endTextPosition>
+        </TextLine>
+      </SpannerMap>
     </Score>
   </museScore>

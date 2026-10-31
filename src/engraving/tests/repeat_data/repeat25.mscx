@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="3.01">
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>YWlNYNMNCuC_PyvUZju4+nI</eid>
     <Division>480</Division>
-    <Style>
-      <lastSystemFillLimit>0</lastSystemFillLimit>
-      <showMeasureNumberOne>1</showMeasureNumberOne>
-      <measureNumberInterval>1</measureNumberInterval>
-      <Spatium>1.76389</Spatium>
-      </Style>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
     <showFrames>1</showFrames>
@@ -15,23 +12,28 @@
     <metaTag name="arranger"></metaTag>
     <metaTag name="composer"></metaTag>
     <metaTag name="copyright"></metaTag>
+    <metaTag name="creationDate">2026-10-31</metaTag>
     <metaTag name="lyricist"></metaTag>
     <metaTag name="movementNumber"></metaTag>
     <metaTag name="movementTitle"></metaTag>
+    <metaTag name="platform">Microsoft Windows</metaTag>
     <metaTag name="source"></metaTag>
     <metaTag name="translator"></metaTag>
     <metaTag name="workNumber"></metaTag>
     <metaTag name="workTitle"></metaTag>
-    <Part>
-      <Staff id="1">
+    <Part id="1">
+      <eid>wtaGqkYs2eI_JlRuUp+/5lE</eid>
+      <Staff>
+        <eid>clKaiDXJOSB_0WRmGvhsASK</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
-      <trackName>Piano</trackName>
-      <Instrument>
-        <longName>Piano</longName>
-        <shortName>Pno.</shortName>
+      <Instrument id="piano">
+        <InstrumentLabel>
+          <longName>Piano</longName>
+          <shortName>Pno.</shortName>
+          </InstrumentLabel>
         <trackName>Piano</trackName>
         <minPitchP>21</minPitchP>
         <maxPitchP>108</maxPitchP>
@@ -69,6 +71,7 @@
           </Articulation>
         <Channel>
           <program value="0"/>
+          <synti>Fluid</synti>
           </Channel>
         </Instrument>
       </Part>
@@ -76,46 +79,58 @@
       <VBox>
         <height>10</height>
         <bottomGap>1</bottomGap>
+        <boxAutoSize>0</boxAutoSize>
+        <sizeIsSpatiumDependent>1</sizeIsSpatiumDependent>
+        <eid>Mc5FALlWIAM_4NRYe7ocOUJ</eid>
         <Text>
           <style>title</style>
+          <eid>qTDiNaP3qpC_p5efw+5UJ1I</eid>
           <text>repeat25</text>
           </Text>
         <Text>
           <style>subtitle</style>
+          <eid>qGsS8IJ947L_qSImuCTLTnG</eid>
           <text>segno and DS between repeats</text>
           </Text>
         </VBox>
       <TBox>
-        <height>1</height>
         <topGap>0</topGap>
         <leftMargin>1</leftMargin>
         <rightMargin>1</rightMargin>
         <topMargin>1</topMargin>
         <bottomMargin>1</bottomMargin>
+        <eid>qipIPaF5NC_eC8qT2UE+1</eid>
         <Text>
-          <style>Frame</style>
+          <style>frame</style>
+          <eid>6M1KXgzv31J_BHgiXqZraON</eid>
           <text>1,2   1,2,3,4,5   4   2,3,4,5</text>
           </Text>
         </TBox>
       <Measure>
+        <eid>6mi4kB6xB9K_iNaQwp9RXvH</eid>
         <startRepeat/>
         <voice>
           <TimeSig>
+            <eid>ncNSMgRSCbD_GH6CjNYd0k</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <BarLine>
             <subtype>start-repeat</subtype>
             <span>1</span>
+            <eid>E4pRCAOeExE_qbhL2loCOMP</eid>
             </BarLine>
           <Tempo>
             <tempo>6.66667</tempo>
             <followText>1</followText>
-            <text><b></b><font face="ScoreText"></font><b><font face="FreeSerif"></font> = 400</b></text>
+            <eid>4U7K6Q0JwjO_PHUSzMowPmH</eid>
+            <text><b/><font face="ScoreText"/><b><font face="FreeSerif"/> = 400</b></text>
             </Tempo>
           <Chord>
+            <eid>WDwhO9PDKB_iEvSMGUI9c</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>hBUKMjLKMJM_wtCbwkxfvlH</eid>
               <pitch>60</pitch>
               <tpc>14</tpc>
               </Note>
@@ -123,16 +138,21 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>pZrxWtwjlsD_h6QUJM0N1HC</eid>
         <endRepeat>2</endRepeat>
         <Marker>
-          <style>Repeat Text Left</style>
+          <style>repeat_left</style>
+          <eid>vXd2c/EKbYB_+NUp8wj9RlL</eid>
           <text><sym>segno</sym></text>
           <label>segno</label>
+          <markerType>segno</markerType>
           </Marker>
         <voice>
           <Chord>
+            <eid>+eoNC3yY4BM_SJ/mF4FVXNO</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>1zmGLh60qqC_gzDlBJdxtcI</eid>
               <pitch>62</pitch>
               <tpc>16</tpc>
               </Note>
@@ -140,10 +160,13 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>NoZew3TMP8K_ldIhkPkWZRL</eid>
         <voice>
           <Chord>
+            <eid>FV2owlJcoBF_6DFrbPciJRH</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>GeicBWAkToM_uEvvLkU8/tN</eid>
               <pitch>64</pitch>
               <tpc>18</tpc>
               </Note>
@@ -151,9 +174,11 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>nvzfjLzdgNL_gGWlw/Hx4yI</eid>
         <startRepeat/>
         <Jump>
-          <style>Repeat Text Right</style>
+          <style>repeat_right</style>
+          <eid>5NowLiGC+nM_xo6g2zX+EmC</eid>
           <text>D.S.</text>
           <jumpTo>segno</jumpTo>
           <playUntil>end</playUntil>
@@ -161,8 +186,10 @@
           </Jump>
         <voice>
           <Chord>
+            <eid>6AQro4a3ZeN_AFLTVGwFJE</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>U84drPfTmTO_TicnlF5Rt9P</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
@@ -170,11 +197,14 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>az6b+H8cbhM_CTqVjYRNMjN</eid>
         <endRepeat>2</endRepeat>
         <voice>
           <Chord>
+            <eid>/K+LPx38lsF_fISH1kqVODB</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>5w/TtPvGMQE_JBJETUiWFpF</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>

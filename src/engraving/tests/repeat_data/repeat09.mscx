@@ -1,75 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="3.01">
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>U8L5kH9E2dH_mhfIY22t2uH</eid>
     <Division>480</Division>
-    <Style>
-      <minSystemDistance>9.2</minSystemDistance>
-      <bracketDistance>0.2</bracketDistance>
-      <showMeasureNumberOne>1</showMeasureNumberOne>
-      <measureNumberInterval>1</measureNumberInterval>
-      <measureNumberSystem>0</measureNumberSystem>
-      <evenHeaderL>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'freeSans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</evenHeaderL>
-      <evenHeaderC>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'freeSans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</evenHeaderC>
-      <evenHeaderR>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'freeSans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</evenHeaderR>
-      <oddHeaderL>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'freeSans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oddHeaderL>
-      <oddHeaderC>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'freeSans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oddHeaderC>
-      <oddHeaderR>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'freeSans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oddHeaderR>
-      <evenFooterL>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'freeSans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;$p&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</evenFooterL>
-      <evenFooterC>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'freeSans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</evenFooterC>
-      <evenFooterR>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'freeSans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;$:copyright:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</evenFooterR>
-      <oddFooterL>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'freeSans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;$:copyright:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oddFooterL>
-      <oddFooterC>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'freeSans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oddFooterC>
-      <oddFooterR>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'freeSans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p align=&quot;right&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;$p&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oddFooterR>
-      <Spatium>1.764</Spatium>
-      </Style>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
     <showFrames>1</showFrames>
@@ -77,23 +12,28 @@ p, li { white-space: pre-wrap; }
     <metaTag name="arranger"></metaTag>
     <metaTag name="composer"></metaTag>
     <metaTag name="copyright"></metaTag>
+    <metaTag name="creationDate">2026-10-31</metaTag>
     <metaTag name="lyricist"></metaTag>
     <metaTag name="movementNumber"></metaTag>
     <metaTag name="movementTitle"></metaTag>
+    <metaTag name="platform">Microsoft Windows</metaTag>
     <metaTag name="source"></metaTag>
     <metaTag name="translator"></metaTag>
     <metaTag name="workNumber"></metaTag>
     <metaTag name="workTitle"></metaTag>
-    <Part>
-      <Staff id="1">
+    <Part id="1">
+      <eid>D+cXiY4zXFI_9K4RRQ0N7iM</eid>
+      <Staff>
+        <eid>x06PqyDt0gM_8YvYVbP8YOC</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
-      <trackName>Piano</trackName>
-      <Instrument>
-        <longName>Piano</longName>
-        <shortName>Pno.</shortName>
+      <Instrument id="piano">
+        <InstrumentLabel>
+          <longName>Piano</longName>
+          <shortName>Pno.</shortName>
+          </InstrumentLabel>
         <trackName>Piano</trackName>
         <minPitchP>21</minPitchP>
         <maxPitchP>108</maxPitchP>
@@ -143,6 +83,7 @@ p, li { white-space: pre-wrap; }
           </Articulation>
         <Channel>
           <program value="0"/>
+          <synti>Fluid</synti>
           </Channel>
         </Instrument>
       </Part>
@@ -150,46 +91,58 @@ p, li { white-space: pre-wrap; }
       <VBox>
         <height>10</height>
         <bottomGap>1</bottomGap>
+        <boxAutoSize>0</boxAutoSize>
+        <sizeIsSpatiumDependent>1</sizeIsSpatiumDependent>
+        <eid>722h3BhWjAI_Zq0ydx13LgP</eid>
         <Text>
           <style>title</style>
+          <eid>TGlOe+hSruB_oChjCp2qFuI</eid>
           <text>repeat9</text>
           </Text>
         <Text>
           <style>subtitle</style>
-          <text>
-RepeatList of 2a is set to 1, so it'll be skipped</text>
+          <eid>wcO87s32y/J_HqVaiRLArjK</eid>
+          <text><br/>RepeatList of 2a is set to 1, so it'll be skipped</text>
           </Text>
         </VBox>
       <TBox>
-        <height>1</height>
         <topGap>0</topGap>
         <leftMargin>1</leftMargin>
         <rightMargin>1</rightMargin>
         <topMargin>1</topMargin>
         <bottomMargin>1</bottomMargin>
+        <eid>IKSjUpkQz3H_ydmLzZ1vPwF</eid>
         <Text>
-          <style>Frame</style>
+          <style>frame</style>
+          <eid>AVVRAGVint_AJhRyxGsgfJ</eid>
           <text>1,2,3   2   5,6</text>
           </Text>
         </TBox>
       <Measure>
+        <eid>lccFEBM20P_xXJ0jxKagpE</eid>
         <voice>
           <Clef>
             <concertClefType>G</concertClefType>
             <transposingClefType>G</transposingClefType>
+            <isHeader>1</isHeader>
+            <eid>wGp0TjCY+qM_Az9J+zg+okP</eid>
             </Clef>
           <TimeSig>
+            <eid>POFoyg6rA+F_cd0ZkpaJOOM</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Tempo>
             <tempo>6.66667</tempo>
             <followText>1</followText>
-            <text><b></b><font face="ScoreText"></font><b><font face="FreeSerif"></font> = 400</b></text>
+            <eid>vx0bW1vZRZK_diLyK9cuLQH</eid>
+            <text><b/><font face="ScoreText"/><b><font face="FreeSerif"/> = 400</b></text>
             </Tempo>
           <Chord>
+            <eid>gjadmtMBkUB_Q6X2lORImuI</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>wFJ8ZOz24CG_+22qi1G82cI</eid>
               <pitch>60</pitch>
               <tpc>14</tpc>
               </Note>
@@ -197,11 +150,14 @@ RepeatList of 2a is set to 1, so it'll be skipped</text>
           </voice>
         </Measure>
       <Measure>
+        <eid>ZUEFdlTpH2L_mTmdTyxo3ZD</eid>
         <startRepeat/>
         <voice>
           <Chord>
+            <eid>lhJ0hZuxvsI_y2qc5MTTKyO</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>5hVHOg1FXyE_raRHedHETCP</eid>
               <pitch>62</pitch>
               <tpc>16</tpc>
               </Note>
@@ -209,28 +165,14 @@ RepeatList of 2a is set to 1, so it'll be skipped</text>
           </voice>
         </Measure>
       <Measure>
+        <eid>hTD/reE/flO_bnAIi5/MdPJ</eid>
         <endRepeat>2</endRepeat>
         <voice>
-          <Spanner type="Volta">
-            <Volta>
-              <endHookType>1</endHookType>
-              <beginText>1.</beginText>
-              <Segment>
-                <subtype>0</subtype>
-                <offset x="-0.491739" y="-2.95043"/>
-                <off2 x="0" y="0"/>
-                </Segment>
-              <endings>1</endings>
-              </Volta>
-            <next>
-              <location>
-                <measures>1</measures>
-                </location>
-              </next>
-            </Spanner>
           <Chord>
+            <eid>XQvVrpQBgOD_Zes4VGRyN+B</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>I5z6eU+k5rM_JZlN8ySM/LJ</eid>
               <pitch>64</pitch>
               <tpc>18</tpc>
               </Note>
@@ -238,35 +180,14 @@ RepeatList of 2a is set to 1, so it'll be skipped</text>
           </voice>
         </Measure>
       <Measure>
+        <eid>Lu+y4jG3NiB_DnUbqmfWc5D</eid>
         <endRepeat>2</endRepeat>
         <voice>
-          <Spanner type="Volta">
-            <prev>
-              <location>
-                <measures>-1</measures>
-                </location>
-              </prev>
-            </Spanner>
-          <Spanner type="Volta">
-            <Volta>
-              <endHookType>1</endHookType>
-              <beginText>2a.</beginText>
-              <Segment>
-                <subtype>0</subtype>
-                <offset x="-0.0674338" y="-2.95043"/>
-                <off2 x="0" y="0"/>
-                </Segment>
-              <endings>1</endings>
-              </Volta>
-            <next>
-              <location>
-                <measures>1</measures>
-                </location>
-              </next>
-            </Spanner>
           <Chord>
+            <eid>RGVBg0FVRtD_sOYyJOjmemB</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>0bLSNThrrhH_oQfgj0VjxaI</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
@@ -274,28 +195,13 @@ RepeatList of 2a is set to 1, so it'll be skipped</text>
           </voice>
         </Measure>
       <Measure>
+        <eid>B3cv0++e9pN_kMrPDKxIOSI</eid>
         <voice>
-          <Spanner type="Volta">
-            <prev>
-              <location>
-                <measures>-1</measures>
-                </location>
-              </prev>
-            </Spanner>
-          <Spanner type="Volta">
-            <Volta>
-              <beginText>2b.</beginText>
-              <endings>2</endings>
-              </Volta>
-            <next>
-              <location>
-                <measures>1</measures>
-                </location>
-              </next>
-            </Spanner>
           <Chord>
+            <eid>3sugMDgBiOB_a3CgG3lMrPP</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>cA/du6NQMgI_rIM4o4gyviC</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
@@ -303,17 +209,13 @@ RepeatList of 2a is set to 1, so it'll be skipped</text>
           </voice>
         </Measure>
       <Measure>
+        <eid>fZ5M2snrB6N_tk4397ZD2kB</eid>
         <voice>
-          <Spanner type="Volta">
-            <prev>
-              <location>
-                <measures>-1</measures>
-                </location>
-              </prev>
-            </Spanner>
           <Chord>
+            <eid>05FEEaBzohE_e13U1G+YwzE</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>yzCR/3vuKVI_gOTPI/ryYyO</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>
@@ -321,9 +223,54 @@ RepeatList of 2a is set to 1, so it'll be skipped</text>
           <BarLine>
             <subtype>end</subtype>
             <span>1</span>
+            <eid>6zVMtyalh3P_7G4XNmi/3aP</eid>
             </BarLine>
           </voice>
         </Measure>
       </Staff>
+    <SpannerMap>
+      <Volta>
+        <endHookType>1</endHookType>
+        <beginText>1.</beginText>
+        <startElement>hTD/reE/flO_bnAIi5/MdPJ</startElement>
+        <endElement>hTD/reE/flO_bnAIi5/MdPJ</endElement>
+        <eid>OdOjwW6CsOI_NLarE0KydxL</eid>
+        <track>0</track>
+        <Segment>
+          <subtype>0</subtype>
+          <offset x="-0.491739" y="0.04957"/>
+          <off2 x="0" y="0"/>
+          <eid>W8GRc1VO3SJ_oTMgEmdCr0H</eid>
+          <track>0</track>
+          <offset x="-0.491739" y="0.04957"/>
+          </Segment>
+        <endings>1</endings>
+        </Volta>
+      <Volta>
+        <endHookType>1</endHookType>
+        <beginText>2a.</beginText>
+        <startElement>Lu+y4jG3NiB_DnUbqmfWc5D</startElement>
+        <endElement>Lu+y4jG3NiB_DnUbqmfWc5D</endElement>
+        <eid>Hi0Wh0Wq1OF_V2fw+So+gvI</eid>
+        <track>0</track>
+        <Segment>
+          <subtype>0</subtype>
+          <offset x="-0.0674338" y="0.04957"/>
+          <off2 x="0" y="0"/>
+          <eid>9asofUs+YjP_duqVc6Im67K</eid>
+          <track>0</track>
+          <offset x="-0.0674338" y="0.04957"/>
+          </Segment>
+        <endings>1</endings>
+        </Volta>
+      <Volta>
+        <beginText>2b.</beginText>
+        <startElement>B3cv0++e9pN_kMrPDKxIOSI</startElement>
+        <endElement>B3cv0++e9pN_kMrPDKxIOSI</endElement>
+        <eid>SS1oGG+GWgF_HtZ4G5AF6D</eid>
+        <track>0</track>
+        <endings>2</endings>
+        </Volta>
+      </SpannerMap>
     </Score>
   </museScore>

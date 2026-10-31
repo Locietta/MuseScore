@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="3.01">
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>TcWxxIlSEKF_/q1XdDK7CvJ</eid>
     <Division>480</Division>
-    <Style>
-      <frameSystemDistance>21</frameSystemDistance>
-      <defaultFramePadding>0</defaultFramePadding>
-      <defaultFrameWidth>0</defaultFrameWidth>
-      <titleFontFace>Arial</titleFontFace>
-      <titleFontSize>48</titleFontSize>
-      <titleFontSpatiumDependent>1</titleFontSpatiumDependent>
-      <Spatium>1.364</Spatium>
-      </Style>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
     <showFrames>1</showFrames>
@@ -18,26 +12,30 @@
     <metaTag name="arranger"></metaTag>
     <metaTag name="composer"></metaTag>
     <metaTag name="copyright"></metaTag>
+    <metaTag name="creationDate">2026-10-31</metaTag>
     <metaTag name="lyricist"></metaTag>
     <metaTag name="movementNumber"></metaTag>
     <metaTag name="movementTitle"></metaTag>
+    <metaTag name="platform">Microsoft Windows</metaTag>
     <metaTag name="source"></metaTag>
     <metaTag name="translator"></metaTag>
     <metaTag name="workNumber"></metaTag>
     <metaTag name="workTitle">Style Score</metaTag>
-    <Part>
-      <Staff id="1">
+    <Part id="1">
+      <eid>NHalVFZnuTB_b9xDXmwrn7N</eid>
+      <Staff>
+        <eid>jqEEMfG4lGE_HT7THU/P2KD</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
-      <trackName>Flute</trackName>
-      <Instrument>
+      <Instrument id="flute">
         <trackName>Flute</trackName>
         <minPitchP>59</minPitchP>
         <maxPitchP>98</maxPitchP>
         <minPitchA>60</minPitchA>
         <maxPitchA>93</maxPitchA>
+        <instrumentId>wind.flutes.flute</instrumentId>
         <Articulation>
           <velocity>100</velocity>
           <gateTime>100</gateTime>
@@ -56,23 +54,28 @@
           </Articulation>
         <Channel>
           <program value="73"/>
+          <synti>Fluid</synti>
           </Channel>
         </Instrument>
       </Part>
-    <Part>
-      <Staff id="2">
+    <Part id="2">
+      <eid>N1gC6EYVKjF_vUKpepzQeVG</eid>
+      <Staff>
+        <eid>x23qwCKkazI_hFQQUoquaGN</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
-      <trackName>Oboe</trackName>
-      <Instrument>
-        <shortName>Ob.</shortName>
+      <Instrument id="oboe">
+        <InstrumentLabel>
+          <shortName>Ob.</shortName>
+          </InstrumentLabel>
         <trackName>Oboe</trackName>
         <minPitchP>58</minPitchP>
         <maxPitchP>93</maxPitchP>
         <minPitchA>58</minPitchA>
         <maxPitchA>87</maxPitchA>
+        <instrumentId>wind.reed.oboe</instrumentId>
         <Articulation>
           <velocity>100</velocity>
           <gateTime>100</gateTime>
@@ -91,30 +94,41 @@
           </Articulation>
         <Channel>
           <program value="68"/>
+          <synti>Fluid</synti>
           </Channel>
         </Instrument>
       </Part>
     <Staff id="1">
       <VBox>
         <height>10</height>
+        <boxAutoSize>0</boxAutoSize>
+        <sizeIsSpatiumDependent>1</sizeIsSpatiumDependent>
+        <eid>b59/IXXFxVH_r3rUUM5AmXB</eid>
         <Text>
           <style>title</style>
+          <eid>E6oDwBAccLL_rUq8IRtiLbJ</eid>
           <text>Style Score</text>
           </Text>
         </VBox>
       <Measure>
+        <eid>7QneTc7Wy1P_OTYNe+cqChE</eid>
         <voice>
           <Clef>
             <concertClefType>G</concertClefType>
             <transposingClefType>G</transposingClefType>
+            <isHeader>1</isHeader>
+            <eid>Zh2k1cFzlxD_j3GSlQwpG0H</eid>
             </Clef>
           <TimeSig>
+            <eid>kd9FRbzvMIE_WCwgDkPNa+O</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Chord>
+            <eid>FhEQmfiLjNI_QlCSz0TNA6H</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>S/LxgAXPLGK_nQNQOKM9GIE</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>
@@ -122,10 +136,13 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>1ODmYvjC7qE_YVEzLcVmIAH</eid>
         <voice>
           <Chord>
+            <eid>sJPIVfnaEGO_K1OOc8wHk6M</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>QooiyM+04TB_Fab1x+fENwM</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>
@@ -133,10 +150,13 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>jRl1AwLuV/L_4p/wPSYh3LM</eid>
         <voice>
           <Chord>
+            <eid>jkSGJ/V/I8K_nLu7ny+BKrG</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>xeWkNKkvKBJ_4ASEyNfHh8M</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>
@@ -144,10 +164,13 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>s0UPQl3LJEP_v1VpE+DlLDP</eid>
         <voice>
           <Chord>
+            <eid>HvLYB2IVjeP_SrDE7Wy7itC</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>Jzvk+hcrhWD_vOPM7CI2jsC</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>
@@ -155,10 +178,13 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>ZzemlkIEgxN_8O/wA2lsnw</eid>
         <voice>
           <Chord>
+            <eid>pl9MUFIBErI_yX3hJ6a3S0I</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>RmT9Hz8ZUxI_hkRVSjqLrAO</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>
@@ -166,10 +192,13 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>6Cwf2QwPd9J_cGILSYBoZ9N</eid>
         <voice>
           <Chord>
+            <eid>QjOQ+lnnGeN_MU6cbTzV8LO</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>nWnat+KJ6kN_RWetsn/GwCN</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>
@@ -177,10 +206,13 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>8VvacB8hzvM_bqDAMixDUmE</eid>
         <voice>
           <Chord>
+            <eid>dW7fTc4NHLN_qk/+YQt6/qD</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>tS3RLxSFzxL_Sj1ZY1tZBuP</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>
@@ -188,10 +220,13 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>zBIMJcMZ5wB_LhajnZawQQL</eid>
         <voice>
           <Chord>
+            <eid>rH5krs2a9OI_E+t5kS4fSBL</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>JuIRZ58JBfE_wQxifKaWO0C</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>
@@ -205,12 +240,16 @@
           <Clef>
             <concertClefType>G</concertClefType>
             <transposingClefType>G</transposingClefType>
+            <isHeader>1</isHeader>
+            <eid>iu+lS6uXoyH_gXoc6ETrNgK</eid>
             </Clef>
           <TimeSig>
+            <eid>oN+zcTjXjdI_C++skcdvw5C</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Rest>
+            <eid>2051MGyUySD_vVKm/BI9EIE</eid>
             <durationType>measure</durationType>
             <duration>4/4</duration>
             </Rest>
@@ -219,6 +258,7 @@
       <Measure>
         <voice>
           <Rest>
+            <eid>KVMqfUGA0tP_URiJ5V68o6B</eid>
             <durationType>measure</durationType>
             <duration>4/4</duration>
             </Rest>
@@ -227,6 +267,7 @@
       <Measure>
         <voice>
           <Rest>
+            <eid>a7Wmxk5/nQC_xY9KNridV2K</eid>
             <durationType>measure</durationType>
             <duration>4/4</duration>
             </Rest>
@@ -235,6 +276,7 @@
       <Measure>
         <voice>
           <Rest>
+            <eid>m7dGrRuHAlD_BXr/KA2F8oG</eid>
             <durationType>measure</durationType>
             <duration>4/4</duration>
             </Rest>
@@ -243,6 +285,7 @@
       <Measure>
         <voice>
           <Rest>
+            <eid>yQ9UpRdmF9C_styA4bIacWK</eid>
             <durationType>measure</durationType>
             <duration>4/4</duration>
             </Rest>
@@ -251,6 +294,7 @@
       <Measure>
         <voice>
           <Rest>
+            <eid>HtdPzLdChFN_MjzgtQFdjNJ</eid>
             <durationType>measure</durationType>
             <duration>4/4</duration>
             </Rest>
@@ -259,6 +303,7 @@
       <Measure>
         <voice>
           <Rest>
+            <eid>iE/qRhSxs1F_3uCW7BJ0Pg</eid>
             <durationType>measure</durationType>
             <duration>4/4</duration>
             </Rest>
@@ -267,6 +312,7 @@
       <Measure>
         <voice>
           <Rest>
+            <eid>CFVEGV6s81J_v/waxA1QyGB</eid>
             <durationType>measure</durationType>
             <duration>4/4</duration>
             </Rest>
