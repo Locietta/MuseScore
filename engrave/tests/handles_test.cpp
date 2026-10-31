@@ -414,7 +414,160 @@ struct Evidence {
     int kept = 0;        // of those, how many kept that id through a reload
     int others = 0;      // other instances (not generated)
     int other_kept = 0;  // of those, how many kept the id the probe gave them
+    // The class of the strongest instance seen: a multi-measure rest and everything it
+    // holds is layout's, but the measure and barline types are not, so one instance's
+    // class does not decide the type's.
+    int strength = -1;
 };
+
+int class_strength(IdClass value) {
+    switch (value) {
+    case IdClass::persisted: return 3;
+    case IdClass::session: return 2;
+    case IdClass::address: return 1;
+    case IdClass::layout: return 0;
+    }
+    return -1;
+}
+
+/// Feeds one open document to the inventory: what class each type declares, and whether
+/// the ids the walk hands out survive the score's own write and read.
+void inventory_evidence(engrave::Document& document, const std::string& source, std::map<std::string, Evidence>& evidence) {
+    MasterScore& master = master_of(document);
+
+    // The id of every object, and whether the walk is what gave it: the objects
+    // the walk leaves alone get one here, so a save can show what it is worth. A
+    // generated element stays out of it: it never gets one and its ids do not name
+    // anything a caller can hold.
+    struct Probed {
+        std::string type;
+        bool assigned = false;
+        std::string detail;
+    };
+    std::map<ElementId, Probed> probed;
+    for (EngravingObject* object : engrave::document_objects(master)) {
+        Evidence& row = evidence[object_name(*object)];
+        const IdClass own = engrave::id_class(*object);
+        if (class_strength(own) > row.strength) {
+            row.declared = own;
+            row.strength = class_strength(own);
+        }
+        if (engrave::takes_id(*object)) {
+            ++row.assigned;
+            EXPECT_TRUE(object->eid().isValid()) << object_name(*object) << " has no id";
+            probed.emplace(engine_id(*object), Probed{object_name(*object), true, detail(*object)});
+        } else if (!object->isEngravingItem() || !static_cast<const EngravingItem&>(*object).generated()) {
+            ++row.others;
+            if (!object->eid().isValid()) object->assignNewEID();
+            probed.emplace(engine_id(*object), Probed{object_name(*object), false, detail(*object)});
+        }
+    }
+
+    auto reloaded = reopen(document);
+    if (!reloaded) return;
+    std::map<ElementId, std::string> after;
+    for (EngravingObject* object : engrave::document_objects(master_of(*reloaded))) {
+        if (object->eid().isValid()) after.emplace(engine_id(*object), object_name(*object));
+    }
+    for (const auto& [id, entry] : probed) {
+        const auto found = after.find(id);
+        if (found == after.end() || found->second != entry.type) {
+            if (entry.assigned)
+                std::fprintf(stderr, "LOST %s %s %s %s\n", source.c_str(), entry.type.c_str(),
+                             engrave::to_string(id).c_str(), entry.detail.c_str());
+            continue;
+        }
+        Evidence& row = evidence[entry.type];
+        ++(entry.assigned ? row.kept : row.other_kept);
+    }
+}
+
+/// A score with one instance of every type an operation can create, made through the
+/// public edit API on a template. The corpus cannot show a type it has no instance of,
+/// so the Add pair table and the other creating operations are measured here too.
+std::unique_ptr<engrave::Document> created_types_document(std::set<std::string>& types) {
+    auto created = g_engine->create_document({.template_id = "Treble_Clef"});
+    if (!created) {
+        ADD_FAILURE() << "the Treble_Clef template: " << created.error().message;
+        return nullptr;
+    }
+    std::unique_ptr<engrave::Document> document = std::move(*created);
+    engrave::Document& doc = *document;
+    const auto outline = doc.outline();
+    if (!outline || outline->measures.empty() || outline->parts.empty()) {
+        ADD_FAILURE() << "the Treble_Clef template has no measure or no part";
+        return nullptr;
+    }
+    const ElementId first_measure = outline->measures.front().id;
+    const ElementId first_part = outline->parts.front().id;
+    const auto address = [first_measure](std::int64_t num, std::int64_t den) {
+        engrave::SegmentAddress at;
+        at.measure = first_measure;
+        at.staff = 0;
+        at.voice = 0;
+        at.tick = {num, den};
+        at.kind = "ChordRest";
+        return at;
+    };
+    // What the operations before this one made, for the operations that name an element
+    // of their own batch or of an earlier one.
+    std::vector<std::optional<ElementId>> chords;
+    std::optional<ElementId> note;
+    const auto apply = [&doc, &types](std::string_view what, const engrave::Op& op) -> std::optional<engrave::EditResult> {
+        std::set<const EngravingObject*> before;
+        for (EngravingObject* object : engrave::document_objects(master_of(doc))) before.insert(object);
+        auto result = doc.edit(engrave::Batch{{op}});
+        if (!result) {
+            ADD_FAILURE() << what << ": " << std::string(engrave::to_string(result.error().code)) << ": "
+                          << result.error().message;
+            return std::nullopt;
+        }
+        for (EngravingObject* object : engrave::document_objects(master_of(doc))) {
+            if (!before.contains(object)) types.insert(object_name(*object));
+        }
+        return std::move(*result);
+    };
+    const auto enter = [&](std::string_view what, std::int64_t num, std::int64_t den,
+                           std::vector<engrave::Pitch> pitches) -> std::optional<ElementId> {
+        const auto result = apply(what, engrave::EnterNotes{address(num, den), {1, 4}, std::move(pitches)});
+        if (!result || result->ops.empty() || result->ops[0].created.empty()) return std::nullopt;
+        return result->ops[0].created.front();
+    };
+
+    const std::optional<ElementId> first = enter("EnterNotes a chord", 0, 1, {{60, std::nullopt}, {64, std::nullopt}});
+    const std::optional<ElementId> second = enter("EnterNotes a second chord", 1, 4, {{60, std::nullopt}});
+    enter("EnterNotes a rest", 2, 4, {});
+    if (!first || !second) return document;
+    // The first note of the first chord, for AddTie.
+    {
+        const auto found = engrave::resolve(master_of(doc), *first);
+        if (found && found->object && found->object->isChord()) {
+            const auto& notes = mu::engraving::toChord(found->object)->notes();
+            if (!notes.empty()) note = engrave::from_engine(notes.front()->eid());
+        }
+    }
+
+    apply("Add an articulation", engrave::Add{*first, "Articulation", {{"symbol", engrave::Enum{"articStaccatoAbove"}}}});
+    apply("Add a fermata", engrave::Add{address(0, 1), "Fermata", {{"symbol", engrave::Enum{"fermataAbove"}}}});
+    apply("Add a dynamic", engrave::Add{address(0, 1), "Dynamic",
+                                       {{"DYNAMIC_TYPE", engrave::Enum{"ff"}}, {"text", std::string("<sym>dynamicFF</sym>")}}});
+    apply("Add a staff text", engrave::Add{address(0, 1), "StaffText", {{"text", std::string("dolce")}}});
+    apply("Add a tempo", engrave::Add{address(0, 1), "Tempo", {{"text", std::string("Allegro")}}});
+    apply("AddText lyrics", engrave::AddText{address(0, 1), "lyrics_odd", "la"});
+    apply("AddText system text", engrave::AddText{address(0, 1), "system", "solo"});
+    apply("AddSpanner a slur", engrave::AddSpanner{"Slur", *first, *second, {}});
+    apply("AddSpanner a hairpin", engrave::AddSpanner{"HairPin", *first, *second, {}});
+    if (note) apply("AddTie", engrave::AddTie{*note});
+    apply("AddTuplet", engrave::AddTuplet{*second, *second, 3, 2});
+    apply("InsertClef", engrave::InsertClef{.at = address(0, 1), .clef = "F"});
+    apply("InsertMeasures a measure", engrave::InsertMeasures{.before = std::nullopt, .count = 1, .kind = "Measure"});
+    apply("InsertMeasures a frame", engrave::InsertMeasures{.before = std::nullopt, .count = 1, .kind = "VBox"});
+    apply("SetLayoutBreak", engrave::SetLayoutBreak{first_measure, "line", true});
+    apply("AddPart", engrave::AddPart{"flute", std::nullopt});
+    apply("AddStaff", engrave::AddStaff{first_part});
+    apply("GenerateExcerpts", engrave::GenerateExcerpts{{first_part}});
+    return document;
+}
 
 TEST(Handles, H1Inventory) {
     ASSERT_FALSE(g_corpus.empty());
@@ -424,50 +577,25 @@ TEST(Handles, H1Inventory) {
         auto document = open_path(path);
         if (!document) continue;
         SCOPED_TRACE(path.string());
-        MasterScore& master = master_of(*document);
-
-        // The id of every object, and whether the walk is what gave it: the objects
-        // the walk leaves alone get one here, so a save can show what it is worth. A
-        // generated element stays out of it: it never gets one and its ids do not name
-        // anything a caller can hold.
-        struct Probed {
-            std::string type;
-            bool assigned = false;
-            std::string detail;
-        };
-        std::map<ElementId, Probed> probed;
-        for (EngravingObject* object : engrave::document_objects(master)) {
-            Evidence& row = evidence[object_name(*object)];
-            row.declared = engrave::id_class(*object);
-            if (engrave::takes_id(*object)) {
-                ++row.assigned;
-                EXPECT_TRUE(object->eid().isValid()) << object_name(*object) << " has no id";
-                probed.emplace(engine_id(*object), Probed{object_name(*object), true, detail(*object)});
-            } else if (!object->isEngravingItem() || !static_cast<const EngravingItem&>(*object).generated()) {
-                ++row.others;
-                if (!object->eid().isValid()) object->assignNewEID();
-                probed.emplace(engine_id(*object), Probed{object_name(*object), false, detail(*object)});
-            }
-        }
-
-        auto reloaded = reopen(*document);
-        if (!reloaded) continue;
-        std::map<ElementId, std::string> after;
-        for (EngravingObject* object : engrave::document_objects(master_of(*reloaded))) {
-            if (object->eid().isValid()) after.emplace(engine_id(*object), object_name(*object));
-        }
-        for (const auto& [id, entry] : probed) {
-            const auto found = after.find(id);
-            if (found == after.end() || found->second != entry.type) {
-                if (entry.assigned)
-                    std::fprintf(stderr, "LOST %s %s %s %s\n", path.filename().string().c_str(), entry.type.c_str(),
-                                 engrave::to_string(id).c_str(), entry.detail.c_str());
-                continue;
-            }
-            Evidence& row = evidence[entry.type];
-            ++(entry.assigned ? row.kept : row.other_kept);
-        }
+        inventory_evidence(*document, path.filename().string(), evidence);
     }
+
+    // Not only what the corpus shows: a type an operation can create is measured too,
+    // so adding an Add pair or a creating operation fails here until the inventory says
+    // what class the new type has.
+    std::set<std::string> created;
+    if (auto document = created_types_document(created)) {
+        SCOPED_TRACE("types created through the edit API");
+        inventory_evidence(*document, "created", evidence);
+    }
+    for (const char* type : {"Articulation", "Chord", "Clef", "Dynamic", "Fermata", "HairPin", "LayoutBreak", "Lyrics",
+                            "Measure", "Note", "Part", "Rest", "Score", "Slur", "Staff", "StaffText", "SystemText",
+                            "Tempo", "Tuplet", "VBox"}) {
+        EXPECT_TRUE(created.contains(type)) << "the edit API did not create a " << type << "; does it still create one?";
+    }
+    // AddTie is exercised above but a Tie is note-anchored and not part of the walk (it
+    // takes no id the document hands out), so it has no row to classify.
+    EXPECT_TRUE(evidence.find("Tie") == evidence.end()) << "a Tie reached the handle walk; classify it in the inventory";
 
     ASSERT_FALSE(evidence.empty()) << "no corpus score opens";
 
@@ -494,12 +622,25 @@ TEST(Handles, H1Inventory) {
 
     if (g_update_inventory) {
         nlohmann::json types = nlohmann::json::object();
+        // A row this run did not see is kept: the corpus a regeneration is run with is no
+        // reason to forget what the walk was measured to do with a type.
+        if (std::filesystem::is_regular_file(g_inventory)) {
+            const auto old = nlohmann::json::parse(read_text(g_inventory), nullptr, false);
+            if (!old.is_discarded() && old.contains("types")) {
+                int kept = 0;
+                for (const auto& [type, value] : old.at("types").items()) {
+                    types[type] = value;
+                    if (!observed.contains(type)) ++kept;
+                }
+                if (kept) std::printf("kept %d row(s) this corpus did not show\n", kept);
+            }
+        }
         for (const auto& [type, value] : observed) types[type] = value;
         nlohmann::json document = {
-            {"note", "The id class of every element type the corpus shows. persisted: the writer stores its id and a "
-                     "reload restores it; layout: created by layout, so the next pass hands out a new id; address: "
-                     "reached through an Address instead; session: alive in memory but not written. This test fails "
-                     "when a type is missing here or its class changed."},
+            {"note", "The id class of every element type the corpus shows or an operation can create. persisted: the "
+                     "writer stores its id and a reload restores it; layout: created by layout, so the next pass hands "
+                     "out a new id; address: reached through an Address instead; session: alive in memory but not "
+                     "written. This test fails when a type is missing here or its class changed."},
             {"types", types},
         };
         std::ofstream out(g_inventory, std::ios::binary);
