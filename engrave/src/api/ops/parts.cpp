@@ -196,12 +196,13 @@ Result<Step> prepare(EditContext& context, const GenerateExcerpts& op) {
         if (!target) return std::unexpected(target.error());
         targets.push_back(*target);
     }
-    // Refused by its policy row: Excerpt::createExcerpt pushes the links and the cloned
-    // measures as commands of its own, and rolling those back frees the link lists twice
-    // (LinkedObjects freed by an element's destructor, then by ~LinkUnlink). A command
-    // that owned the excerpt instead frees it before them, which is as bad. The body is
-    // what the parts panel does and is safe when the batch commits; the snapshot restore
-    // is what has to replace the unwind before the row can say Snapshot.
+    // The excerpt is built by the engine's own excerpt commands, inside the batch's
+    // transaction: the links, the cloned elements and the inserted frames and measures are
+    // all undo steps of this batch. The excerpt itself has to be added by a command as well
+    // (initAndAddExcerpt records an AddExcerpt), or undoing the batch takes the elements the
+    // build added out of the excerpt and leaves the excerpt in the master, with freed
+    // elements in its score. The build cannot be unwound (see the policy row), so a failed
+    // batch is restored from its snapshot rather than unwound.
     return [targets](EditContext& context) -> Result<void> {
         MasterScore& master = context.master();
         for (const Target& target : targets) {
@@ -210,8 +211,7 @@ Result<Step> prepare(EditContext& context, const GenerateExcerpts& op) {
             Part* part = *found;
             if (part->score() != &master) return invalid("an excerpt is generated from a part of the master score");
             Excerpt* excerpt = Excerpt::createExcerptsFromParts({part}, &master).front();
-            master.initExcerpt(excerpt);
-            master.addExcerpt(excerpt);
+            master.initAndAddExcerpt(excerpt, false);
             context.created(excerpt->excerptScore());
         }
         return {};
