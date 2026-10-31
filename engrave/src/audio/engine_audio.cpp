@@ -6,6 +6,8 @@
 
 #include "engine_audio.h"
 #include "audio_output.h"
+#include "global/defer.h"
+#include "audio/engine/internal/offlinetiming.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -26,8 +28,8 @@
 #include "audio/engine/iaudioengineconfiguration.h"
 #include "audio/engine/isynthresolver.h"
 #include "audio/engine/internal/export/soundtrackwriter.h"
-#include "audio/engine/internal/iaudiocontext.h"
-#include "audio/engine/internal/iaudioengine.h"
+#include "audio/engine/internal/offlinerendersession.h"
+#include "audio/engine/internal/audiofactory.h"
 #include "audio/engine/internal/nodes/automationcontrolnode.h"
 #include "audio/engine/internal/nodes/signalnode.h"
 #include "audio/engine/internal/nodes/trackchain.h"
@@ -71,10 +73,6 @@ constexpr const char* kReverbTrackName = "Reverb";
 constexpr const char* kAuxTrackName = "Aux 2";
 constexpr const char* kMetronomeTrackName = "Metronome";
 constexpr const char* kChordsTrackNamePrefix = "Chords.";
-// One context per process: the host renders one audio job per worker child
-// (worker_protocol.cpp), so the id only has to be non-zero and stable.
-constexpr AudioCtxId kAudioCtxId = 1;
-
 // Capturing midi::IMidiOutPort. FluidSynth sends every event it handles (after
 // the staff -> channel remap), which is the event stream later golden tests
 // compare. A global hook keeps the sink reusable by the probe and by tests.
@@ -197,7 +195,7 @@ private:
     size_t m_streamPos = 0;
 };
 
-// Process-wide state. The services and the engine controller are intentionally
+// Process-wide state. The registered services are intentionally
 // leaked: the engine owns global IoC exports and static synthesizer state, and
 // must outlive every static destructor (FluidResolver's Vorbis decoder is a
 // process-wide pointer, fluidresolver.cpp:44-53).
@@ -205,7 +203,7 @@ struct EngineState {
     std::shared_ptr<CapturingMidiOutPort> midiOutPort;
     engine::EngineGlobalSetup* engineSetup = nullptr;
     bool servicesInitialized = false;
-    std::shared_ptr<engine::IAudioContext> context;
+    std::shared_ptr<engine::AudioFactory> factory;
     int sampleRate = kDefaultSampleRate;
     // One entry per SoundFont of the setup, in its order; the first is the
     // default.
@@ -359,18 +357,9 @@ void set_track_control(ControlParams& control, const EngineAudioTrackParams& par
     control.muted = params.muted;
 }
 
-// The explicit master chain this driver renders through.
-//
-// AudioContext::saveSoundTrack() hands the writer the context mixer
-// (audiocontext.cpp:915), i.e. the node *below* the context's own master chain
-// (audiocontext.cpp:65-77), so master volume/balance/mute - which 5.0 applies
-// with setControlParams(MASTER_TRACK_ID, ...) on that chain
-// (audiocontext.cpp:557-566) - never reach the exported file. 4.7.6 applied
-// the master params inside Mixer::process (4.7.6 mixer.cpp:583-589). To keep
-// that behavior this builds the same chain AudioContext::init() builds and
-// makes it the writer's source; the context's internal master chain then runs
-// with neutral values and is a no-op.
-engine::TrackChainPtr make_master_chain(const std::shared_ptr<engine::IAudioContext>& context,
+// The public master controls wrap the neutral session master chain. Keeping
+// both chains preserves existing gain initialization and sample arithmetic.
+engine::TrackChainPtr make_master_chain(const IAudioNodePtr& context,
                                         const AudioRenderRequest& request, std::string& error)
 {
     IAudioNodePtr contextNode = std::dynamic_pointer_cast<IAudioNode>(context);
@@ -511,7 +500,8 @@ bool initialize_engine_audio(const EngineAudioSetup& setup, std::string* error)
     auto configuration = globalIoc()->resolve<engine::IAudioEngineConfiguration>("engine_audio");
     configuration->setConfig(config);
     globalIoc()->resolve<synth::ISynthResolver>("engine_audio")->init(configuration->defaultAudioInputParams(), output_spec());
-    globalIoc()->resolve<engine::IAudioEngine>("engine_audio")->init(output_spec());
+    state.factory = std::dynamic_pointer_cast<engine::AudioFactory>(globalIoc()->resolve<engine::IAudioFactory>("engine_audio"));
+    state.factory->setOutputSpec(output_spec());
 
     // 4. SoundFonts. addSoundFont() is synchronous for file: URIs
     // (soundfontrepository.cpp:68-77, 117-168) and refreshes FluidResolver
@@ -534,24 +524,12 @@ bool initialize_engine_audio(const EngineAudioSetup& setup, std::string* error)
         repository->addSoundFont(Uri::fromLocalFile(io::path_t(path)));
     }
 
-    // 5. One audio context for the process. 4.7.6 created a TrackSequence per
-    // export instead; in 5.0 the context owns the graph and the master chain
-    // (audiocontext.cpp:44-86).
-    auto audioEngine = globalIoc()->resolve<engine::IAudioEngine>("engine_audio");
-    if (!audioEngine) {
-        return fail("audio engine is not registered");
-    }
-    RetVal<std::shared_ptr<engine::IAudioContext> > context = audioEngine->addAudioContext(kAudioCtxId);
-    if (!context.ret || !context.val) {
-        return fail("failed to create an audio context: " + context.ret.toString());
-    }
-
     // 6. Explicit source resource for every track, taken from the engine's own
     // resource list (FluidResolver::refresh, fluidresolver.cpp:102-145). Without
     // it a track would resolve to the engine default ("MS Basic",
     // audioengineconfiguration.cpp:35-41, 103-109), which is absent from this
     // process, and the track would be silent.
-    const AudioResourceMetaList resources = context.val->availableInputResources();
+    const AudioResourceMetaList resources = state.factory->availableInputResources();
     for (std::size_t index = 0; index < soundfont_paths.size(); ++index) {
         const std::string& path = soundfont_paths[index];
         const Uri uri = Uri::fromLocalFile(io::path_t(path));
@@ -582,7 +560,6 @@ bool initialize_engine_audio(const EngineAudioSetup& setup, std::string* error)
         }
     }
 
-    state.context = context.val;
     return true;
 }
 
@@ -609,6 +586,7 @@ std::string engine_soundfont_uri()
 
 AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderRequest& request)
 {
+    OfflineTimingReport timingReport;
     AudioRenderResult result;
     const auto fail = [&result](AudioRenderResult::Failure kind, std::string message) {
         result.ok = false;
@@ -618,7 +596,7 @@ AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderReque
     };
 
     const EngineState& state = engine_state();
-    if (!state.servicesInitialized || !state.context || state.soundfontId.empty()) {
+    if (!state.servicesInitialized || !state.factory || state.soundfontId.empty()) {
         return fail(AudioRenderResult::Failure::EngineFailure, "audio engine is not initialised");
     }
     if (!master) {
@@ -629,17 +607,6 @@ AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderReque
     }
 
     MasterScore* masterScore = master;
-    engine::IAudioContext& context = *state.context;
-
-    // Drop what the previous render left in the shared context: its tracks and
-    // their sources, the synthesizer instances behind them and the fx chains
-    // (the reverb return is one). Muse Reverb keeps state between renders, so
-    // without this a second render in one process does not equal a fresh one.
-    // A fresh context has nothing to drop, so the first render is unaffected.
-    context.removeAllTracks();
-    context.clearSources();
-    context.clearAllFx();
-
     // Excerpt selection mutes every master part that is absent from, or
     // invisible in, the excerpt (masternotation.cpp:748-770).
     std::set<ID> mutedParts;
@@ -728,11 +695,14 @@ AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderReque
                     + " MiB) exceeds the 1 GiB audio export limit");
     }
 
+    engine::OfflineRenderSession context(*state.factory, output_spec());
     std::string chainError;
-    engine::TrackChainPtr masterChain = make_master_chain(state.context, request, chainError);
+    engine::TrackChainPtr masterChain = make_master_chain(context.output(), request, chainError);
     if (!masterChain) {
         return fail(AudioRenderResult::Failure::EngineFailure, std::move(chainError));
     }
+
+    DEFER { masterChain->clear(); };
 
     // The public mix is indexed by the same deterministic track list that
     // score_audio_tracks reports. Keep the list for the selected excerpt: for
@@ -839,15 +809,7 @@ AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderReque
         return fail(AudioRenderResult::Failure::EngineFailure, "addAuxTrack(aux 2) failed: " + aux2.ret.toString());
     }
 
-    context.setDuration(renderSecs);
-
-    // Mirrors the pre-render reset in AudioContext::saveSoundTrack()
-    // (audiocontext.cpp:785-793): stop and seek to zero so every source starts
-    // from a known position. A fresh synth is already at zero, so this is a
-    // no-op for the one-job-per-process case and only matters for a caller that
-    // renders after playback.
-    context.stop();
-    context.seek(0.0);
+    context.resetSources();
 
     // libopusenc dithers with rand(). 4.7.6 also relied on this for the Ogg
     // stream serial; 5.0 pins the serial itself (oggencoder.cpp:88-91), so the

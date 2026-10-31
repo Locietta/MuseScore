@@ -22,7 +22,6 @@
 #include "audiosanitizer.h"
 
 #include <thread>
-#include <atomic>
 
 #include "containers.h"
 
@@ -31,7 +30,6 @@ using namespace muse::audio;
 static std::thread::id s_as_mainThreadID;
 static std::thread::id s_as_engineThreadID;
 static std::set<std::thread::id> s_mixerThreadIdSet;
-static std::atomic<engine::OperationType> s_operationType(engine::OperationType::Undefined);
 
 void AudioSanitizer::setupMainThread()
 {
@@ -68,15 +66,4 @@ bool AudioSanitizer::isEngineThread()
     std::thread::id id = std::this_thread::get_id();
 
     return id == s_as_engineThreadID || muse::contains(s_mixerThreadIdSet, id);
-}
-
-void AudioSanitizer::setOperationType(engine::OperationType type)
-{
-    s_operationType = type;
-}
-
-bool AudioSanitizer::isOperationExec()
-{
-    engine::OperationType type = s_operationType.load();
-    return type != engine::OperationType::Undefined && type != engine::OperationType::NoOperation;
 }

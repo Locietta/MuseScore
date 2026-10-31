@@ -36,7 +36,7 @@ class FxResolver;
 
 namespace muse::audio::engine {
 class AudioEngineConfiguration;
-class AudioEngine;
+class AudioFactory;
 class EngineGlobalSetup : public modularity::IModuleSetup
 {
 public:
@@ -53,6 +53,6 @@ private:
     std::shared_ptr<synth::SynthResolver> m_synthResolver;
     std::shared_ptr<fx::FxResolver> m_fxResolver;
     std::shared_ptr<synth::SoundFontRepository> m_soundFontRepository;
-    std::shared_ptr<AudioEngine> m_audioEngine;
+    std::shared_ptr<AudioFactory> m_factory;
 };
 }

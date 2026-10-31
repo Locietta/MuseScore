@@ -3,26 +3,10 @@
 // Offline driver for the retained audio graph, synthesizers and encoders.
 // Services are initialized directly; no RPC channel or controller is installed.
 //
-// The engine keeps process-wide state (global IoC exports, the global FluidSynth
-// Vorbis decoder, the lock-free SoundFont cache, static track ids) and we run it
-// single-threaded: MUSE_THREADS_SUPPORT stays undefined, so the mixer never
-// starts worker threads. Therefore:
-//   - only one engine may exist per process;
-//   - initialize_engine_audio() must be called once, before any export;
-//   - every engine call (bootstrap, export, track listing) must happen on the
-//     same OS thread. It is not safe to export from two threads or to run two
-//     exports at the same time;
-//   - a process may render any number of audio jobs: export_score_audio() drops
-//     what the previous job left in the shared context (its tracks and sources,
-//     the synthesizer instances behind them, and the fx chains, Muse Reverb
-//     included) before it builds the graph. A second render therefore starts
-//     from the same state as the first, and the caller gets the same bytes it
-//     would get from a fresh process (engrave_output_test's D4 test).
-//
-// initialize_engine_audio() needs the native runtime already set up
-// (music::initialize_native_runtime): Uri::fromLocalFile resolves through
-// IFileSystem and PlaybackModel resolves the MPE articulation profile
-// repository from the global IoC.
+// Process-wide audio services and SoundFont resources require one engine per
+// process and calls on its owner thread. Each export owns a fresh render graph
+// and releases its tracks, synth sources and effects before returning. The
+// native runtime must be initialized before initialize_engine_audio().
 
 #pragma once
 
@@ -201,26 +185,13 @@ struct AudioRenderResult {
 // behavior too), so the decoded Ogg stream is 48 kHz while its duration follows
 // the engine render.
 //
-// Setup mirrors desktop playback/export:
-//   the context's previous tracks, sources and fx are dropped first, so every
-//   render starts from the state a fresh process has;
-//   PlaybackModel on `master` (repeats as requested, chord symbols off,
-//   metronome off) kept alive for the whole export;
-//   the context is stopped and seeked to zero (audiocontext.cpp:785-793);
-//   addTrack per playable InstrumentTrackId with resolveTrackPlaybackData() and
-//   an explicit Fluid source resource from the track's SoundFont (so a track
-//   never falls back to the nonexistent default "MS Basic" resource),
-//   TrackParams::auxSends = {{request.reverb_send,true}, {0,true}}; aux 0 is
-//   Muse Reverb (fx chain copied from playbackcontroller.cpp:63-73), aux 1 is
-//   an empty output;
-//   setDuration(total render time); SoundTrackWriter over the context.
-//
-// Master volume/balance/mute are applied by an explicit master TrackChain that
-// wraps the context (the same TrackChain/AutomationControlNode/SignalNode trio
-// AudioContext::init() builds at audiocontext.cpp:44-79), because
-// AudioContext::saveSoundTrack() renders from the context mixer, i.e. from
-// below the context's own master chain (audiocontext.cpp:915): the 5.0 export
-// path drops master control params. See engine_audio.cpp for the details.
+// A PlaybackModel supplies repeat-expanded MPE events for the duration of the
+// owned OfflineRenderSession. Tracks use explicit SoundFont resources and two
+// auxiliary returns (Muse Reverb and an empty return). The retained nested
+// master chains preserve the existing gain initialization and mix behavior.
+// The writer clears its additive mix buffer before each 4096-frame block,
+// finalizes the encoder, and returns through the existing public ByteSink
+// adapter (which uses a seekable temporary file for header finalization).
 //
 // The metronome and chord-symbol tracks are added when the PlaybackModel
 // reports them, but are always muted (the metronome/chord playback switches
