@@ -25,8 +25,10 @@ struct EngineOptions {
     // Extra text fonts, added in order.
     std::vector<std::filesystem::path> fonts;
     // Sequential element ids instead of random ones, so that two opens of the same
-    // file agree. Tests use it; it also changes what the writer stores, so leave
-    // it off otherwise.
+    // file agree.  Only for tests that never round-trip a score: the sequence
+    // collides with the ids a read-back score already has, and the reader then
+    // renumbers them.  It also changes what the writer stores, so leave it off
+    // otherwise.
     bool deterministic_ids = false;
 };
 
