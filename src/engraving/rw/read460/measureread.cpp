@@ -557,6 +557,29 @@ void MeasureRead::readVoice(Measure* measure, XmlReader& e, ReadContext& ctx, in
                 e.skipCurrentElement();
                 continue;
             }
+            // Gap rests are serialized as location jumps. Restore a leading gap
+            // inside its tuplet before checkMeasure() treats the first chord as
+            // the start of the full tuplet and fills over subsequent notes.
+            if (!tuplet->elements().empty()) {
+                const Fraction start = tuplet->tick();
+                const Fraction gap = tuplet->elements().front()->tick() - start;
+                if (gap > Fraction(0, 1)) {
+                    Fraction duration = gap * staff->timeStretch(start);
+                    for (Tuplet* parent = tuplet; parent; parent = parent->tuplet()) {
+                        duration *= parent->ratio();
+                    }
+                    Segment* gapSegment = measure->getSegment(SegmentType::ChordRest, start);
+                    if (!gapSegment->element(ctx.track())) {
+                        Rest* rest = Factory::createRest(gapSegment);
+                        rest->setTrack(ctx.track());
+                        rest->setDurationType(TDuration(duration, true));
+                        rest->setTicks(duration);
+                        rest->setGap(true);
+                        gapSegment->add(rest);
+                        tuplet->add(rest);
+                    }
+                }
+            }
             Tuplet* oldTuplet = tuplet;
             tuplet = tuplet->tuplet();
             if (oldTuplet->elements().empty()) {
