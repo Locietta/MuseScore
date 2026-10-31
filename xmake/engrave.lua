@@ -83,57 +83,11 @@ local function read_version(os, io)
         MUSE_APP_VERSION_MAJOR = major,
         MUSE_APP_VERSION_MINOR = minor,
         MUSE_APP_VERSION_PATCH = patch,
-        MUSE_MODULE_AUDIO = true,
-        MUSE_MODULE_AUDIO_API = true,
-        MUSE_MODULE_AUDIO_EXPORT = true,
-        MUSE_MODULE_AUDIO_WORKMODE = 1,
-        MUSE_MODULE_DRAW = true,
-        MUSE_MODULE_DRAW_API = true,
-        MUSE_MODULE_GLOBAL = true,
-        MUSE_MODULE_GLOBAL_API = true,
-        MUSE_MODULE_MPE = true,
-        MUSE_MODULE_MPE_API = true,
     }
     if version_label and version_label ~= "" then
         result.MUSE_APP_VERSION_LABEL = version_label
     end
     return result
-end
-
-local function render_framework_config(template, variables)
-    local output = {}
-    for line in (template .. "\n"):gmatch("([^\r\n]*)\r?\n") do
-        local name, rest = line:match("^#cmakedefine%s+([%w_]+)(.*)$")
-        if name then
-            local value = variables[name]
-            if value == nil or value == false then
-                table.insert(output, "/* #undef " .. name .. " */")
-            else
-                local fmt = (rest or ""):gsub("%${([%w_]+)}", function(key)
-                    local item = variables[key]
-                    if item == nil or item == false then
-                        return ""
-                    end
-                    return tostring(item)
-                end)
-                if fmt:gsub("%s", "") == "" then
-                    table.insert(output, "#define " .. name)
-                else
-                    table.insert(output, "#define " .. name .. fmt)
-                end
-            end
-        else
-            line = line:gsub("%${([%w_]+)}", function(key)
-                local item = variables[key]
-                if item == nil or item == false then
-                    return ""
-                end
-                return tostring(item)
-            end)
-            table.insert(output, line)
-        end
-    end
-    return table.concat(output, "\n") .. "\n"
 end
 
 local function write_if_changed(os, io, filename, content)
@@ -157,13 +111,26 @@ target("muse_generated")
             raise("generated target requires a build directory")
         end
         os.mkdir(output_dir)
-        local template_path = engine("muse/framework/cmake/muse_framework_config.h.in")
+        local template_path = path.join(fork_root, "xmake", "framework_config.h")
         local template = io.readfile(template_path)
         if not template then
             raise("cannot read pinned config template: %s", template_path)
         end
         write_if_changed(os, io, path.join(output_dir, "muse_framework_config.h"),
-            render_framework_config(template, read_version(os, io)))
+            template)
+        local metadata = {}
+        for name, value in pairs(read_version(os, io)) do
+            if name:find("^MUSE_APP_") then
+                if type(value) == "boolean" then
+                    if value then table.insert(metadata, "#define " .. name .. " 1") end
+                else
+                    table.insert(metadata, "#define " .. name .. " " .. string.format("%q", value))
+                end
+            end
+        end
+        table.sort(metadata)
+        write_if_changed(os, io, path.join(output_dir, "engrave_version.h"),
+            table.concat(metadata, "\n") .. "\n")
     end
     on_config(function (target)
         generate_framework_config(target, os, io)
@@ -180,16 +147,10 @@ ENGRAVE_SOURCE_ROOT = source_root
 ENGRAVE_FORK_ROOT = fork_root
 
 ENGRAVE_DEFINES = {
-    "NO_QT_SUPPORT",
-    "ENGRAVING_NO_ACCESSIBILITY",
-    "ENGRAVING_NO_INTERACTIVE",
-    "ENGRAVING_NO_API",
-    "MUSICXML_NO_INTERNAL",
-    "MUSICXML_NO_INTERACTIVE",
-    "MUSICXML_NO_VALIDATION",
+
     "MUSE_MODULE_AUDIO_EXPORT",
-    "MUSE_MODULE_DRAW_USE_FONTFACE_FT",
-    "MUSE_MODULE_DRAW_USE_QTTEXTDRAW",
+
+
 }
 
 ENGRAVE_GLOBAL_DEFINES = {
@@ -277,7 +238,7 @@ target("muse_global")
     add_deps("muse_generated")
     add_packages("muse-pugixml", "utfcpp", "muse-picojson")
     add_engine_target_defaults()
-    add_defines("GLOBAL_NO_INTERNAL", "KORS_PROFILER_ENABLED", "MUSE_MODULE_GLOBAL_LOGGER_DEBUGLEVEL")
+    add_defines("KORS_PROFILER_ENABLED", "MUSE_MODULE_GLOBAL_LOGGER_DEBUGLEVEL")
     add_includedirs(
         engine("muse/framework/global"),
         engine("src"),
@@ -288,7 +249,6 @@ target("muse_global")
         engine("muse/framework/global/*.cpp"),
         engine("muse/framework/global/io/*.cpp"),
         engine("muse/framework/global/io/devtools/*.cpp"),
-        engine("muse/framework/global/modularity/*.cpp"),
         engine("muse/framework/global/serialization/**.cpp"),
         engine("muse/framework/global/types/*.cpp"),
         engine("muse/framework/global/thirdparty/kors_async/async/internal/*.cpp"),
@@ -310,7 +270,7 @@ target("muse_draw")
     add_deps("muse_generated", "muse_global")
     add_packages("freetype", "muse-harfbuzz", {public = true})
     add_engine_target_defaults()
-    add_defines("DRAW_NO_QSVGRENDER", "KORS_PROFILER_ENABLED", "MUSE_MODULE_DRAW_USE_FONTFACE_FT", "MUSE_MODULE_DRAW_USE_QTTEXTDRAW")
+    add_defines("KORS_PROFILER_ENABLED")
     add_includedirs(
         engine("muse/framework/draw"),
         engine("src"),
@@ -341,7 +301,7 @@ target("engraving")
     set_kind("static")
     add_deps("muse_generated", "muse_global", "muse_draw", "muse_mpe")
     add_engine_target_defaults()
-    add_defines("ENGRAVING_NO_ACCESSIBILITY", "KORS_PROFILER_ENABLED")
+    add_defines("KORS_PROFILER_ENABLED")
     add_includedirs(
         engine("src/engraving"),
         engine("src"),
@@ -360,7 +320,7 @@ target("iex_musicxml")
     set_kind("static")
     add_deps("muse_generated", "muse_global", "engraving")
     add_engine_target_defaults()
-    add_defines("ENGRAVING_NO_ACCESSIBILITY", "KORS_PROFILER_ENABLED", "MUSICXML_NO_INTERACTIVE", "MUSICXML_NO_INTERNAL", "MUSICXML_NO_VALIDATION")
+    add_defines("KORS_PROFILER_ENABLED")
     add_includedirs(
         engine("src/importexport/musicxml"),
         engine("src"),
@@ -377,7 +337,7 @@ target("iex_guitarpro")
     set_kind("static")
     add_deps("muse_generated", "engraving")
     add_engine_target_defaults()
-    add_defines("ENGRAVING_NO_ACCESSIBILITY", "KORS_PROFILER_ENABLED")
+    add_defines("KORS_PROFILER_ENABLED")
     add_includedirs(
         engine("src/importexport/guitarpro"),
         engine("src"),
@@ -396,7 +356,7 @@ target("iex_midi")
     set_kind("static")
     add_deps("muse_generated", "engraving")
     add_engine_target_defaults()
-    add_defines("ENGRAVING_NO_ACCESSIBILITY", "KORS_PROFILER_ENABLED")
+    add_defines("KORS_PROFILER_ENABLED")
     add_includedirs(
         engine("src/importexport/midi"),
         engine("src"),
@@ -502,4 +462,11 @@ target_end()
 ---------------------------------------------------------------------------
 -- Tests: the upstream gtest suites, the adapter tests and the dev probes
 ---------------------------------------------------------------------------
-includes(path.join(fork_root, "xmake", "tests.lua"))
+option("engrave_tests")
+    set_default(false)
+    set_showmenu(true)
+    set_description("Enable engine tests and c0_gate (no test targets build by default)")
+option_end()
+if has_config("engrave_tests") then
+    includes(path.join(fork_root, "xmake", "tests.lua"))
+end
