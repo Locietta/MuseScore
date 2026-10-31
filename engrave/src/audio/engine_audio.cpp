@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 //
-// Headless driver for MuseScore 5.0's audio engine. See engine_audio.h for the
-// lifetime/threading contract, the 5.0 call sequence and the 4.7.6 -> 5.0 API
-// mapping.
+// Offline audio driver. See engine_audio.h for the lifetime/threading contract.
 
 #include "engine_audio.h"
 #include "audio_output.h"
@@ -484,11 +482,8 @@ bool initialize_engine_audio(const EngineAudioSetup& setup, std::string* error)
     globalIoc()->unregister<midi::IMidiOutPort>("engine_audio");
     globalIoc()->registerExport<midi::IMidiOutPort>("engine_audio", state.midiOutPort);
 
-    // 3. Engine services. EngineGlobalSetup is the 5.0 replacement for
-    // EngineController::registerExports() (enginesetup.cpp:46-74): it registers
-    // AudioEngine, AudioFactory, AudioEngineConfiguration, SynthResolver,
-    // FxResolver, SoundFontRepository and TransportEventsDispatcher, and
-    // resolveImports() wires the Fluid synthesizer and MuseFX resolvers.
+    // Register the retained factory, configuration, SoundFont repository and
+    // synth/effect resolvers. Their initialization sequence is explicit below.
     state.engineSetup = new engine::EngineGlobalSetup();
     state.engineSetup->registerExports();
     state.engineSetup->resolveImports();

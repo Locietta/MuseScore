@@ -1,10 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 //
-// Build-time link probe for the Qt-free MuseScore 5.0 audio engine and its
-// encoders. It is not the export driver: it only proves that the static
-// libraries resolve, that the engine services register, and that an
-// AudioContext can be created against the shared no-op RPC channel (the real
-// driver is engrave/src/audio/engine_audio.cpp).
+// Link and lifecycle probe for the offline audio services and render session.
+// Musical output, encoder finalization and parity are checked by the public
+// output tests and engine_audio_probe.
 
 #include <iostream>
 #include <memory>
