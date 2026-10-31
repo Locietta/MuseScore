@@ -46,6 +46,7 @@ std::string_view to_string(Format format) noexcept {
     case Format::Mxl: return "MXL";
     case Format::Midi: return "MIDI";
     case Format::GuitarPro: return "Guitar Pro";
+    case Format::Mnx: return "MNX";
     }
     return "Unknown";
 }

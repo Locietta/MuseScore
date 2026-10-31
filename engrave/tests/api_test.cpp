@@ -74,7 +74,7 @@ TEST(Open, RejectsPreMuseScore4) {
 TEST(Capabilities, ListsFormatsAndVersion) {
     const auto capabilities = g_engine->capabilities();
     EXPECT_FALSE(capabilities.engine_version.empty());
-    EXPECT_EQ(capabilities.import_formats.size(), 6u);
+    EXPECT_EQ(capabilities.import_formats.size(), 7u);
     EXPECT_EQ(capabilities.export_formats,
               (std::vector<Format>{Format::Mscz, Format::MusicXml, Format::Mxl, Format::Midi}));
 }
@@ -148,7 +148,7 @@ TEST(Export, WritesEachExportFormat) {
 TEST(Export, RejectsFormatsTheEngineDoesNotWrite) {
     auto document = treble_clef();
     ASSERT_TRUE(document);
-    for (const auto format : {Format::Mscx, Format::GuitarPro}) {
+    for (const auto format : {Format::Mscx, Format::GuitarPro, Format::Mnx}) {
         const auto bytes = document->export_score({.format = format});
         ASSERT_FALSE(bytes);
         EXPECT_EQ(bytes.error().code, ErrorCode::Unsupported);

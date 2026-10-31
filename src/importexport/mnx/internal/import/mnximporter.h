@@ -22,6 +22,7 @@
 #pragma once
 
 #include <map>
+#include <variant>
 #include <stack>
 #include <unordered_map>
 
