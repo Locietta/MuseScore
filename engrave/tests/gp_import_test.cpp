@@ -4,16 +4,20 @@
 //
 // The library contract for bad input is a returned Error{InvalidInput}: the importer must
 // neither crash nor hand back a document without a score.  Upstream's fixtures include
-// deliberately malformed files (a PowerTab track with no strings, for one), so the test
-// opens every score file of src/importexport/guitarpro/tests/data and records which ones
-// come back as errors.  The reference MSCX files and the two updateReference scripts in
-// that directory are not inputs and are skipped.
+// deliberately malformed files (unknown headers and version strings, a MIDI channel out
+// of range), so the test opens every score file of
+// src/importexport/guitarpro/tests/data and requires exactly those to fail; every other
+// file, the .gpx fixtures with their reference scores included, has to open.  The
+// reference MSCX files and the two updateReference scripts in that directory are not
+// inputs and are skipped.
 
 #include <algorithm>
 #include <cstdio>
 #include <filesystem>
 #include <iterator>
+#include <map>
 #include <memory>
+#include <set>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -38,6 +42,17 @@ std::filesystem::path g_resources;
 std::unique_ptr<engrave::Engine> g_engine;
 
 constexpr std::string_view score_extensions[] = { ".gp", ".gp3", ".gp4", ".gp5", ".gpx", ".ptb" };
+
+/// The fixtures that are malformed on purpose. Every other score file of the data
+/// directory opens: the 17 .gpx files with reference scores used to be rejected by the
+/// GPX decoder's length guard (it copied a back-reference only up to its offset and then
+/// reached end of input one or two bytes short of the declared length).
+const std::set<std::string> malformed_fixtures = {
+    "midi-channel-out-of-range.gp4",
+    "unknown-header.gp4",
+    "unknown-version-string.gp4",
+    "unsupported-version.gp4",
+};
 
 std::filesystem::path test_data() {
     static const std::filesystem::path dir =
@@ -84,6 +99,7 @@ TEST(GuitarProImport, EveryTestDataFileOpensOrReturnsAnError) {
     ASSERT_GE(files.size(), 240u) << "the Guitar Pro test data is missing under " << test_data();
 
     std::vector<std::string> errors;
+    std::map<std::string, std::string> rejected;
     std::size_t opened = 0;
     for (const std::filesystem::path& path : files) {
         SCOPED_TRACE(path.filename().string());
@@ -92,6 +108,7 @@ TEST(GuitarProImport, EveryTestDataFileOpensOrReturnsAnError) {
         auto document = g_engine->open(path);
         if (!document) {
             errors.push_back(path.filename().string() + ": " + document.error().message);
+            rejected.emplace(path.filename().string(), document.error().message);
             continue;
         }
         ++opened;
@@ -109,6 +126,15 @@ TEST(GuitarProImport, EveryTestDataFileOpensOrReturnsAnError) {
     }
     std::fflush(stdout);
     EXPECT_GT(opened, 0u);
+    EXPECT_EQ(opened + errors.size(), files.size());
+    // Exactly the malformed fixtures fail, and every one of them does.
+    EXPECT_EQ(errors.size(), malformed_fixtures.size());
+    for (const auto& [name, message] : rejected) {
+        EXPECT_TRUE(malformed_fixtures.contains(name)) << name << " was rejected: " << message;
+    }
+    for (const std::string& name : malformed_fixtures) {
+        EXPECT_TRUE(rejected.contains(name)) << name << " is malformed but opened";
+    }
 }
 
 } // namespace

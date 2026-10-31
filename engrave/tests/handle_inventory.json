@@ -1,8 +1,9 @@
 {
-  "note": "The id class of every element type the corpus shows. persisted: the writer stores its id and a reload restores it; layout: created by layout, so the next pass hands out a new id; address: reached through an Address instead; session: alive in memory but not written. This test fails when a type is missing here or its class changed.",
+  "note": "The id class of every element type the corpus shows or an operation can create. persisted: the writer stores its id and a reload restores it; layout: created by layout, so the next pass hands out a new id; address: reached through an Address instead; session: alive in memory but not written. This test fails when a type is missing here or its class changed.",
   "types": {
     "Accidental": "persisted",
     "Arpeggio": "persisted",
+    "Articulation": "persisted",
     "BarLine": "persisted",
     "Beam": "persisted",
     "Bracket": "layout",
@@ -33,6 +34,7 @@
     "LedgerLine": "layout",
     "Lyrics": "persisted",
     "LyricsLineSegment": "layout",
+    "MMRest": "layout",
     "Marker": "persisted",
     "Measure": "persisted",
     "MeasureNumber": "layout",
