@@ -19,7 +19,7 @@ ENGRAVE_OP(SetStyle, Transaction)
 
 // spanners (ops/spanners.cpp)
 ENGRAVE_OP(AddSpanner, Snapshot)
-ENGRAVE_OP(AddTie, Snapshot)
+ENGRAVE_OP(AddTie, Transaction)
 ENGRAVE_OP(AddTuplet, Snapshot)
 
 // text (ops/text.cpp)
