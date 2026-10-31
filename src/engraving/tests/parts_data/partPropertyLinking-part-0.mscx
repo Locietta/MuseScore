@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <museScore version="5.00">
   <Score>
-    <eid>ecWMw45ojWP_ecWMw45ojWP</eid>
+    <eid>RaghvP0J+AP_RaghvP0J+AP</eid>
     <name>Flute</name>
     <Division>480</Division>
     <Style>
@@ -13,10 +13,10 @@
     <showMargins>0</showMargins>
     <metaTag name="partName">Flute</metaTag>
     <Part id="1">
-      <eid>fcWMw45ojWP_fcWMw45ojWP</eid>
+      <eid>SaghvP0J+AP_SaghvP0J+AP</eid>
       <Staff>
-        <eid>gcWMw45ojWP_gcWMw45ojWP</eid>
-        <linkedTo>IvZZHFzSKgO_om1CRoYRByM</linkedTo>
+        <eid>TaghvP0J+AP_TaghvP0J+AP</eid>
+        <linkedTo>KuAnobn4KQG_n5SEmDbs0TD</linkedTo>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
@@ -40,41 +40,41 @@
     <Staff id="1">
       <VBox>
         <height>10</height>
-        <eid>hcWMw45ojWP_hcWMw45ojWP</eid>
-        <linkedTo>dcWMw45ojWP_dcWMw45ojWP</linkedTo>
+        <eid>UaghvP0J+AP_UaghvP0J+AP</eid>
+        <linkedTo>QaghvP0J+AP_QaghvP0J+AP</linkedTo>
         <Text>
           <style>instrument_excerpt</style>
-          <eid>icWMw45ojWP_icWMw45ojWP</eid>
+          <eid>VaghvP0J+AP_VaghvP0J+AP</eid>
           <text>Flute</text>
           </Text>
         </VBox>
       <Measure>
-        <eid>jcWMw45ojWP_jcWMw45ojWP</eid>
+        <eid>WaghvP0J+AP_WaghvP0J+AP</eid>
         <voice>
           <KeySig>
-            <eid>kcWMw45ojWP_kcWMw45ojWP</eid>
-            <linkedTo>oMnycG9bG0_ymfiMXeTPLC</linkedTo>
+            <eid>XaghvP0J+AP_XaghvP0J+AP</eid>
+            <linkedTo>OLJ6QGEfRhE_YV+S6RWWtrE</linkedTo>
             <concertKey>0</concertKey>
             </KeySig>
           <TimeSig>
-            <eid>lcWMw45ojWP_lcWMw45ojWP</eid>
-            <linkedTo>oL1fsuF02dM_CSQi1/JxHqG</linkedTo>
+            <eid>YaghvP0J+AP_YaghvP0J+AP</eid>
+            <linkedTo>F0Hj7dR9Y3O_C7Rvy1/W/3E</linkedTo>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Dynamic>
             <subtype>mf</subtype>
             <velocity>80</velocity>
-            <eid>mcWMw45ojWP_mcWMw45ojWP</eid>
-            <linkedTo>XYO4+3NnUlD_q7O2ZuMNfsH</linkedTo>
+            <eid>ZaghvP0J+AP_ZaghvP0J+AP</eid>
+            <linkedTo>5USWn+CX3NG_KeqBR9+ubGN</linkedTo>
             </Dynamic>
           <Chord>
-            <eid>ncWMw45ojWP_ncWMw45ojWP</eid>
-            <linkedTo>6ofxKW6zS2M_ccWMw45ojWP</linkedTo>
+            <eid>aaghvP0J+AP_aaghvP0J+AP</eid>
+            <linkedTo>TD8sy0yPceH_XbulAMFBtEH</linkedTo>
             <durationType>whole</durationType>
             <Note>
-              <eid>ocWMw45ojWP_ocWMw45ojWP</eid>
-              <linkedTo>Zuj+/mEgSmL_1FKt4bJOCGK</linkedTo>
+              <eid>baghvP0J+AP_baghvP0J+AP</eid>
+              <linkedTo>mK2eaun6uOH_PaghvP0J+AP</linkedTo>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>

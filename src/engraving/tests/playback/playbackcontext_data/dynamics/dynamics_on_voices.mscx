@@ -1,9 +1,2065 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <museScore version="5.00">
   <programVersion>5.0.0</programVersion>
-  <programRevision>804d836</programRevision>
+  <programRevision>a4052d7</programRevision>
   <Score>
-    <eid>mWup8Sl1uPP_Sh2sTxa6I9D</eid>
+    <Style>
+    <pageWidth>8.26772</pageWidth>
+    <pageHeight>11.6929</pageHeight>
+    <pagePrintableWidth>7.08661</pagePrintableWidth>
+    <pageEvenLeftMargin>0.590551</pageEvenLeftMargin>
+    <pageOddLeftMargin>0.590551</pageOddLeftMargin>
+    <pageEvenTopMargin>0.590551</pageEvenTopMargin>
+    <pageEvenBottomMargin>0.590551</pageEvenBottomMargin>
+    <pageOddTopMargin>0.590551</pageOddTopMargin>
+    <pageOddBottomMargin>0.590551</pageOddBottomMargin>
+    <pageTwosided>1</pageTwosided>
+    <staffUpperBorder>7</staffUpperBorder>
+    <staffLowerBorder>7</staffLowerBorder>
+    <staffHeaderFooterPadding>1</staffHeaderFooterPadding>
+    <staffDistance>6.5</staffDistance>
+    <instrumentNameOffset>1</instrumentNameOffset>
+    <akkoladeDistance>6.5</akkoladeDistance>
+    <minSystemDistance>8.5</minSystemDistance>
+    <maxSystemDistance>15</maxSystemDistance>
+    <alignSystemToMargin>1</alignSystemToMargin>
+    <instrumentNamesShowTranspositionLong>1</instrumentNamesShowTranspositionLong>
+    <instrumentNamesShowTranspositionShort>1</instrumentNamesShowTranspositionShort>
+    <instrumentNamesFormatLong>name-in-transp-num</instrumentNamesFormatLong>
+    <instrumentNamesCustomFormatLong>$name in $transposition $number</instrumentNamesCustomFormatLong>
+    <instrumentNamesFormatShort>name-in-transp-num</instrumentNamesFormatShort>
+    <instrumentNamesCustomFormatShort>$name in $transposition $number</instrumentNamesCustomFormatShort>
+    <instrumentNamesAlignLong>right-right</instrumentNamesAlignLong>
+    <instrumentNamesAlignShort>right-right</instrumentNamesAlignShort>
+    <instrumentNamesStackVertically>0</instrumentNamesStackVertically>
+    <instrumentNamesAlignIncludeGroupBrackets>1</instrumentNamesAlignIncludeGroupBrackets>
+    <instrumentNumeralsTrailingDotSingle>0</instrumentNumeralsTrailingDotSingle>
+    <instrumentNumeralsTrailingDotMultiple>0</instrumentNumeralsTrailingDotMultiple>
+    <instrumentNumeralsOrientation>horizontal</instrumentNumeralsOrientation>
+    <instrumentNumeralsVerticalThreshold>2</instrumentNumeralsVerticalThreshold>
+    <instrumentNumeralsHorizontalThreshold>2</instrumentNumeralsHorizontalThreshold>
+    <instrumentNumeralsHyphenEnable>1</instrumentNumeralsHyphenEnable>
+    <instrumentNumeralsHyphenThreshold>1</instrumentNumeralsHyphenThreshold>
+    <textForUnisonLabel>a </textForUnisonLabel>
+    <unisonLabelRestateOnNewSystem>auto</unisonLabelRestateOnNewSystem>
+    <sharedOnStaffNumeralsFollowInstrumentNumerals>1</sharedOnStaffNumeralsFollowInstrumentNumerals>
+    <sharedOnStaffNumeralsTrailingDotSingle>0</sharedOnStaffNumeralsTrailingDotSingle>
+    <sharedOnStaffNumeralsTrailingDotMultiple>0</sharedOnStaffNumeralsTrailingDotMultiple>
+    <sharedOnStaffNumeralsHyphenEnable>1</sharedOnStaffNumeralsHyphenEnable>
+    <sharedOnStaffNumeralsHyphenThreshold>1</sharedOnStaffNumeralsHyphenThreshold>
+    <staveSharingInstrChangePlayerNum>1</staveSharingInstrChangePlayerNum>
+    <windsNameByGroup>1</windsNameByGroup>
+    <vocalsNameByGroup>1</vocalsNameByGroup>
+    <stringsNameByGroup>0</stringsNameByGroup>
+    <othersNameByGroup>0</othersNameByGroup>
+    <enableVerticalSpread>1</enableVerticalSpread>
+    <spreadSystem>2.5</spreadSystem>
+    <spreadSquareBracket>1.2</spreadSquareBracket>
+    <spreadCurlyBracket>1.1</spreadCurlyBracket>
+    <minSystemSpread>8.5</minSystemSpread>
+    <maxSystemSpread>32</maxSystemSpread>
+    <minStaffSpread>3.5</minStaffSpread>
+    <maxStaffSpread>20</maxStaffSpread>
+    <maxAkkoladeDistance>6.5</maxAkkoladeDistance>
+    <maxPageFillSpread>6</maxPageFillSpread>
+    <lyricsPlacement>1</lyricsPlacement>
+    <lyricsPosAbove x="0" y="-2"/>
+    <lyricsPosBelow x="0" y="3"/>
+    <lyricsMinTopDistance>1</lyricsMinTopDistance>
+    <lyricsMinBottomDistance>1.5</lyricsMinBottomDistance>
+    <lyricsMinDistance>0.25</lyricsMinDistance>
+    <lyricsLineHeight>1</lyricsLineHeight>
+    <lyricsDashMinLength>0.4</lyricsDashMinLength>
+    <lyricsDashMaxLength>0.6</lyricsDashMaxLength>
+    <lyricsDashMaxDistance>16</lyricsDashMaxDistance>
+    <lyricsDashForce>1</lyricsDashForce>
+    <lyricsDashFirstAndLastGapAreHalf>1</lyricsDashFirstAndLastGapAreHalf>
+    <lyricsAlignVerseNumber>1</lyricsAlignVerseNumber>
+    <lyricsLineThickness>0.1</lyricsLineThickness>
+    <lyricsMelismaAlign>left,baseline</lyricsMelismaAlign>
+    <lyricsMelismaPad>0.2</lyricsMelismaPad>
+    <lyricsDashPad>0.05</lyricsDashPad>
+    <lyricsDashLineThickness>0.1</lyricsDashLineThickness>
+    <lyricsDashYposRatio>0.5</lyricsDashYposRatio>
+    <lyricsShowDashIfSyllableOnFirstNote>1</lyricsShowDashIfSyllableOnFirstNote>
+    <lyricsMelismaForce>0</lyricsMelismaForce>
+    <lyricsMelismaMinLength>1</lyricsMelismaMinLength>
+    <lyricsDashPosAtStartOfSystem>0</lyricsDashPosAtStartOfSystem>
+    <lyricsAvoidBarlines>1</lyricsAvoidBarlines>
+    <lyricsAutoCenterOnGrandStaff>0</lyricsAutoCenterOnGrandStaff>
+    <lyricsAutoCenterOnVocalStaves>0</lyricsAutoCenterOnVocalStaves>
+    <lyricsStackingOrder>1</lyricsStackingOrder>
+    <lyricsLimitDashCount>0</lyricsLimitDashCount>
+    <lyricsMaxDashCount>1</lyricsMaxDashCount>
+    <lyricsCenterDashedSyllables>0</lyricsCenterDashedSyllables>
+    <lyricsOddFontFace>Edwin</lyricsOddFontFace>
+    <lyricsOddFontSize>10</lyricsOddFontSize>
+    <lyricsOddLineSpacing>1</lyricsOddLineSpacing>
+    <lyricsOddFontSpatiumDependent>1</lyricsOddFontSpatiumDependent>
+    <lyricsOddFontStyle>0</lyricsOddFontStyle>
+    <lyricsOddColor r="0" g="0" b="0" a="255"/>
+    <lyricsOddAlign>center,baseline</lyricsOddAlign>
+    <lyricsOddFrameType>0</lyricsOddFrameType>
+    <lyricsOddFramePadding>0.2</lyricsOddFramePadding>
+    <lyricsOddFrameWidth>0.1</lyricsOddFrameWidth>
+    <lyricsOddFrameRound>0</lyricsOddFrameRound>
+    <lyricsOddFrameFgColor r="0" g="0" b="0" a="255"/>
+    <lyricsOddFrameBgColor r="255" g="255" b="255" a="0"/>
+    <lyricsOddPosition>center</lyricsOddPosition>
+    <lyricsEvenFontFace>Edwin</lyricsEvenFontFace>
+    <lyricsEvenFontSize>10</lyricsEvenFontSize>
+    <lyricsEvenLineSpacing>1</lyricsEvenLineSpacing>
+    <lyricsEvenFontSpatiumDependent>1</lyricsEvenFontSpatiumDependent>
+    <lyricsEvenFontStyle>0</lyricsEvenFontStyle>
+    <lyricsEvenColor r="0" g="0" b="0" a="255"/>
+    <lyricsEvenAlign>center,baseline</lyricsEvenAlign>
+    <lyricsEvenFrameType>0</lyricsEvenFrameType>
+    <lyricsEvenFramePadding>0.2</lyricsEvenFramePadding>
+    <lyricsEvenFrameWidth>0.1</lyricsEvenFrameWidth>
+    <lyricsEvenFrameRound>0</lyricsEvenFrameRound>
+    <lyricsEvenFrameFgColor r="0" g="0" b="0" a="255"/>
+    <lyricsEvenFrameBgColor r="255" g="255" b="255" a="0"/>
+    <lyricsEvenPosition>center</lyricsEvenPosition>
+    <figuredBassFontFamily>MScoreBC</figuredBassFontFamily>
+    <figuredBassYOffset>6</figuredBassYOffset>
+    <figuredBassLineHeight>1</figuredBassLineHeight>
+    <figuredBassAlignment>0</figuredBassAlignment>
+    <figuredBassStyle>0</figuredBassStyle>
+    <systemFrameDistance>7</systemFrameDistance>
+    <frameSystemDistance>7</frameSystemDistance>
+    <paddingToNotationAbove>2</paddingToNotationAbove>
+    <paddingToNotationBelow>2</paddingToNotationBelow>
+    <minMeasureWidth>8</minMeasureWidth>
+    <barWidth>0.18</barWidth>
+    <doubleBarWidth>0.18</doubleBarWidth>
+    <endBarWidth>0.55</endBarWidth>
+    <dashBarWidth>0.18</dashBarWidth>
+    <dashBarDash>0.6</dashBarDash>
+    <dashBarGap>0.57</dashBarGap>
+    <doubleBarDistance>0.37</doubleBarDistance>
+    <endBarDistance>0.37</endBarDistance>
+    <repeatBarlineDotSeparation>0.37</repeatBarlineDotSeparation>
+    <repeatBarTips>0</repeatBarTips>
+    <startBarlineSingle>0</startBarlineSingle>
+    <startBarlineMultiple>1</startBarlineMultiple>
+    <maskBarlinesForText>1</maskBarlinesForText>
+    <bracketWidth>0.45</bracketWidth>
+    <bracketDistance>0.45</bracketDistance>
+    <akkoladeWidth>1.5</akkoladeWidth>
+    <akkoladeBarDistance>0.35</akkoladeBarDistance>
+    <groupBracketLineWidth>0.11</groupBracketLineWidth>
+    <groupBracketHookLen>1</groupBracketHookLen>
+    <groupBracketTextOrientation>vertical</groupBracketTextOrientation>
+    <groupBracketTextAlign>0</groupBracketTextAlign>
+    <groupBracketHangTextIntoMargin>1</groupBracketHangTextIntoMargin>
+    <groupBracketDistanceToNames>1</groupBracketDistanceToNames>
+    <groupBracketDistanceToGroupBracket>1</groupBracketDistanceToGroupBracket>
+    <dividerLeft>0</dividerLeft>
+    <dividerLeftSym>systemDivider</dividerLeftSym>
+    <dividerLeftX>0</dividerLeftX>
+    <dividerLeftY>0</dividerLeftY>
+    <dividerRight>0</dividerRight>
+    <dividerRightSym>systemDivider</dividerRightSym>
+    <dividerRightX>0</dividerRightX>
+    <dividerRightY>0</dividerRightY>
+    <dividerLeftAlignToSystemBarline>1</dividerLeftAlignToSystemBarline>
+    <dividerRightAlignToSystemBarline>1</dividerRightAlignToSystemBarline>
+    <dividerLeftSize>1</dividerLeftSize>
+    <dividerRightSize>1</dividerRightSize>
+    <clefLeftMargin>0.75</clefLeftMargin>
+    <keysigLeftMargin>0.5</keysigLeftMargin>
+    <ambitusMargin>0.5</ambitusMargin>
+    <timesigLeftMargin>0.63</timesigLeftMargin>
+    <midClefKeyRightMargin>1</midClefKeyRightMargin>
+    <clefKeyRightMargin>0.8</clefKeyRightMargin>
+    <clefKeyDistance>0.75</clefKeyDistance>
+    <clefTimesigDistance>1</clefTimesigDistance>
+    <keyTimesigDistance>1</keyTimesigDistance>
+    <keyBarlineDistance>1</keyBarlineDistance>
+    <systemHeaderDistance>2.5</systemHeaderDistance>
+    <systemHeaderTimeSigDistance>2</systemHeaderTimeSigDistance>
+    <systemHeaderMinStartOfSystemDistance>1.25</systemHeaderMinStartOfSystemDistance>
+    <systemTrailerRightMargin>0.5</systemTrailerRightMargin>
+    <clefBarlineDistance>0.5</clefBarlineDistance>
+    <timesigBarlineDistance>0.5</timesigBarlineDistance>
+    <timeSigPlacement>normal</timeSigPlacement>
+    <timeSigCenterOnBarline>1</timeSigCenterOnBarline>
+    <timeSigVSMarginCentered>hangIntoMargin</timeSigVSMarginCentered>
+    <timeSigVSMarginNonCentered>rightAlignToBarline</timeSigVSMarginNonCentered>
+    <timeSigCenterAcrossStaveGroup>0</timeSigCenterAcrossStaveGroup>
+    <timeSigNormalStyle>normal</timeSigNormalStyle>
+    <timeSigNormalScale w="1" h="1"/>
+    <timeSigNormalScaleLock>1</timeSigNormalScaleLock>
+    <timeSigNormalNumDist>0</timeSigNormalNumDist>
+    <timeSigNormalY>0</timeSigNormalY>
+    <timeSigAboveStyle>normal</timeSigAboveStyle>
+    <timeSigAboveScale w="2" h="2"/>
+    <timeSigAboveScaleLock>1</timeSigAboveScaleLock>
+    <timeSigAboveNumDist>0.1</timeSigAboveNumDist>
+    <timeSigAboveY>-1</timeSigAboveY>
+    <timeSigAcrossStyle>narrow</timeSigAcrossStyle>
+    <timeSigAcrossScale w="4" h="4"/>
+    <timeSigAcrossScaleLock>1</timeSigAcrossScaleLock>
+    <timeSigAcrossNumDist>0.1</timeSigAcrossNumDist>
+    <timeSigAcrossY>0</timeSigAcrossY>
+    <useStraightNoteFlags>0</useStraightNoteFlags>
+    <stemWidth>0.1</stemWidth>
+    <shortenStem>1</shortenStem>
+    <stemLength>3.5</stemLength>
+    <shortStemStartLocation>1</shortStemStartLocation>
+    <shortestStem>2.5</shortestStem>
+    <combineVoice>1</combineVoice>
+    <beginRepeatLeftMargin>1</beginRepeatLeftMargin>
+    <minNoteDistance>0.35</minNoteDistance>
+    <barNoteDistance>1.25</barNoteDistance>
+    <barAccidentalDistance>0.65</barAccidentalDistance>
+    <noteBarDistance>1.5</noteBarDistance>
+    <spacingDensity>1</spacingDensity>
+    <measureSpacing>1.5</measureSpacing>
+    <measureRepeatNumberPos>-0.5</measureRepeatNumberPos>
+    <mrNumberSeries>0</mrNumberSeries>
+    <mrNumberEveryXMeasures>4</mrNumberEveryXMeasures>
+    <mrNumberSeriesWithParentheses>1</mrNumberSeriesWithParentheses>
+    <oneMeasureRepeatShow1>0</oneMeasureRepeatShow1>
+    <fourMeasureRepeatShowExtenders>0</fourMeasureRepeatShowExtenders>
+    <staffLineWidth>0.11</staffLineWidth>
+    <ledgerLineWidth>0.16</ledgerLineWidth>
+    <ledgerLineLength>0.33</ledgerLineLength>
+    <stemSlashPosition>2</stemSlashPosition>
+    <stemSlashAngle>40</stemSlashAngle>
+    <stemSlashThickness>0.125</stemSlashThickness>
+    <accidentalDistance>0.25</accidentalDistance>
+    <accidentalNoteDistance>0.25</accidentalNoteDistance>
+    <bracketedAccidentalPadding>0.175</bracketedAccidentalPadding>
+    <alignAccidentalsLeft>0</alignAccidentalsLeft>
+    <accidentalOrderFollowsNoteDisplacement>0</accidentalOrderFollowsNoteDisplacement>
+    <alignAccidentalOctavesAcrossSubChords>0</alignAccidentalOctavesAcrossSubChords>
+    <keepAccidentalSecondsTogether>0</keepAccidentalSecondsTogether>
+    <alignOffsetOctaveAccidentals>0</alignOffsetOctaveAccidentals>
+    <keysigAccidentalDistance>0.3</keysigAccidentalDistance>
+    <keysigNaturalDistance>0.4</keysigNaturalDistance>
+    <beamWidth>0.5</beamWidth>
+    <useWideBeams>0</useWideBeams>
+    <beamMinLen>1.1</beamMinLen>
+    <beamNoSlope>0</beamNoSlope>
+    <snapCustomBeamsToGrid>1</snapCustomBeamsToGrid>
+    <frenchStyleBeams>0</frenchStyleBeams>
+    <dotMag>1</dotMag>
+    <dotNoteDistance>0.5</dotNoteDistance>
+    <dotRestDistance>0.25</dotRestDistance>
+    <dotDotDistance>0.65</dotDotDistance>
+    <propertyDistanceHead>0.4</propertyDistanceHead>
+    <propertyDistanceStem>0.4</propertyDistanceStem>
+    <propertyDistance>0.4</propertyDistance>
+    <articulationMag>1</articulationMag>
+    <articulationPosAbove x="0" y="0"/>
+    <articulationAnchorDefault>2</articulationAnchorDefault>
+    <articulationAnchorLuteFingering>1</articulationAnchorLuteFingering>
+    <articulationAnchorOther>0</articulationAnchorOther>
+    <articulationStemHAlign>2</articulationStemHAlign>
+    <articulationKeepTogether>1</articulationKeepTogether>
+    <trillAlwaysShowCueNote>0</trillAlwaysShowCueNote>
+    <lastSystemFillLimit>0.3</lastSystemFillLimit>
+    <enableStaveSharing>0</enableStaveSharing>
+    <allowVoiceCrossing>0</allowVoiceCrossing>
+    <hairpinPlacement>1</hairpinPlacement>
+    <hairpinPosAbove x="0" y="-1.75"/>
+    <hairpinPosBelow x="0" y="1.75"/>
+    <hairpinLinePosAbove x="0" y="-1"/>
+    <hairpinLinePosBelow x="0" y="2"/>
+    <hairpinHeight>1.15</hairpinHeight>
+    <hairpinContHeight>0.5</hairpinContHeight>
+    <hairpinLineWidth>0.12</hairpinLineWidth>
+    <hairpinFontFace>Edwin</hairpinFontFace>
+    <hairpinFontSize>10</hairpinFontSize>
+    <hairpinLineSpacing>1</hairpinLineSpacing>
+    <hairpinFontSpatiumDependent>1</hairpinFontSpatiumDependent>
+    <hairpinFontStyle>2</hairpinFontStyle>
+    <hairpinColor r="0" g="0" b="0" a="255"/>
+    <hairpinTextAlign>left,baseline</hairpinTextAlign>
+    <hairpinFrameType>0</hairpinFrameType>
+    <hairpinFramePadding>0.2</hairpinFramePadding>
+    <hairpinFrameWidth>0.1</hairpinFrameWidth>
+    <hairpinFrameRound>0</hairpinFrameRound>
+    <hairpinFrameFgColor r="0" g="0" b="0" a="255"/>
+    <hairpinFrameBgColor r="255" g="255" b="255" a="0"/>
+    <hairpinPosition>left</hairpinPosition>
+    <hairpinText></hairpinText>
+    <hairpinCrescText>cresc.</hairpinCrescText>
+    <hairpinDecrescText>dim.</hairpinDecrescText>
+    <hairpinCrescContText>(cresc.)</hairpinCrescContText>
+    <hairpinDecrescContText>(dim.)</hairpinDecrescContText>
+    <hairpinLineStyle>solid</hairpinLineStyle>
+    <hairpinDashLineLen>3</hairpinDashLineLen>
+    <hairpinDashGapLen>3</hairpinDashGapLen>
+    <hairpinLineLineStyle>dashed</hairpinLineLineStyle>
+    <hairpinLineDashLineLen>6</hairpinLineDashLineLen>
+    <hairpinLineDashGapLen>9</hairpinLineDashGapLen>
+    <hairpinOffset x="0" y="0"/>
+    <pedalPlacement>1</pedalPlacement>
+    <pedalPosAbove x="0" y="-1"/>
+    <pedalPosBelow x="0" y="2.5"/>
+    <pedalLineWidth>0.11</pedalLineWidth>
+    <pedalLineStyle>solid</pedalLineStyle>
+    <pedalDashLineLen>4</pedalDashLineLen>
+    <pedalDashGapLen>4</pedalDashGapLen>
+    <pedalHookHeight>1.2</pedalHookHeight>
+    <pedalFontFace>Edwin</pedalFontFace>
+    <pedalFontSize>10</pedalFontSize>
+    <pedalLineSpacing>1</pedalLineSpacing>
+    <pedalFontSpatiumDependent>1</pedalFontSpatiumDependent>
+    <pedalMusicalSymbolsScale>1</pedalMusicalSymbolsScale>
+    <pedalFontStyle>0</pedalFontStyle>
+    <pedalColor r="0" g="0" b="0" a="255"/>
+    <pedalTextAlign>left,baseline</pedalTextAlign>
+    <pedalFrameType>0</pedalFrameType>
+    <pedalFramePadding>0.2</pedalFramePadding>
+    <pedalFrameWidth>0.1</pedalFrameWidth>
+    <pedalFrameRound>0</pedalFrameRound>
+    <pedalFrameFgColor r="0" g="0" b="0" a="255"/>
+    <pedalFrameBgColor r="255" g="255" b="255" a="0"/>
+    <pedalPosition>left</pedalPosition>
+    <pedalText>&lt;sym&gt;keyboardPedalPed&lt;/sym&gt;</pedalText>
+    <pedalHookText></pedalHookText>
+    <pedalContinueText>&lt;sym&gt;keyboardPedalParensLeft&lt;/sym&gt;&lt;sym&gt;keyboardPedalPed&lt;/sym&gt;&lt;sym&gt;keyboardPedalParensRight&lt;/sym&gt;</pedalContinueText>
+    <pedalContinueHookText></pedalContinueHookText>
+    <pedalEndText></pedalEndText>
+    <pedalRosetteEndText>&lt;sym&gt;keyboardPedalUp&lt;/sym&gt;</pedalRosetteEndText>
+    <pedalOffset x="0" y="0"/>
+    <trillPlacement>0</trillPlacement>
+    <trillPosAbove x="0" y="-0.5"/>
+    <trillPosBelow x="0" y="2"/>
+    <vibratoPlacement>0</vibratoPlacement>
+    <vibratoPosAbove x="0" y="-1"/>
+    <vibratoPosBelow x="0" y="1"/>
+    <harmonyFretDist>1</harmonyFretDist>
+    <minHarmonyDistance>0.5</minHarmonyDistance>
+    <harmonyHarmonyDistance>0.5</harmonyHarmonyDistance>
+    <maxHarmonyBarDistance>3</maxHarmonyBarDistance>
+    <maxChordShiftAbove>0</maxChordShiftAbove>
+    <maxChordShiftBelow>0</maxChordShiftBelow>
+    <harmonyPlacement>0</harmonyPlacement>
+    <romanNumeralPlacement>1</romanNumeralPlacement>
+    <nashvilleNumberPlacement>0</nashvilleNumberPlacement>
+    <harmonyVoiceLiteral>1</harmonyVoiceLiteral>
+    <harmonyVoicing>0</harmonyVoicing>
+    <harmonyDuration>0</harmonyDuration>
+    <chordSymbolAPosAbove x="0" y="-2.5"/>
+    <chordSymbolAPosBelow x="0" y="3.5"/>
+    <chordSymbolBPosAbove x="0" y="-5"/>
+    <chordSymbolBPosBelow x="0" y="3.5"/>
+    <romanNumeralPosAbove x="0" y="-2.5"/>
+    <romanNumeralPosBelow x="0" y="3.5"/>
+    <nashvilleNumberPosAbove x="0" y="-2.5"/>
+    <nashvilleNumberPosBelow x="0" y="3.5"/>
+    <chordSymbolAFontFace>Edwin</chordSymbolAFontFace>
+    <chordSymbolAFontSize>10</chordSymbolAFontSize>
+    <chordSymbolALineSpacing>1</chordSymbolALineSpacing>
+    <chordSymbolAFontSpatiumDependent>1</chordSymbolAFontSpatiumDependent>
+    <chordSymbolAFontStyle>0</chordSymbolAFontStyle>
+    <chordSymbolAColor r="0" g="0" b="0" a="255"/>
+    <chordSymbolAAlign>center,baseline</chordSymbolAAlign>
+    <chordSymbolAFrameType>0</chordSymbolAFrameType>
+    <chordSymbolAFramePadding>0.2</chordSymbolAFramePadding>
+    <chordSymbolAFrameWidth>0.1</chordSymbolAFrameWidth>
+    <chordSymbolAFrameRound>0</chordSymbolAFrameRound>
+    <chordSymbolAFrameFgColor r="0" g="0" b="0" a="255"/>
+    <chordSymbolAFrameBgColor r="255" g="255" b="255" a="0"/>
+    <chordSymbolBFontFace>Edwin</chordSymbolBFontFace>
+    <chordSymbolBFontSize>10</chordSymbolBFontSize>
+    <chordSymbolBLineSpacing>1</chordSymbolBLineSpacing>
+    <chordSymbolBFontSpatiumDependent>1</chordSymbolBFontSpatiumDependent>
+    <chordSymbolBFontStyle>2</chordSymbolBFontStyle>
+    <chordSymbolBColor r="0" g="0" b="0" a="255"/>
+    <chordSymbolBAlign>center,baseline</chordSymbolBAlign>
+    <chordSymbolBFrameType>0</chordSymbolBFrameType>
+    <chordSymbolBFramePadding>0.2</chordSymbolBFramePadding>
+    <chordSymbolBFrameWidth>0.1</chordSymbolBFrameWidth>
+    <chordSymbolBFrameRound>0</chordSymbolBFrameRound>
+    <chordSymbolBFrameFgColor r="0" g="0" b="0" a="255"/>
+    <chordSymbolBFrameBgColor r="255" g="255" b="255" a="0"/>
+    <romanNumeralFontFace>Campania</romanNumeralFontFace>
+    <romanNumeralFontSize>12</romanNumeralFontSize>
+    <romanNumeralLineSpacing>1</romanNumeralLineSpacing>
+    <romanNumeralFontSpatiumDependent>1</romanNumeralFontSpatiumDependent>
+    <romanNumeralFontStyle>0</romanNumeralFontStyle>
+    <romanNumeralColor r="0" g="0" b="0" a="255"/>
+    <romanNumeralAlign>left,baseline</romanNumeralAlign>
+    <romanNumeralFrameType>0</romanNumeralFrameType>
+    <romanNumeralFramePadding>0.2</romanNumeralFramePadding>
+    <romanNumeralFrameWidth>0.1</romanNumeralFrameWidth>
+    <romanNumeralFrameRound>0</romanNumeralFrameRound>
+    <romanNumeralFrameFgColor r="0" g="0" b="0" a="255"/>
+    <romanNumeralFrameBgColor r="255" g="255" b="255" a="0"/>
+    <nashvilleNumberFontFace>Edwin</nashvilleNumberFontFace>
+    <nashvilleNumberFontSize>12</nashvilleNumberFontSize>
+    <nashvilleNumberLineSpacing>1</nashvilleNumberLineSpacing>
+    <nashvilleNumberFontSpatiumDependent>1</nashvilleNumberFontSpatiumDependent>
+    <nashvilleNumberFontStyle>0</nashvilleNumberFontStyle>
+    <nashvilleNumberColor r="0" g="0" b="0" a="255"/>
+    <nashvilleNumberAlign>left,baseline</nashvilleNumberAlign>
+    <nashvilleNumberFrameType>0</nashvilleNumberFrameType>
+    <nashvilleNumberFramePadding>0.2</nashvilleNumberFramePadding>
+    <nashvilleNumberFrameWidth>0.1</nashvilleNumberFrameWidth>
+    <nashvilleNumberFrameRound>0</nashvilleNumberFrameRound>
+    <nashvilleNumberFrameFgColor r="0" g="0" b="0" a="255"/>
+    <nashvilleNumberFrameBgColor r="255" g="255" b="255" a="0"/>
+    <displayCapoChords>0</displayCapoChords>
+    <capoPosition>0</capoPosition>
+    <fretNumMag>2</fretNumMag>
+    <fretNumPos>0</fretNumPos>
+    <fretY>1</fretY>
+    <fretMinDistance>0.5</fretMinDistance>
+    <fretMag>1</fretMag>
+    <fretPlacement>0</fretPlacement>
+    <fretStrings>6</fretStrings>
+    <fretFrets>4</fretFrets>
+    <fretNut>1</fretNut>
+    <fretDotSize>1</fretDotSize>
+    <fretDotSpatiumSize>0.5</fretDotSpatiumSize>
+    <fretStringSpacing>0.7</fretStringSpacing>
+    <fretFretSpacing>0.7</fretFretSpacing>
+    <fretOrientation>0</fretOrientation>
+    <maxFretShiftAbove>0</maxFretShiftAbove>
+    <maxFretShiftBelow>0</maxFretShiftBelow>
+    <fretNutThickness>0.3</fretNutThickness>
+    <fretUseCustomSuffix>0</fretUseCustomSuffix>
+    <fretCustomSuffix>fr</fretCustomSuffix>
+    <barreAppearanceSlur>0</barreAppearanceSlur>
+    <barreLineWidth>0.85</barreLineWidth>
+    <fretShowFingerings>0</fretShowFingerings>
+    <fretStyleExtended>0</fretStyleExtended>
+    <showPageNumber>1</showPageNumber>
+    <showPageNumberOne>0</showPageNumberOne>
+    <pageNumberOddEven>1</pageNumberOddEven>
+    <showMeasureNumber>1</showMeasureNumber>
+    <showMeasureNumberOne>0</showMeasureNumberOne>
+    <measureNumberInterval>5</measureNumberInterval>
+    <measureNumberSystem>1</measureNumberSystem>
+    <measureNumberPlacementMode>above-system</measureNumberPlacementMode>
+    <smallNoteMag>0.7</smallNoteMag>
+    <scaleRythmicSpacingForSmallNotes>1</scaleRythmicSpacingForSmallNotes>
+    <graceNoteMag>0.7</graceNoteMag>
+    <graceToMainNoteDist>0.45</graceToMainNoteDist>
+    <graceToGraceNoteDist>0.3</graceToGraceNoteDist>
+    <smallStaffMag>0.7</smallStaffMag>
+    <smallClefMag>0.8</smallClefMag>
+    <genClef>1</genClef>
+    <hideTabClefAfterFirst>1</hideTabClefAfterFirst>
+    <genKeysig>1</genKeysig>
+    <genCourtesyTimesig>1</genCourtesyTimesig>
+    <genCourtesyKeysig>1</genCourtesyKeysig>
+    <genCourtesyClef>1</genCourtesyClef>
+    <keySigCourtesyBarlineMode>2</keySigCourtesyBarlineMode>
+    <timeSigCourtesyBarlineMode>0</timeSigCourtesyBarlineMode>
+    <barlineBeforeSigChange>0</barlineBeforeSigChange>
+    <doubleBarlineBeforeKeySig>0</doubleBarlineBeforeKeySig>
+    <doubleBarlineBeforeTimeSig>0</doubleBarlineBeforeTimeSig>
+    <swingRatio>60</swingRatio>
+    <swingUnit></swingUnit>
+    <chordSymbolSpelling>standard</chordSymbolSpelling>
+    <automaticCapitalization>1</automaticCapitalization>
+    <lowerCaseMinorChords>0</lowerCaseMinorChords>
+    <lowerCaseBassNotes>0</lowerCaseBassNotes>
+    <allCapsNoteNames>0</allCapsNoteNames>
+    <chordStyle>std</chordStyle>
+    <chordsXmlFile>0</chordsXmlFile>
+    <chordDescriptionFile>chords_std.xml</chordDescriptionFile>
+    <chordExtensionMag>1</chordExtensionMag>
+    <chordExtensionAdjust>0</chordExtensionAdjust>
+    <chordModifierMag>1</chordModifierMag>
+    <chordModifierAdjust>0</chordModifierAdjust>
+    <verticallyStackModifiers>0</verticallyStackModifiers>
+    <chordStackedModifierMag>0.75</chordStackedModifierMag>
+    <chordBassNoteStagger>0</chordBassNoteStagger>
+    <chordBassNoteScale>1</chordBassNoteScale>
+    <polychordDividerThickness>0.11</polychordDividerThickness>
+    <polychordDividerSpacing>0.4</polychordDividerSpacing>
+    <verticallyAlignChordSymbols>1</verticallyAlignChordSymbols>
+    <chordSymPosition>center</chordSymPosition>
+    <chordAlignmentToFretboard>center</chordAlignmentToFretboard>
+    <chordAlignmentExcludeModifiers>0</chordAlignmentExcludeModifiers>
+    <concertPitch>0</concertPitch>
+    <multiVoiceRestTwoSpaceOffset>0</multiVoiceRestTwoSpaceOffset>
+    <mergeMatchingRests>0</mergeMatchingRests>
+    <createMultiMeasureRests>0</createMultiMeasureRests>
+    <minEmptyMeasures>1</minEmptyMeasures>
+    <singleMeasureMMRestUseNormalRest>1</singleMeasureMMRestUseNormalRest>
+    <singleMeasureMMRestShowNumber>1</singleMeasureMMRestShowNumber>
+    <minMMRestWidth>6</minMMRestWidth>
+    <mmRestConstantWidth>0</mmRestConstantWidth>
+    <mmRestReferenceWidth>2</mmRestReferenceWidth>
+    <mmRestMaxWidthIncrease>8</mmRestMaxWidthIncrease>
+    <mmRestNumberPos>-0.5</mmRestNumberPos>
+    <mmRestBetweenStaves>1</mmRestBetweenStaves>
+    <mmRestNumberMaskHBar>1</mmRestNumberMaskHBar>
+    <multiMeasureRestMargin>1.25</multiMeasureRestMargin>
+    <mmRestHBarThickness>0.7</mmRestHBarThickness>
+    <mmRestHBarVStrokeThickness>0.2</mmRestHBarVStrokeThickness>
+    <mmRestHBarVStrokeHeight>2</mmRestHBarVStrokeHeight>
+    <oldStyleMultiMeasureRests>0</oldStyleMultiMeasureRests>
+    <mmRestOldStyleMaxMeasures>9</mmRestOldStyleMaxMeasures>
+    <mmRestOldStyleSpacing>0.85</mmRestOldStyleSpacing>
+    <hideEmptyStaves>0</hideEmptyStaves>
+    <dontHideStavesInFirstSystem>1</dontHideStavesInFirstSystem>
+    <enableIndentationOnFirstSystem>1</enableIndentationOnFirstSystem>
+    <firstSystemIndentationValue>5</firstSystemIndentationValue>
+    <alwaysShowBracketsWhenEmptyStavesAreHidden>0</alwaysShowBracketsWhenEmptyStavesAreHidden>
+    <alwaysShowSquareBracketsWhenEmptyStavesAreHidden>0</alwaysShowSquareBracketsWhenEmptyStavesAreHidden>
+    <hideInstrumentNameIfOneInstrument>1</hideInstrumentNameIfOneInstrument>
+    <firstSystemInstNameVisibility>0</firstSystemInstNameVisibility>
+    <subsSystemInstNameVisibility>1</subsSystemInstNameVisibility>
+    <gateTime>100</gateTime>
+    <tenutoGateTime>100</tenutoGateTime>
+    <staccatoGateTime>50</staccatoGateTime>
+    <slurGateTime>100</slurGateTime>
+    <arpeggioNoteDistance>0.4</arpeggioNoteDistance>
+    <arpeggioAccidentalDistance>0.3</arpeggioAccidentalDistance>
+    <arpeggioAccidentalDistanceMin>0.33</arpeggioAccidentalDistanceMin>
+    <arpeggioLineWidth>0.18</arpeggioLineWidth>
+    <arpeggioHookLen>0.8</arpeggioHookLen>
+    <arpeggioHiddenInStdIfTab>0</arpeggioHiddenInStdIfTab>
+    <chordBracketNoteDistance>0.15</chordBracketNoteDistance>
+    <chordBracketLineWidth>0.1</chordBracketLineWidth>
+    <chordBracketHookLen>0.7</chordBracketHookLen>
+    <slurEndWidth>0.05</slurEndWidth>
+    <slurMidWidth>0.21</slurMidWidth>
+    <slurDottedWidth>0.1</slurDottedWidth>
+    <angleHangingSlursAwayFromStaff>0</angleHangingSlursAwayFromStaff>
+    <tieEndWidth>0.05</tieEndWidth>
+    <tieMidWidth>0.21</tieMidWidth>
+    <tieDottedWidth>0.1</tieDottedWidth>
+    <minTieLength>1</minTieLength>
+    <minHangingTieLength>1.5</minHangingTieLength>
+    <minStraightGlissandoLength>1.2</minStraightGlissandoLength>
+    <minWigglyGlissandoLength>2</minWigglyGlissandoLength>
+    <slurMinDistance>0.5</slurMinDistance>
+    <tieMinDistance>0.5</tieMinDistance>
+    <maskSlurs>1</maskSlurs>
+    <maskTies>1</maskTies>
+    <laissezVibMinDistance>0.5</laissezVibMinDistance>
+    <headerToLineStartDistance>1</headerToLineStartDistance>
+    <lineEndToBarlineDistance>0.25</lineEndToBarlineDistance>
+    <barlineToLineStartDistance>0.65</barlineToLineStartDistance>
+    <tiePlacementSingleNote>outside</tiePlacementSingleNote>
+    <tiePlacementChord>outside</tiePlacementChord>
+    <tieDotsPlacement>auto</tieDotsPlacement>
+    <tieMinShoulderHeight>0.3</tieMinShoulderHeight>
+    <tieMaxShoulderHeight>2</tieMaxShoulderHeight>
+    <minLaissezVibLength>2</minLaissezVibLength>
+    <laissezVibUseSmuflSym>0</laissezVibUseSmuflSym>
+    <sectionPause>3</sectionPause>
+    <musicalSymbolFont>Leland</musicalSymbolFont>
+    <musicalTextFont>Leland Text</musicalTextFont>
+    <showHeader>1</showHeader>
+    <headerFirstPage>0</headerFirstPage>
+    <headerOddEven>1</headerOddEven>
+    <evenHeaderL>$p</evenHeaderL>
+    <evenHeaderC></evenHeaderC>
+    <evenHeaderR></evenHeaderR>
+    <oddHeaderL></oddHeaderL>
+    <oddHeaderC></oddHeaderC>
+    <oddHeaderR>$p</oddHeaderR>
+    <showFooter>1</showFooter>
+    <footerFirstPage>1</footerFirstPage>
+    <footerOddEven>1</footerOddEven>
+    <evenFooterL></evenFooterL>
+    <evenFooterC>$C</evenFooterC>
+    <evenFooterR></evenFooterR>
+    <oddFooterL></oddFooterL>
+    <oddFooterC>$C</oddFooterC>
+    <oddFooterR></oddFooterR>
+    <voltaPosAbove x="0" y="-3"/>
+    <voltaHook>2.2</voltaHook>
+    <voltaLineWidth>0.11</voltaLineWidth>
+    <voltaLineStyle>solid</voltaLineStyle>
+    <voltaDashLineLen>5</voltaDashLineLen>
+    <voltaDashGapLen>5</voltaDashGapLen>
+    <voltaFontFace>Edwin</voltaFontFace>
+    <voltaFontSize>11</voltaFontSize>
+    <voltaLineSpacing>1</voltaLineSpacing>
+    <voltaFontSpatiumDependent>1</voltaFontSpatiumDependent>
+    <voltaFontStyle>1</voltaFontStyle>
+    <voltaColor r="0" g="0" b="0" a="255"/>
+    <voltaAlign>left,baseline</voltaAlign>
+    <voltaOffset x="0.6" y="2.2"/>
+    <voltaFrameType>0</voltaFrameType>
+    <voltaFramePadding>0.2</voltaFramePadding>
+    <voltaFrameWidth>0.1</voltaFrameWidth>
+    <voltaFrameRound>0</voltaFrameRound>
+    <voltaFrameFgColor r="0" g="0" b="0" a="255"/>
+    <voltaFrameBgColor r="255" g="255" b="255" a="0"/>
+    <voltaPosition>left</voltaPosition>
+    <voltaAlignStartBeforeKeySig>0</voltaAlignStartBeforeKeySig>
+    <voltaAlignEndLeftOfBarline>0</voltaAlignEndLeftOfBarline>
+    <ottava8VAPlacement>0</ottava8VAPlacement>
+    <ottava8VBPlacement>1</ottava8VBPlacement>
+    <ottava15MAPlacement>0</ottava15MAPlacement>
+    <ottava15MBPlacement>1</ottava15MBPlacement>
+    <ottava22MAPlacement>0</ottava22MAPlacement>
+    <ottava22MBPlacement>1</ottava22MBPlacement>
+    <ottava8VAText>&lt;sym&gt;ottavaAlta&lt;/sym&gt;</ottava8VAText>
+    <ottava8VAContinueText>&lt;sym&gt;ottavaAlta&lt;/sym&gt;</ottava8VAContinueText>
+    <ottava8VBText>&lt;sym&gt;ottavaBassa&lt;/sym&gt;</ottava8VBText>
+    <ottava8VBContinueText>&lt;sym&gt;ottavaBassa&lt;/sym&gt;</ottava8VBContinueText>
+    <ottava15MAText>&lt;sym&gt;quindicesimaAlta&lt;/sym&gt;</ottava15MAText>
+    <ottava15MAContinueText>&lt;sym&gt;quindicesimaAlta&lt;/sym&gt;</ottava15MAContinueText>
+    <ottava15MBText>&lt;sym&gt;quindicesimaBassa&lt;/sym&gt;</ottava15MBText>
+    <ottava15MBContinueText>&lt;sym&gt;quindicesimaBassa&lt;/sym&gt;</ottava15MBContinueText>
+    <ottava22MAText>&lt;sym&gt;ventiduesimaAlta&lt;/sym&gt;</ottava22MAText>
+    <ottava22MAContinueText>&lt;sym&gt;ventiduesimaAlta&lt;/sym&gt;</ottava22MAContinueText>
+    <ottava22MBText>&lt;sym&gt;ventiduesimaBassa&lt;/sym&gt;</ottava22MBText>
+    <ottava22MBContinueText>&lt;sym&gt;ventiduesimaBassa&lt;/sym&gt;</ottava22MBContinueText>
+    <ottava8VAnoText>&lt;sym&gt;ottava&lt;/sym&gt;</ottava8VAnoText>
+    <ottava8VAnoContinueText>&lt;sym&gt;ottava&lt;/sym&gt;</ottava8VAnoContinueText>
+    <ottava8VBnoText>&lt;sym&gt;ottava&lt;/sym&gt;</ottava8VBnoText>
+    <ottava8VBnoContinueText>&lt;sym&gt;ottava&lt;/sym&gt;</ottava8VBnoContinueText>
+    <ottava15MAnoText>&lt;sym&gt;quindicesima&lt;/sym&gt;</ottava15MAnoText>
+    <ottava15MAnoContinueText>&lt;sym&gt;quindicesima&lt;/sym&gt;</ottava15MAnoContinueText>
+    <ottava15MBnoText>&lt;sym&gt;quindicesima&lt;/sym&gt;</ottava15MBnoText>
+    <ottava15MBnoContinueText>&lt;sym&gt;quindicesima&lt;/sym&gt;</ottava15MBnoContinueText>
+    <ottava22MAnoText>&lt;sym&gt;ventiduesima&lt;/sym&gt;</ottava22MAnoText>
+    <ottava22MAnoContinueText>&lt;sym&gt;ventiduesima&lt;/sym&gt;</ottava22MAnoContinueText>
+    <ottava22MBnoText>&lt;sym&gt;ventiduesima&lt;/sym&gt;</ottava22MBnoText>
+    <ottava22MBnoContinueText>&lt;sym&gt;ventiduesima&lt;/sym&gt;</ottava22MBnoContinueText>
+    <ottavaPosAbove x="0" y="-2"/>
+    <ottavaPosBelow x="0" y="2"/>
+    <ottavaHookAbove>1</ottavaHookAbove>
+    <ottavaHookBelow>1</ottavaHookBelow>
+    <ottavaLineWidth>0.11</ottavaLineWidth>
+    <ottavaLineStyle>dashed</ottavaLineStyle>
+    <ottavaDashLineLen>6</ottavaDashLineLen>
+    <ottavaDashGapLen>6</ottavaDashGapLen>
+    <ottavaNumbersOnly>1</ottavaNumbersOnly>
+    <ottavaFontFace>Edwin</ottavaFontFace>
+    <ottavaFontSize>10</ottavaFontSize>
+    <ottavaLineSpacing>1</ottavaLineSpacing>
+    <ottavaFontSpatiumDependent>1</ottavaFontSpatiumDependent>
+    <ottavaMusicalSymbolsScale>1</ottavaMusicalSymbolsScale>
+    <ottavaFontStyle>0</ottavaFontStyle>
+    <ottavaColor r="0" g="0" b="0" a="255"/>
+    <ottavaTextAlignAbove>left,top</ottavaTextAlignAbove>
+    <ottavaTextAlignBelow>left,baseline</ottavaTextAlignBelow>
+    <ottavaFrameType>0</ottavaFrameType>
+    <ottavaFramePadding>0.2</ottavaFramePadding>
+    <ottavaFrameWidth>0.1</ottavaFrameWidth>
+    <ottavaFrameRound>0</ottavaFrameRound>
+    <ottavaFrameFgColor r="0" g="0" b="0" a="255"/>
+    <ottavaFrameBgColor r="255" g="255" b="255" a="0"/>
+    <ottavaPosition>left</ottavaPosition>
+    <tabClef>31</tabClef>
+    <tremoloWidth>1.2</tremoloWidth>
+    <tremoloBoxHeight>0.65</tremoloBoxHeight>
+    <tremoloLineWidth>0.5</tremoloLineWidth>
+    <tremoloDistance>0.8</tremoloDistance>
+    <tremoloStyle>0</tremoloStyle>
+    <tremoloStrokeLengthMultiplier>0.62</tremoloStrokeLengthMultiplier>
+    <tremoloNoteSidePadding>1.25</tremoloNoteSidePadding>
+    <tremoloOutSidePadding>0.5</tremoloOutSidePadding>
+    <linearStretch>1.5</linearStretch>
+    <crossMeasureValues>0</crossMeasureValues>
+    <keySigNaturals>0</keySigNaturals>
+    <keySigShowNaturalsChangingSharpsFlats>1</keySigShowNaturalsChangingSharpsFlats>
+    <tupletMaxSlope>0.5</tupletMaxSlope>
+    <tupletOutOfStaff>1</tupletOutOfStaff>
+    <tupletVHeadDistance>0.5</tupletVHeadDistance>
+    <tupletVStemDistance>0.5</tupletVStemDistance>
+    <tupletStemLeftDistance>0.5</tupletStemLeftDistance>
+    <tupletStemRightDistance>0.5</tupletStemRightDistance>
+    <tupletNoteLeftDistance>0</tupletNoteLeftDistance>
+    <tupletNoteRightDistance>0</tupletNoteRightDistance>
+    <tupletBracketWidth>0.1</tupletBracketWidth>
+    <tupletDirection>0</tupletDirection>
+    <tupletNumberType>0</tupletNumberType>
+    <tupletBracketType>0</tupletBracketType>
+    <tupletFontFace>Edwin</tupletFontFace>
+    <tupletFontSize>9</tupletFontSize>
+    <tupletLineSpacing>1</tupletLineSpacing>
+    <tupletFontSpatiumDependent>1</tupletFontSpatiumDependent>
+    <tupletMusicalSymbolsScale>1</tupletMusicalSymbolsScale>
+    <tupletFontStyle>2</tupletFontStyle>
+    <tupletColor r="0" g="0" b="0" a="255"/>
+    <tupletAlign>center,center</tupletAlign>
+    <tupletUseSymbols>0</tupletUseSymbols>
+    <tupletBracketHookHeight>0.75</tupletBracketHookHeight>
+    <tupletOffset x="0" y="0"/>
+    <tupletFrameType>0</tupletFrameType>
+    <tupletFramePadding>0.2</tupletFramePadding>
+    <tupletFrameWidth>0.1</tupletFrameWidth>
+    <tupletFrameRound>0</tupletFrameRound>
+    <tupletFrameFgColor r="0" g="0" b="0" a="255"/>
+    <tupletFrameBgColor r="255" g="255" b="255" a="0"/>
+    <tupletPosition>center</tupletPosition>
+    <tupletExtendToEndOfDuration>0</tupletExtendToEndOfDuration>
+    <tupletNumberRythmicCenter>0</tupletNumberRythmicCenter>
+    <scaleBarlines>0</scaleBarlines>
+    <barGraceDistance>1</barGraceDistance>
+    <minVerticalDistance>0.5</minVerticalDistance>
+    <skylineMinHorizontalClearance>0.25</skylineMinHorizontalClearance>
+    <ornamentStyle>0</ornamentStyle>
+    <autoplaceHairpinDynamicsDistance>0.5</autoplaceHairpinDynamicsDistance>
+    <dynamicsHairpinVoiceBasedPlacement>0</dynamicsHairpinVoiceBasedPlacement>
+    <dynamicsHairpinsAutoCenterOnGrandStaff>1</dynamicsHairpinsAutoCenterOnGrandStaff>
+    <dynamicsHairpinsAutoCenterOnVocalStaves>0</dynamicsHairpinsAutoCenterOnVocalStaves>
+    <dynamicsHairpinsAboveForVocalStaves>1</dynamicsHairpinsAboveForVocalStaves>
+    <dynamicsOverrideFont>0</dynamicsOverrideFont>
+    <dynamicsFont>Leland</dynamicsFont>
+    <dynamicsSize>1</dynamicsSize>
+    <dynamicsPlacement>1</dynamicsPlacement>
+    <dynamicsPosAbove x="0" y="-1"/>
+    <dynamicsPosBelow x="0" y="2"/>
+    <avoidBarLines>1</avoidBarLines>
+    <snapToDynamics>1</snapToDynamics>
+    <centerOnNotehead>1</centerOnNotehead>
+    <dynamicsMinDistance>0.5</dynamicsMinDistance>
+    <textLinePlacement>0</textLinePlacement>
+    <textLinePosAbove x="0" y="-1"/>
+    <textLinePosBelow x="0" y="1"/>
+    <textLineLineWidth>0.15</textLineLineWidth>
+    <textLineLineStyle>solid</textLineLineStyle>
+    <textLineDashLineLen>4</textLineDashLineLen>
+    <textLineDashGapLen>4</textLineDashGapLen>
+    <textLineHookHeight>1.5</textLineHookHeight>
+    <textLineFrameType>0</textLineFrameType>
+    <textLineFramePadding>0.2</textLineFramePadding>
+    <textLineFrameWidth>0.1</textLineFrameWidth>
+    <textLineFrameRound>0</textLineFrameRound>
+    <textLineFrameFgColor r="0" g="0" b="0" a="255"/>
+    <textLineFrameBgColor r="255" g="255" b="255" a="0"/>
+    <textLinePosition>left</textLinePosition>
+    <systemTextLinePlacement>0</systemTextLinePlacement>
+    <systemTextLinePosAbove x="0" y="-1"/>
+    <systemTextLinePosBelow x="0" y="1"/>
+    <systemTextLineLineWidth>0.15</systemTextLineLineWidth>
+    <systemTextLineLineStyle>solid</systemTextLineLineStyle>
+    <systemTextLineDashLineLen>4</systemTextLineDashLineLen>
+    <systemTextLineDashGapLen>4</systemTextLineDashGapLen>
+    <systemTextLineHookHeight>1.5</systemTextLineHookHeight>
+    <systemTextLineFrameType>0</systemTextLineFrameType>
+    <systemTextLineFramePadding>0.2</systemTextLineFramePadding>
+    <systemTextLineFrameWidth>0.1</systemTextLineFrameWidth>
+    <systemTextLineFrameRound>0</systemTextLineFrameRound>
+    <systemTextLineFrameFgColor r="0" g="0" b="0" a="255"/>
+    <systemTextLineFrameBgColor r="255" g="255" b="255" a="0"/>
+    <systemTextLinePosition>left</systemTextLinePosition>
+    <tremoloBarLineWidth>0.12</tremoloBarLineWidth>
+    <jumpPosAbove x="0" y="-2"/>
+    <markerPosAbove x="0" y="-2"/>
+    <defaultFontFace>Edwin</defaultFontFace>
+    <defaultFontSize>10</defaultFontSize>
+    <defaultLineSpacing>1</defaultLineSpacing>
+    <defaultFontSpatiumDependent>1</defaultFontSpatiumDependent>
+    <defaultFontStyle>0</defaultFontStyle>
+    <defaultColor r="0" g="0" b="0" a="255"/>
+    <defaultAlign>left,top</defaultAlign>
+    <defaultFrameType>0</defaultFrameType>
+    <defaultFramePadding>0.2</defaultFramePadding>
+    <defaultFrameWidth>0.1</defaultFrameWidth>
+    <defaultFrameRound>0</defaultFrameRound>
+    <defaultFrameFgColor r="0" g="0" b="0" a="255"/>
+    <defaultFrameBgColor r="255" g="255" b="255" a="0"/>
+    <defaultOffset x="0" y="0"/>
+    <defaultOffsetType>1</defaultOffsetType>
+    <defaultSystemFlag>0</defaultSystemFlag>
+    <defaultText></defaultText>
+    <defaultPosition>left</defaultPosition>
+    <titleFontFace>Edwin</titleFontFace>
+    <titleFontSize>22</titleFontSize>
+    <titleLineSpacing>1</titleLineSpacing>
+    <titleFontSpatiumDependent>0</titleFontSpatiumDependent>
+    <titleFontStyle>0</titleFontStyle>
+    <titleColor r="0" g="0" b="0" a="255"/>
+    <titleAlign>center,top</titleAlign>
+    <titleOffset x="0" y="0"/>
+    <titleOffsetType>0</titleOffsetType>
+    <titleFrameType>0</titleFrameType>
+    <titleFramePadding>0.2</titleFramePadding>
+    <titleFrameWidth>0.1</titleFrameWidth>
+    <titleFrameRound>0</titleFrameRound>
+    <titleFrameFgColor r="0" g="0" b="0" a="255"/>
+    <titleFrameBgColor r="255" g="255" b="255" a="0"/>
+    <titlePosition>center</titlePosition>
+    <subTitleFontFace>Edwin</subTitleFontFace>
+    <subTitleFontSize>14</subTitleFontSize>
+    <subTitleLineSpacing>1</subTitleLineSpacing>
+    <subTitleFontSpatiumDependent>0</subTitleFontSpatiumDependent>
+    <subTitleFontStyle>0</subTitleFontStyle>
+    <subTitleColor r="0" g="0" b="0" a="255"/>
+    <subTitleAlign>center,top</subTitleAlign>
+    <subTitleOffset x="0" y="10"/>
+    <subTitleOffsetType>0</subTitleOffsetType>
+    <subTitleFrameType>0</subTitleFrameType>
+    <subTitleFramePadding>0.2</subTitleFramePadding>
+    <subTitleFrameWidth>0.1</subTitleFrameWidth>
+    <subTitleFrameRound>0</subTitleFrameRound>
+    <subTitleFrameFgColor r="0" g="0" b="0" a="255"/>
+    <subTitleFrameBgColor r="255" g="255" b="255" a="0"/>
+    <subTitlePosition>center</subTitlePosition>
+    <composerFontFace>Edwin</composerFontFace>
+    <composerFontSize>10</composerFontSize>
+    <composerLineSpacing>1</composerLineSpacing>
+    <composerFontSpatiumDependent>0</composerFontSpatiumDependent>
+    <composerFontStyle>0</composerFontStyle>
+    <composerColor r="0" g="0" b="0" a="255"/>
+    <composerAlign>right,bottom</composerAlign>
+    <composerOffset x="0" y="0"/>
+    <composerOffsetType>0</composerOffsetType>
+    <composerFrameType>0</composerFrameType>
+    <composerFramePadding>0.2</composerFramePadding>
+    <composerFrameWidth>0.1</composerFrameWidth>
+    <composerFrameRound>0</composerFrameRound>
+    <composerFrameFgColor r="0" g="0" b="0" a="255"/>
+    <composerFrameBgColor r="255" g="255" b="255" a="0"/>
+    <composerPosition>right</composerPosition>
+    <lyricistFontFace>Edwin</lyricistFontFace>
+    <lyricistFontSize>10</lyricistFontSize>
+    <lyricistLineSpacing>1</lyricistLineSpacing>
+    <lyricistFontSpatiumDependent>0</lyricistFontSpatiumDependent>
+    <lyricistFontStyle>0</lyricistFontStyle>
+    <lyricistColor r="0" g="0" b="0" a="255"/>
+    <lyricistAlign>left,bottom</lyricistAlign>
+    <lyricistOffset x="0" y="0"/>
+    <lyricistOffsetType>0</lyricistOffsetType>
+    <lyricistFrameType>0</lyricistFrameType>
+    <lyricistFramePadding>0.2</lyricistFramePadding>
+    <lyricistFrameWidth>0.1</lyricistFrameWidth>
+    <lyricistFrameRound>0</lyricistFrameRound>
+    <lyricistFrameFgColor r="0" g="0" b="0" a="255"/>
+    <lyricistFrameBgColor r="255" g="255" b="255" a="0"/>
+    <lyricistPosition>left</lyricistPosition>
+    <fingeringFontFace>Edwin</fingeringFontFace>
+    <fingeringFontSize>8</fingeringFontSize>
+    <fingeringLineSpacing>1</fingeringLineSpacing>
+    <fingeringFontSpatiumDependent>1</fingeringFontSpatiumDependent>
+    <fingeringFontStyle>0</fingeringFontStyle>
+    <fingeringColor r="0" g="0" b="0" a="255"/>
+    <fingeringAlign>center,center</fingeringAlign>
+    <fingeringFrameType>0</fingeringFrameType>
+    <fingeringFramePadding>0.2</fingeringFramePadding>
+    <fingeringFrameWidth>0.1</fingeringFrameWidth>
+    <fingeringFrameRound>0</fingeringFrameRound>
+    <fingeringFrameFgColor r="0" g="0" b="0" a="255"/>
+    <fingeringFrameBgColor r="255" g="255" b="255" a="0"/>
+    <fingeringOffset x="0" y="0"/>
+    <fingeringPosition>center</fingeringPosition>
+    <tabFretNumberFontFace>FreeSans</tabFretNumberFontFace>
+    <tabFretNumberFontSize>9</tabFretNumberFontSize>
+    <tabFretNumberLineSpacing>1</tabFretNumberLineSpacing>
+    <tabFretNumberFontSpatiumDependent>1</tabFretNumberFontSpatiumDependent>
+    <tabFretNumberFontStyle>0</tabFretNumberFontStyle>
+    <tabFretNumberColor r="0" g="0" b="0" a="255"/>
+    <tabFretNumberAlign>left,baseline</tabFretNumberAlign>
+    <tabFretNumberOffset x="0" y="0"/>
+    <tabFretNumberFrameType>0</tabFretNumberFrameType>
+    <tabFretNumberFramePadding>0.2</tabFretNumberFramePadding>
+    <tabFretNumberFrameWidth>0.1</tabFretNumberFrameWidth>
+    <tabFretNumberFrameRound>0</tabFretNumberFrameRound>
+    <tabFretNumberFrameFgColor r="0" g="0" b="0" a="255"/>
+    <tabFretNumberFrameBgColor r="255" g="255" b="255" a="0"/>
+    <lhGuitarFingeringFontFace>Edwin</lhGuitarFingeringFontFace>
+    <lhGuitarFingeringFontSize>8</lhGuitarFingeringFontSize>
+    <lhGuitarFingeringLineSpacing>1</lhGuitarFingeringLineSpacing>
+    <lhGuitarFingeringFontSpatiumDependent>1</lhGuitarFingeringFontSpatiumDependent>
+    <lhGuitarFingeringFontStyle>0</lhGuitarFingeringFontStyle>
+    <lhGuitarFingeringColor r="0" g="0" b="0" a="255"/>
+    <lhGuitarFingeringAlign>right,center</lhGuitarFingeringAlign>
+    <lhGuitarFingeringFrameType>0</lhGuitarFingeringFrameType>
+    <lhGuitarFingeringFramePadding>0.2</lhGuitarFingeringFramePadding>
+    <lhGuitarFingeringFrameWidth>0.1</lhGuitarFingeringFrameWidth>
+    <lhGuitarFingeringFrameRound>0</lhGuitarFingeringFrameRound>
+    <lhGuitarFingeringFrameFgColor r="0" g="0" b="0" a="255"/>
+    <lhGuitarFingeringFrameBgColor r="255" g="255" b="255" a="0"/>
+    <lhGuitarFingeringOffset x="-0.5" y="0"/>
+    <lhGuitarFingeringPosition>right</lhGuitarFingeringPosition>
+    <rhGuitarFingeringFontFace>Edwin</rhGuitarFingeringFontFace>
+    <rhGuitarFingeringFontSize>8</rhGuitarFingeringFontSize>
+    <rhGuitarFingeringLineSpacing>1</rhGuitarFingeringLineSpacing>
+    <rhGuitarFingeringFontSpatiumDependent>1</rhGuitarFingeringFontSpatiumDependent>
+    <rhGuitarFingeringFontStyle>2</rhGuitarFingeringFontStyle>
+    <rhGuitarFingeringColor r="0" g="0" b="0" a="255"/>
+    <rhGuitarFingeringAlign>center,center</rhGuitarFingeringAlign>
+    <rhGuitarFingeringFrameType>0</rhGuitarFingeringFrameType>
+    <rhGuitarFingeringFramePadding>0.2</rhGuitarFingeringFramePadding>
+    <rhGuitarFingeringFrameWidth>0.1</rhGuitarFingeringFrameWidth>
+    <rhGuitarFingeringFrameRound>0</rhGuitarFingeringFrameRound>
+    <rhGuitarFingeringFrameFgColor r="0" g="0" b="0" a="255"/>
+    <rhGuitarFingeringFrameBgColor r="255" g="255" b="255" a="0"/>
+    <rhGuitarFingeringOffset x="0" y="0"/>
+    <rhGuitarFingeringPosition>center</rhGuitarFingeringPosition>
+    <hammerOnPullOffTappingFontFace>Edwin</hammerOnPullOffTappingFontFace>
+    <hammerOnPullOffTappingFontSize>8</hammerOnPullOffTappingFontSize>
+    <hammerOnPullOffTappingLineSpacing>1</hammerOnPullOffTappingLineSpacing>
+    <hammerOnPullOffTappingFontSpatiumDependent>1</hammerOnPullOffTappingFontSpatiumDependent>
+    <hammerOnPullOffTappingFontStyle>0</hammerOnPullOffTappingFontStyle>
+    <hammerOnPullOffTappingColor r="0" g="0" b="0" a="255"/>
+    <hammerOnPullOffTappingAlign>left,baseline</hammerOnPullOffTappingAlign>
+    <hammerOnPullOffTappingFrameType>0</hammerOnPullOffTappingFrameType>
+    <hammerOnPullOffTappingFramePadding>0.2</hammerOnPullOffTappingFramePadding>
+    <hammerOnPullOffTappingFrameWidth>0.1</hammerOnPullOffTappingFrameWidth>
+    <hammerOnPullOffTappingFrameRound>0</hammerOnPullOffTappingFrameRound>
+    <hammerOnPullOffTappingFrameFgColor r="0" g="0" b="0" a="255"/>
+    <hammerOnPullOffTappingFrameBgColor r="255" g="255" b="255" a="0"/>
+    <hammerOnPullOffTappingOffset x="0" y="0"/>
+    <hammerOnPullOffTappingPosition>left</hammerOnPullOffTappingPosition>
+    <hopoShowOnStandardStaves>1</hopoShowOnStandardStaves>
+    <hopoShowOnTabStaves>1</hopoShowOnTabStaves>
+    <hopoUpperCase>1</hopoUpperCase>
+    <hopoShowAll>1</hopoShowAll>
+    <hopoAlignLettersStandardStaves>1</hopoAlignLettersStandardStaves>
+    <hopoAlignLettersTabStaves>1</hopoAlignLettersTabStaves>
+    <lhTappingSymbolNormalStave>dot</lhTappingSymbolNormalStave>
+    <lhTappingSymbolTab>dot</lhTappingSymbolTab>
+    <lhTappingShowItemsNormalStave>0</lhTappingShowItemsNormalStave>
+    <lhTappingShowItemsTab>0</lhTappingShowItemsTab>
+    <lhTappingSlurTopAndBottomNoteOnTab>1</lhTappingSlurTopAndBottomNoteOnTab>
+    <rhTappingSymbolNormalStave>plus</rhTappingSymbolNormalStave>
+    <rhTappingSymbolTab>T</rhTappingSymbolTab>
+    <stringNumberFontFace>Edwin</stringNumberFontFace>
+    <stringNumberFontSize>8</stringNumberFontSize>
+    <stringNumberLineSpacing>1</stringNumberLineSpacing>
+    <stringNumberFontSpatiumDependent>1</stringNumberFontSpatiumDependent>
+    <stringNumberFontStyle>0</stringNumberFontStyle>
+    <stringNumberColor r="0" g="0" b="0" a="255"/>
+    <stringNumberAlign>center,center</stringNumberAlign>
+    <stringNumberFrameType>2</stringNumberFrameType>
+    <stringNumberFramePadding>0.2</stringNumberFramePadding>
+    <stringNumberFrameWidth>0.1</stringNumberFrameWidth>
+    <stringNumberFrameRound>0</stringNumberFrameRound>
+    <stringNumberFrameFgColor r="0" g="0" b="0" a="255"/>
+    <stringNumberFrameBgColor r="255" g="255" b="255" a="0"/>
+    <stringNumberOffset x="0" y="0"/>
+    <stringNumberPosition>center</stringNumberPosition>
+    <stringTuningsFontSize>9</stringTuningsFontSize>
+    <harpPedalDiagramFontFace>Edwin</harpPedalDiagramFontFace>
+    <harpPedalDiagramFontSize>10</harpPedalDiagramFontSize>
+    <harpPedalDiagramLineSpacing>1</harpPedalDiagramLineSpacing>
+    <harpPedalDiagramFontSpatiumDependent>1</harpPedalDiagramFontSpatiumDependent>
+    <harpPedalDiagramMusicalSymbolsScale>1</harpPedalDiagramMusicalSymbolsScale>
+    <harpPedalDiagramFontStyle>0</harpPedalDiagramFontStyle>
+    <harpPedalDiagramColor r="0" g="0" b="0" a="255"/>
+    <harpPedalDiagramAlign>center,center</harpPedalDiagramAlign>
+    <harpPedalDiagramFrameType>0</harpPedalDiagramFrameType>
+    <harpPedalDiagramFramePadding>0.2</harpPedalDiagramFramePadding>
+    <harpPedalDiagramFrameWidth>0.1</harpPedalDiagramFrameWidth>
+    <harpPedalDiagramFrameRound>0</harpPedalDiagramFrameRound>
+    <harpPedalDiagramFrameFgColor r="0" g="0" b="0" a="255"/>
+    <harpPedalDiagramFrameBgColor r="255" g="255" b="255" a="0"/>
+    <harpPedalDiagramOffset x="0" y="0"/>
+    <harpPedalDiagramPlacement>0</harpPedalDiagramPlacement>
+    <harpPedalDiagramPosAbove x="0" y="-1"/>
+    <harpPedalDiagramPosBelow x="0" y="2.5"/>
+    <harpPedalDiagramMinDistance>0.5</harpPedalDiagramMinDistance>
+    <harpPedalDiagramPosition>center</harpPedalDiagramPosition>
+    <harpPedalTextDiagramFontFace>Edwin</harpPedalTextDiagramFontFace>
+    <harpPedalTextDiagramFontSize>8</harpPedalTextDiagramFontSize>
+    <harpPedalTextDiagramLineSpacing>1</harpPedalTextDiagramLineSpacing>
+    <harpPedalTextDiagramFontSpatiumDependent>1</harpPedalTextDiagramFontSpatiumDependent>
+    <harpPedalTextDiagramFontStyle>0</harpPedalTextDiagramFontStyle>
+    <harpPedalTextDiagramColor r="0" g="0" b="0" a="255"/>
+    <harpPedalTextDiagramAlign>left,baseline</harpPedalTextDiagramAlign>
+    <harpPedalTextDiagramFrameType>0</harpPedalTextDiagramFrameType>
+    <harpPedalTextDiagramFramePadding>0.2</harpPedalTextDiagramFramePadding>
+    <harpPedalTextDiagramFrameWidth>0.1</harpPedalTextDiagramFrameWidth>
+    <harpPedalTextDiagramFrameRound>0</harpPedalTextDiagramFrameRound>
+    <harpPedalTextDiagramFrameFgColor r="0" g="0" b="0" a="255"/>
+    <harpPedalTextDiagramFrameBgColor r="255" g="255" b="255" a="0"/>
+    <harpPedalTextDiagramOffset x="0" y="0"/>
+    <harpPedalTextDiagramPlacement>1</harpPedalTextDiagramPlacement>
+    <harpPedalTextDiagramPosAbove x="0" y="-1.5"/>
+    <harpPedalTextDiagramPosBelow x="0" y="2.5"/>
+    <harpPedalTextDiagramMinDistance>0.5</harpPedalTextDiagramMinDistance>
+    <harpPedalTextDiagramPosition>left</harpPedalTextDiagramPosition>
+    <articulationFontFace>Edwin</articulationFontFace>
+    <articulationFontSize>8</articulationFontSize>
+    <articulationLineSpacing>1</articulationLineSpacing>
+    <articulationFontSpatiumDependent>1</articulationFontSpatiumDependent>
+    <articulationFontStyle>0</articulationFontStyle>
+    <articulationColor r="0" g="0" b="0" a="255"/>
+    <articulationAlign>left,baseline</articulationAlign>
+    <articulationFrameType>0</articulationFrameType>
+    <articulationFramePadding>0.2</articulationFramePadding>
+    <articulationFrameWidth>0.1</articulationFrameWidth>
+    <articulationFrameRound>0</articulationFrameRound>
+    <articulationFrameFgColor r="0" g="0" b="0" a="255"/>
+    <articulationFrameBgColor r="255" g="255" b="255" a="0"/>
+    <articulationOffset x="0" y="0"/>
+    <articulationPosition>left</articulationPosition>
+    <longInstrumentFontFace>Edwin</longInstrumentFontFace>
+    <longInstrumentFontSize>10</longInstrumentFontSize>
+    <longInstrumentLineSpacing>1</longInstrumentLineSpacing>
+    <longInstrumentFontSpatiumDependent>1</longInstrumentFontSpatiumDependent>
+    <longInstrumentFontStyle>0</longInstrumentFontStyle>
+    <longInstrumentColor r="0" g="0" b="0" a="255"/>
+    <longInstrumentAlign>right,baseline</longInstrumentAlign>
+    <longInstrumentOffset x="0" y="0"/>
+    <longInstrumentFrameType>0</longInstrumentFrameType>
+    <longInstrumentFramePadding>0.2</longInstrumentFramePadding>
+    <longInstrumentFrameWidth>0.1</longInstrumentFrameWidth>
+    <longInstrumentFrameRound>0</longInstrumentFrameRound>
+    <longInstrumentFrameFgColor r="0" g="0" b="0" a="255"/>
+    <longInstrumentFrameBgColor r="255" g="255" b="255" a="0"/>
+    <longInstrumentPosition>right</longInstrumentPosition>
+    <shortInstrumentFontFace>Edwin</shortInstrumentFontFace>
+    <shortInstrumentFontSize>10</shortInstrumentFontSize>
+    <shortInstrumentLineSpacing>1</shortInstrumentLineSpacing>
+    <shortInstrumentFontSpatiumDependent>1</shortInstrumentFontSpatiumDependent>
+    <shortInstrumentFontStyle>0</shortInstrumentFontStyle>
+    <shortInstrumentColor r="0" g="0" b="0" a="255"/>
+    <shortInstrumentAlign>right,baseline</shortInstrumentAlign>
+    <shortInstrumentOffset x="0" y="0"/>
+    <shortInstrumentFrameType>0</shortInstrumentFrameType>
+    <shortInstrumentFramePadding>0.2</shortInstrumentFramePadding>
+    <shortInstrumentFrameWidth>0.1</shortInstrumentFrameWidth>
+    <shortInstrumentFrameRound>0</shortInstrumentFrameRound>
+    <shortInstrumentFrameFgColor r="0" g="0" b="0" a="255"/>
+    <shortInstrumentFrameBgColor r="255" g="255" b="255" a="0"/>
+    <shortInstrumentPosition>right</shortInstrumentPosition>
+    <partInstrumentFontFace>Edwin</partInstrumentFontFace>
+    <partInstrumentFontSize>14</partInstrumentFontSize>
+    <partInstrumentLineSpacing>1</partInstrumentLineSpacing>
+    <partInstrumentFontSpatiumDependent>0</partInstrumentFontSpatiumDependent>
+    <partInstrumentFontStyle>0</partInstrumentFontStyle>
+    <partInstrumentColor r="0" g="0" b="0" a="255"/>
+    <partInstrumentAlign>left,top</partInstrumentAlign>
+    <partInstrumentOffset x="0" y="0"/>
+    <partInstrumentFrameType>0</partInstrumentFrameType>
+    <partInstrumentFramePadding>0.2</partInstrumentFramePadding>
+    <partInstrumentFrameWidth>0.1</partInstrumentFrameWidth>
+    <partInstrumentFrameRound>0</partInstrumentFrameRound>
+    <partInstrumentFrameFgColor r="0" g="0" b="0" a="255"/>
+    <partInstrumentFrameBgColor r="255" g="255" b="255" a="0"/>
+    <partInstrumentPosition>left</partInstrumentPosition>
+    <groupBracketFontFace>Edwin</groupBracketFontFace>
+    <groupBracketFontSize>10</groupBracketFontSize>
+    <groupBracketLineSpacing>1</groupBracketLineSpacing>
+    <groupBracketFontSpatiumDependent>1</groupBracketFontSpatiumDependent>
+    <groupBracketFontStyle>0</groupBracketFontStyle>
+    <groupBracketColor r="0" g="0" b="0" a="255"/>
+    <groupBracketAlign>center,center</groupBracketAlign>
+    <groupBracketOffset x="0" y="0"/>
+    <groupBracketFrameType>0</groupBracketFrameType>
+    <groupBracketFramePadding>0.2</groupBracketFramePadding>
+    <groupBracketFrameWidth>0.1</groupBracketFrameWidth>
+    <groupBracketFrameRound>0</groupBracketFrameRound>
+    <groupBracketFrameFgColor r="0" g="0" b="0" a="255"/>
+    <groupBracketFrameBgColor r="255" g="255" b="255" a="0"/>
+    <groupBracketPosition>center</groupBracketPosition>
+    <dynamicsFontFace>Edwin</dynamicsFontFace>
+    <dynamicsFontSize>10</dynamicsFontSize>
+    <dynamicsLineSpacing>1</dynamicsLineSpacing>
+    <dynamicsFontSpatiumDependent>1</dynamicsFontSpatiumDependent>
+    <dynamicsFontStyle>2</dynamicsFontStyle>
+    <dynamicsColor r="0" g="0" b="0" a="255"/>
+    <dynamicsAlign>center,baseline</dynamicsAlign>
+    <dynamicsFrameType>0</dynamicsFrameType>
+    <dynamicsFramePadding>0.2</dynamicsFramePadding>
+    <dynamicsFrameWidth>0.1</dynamicsFrameWidth>
+    <dynamicsFrameRound>0</dynamicsFrameRound>
+    <dynamicsFrameFgColor r="0" g="0" b="0" a="255"/>
+    <dynamicsFrameBgColor r="255" g="255" b="255" a="0"/>
+    <dynamicsPosition>center</dynamicsPosition>
+    <expressionFontFace>Edwin</expressionFontFace>
+    <expressionFontSize>10</expressionFontSize>
+    <expressionLineSpacing>1</expressionLineSpacing>
+    <expressionFontSpatiumDependent>1</expressionFontSpatiumDependent>
+    <expressionFontStyle>2</expressionFontStyle>
+    <expressionColor r="0" g="0" b="0" a="255"/>
+    <expressionAlign>left,baseline</expressionAlign>
+    <expressionPlacement>1</expressionPlacement>
+    <expressionOffset x="0" y="2.5"/>
+    <expressionPosAbove x="0" y="-1.5"/>
+    <expressionPosBelow x="0" y="2.5"/>
+    <expressionFrameType>0</expressionFrameType>
+    <expressionFramePadding>0.2</expressionFramePadding>
+    <expressionFrameWidth>0.1</expressionFrameWidth>
+    <expressionFrameRound>0</expressionFrameRound>
+    <expressionFrameFgColor r="0" g="0" b="0" a="255"/>
+    <expressionFrameBgColor r="255" g="255" b="255" a="0"/>
+    <expressionMinDistance>0.5</expressionMinDistance>
+    <expressionPosition>left</expressionPosition>
+    <tempoFontFace>Edwin</tempoFontFace>
+    <tempoFontSize>12</tempoFontSize>
+    <tempoLineSpacing>1</tempoLineSpacing>
+    <tempoFontSpatiumDependent>1</tempoFontSpatiumDependent>
+    <tempoFontStyle>1</tempoFontStyle>
+    <tempoColor r="0" g="0" b="0" a="255"/>
+    <tempoAlign>left,baseline</tempoAlign>
+    <tempoSystemFlag>1</tempoSystemFlag>
+    <tempoPlacement>0</tempoPlacement>
+    <tempoPosAbove x="0" y="-2"/>
+    <tempoPosBelow x="0" y="3"/>
+    <tempoMinDistance>0.5</tempoMinDistance>
+    <tempoFrameType>0</tempoFrameType>
+    <tempoFramePadding>0.2</tempoFramePadding>
+    <tempoFrameWidth>0.1</tempoFrameWidth>
+    <tempoFrameRound>0</tempoFrameRound>
+    <tempoFrameFgColor r="0" g="0" b="0" a="255"/>
+    <tempoFrameBgColor r="255" g="255" b="255" a="0"/>
+    <tempoPosition>left</tempoPosition>
+    <tempoChangeFontFace>Edwin</tempoChangeFontFace>
+    <tempoChangeFontSize>12</tempoChangeFontSize>
+    <tempoChangeLineSpacing>1</tempoChangeLineSpacing>
+    <tempoChangeFontSpatiumDependent>1</tempoChangeFontSpatiumDependent>
+    <tempoChangeFontStyle>1</tempoChangeFontStyle>
+    <tempoChangeColor r="0" g="0" b="0" a="255"/>
+    <tempoChangeAlign>left,baseline</tempoChangeAlign>
+    <tempoChangeSystemFlag>1</tempoChangeSystemFlag>
+    <tempoChangePlacement>0</tempoChangePlacement>
+    <tempoChangePosAbove x="0" y="-2"/>
+    <tempoChangePosBelow x="0" y="3"/>
+    <tempoChangeMinDistance>0.5</tempoChangeMinDistance>
+    <tempoChangeFrameType>0</tempoChangeFrameType>
+    <tempoChangeFramePadding>0.2</tempoChangeFramePadding>
+    <tempoChangeFrameWidth>0.1</tempoChangeFrameWidth>
+    <tempoChangeFrameRound>0</tempoChangeFrameRound>
+    <tempoChangeFrameFgColor r="0" g="0" b="0" a="255"/>
+    <tempoChangeFrameBgColor r="255" g="255" b="255" a="0"/>
+    <tempoChangePosition>left</tempoChangePosition>
+    <tempoChangeLineWidth>0.15</tempoChangeLineWidth>
+    <tempoChangeLineStyle>dashed</tempoChangeLineStyle>
+    <tempoChangeDashLineLen>6</tempoChangeDashLineLen>
+    <tempoChangeDashGapLen>9</tempoChangeDashGapLen>
+    <metronomeFontFace>Edwin</metronomeFontFace>
+    <metronomeFontSize>12</metronomeFontSize>
+    <metronomeLineSpacing>1</metronomeLineSpacing>
+    <metronomeFontSpatiumDependent>0</metronomeFontSpatiumDependent>
+    <metronomeFontStyle>0</metronomeFontStyle>
+    <metronomeColor r="0" g="0" b="0" a="255"/>
+    <metronomePlacement>0</metronomePlacement>
+    <metronomeAlign>left,top</metronomeAlign>
+    <metronomeOffset x="0" y="0"/>
+    <metronomeFrameType>0</metronomeFrameType>
+    <metronomeFramePadding>0.2</metronomeFramePadding>
+    <metronomeFrameWidth>0.1</metronomeFrameWidth>
+    <metronomeFrameRound>0</metronomeFrameRound>
+    <metronomeFrameFgColor r="0" g="0" b="0" a="255"/>
+    <metronomeFrameBgColor r="255" g="255" b="255" a="0"/>
+    <metronomePosition>left</metronomePosition>
+    <measureNumberFontFace>Edwin</measureNumberFontFace>
+    <measureNumberFontSize>8</measureNumberFontSize>
+    <measureNumberLineSpacing>1</measureNumberLineSpacing>
+    <measureNumberFontSpatiumDependent>0</measureNumberFontSpatiumDependent>
+    <measureNumberFontStyle>2</measureNumberFontStyle>
+    <measureNumberColor r="0" g="0" b="0" a="255"/>
+    <measureNumberPosAbove x="0" y="-2"/>
+    <measureNumberPosBelow x="0" y="2"/>
+    <measureNumberOffsetType>1</measureNumberOffsetType>
+    <measureNumberVPlacement>0</measureNumberVPlacement>
+    <measureNumberHPlacement>left</measureNumberHPlacement>
+    <measureNumberMinDistance>0.5</measureNumberMinDistance>
+    <measureNumberAlign>left,baseline</measureNumberAlign>
+    <measureNumberFrameType>0</measureNumberFrameType>
+    <measureNumberFramePadding>0.2</measureNumberFramePadding>
+    <measureNumberFrameWidth>0.1</measureNumberFrameWidth>
+    <measureNumberFrameRound>0</measureNumberFrameRound>
+    <measureNumberFrameFgColor r="0" g="0" b="0" a="255"/>
+    <measureNumberFrameBgColor r="255" g="255" b="255" a="0"/>
+    <measureNumberPosition>left</measureNumberPosition>
+    <measureNumberTextStyle>measure_number</measureNumberTextStyle>
+    <measureNumberAlignToBarline>1</measureNumberAlignToBarline>
+    <measureNumberAlternateFontFace>Edwin</measureNumberAlternateFontFace>
+    <measureNumberAlternateFontSize>10</measureNumberAlternateFontSize>
+    <measureNumberAlternateLineSpacing>1</measureNumberAlternateLineSpacing>
+    <measureNumberAlternateFontSpatiumDependent>0</measureNumberAlternateFontSpatiumDependent>
+    <measureNumberAlternateFontStyle>3</measureNumberAlternateFontStyle>
+    <measureNumberAlternateColor r="0" g="0" b="0" a="255"/>
+    <measureNumberAlternateAlign>left,baseline</measureNumberAlternateAlign>
+    <measureNumberAlternatePosAbove x="0" y="-4"/>
+    <measureNumberAlternatePosBelow x="0" y="4"/>
+    <measureNumberAlternateFrameType>1</measureNumberAlternateFrameType>
+    <measureNumberAlternateFramePadding>0.2</measureNumberAlternateFramePadding>
+    <measureNumberAlternateFrameWidth>0.1</measureNumberAlternateFrameWidth>
+    <measureNumberAlternateFrameRound>0</measureNumberAlternateFrameRound>
+    <measureNumberAlternateFrameFgColor r="0" g="0" b="0" a="255"/>
+    <measureNumberAlternateFrameBgColor r="255" g="255" b="255" a="0"/>
+    <measureNumberAlternatePosition>left</measureNumberAlternatePosition>
+    <mmRestShowMeasureNumberRange>0</mmRestShowMeasureNumberRange>
+    <mmRestRangeBracketType>0</mmRestRangeBracketType>
+    <mmRestRangeFontFace>Edwin</mmRestRangeFontFace>
+    <mmRestRangeFontSize>8</mmRestRangeFontSize>
+    <mmRestRangeFontSpatiumDependent>0</mmRestRangeFontSpatiumDependent>
+    <mmRestRangeFontStyle>2</mmRestRangeFontStyle>
+    <mmRestRangeColor r="0" g="0" b="0" a="255"/>
+    <mmRestRangePosAbove x="0" y="-3"/>
+    <mmRestRangePosBelow x="0" y="1"/>
+    <mmRestRangeOffsetType>1</mmRestRangeOffsetType>
+    <mmRestRangeVPlacement>1</mmRestRangeVPlacement>
+    <mmRestRangeHPlacement>center</mmRestRangeHPlacement>
+    <mmRestRangeAlign>center,baseline</mmRestRangeAlign>
+    <mmRestRangeFrameType>0</mmRestRangeFrameType>
+    <mmRestRangeFramePadding>0.2</mmRestRangeFramePadding>
+    <mmRestRangeFrameWidth>0.1</mmRestRangeFrameWidth>
+    <mmRestRangeFrameRound>0</mmRestRangeFrameRound>
+    <mmRestRangeFrameFgColor r="0" g="0" b="0" a="255"/>
+    <mmRestRangeFrameBgColor r="255" g="255" b="255" a="0"/>
+    <mmRestRangePosition>center</mmRestRangePosition>
+    <mmRestRangeMinDistance>0.5</mmRestRangeMinDistance>
+    <mmRestRangeTextStyle>mmrest_range</mmRestRangeTextStyle>
+    <translatorFontFace>Edwin</translatorFontFace>
+    <translatorFontSize>10</translatorFontSize>
+    <translatorLineSpacing>1</translatorLineSpacing>
+    <translatorFontSpatiumDependent>0</translatorFontSpatiumDependent>
+    <translatorFontStyle>0</translatorFontStyle>
+    <translatorColor r="0" g="0" b="0" a="255"/>
+    <translatorAlign>left,top</translatorAlign>
+    <translatorOffset x="0" y="0"/>
+    <translatorFrameType>0</translatorFrameType>
+    <translatorFramePadding>0.2</translatorFramePadding>
+    <translatorFrameWidth>0.1</translatorFrameWidth>
+    <translatorFrameRound>0</translatorFrameRound>
+    <translatorFrameFgColor r="0" g="0" b="0" a="255"/>
+    <translatorFrameBgColor r="255" g="255" b="255" a="0"/>
+    <translatorPosition>left</translatorPosition>
+    <systemTextFontFace>Edwin</systemTextFontFace>
+    <systemTextFontSize>10</systemTextFontSize>
+    <systemTextLineSpacing>1</systemTextLineSpacing>
+    <systemTextFontSpatiumDependent>1</systemTextFontSpatiumDependent>
+    <systemTextFontStyle>0</systemTextFontStyle>
+    <systemTextColor r="0" g="0" b="0" a="255"/>
+    <systemTextAlign>left,baseline</systemTextAlign>
+    <systemTextOffsetType>1</systemTextOffsetType>
+    <systemTextPlacement>0</systemTextPlacement>
+    <systemTextPosAbove x="0" y="-2"/>
+    <systemTextPosBelow x="0" y="3.5"/>
+    <systemTextMinDistance>0.5</systemTextMinDistance>
+    <systemTextFrameType>0</systemTextFrameType>
+    <systemTextFramePadding>0.2</systemTextFramePadding>
+    <systemTextFrameWidth>0.1</systemTextFrameWidth>
+    <systemTextFrameRound>0</systemTextFrameRound>
+    <systemTextFrameFgColor r="0" g="0" b="0" a="255"/>
+    <systemTextFrameBgColor r="255" g="255" b="255" a="0"/>
+    <systemTextPosition>left</systemTextPosition>
+    <staffTextFontFace>Edwin</staffTextFontFace>
+    <staffTextFontSize>10</staffTextFontSize>
+    <staffTextLineSpacing>1</staffTextLineSpacing>
+    <staffTextFontSpatiumDependent>1</staffTextFontSpatiumDependent>
+    <staffTextFontStyle>0</staffTextFontStyle>
+    <staffTextColor r="0" g="0" b="0" a="255"/>
+    <staffTextAlign>left,baseline</staffTextAlign>
+    <staffTextOffsetType>1</staffTextOffsetType>
+    <staffTextPlacement>0</staffTextPlacement>
+    <staffTextPosAbove x="0" y="-1"/>
+    <staffTextPosBelow x="0" y="2.5"/>
+    <staffTextMinDistance>0.5</staffTextMinDistance>
+    <staffTextFrameType>0</staffTextFrameType>
+    <staffTextFramePadding>0.2</staffTextFramePadding>
+    <staffTextFrameWidth>0.1</staffTextFrameWidth>
+    <staffTextFrameRound>0</staffTextFrameRound>
+    <staffTextFrameFgColor r="0" g="0" b="0" a="255"/>
+    <staffTextFrameBgColor r="255" g="255" b="255" a="0"/>
+    <staffTextPosition>left</staffTextPosition>
+    <staveSharingLabelFontFace>Edwin</staveSharingLabelFontFace>
+    <staveSharingLabelFontSize>10</staveSharingLabelFontSize>
+    <staveSharingLabelLineSpacing>1</staveSharingLabelLineSpacing>
+    <staveSharingLabelFontSpatiumDependent>1</staveSharingLabelFontSpatiumDependent>
+    <staveSharingLabelFontStyle>0</staveSharingLabelFontStyle>
+    <staveSharingLabelColor r="0" g="0" b="0" a="255"/>
+    <staveSharingLabelAlign>left,baseline</staveSharingLabelAlign>
+    <staveSharingLabelOffsetType>1</staveSharingLabelOffsetType>
+    <staveSharingLabelPlacement>0</staveSharingLabelPlacement>
+    <staveSharingLabelPosAbove x="0" y="-1"/>
+    <staveSharingLabelPosBelow x="0" y="2.5"/>
+    <staveSharingLabelMinDistance>0.5</staveSharingLabelMinDistance>
+    <staveSharingLabelFrameType>0</staveSharingLabelFrameType>
+    <staveSharingLabelFramePadding>0.2</staveSharingLabelFramePadding>
+    <staveSharingLabelFrameWidth>0.1</staveSharingLabelFrameWidth>
+    <staveSharingLabelFrameRound>0</staveSharingLabelFrameRound>
+    <staveSharingLabelFrameFgColor r="0" g="0" b="0" a="255"/>
+    <staveSharingLabelFrameBgColor r="255" g="255" b="255" a="0"/>
+    <staveSharingLabelPosition>left</staveSharingLabelPosition>
+    <fretDiagramFingeringFontFace>FreeSans</fretDiagramFingeringFontFace>
+    <fretDiagramFingeringFontSize>6</fretDiagramFingeringFontSize>
+    <fretDiagramFingeringLineSpacing>1</fretDiagramFingeringLineSpacing>
+    <fretDiagramFingeringFontSpatiumDependent>1</fretDiagramFingeringFontSpatiumDependent>
+    <fretDiagramFingeringFontStyle>0</fretDiagramFingeringFontStyle>
+    <fretDiagramFingeringColor r="0" g="0" b="0" a="255"/>
+    <fretDiagramFingeringAlign>left,baseline</fretDiagramFingeringAlign>
+    <fretDiagramFingeringPosAbove x="0" y="-1"/>
+    <fretDiagramFingeringFrameType>0</fretDiagramFingeringFrameType>
+    <fretDiagramFingeringFramePadding>0.2</fretDiagramFingeringFramePadding>
+    <fretDiagramFingeringFrameWidth>0.1</fretDiagramFingeringFrameWidth>
+    <fretDiagramFingeringFrameRound>0</fretDiagramFingeringFrameRound>
+    <fretDiagramFingeringFrameFgColor r="0" g="0" b="0" a="255"/>
+    <fretDiagramFingeringFrameBgColor r="255" g="255" b="255" a="0"/>
+    <fretDiagramFingeringPosition>left</fretDiagramFingeringPosition>
+    <fretDiagramFretNumberFontFace>FreeSans</fretDiagramFretNumberFontFace>
+    <fretDiagramFretNumberFontSize>6</fretDiagramFretNumberFontSize>
+    <fretDiagramFretNumberLineSpacing>1</fretDiagramFretNumberLineSpacing>
+    <fretDiagramFretNumberFontSpatiumDependent>1</fretDiagramFretNumberFontSpatiumDependent>
+    <fretDiagramFretNumberFontStyle>0</fretDiagramFretNumberFontStyle>
+    <fretDiagramFretNumberColor r="0" g="0" b="0" a="255"/>
+    <fretDiagramFretNumberAlign>left,baseline</fretDiagramFretNumberAlign>
+    <fretDiagramFretNumberPosAbove x="0" y="-1"/>
+    <fretDiagramFretNumberFrameType>0</fretDiagramFretNumberFrameType>
+    <fretDiagramFretNumberFramePadding>0.2</fretDiagramFretNumberFramePadding>
+    <fretDiagramFretNumberFrameWidth>0.1</fretDiagramFretNumberFrameWidth>
+    <fretDiagramFretNumberFrameRound>0</fretDiagramFretNumberFrameRound>
+    <fretDiagramFretNumberFrameFgColor r="0" g="0" b="0" a="255"/>
+    <fretDiagramFretNumberFrameBgColor r="255" g="255" b="255" a="0"/>
+    <fretDiagramFretNumberPosition>left</fretDiagramFretNumberPosition>
+    <rehearsalMarkFontFace>Edwin</rehearsalMarkFontFace>
+    <rehearsalMarkFontSize>14</rehearsalMarkFontSize>
+    <rehearsalMarkLineSpacing>1</rehearsalMarkLineSpacing>
+    <rehearsalMarkFontSpatiumDependent>1</rehearsalMarkFontSpatiumDependent>
+    <rehearsalMarkFontStyle>1</rehearsalMarkFontStyle>
+    <rehearsalMarkColor r="0" g="0" b="0" a="255"/>
+    <rehearsalMarkAlign>center,baseline</rehearsalMarkAlign>
+    <rehearsalMarkFrameType>1</rehearsalMarkFrameType>
+    <rehearsalMarkFramePadding>0.5</rehearsalMarkFramePadding>
+    <rehearsalMarkFrameWidth>0.16</rehearsalMarkFrameWidth>
+    <rehearsalMarkFrameRound>0</rehearsalMarkFrameRound>
+    <rehearsalMarkFrameFgColor r="0" g="0" b="0" a="255"/>
+    <rehearsalMarkFrameBgColor r="255" g="255" b="255" a="0"/>
+    <rehearsalMarkPosition>center</rehearsalMarkPosition>
+    <rehearsalMarkPlacement>0</rehearsalMarkPlacement>
+    <rehearsalMarkPosAbove x="0" y="-2"/>
+    <rehearsalMarkPosBelow x="0" y="4"/>
+    <rehearsalMarkMinDistance>0.5</rehearsalMarkMinDistance>
+    <repeatPlayCountFontFace>Edwin</repeatPlayCountFontFace>
+    <repeatPlayCountFontSize>10</repeatPlayCountFontSize>
+    <repeatPlayCountLineSpacing>1</repeatPlayCountLineSpacing>
+    <repeatPlayCountFontSpatiumDependent>1</repeatPlayCountFontSpatiumDependent>
+    <repeatPlayCountFontStyle>0</repeatPlayCountFontStyle>
+    <repeatPlayCountColor r="0" g="0" b="0" a="255"/>
+    <repeatPlayCountAlign>left,baseline</repeatPlayCountAlign>
+    <repeatPlayCountPlacement>0</repeatPlayCountPlacement>
+    <repeatPlayCountFrameType>0</repeatPlayCountFrameType>
+    <repeatPlayCountFramePadding>0.2</repeatPlayCountFramePadding>
+    <repeatPlayCountFrameWidth>0.1</repeatPlayCountFrameWidth>
+    <repeatPlayCountFrameRound>0</repeatPlayCountFrameRound>
+    <repeatPlayCountFrameFgColor r="0" g="0" b="0" a="255"/>
+    <repeatPlayCountFrameBgColor r="255" g="255" b="255" a="0"/>
+    <repeatPlayCountPosition>left</repeatPlayCountPosition>
+    <repeatPlayCountPosAbove x="0" y="-2"/>
+    <repeatPlayCountPosBelow x="0" y="4"/>
+    <repeatPlayCountMinDistance>0.5</repeatPlayCountMinDistance>
+    <repeatLeftFontFace>Edwin</repeatLeftFontFace>
+    <repeatLeftFontSize>10</repeatLeftFontSize>
+    <repeatLeftLineSpacing>1</repeatLeftLineSpacing>
+    <repeatLeftFontSpatiumDependent>1</repeatLeftFontSpatiumDependent>
+    <repeatLeftFontStyle>0</repeatLeftFontStyle>
+    <repeatLeftColor r="0" g="0" b="0" a="255"/>
+    <repeatLeftAlign>left,baseline</repeatLeftAlign>
+    <repeatLeftPlacement>0</repeatLeftPlacement>
+    <repeatLeftFrameType>0</repeatLeftFrameType>
+    <repeatLeftFramePadding>0.2</repeatLeftFramePadding>
+    <repeatLeftFrameWidth>0.1</repeatLeftFrameWidth>
+    <repeatLeftFrameRound>0</repeatLeftFrameRound>
+    <repeatLeftFrameFgColor r="0" g="0" b="0" a="255"/>
+    <repeatLeftFrameBgColor r="255" g="255" b="255" a="0"/>
+    <repeatLeftPosition>left</repeatLeftPosition>
+    <repeatRightFontFace>Edwin</repeatRightFontFace>
+    <repeatRightFontSize>10</repeatRightFontSize>
+    <repeatRightLineSpacing>1</repeatRightLineSpacing>
+    <repeatRightFontSpatiumDependent>1</repeatRightFontSpatiumDependent>
+    <repeatRightFontStyle>0</repeatRightFontStyle>
+    <repeatRightColor r="0" g="0" b="0" a="255"/>
+    <repeatRightAlign>right,baseline</repeatRightAlign>
+    <repeatRightPlacement>0</repeatRightPlacement>
+    <repeatRightFrameType>0</repeatRightFrameType>
+    <repeatRightFramePadding>0.2</repeatRightFramePadding>
+    <repeatRightFrameWidth>0.1</repeatRightFrameWidth>
+    <repeatRightFrameRound>0</repeatRightFrameRound>
+    <repeatRightFrameFgColor r="0" g="0" b="0" a="255"/>
+    <repeatRightFrameBgColor r="255" g="255" b="255" a="0"/>
+    <repeatRightPosition>right</repeatRightPosition>
+    <frameFontFace>Edwin</frameFontFace>
+    <frameFontSize>10</frameFontSize>
+    <frameLineSpacing>1</frameLineSpacing>
+    <frameFontSpatiumDependent>0</frameFontSpatiumDependent>
+    <frameFontStyle>0</frameFontStyle>
+    <frameColor r="0" g="0" b="0" a="255"/>
+    <frameAlign>left,top</frameAlign>
+    <frameOffset x="0" y="0"/>
+    <frameFrameType>0</frameFrameType>
+    <frameFramePadding>0.2</frameFramePadding>
+    <frameFrameWidth>0.1</frameFrameWidth>
+    <frameFrameRound>0</frameFrameRound>
+    <frameFrameFgColor r="0" g="0" b="0" a="255"/>
+    <frameFrameBgColor r="255" g="255" b="255" a="0"/>
+    <framePosition>left</framePosition>
+    <textLineFontFace>Edwin</textLineFontFace>
+    <textLineFontSize>10</textLineFontSize>
+    <textLineLineSpacing>1</textLineLineSpacing>
+    <textLineFontSpatiumDependent>1</textLineFontSpatiumDependent>
+    <textLineFontStyle>0</textLineFontStyle>
+    <textLineColor r="0" g="0" b="0" a="255"/>
+    <textLineTextAlign>left,center</textLineTextAlign>
+    <textLineSystemFlag>0</textLineSystemFlag>
+    <systemTextLineFontFace>Edwin</systemTextLineFontFace>
+    <systemTextLineFontSize>10</systemTextLineFontSize>
+    <systemTextLineLineSpacing>1</systemTextLineLineSpacing>
+    <systemTextLineFontSpatiumDependent>1</systemTextLineFontSpatiumDependent>
+    <systemTextLineFontStyle>0</systemTextLineFontStyle>
+    <systemTextLineColor r="0" g="0" b="0" a="255"/>
+    <systemTextLineTextAlign>left,center</systemTextLineTextAlign>
+    <systemTextLineSystemFlag>1</systemTextLineSystemFlag>
+    <noteLinePlacement>0</noteLinePlacement>
+    <noteLineFontFace>Edwin</noteLineFontFace>
+    <noteLineFontSize>10</noteLineFontSize>
+    <noteLineLineSpacing>1</noteLineLineSpacing>
+    <noteLineFontSpatiumDependent>1</noteLineFontSpatiumDependent>
+    <noteLineFontStyle>0</noteLineFontStyle>
+    <noteLineColor r="0" g="0" b="0" a="255"/>
+    <noteLineAlign>left,center</noteLineAlign>
+    <noteLineOffset x="0" y="0"/>
+    <noteLineFrameType>0</noteLineFrameType>
+    <noteLineFramePadding>0.2</noteLineFramePadding>
+    <noteLineFrameWidth>0.1</noteLineFrameWidth>
+    <noteLineFrameRound>0</noteLineFrameRound>
+    <noteLineFrameFgColor r="0" g="0" b="0" a="255"/>
+    <noteLineFrameBgColor r="255" g="255" b="255" a="0"/>
+    <noteLinePosition>left</noteLinePosition>
+    <noteLineWidth>0.15</noteLineWidth>
+    <noteLineStyle>solid</noteLineStyle>
+    <noteLineDashLineLen>5</noteLineDashLineLen>
+    <noteLineDashGapLen>5</noteLineDashGapLen>
+    <glissandoFontFace>Edwin</glissandoFontFace>
+    <glissandoFontSize>8</glissandoFontSize>
+    <glissandoLineSpacing>1</glissandoLineSpacing>
+    <glissandoFontSpatiumDependent>1</glissandoFontSpatiumDependent>
+    <glissandoFontStyle>2</glissandoFontStyle>
+    <glissandoColor r="0" g="0" b="0" a="255"/>
+    <glissandoAlign>left,top</glissandoAlign>
+    <glissandoOffset x="0" y="0"/>
+    <glissandoFrameType>0</glissandoFrameType>
+    <glissandoFramePadding>0.2</glissandoFramePadding>
+    <glissandoFrameWidth>0.1</glissandoFrameWidth>
+    <glissandoFrameRound>0</glissandoFrameRound>
+    <glissandoFrameFgColor r="0" g="0" b="0" a="255"/>
+    <glissandoFrameBgColor r="255" g="255" b="255" a="0"/>
+    <glissandoPosition>left</glissandoPosition>
+    <glissandoLineWidth>0.15</glissandoLineWidth>
+    <glissandoText>gliss.</glissandoText>
+    <glissandoStyle>0</glissandoStyle>
+    <glissandoStyleHarp>3</glissandoStyleHarp>
+    <glissandoType>0</glissandoType>
+    <glissandoLineStyle>solid</glissandoLineStyle>
+    <glissandoDashLineLen>5</glissandoDashLineLen>
+    <glissandoDashGapLen>5</glissandoDashGapLen>
+    <glissandoShowText>1</glissandoShowText>
+    <bendFontFace>Edwin</bendFontFace>
+    <bendFontSize>8</bendFontSize>
+    <bendLineSpacing>1</bendLineSpacing>
+    <bendFontSpatiumDependent>1</bendFontSpatiumDependent>
+    <bendFontStyle>0</bendFontStyle>
+    <bendColor r="0" g="0" b="0" a="255"/>
+    <bendAlign>left,baseline</bendAlign>
+    <bendOffset x="0" y="0"/>
+    <bendFrameType>0</bendFrameType>
+    <bendFramePadding>0.2</bendFramePadding>
+    <bendFrameWidth>0.1</bendFrameWidth>
+    <bendFrameRound>0</bendFrameRound>
+    <bendFrameFgColor r="0" g="0" b="0" a="255"/>
+    <bendFrameBgColor r="255" g="255" b="255" a="0"/>
+    <bendPosition>left</bendPosition>
+    <bendLineWidth>0.15</bendLineWidth>
+    <bendArrowWidth>0.5</bendArrowWidth>
+    <guitarBendLineWidth>0.13</guitarBendLineWidth>
+    <guitarBendLineWidthTab>0.15</guitarBendLineWidthTab>
+    <guitarBendHeightAboveTABStaff>1.5</guitarBendHeightAboveTABStaff>
+    <guitarBendPartialBendHeight>1.5</guitarBendPartialBendHeight>
+    <guitarBendUseFull>0</guitarBendUseFull>
+    <guitarBendArrowWidth>1</guitarBendArrowWidth>
+    <guitarBendArrowHeight>1</guitarBendArrowHeight>
+    <useCueSizeFretForGraceBends>0</useCueSizeFretForGraceBends>
+    <showFretOnFullBendRelease>1</showFretOnFullBendRelease>
+    <alignPreBendAndPreDiveToGraceNote>0</alignPreBendAndPreDiveToGraceNote>
+    <useFractionCharacters>1</useFractionCharacters>
+    <guitarDivesAboveStaff>0</guitarDivesAboveStaff>
+    <guitarDiveLineWidth>0.13</guitarDiveLineWidth>
+    <guitarDiveLineWidthTab>0.15</guitarDiveLineWidthTab>
+    <headerFontFace>Edwin</headerFontFace>
+    <headerFontSize>9</headerFontSize>
+    <headerLineSpacing>1</headerLineSpacing>
+    <headerFontSpatiumDependent>0</headerFontSpatiumDependent>
+    <headerFontStyle>0</headerFontStyle>
+    <headerColor r="0" g="0" b="0" a="255"/>
+    <headerAlign>center,top</headerAlign>
+    <headerOffset x="0" y="0"/>
+    <headerFrameType>0</headerFrameType>
+    <headerFramePadding>0.2</headerFramePadding>
+    <headerFrameWidth>0.1</headerFrameWidth>
+    <headerFrameRound>0</headerFrameRound>
+    <headerFrameFgColor r="0" g="0" b="0" a="255"/>
+    <headerFrameBgColor r="255" g="255" b="255" a="0"/>
+    <headerPosition>center</headerPosition>
+    <footerFontFace>Edwin</footerFontFace>
+    <footerFontSize>9</footerFontSize>
+    <footerLineSpacing>1</footerLineSpacing>
+    <footerFontSpatiumDependent>0</footerFontSpatiumDependent>
+    <footerFontStyle>0</footerFontStyle>
+    <footerColor r="0" g="0" b="0" a="255"/>
+    <footerAlign>center,bottom</footerAlign>
+    <footerOffset x="0" y="0"/>
+    <footerFrameType>0</footerFrameType>
+    <footerFramePadding>0.2</footerFramePadding>
+    <footerFrameWidth>0.1</footerFrameWidth>
+    <footerFrameRound>0</footerFrameRound>
+    <footerFrameFgColor r="0" g="0" b="0" a="255"/>
+    <footerFrameBgColor r="255" g="255" b="255" a="0"/>
+    <footerPosition>center</footerPosition>
+    <copyrightFontFace>Edwin</copyrightFontFace>
+    <copyrightFontSize>9</copyrightFontSize>
+    <copyrightLineSpacing>1</copyrightLineSpacing>
+    <copyrightFontSpatiumDependent>0</copyrightFontSpatiumDependent>
+    <copyrightFontStyle>0</copyrightFontStyle>
+    <copyrightColor r="0" g="0" b="0" a="255"/>
+    <copyrightAlign>center,bottom</copyrightAlign>
+    <copyrightOffset x="0" y="0"/>
+    <copyrightFrameType>0</copyrightFrameType>
+    <copyrightFramePadding>0.2</copyrightFramePadding>
+    <copyrightFrameWidth>0.1</copyrightFrameWidth>
+    <copyrightFrameRound>0</copyrightFrameRound>
+    <copyrightFrameFgColor r="0" g="0" b="0" a="255"/>
+    <copyrightFrameBgColor r="255" g="255" b="255" a="0"/>
+    <copyrightPosition>center</copyrightPosition>
+    <pageNumberFontFace>Edwin</pageNumberFontFace>
+    <pageNumberFontSize>11</pageNumberFontSize>
+    <pageNumberLineSpacing>1</pageNumberLineSpacing>
+    <pageNumberFontSpatiumDependent>0</pageNumberFontSpatiumDependent>
+    <pageNumberFontStyle>1</pageNumberFontStyle>
+    <pageNumberColor r="0" g="0" b="0" a="255"/>
+    <pageNumberAlign>center,top</pageNumberAlign>
+    <pageNumberOffset x="0" y="0"/>
+    <pageNumberFrameType>0</pageNumberFrameType>
+    <pageNumberFramePadding>0.2</pageNumberFramePadding>
+    <pageNumberFrameWidth>0.1</pageNumberFrameWidth>
+    <pageNumberFrameRound>0</pageNumberFrameRound>
+    <pageNumberFrameFgColor r="0" g="0" b="0" a="255"/>
+    <pageNumberFrameBgColor r="255" g="255" b="255" a="0"/>
+    <pageNumberPosition>center</pageNumberPosition>
+    <instrumentChangeFontFace>Edwin</instrumentChangeFontFace>
+    <instrumentChangeFontSize>10</instrumentChangeFontSize>
+    <instrumentChangeLineSpacing>1</instrumentChangeLineSpacing>
+    <instrumentChangeFontSpatiumDependent>1</instrumentChangeFontSpatiumDependent>
+    <instrumentChangeFontStyle>1</instrumentChangeFontStyle>
+    <instrumentChangeColor r="0" g="0" b="0" a="255"/>
+    <instrumentChangeAlign>left,baseline</instrumentChangeAlign>
+    <instrumentChangeOffset x="0" y="0"/>
+    <instrumentChangePlacement>0</instrumentChangePlacement>
+    <instrumentChangePosAbove x="0" y="-2"/>
+    <instrumentChangePosBelow x="0" y="3.5"/>
+    <instrumentChangeMinDistance>0.5</instrumentChangeMinDistance>
+    <instrumentChangeFrameType>0</instrumentChangeFrameType>
+    <instrumentChangeFramePadding>0.2</instrumentChangeFramePadding>
+    <instrumentChangeFrameWidth>0.1</instrumentChangeFrameWidth>
+    <instrumentChangeFrameRound>0</instrumentChangeFrameRound>
+    <instrumentChangeFrameFgColor r="0" g="0" b="0" a="255"/>
+    <instrumentChangeFrameBgColor r="255" g="255" b="255" a="0"/>
+    <instrumentChangePosition>left</instrumentChangePosition>
+    <stickingFontFace>Edwin</stickingFontFace>
+    <stickingFontSize>10</stickingFontSize>
+    <stickingLineSpacing>1</stickingLineSpacing>
+    <stickingFontSpatiumDependent>1</stickingFontSpatiumDependent>
+    <stickingFontStyle>0</stickingFontStyle>
+    <stickingColor r="0" g="0" b="0" a="255"/>
+    <stickingAlign>center,baseline</stickingAlign>
+    <stickingOffset x="0" y="0"/>
+    <stickingPlacement>1</stickingPlacement>
+    <stickingPosAbove x="0" y="-1"/>
+    <stickingPosBelow x="0" y="2"/>
+    <stickingMinDistance>0.5</stickingMinDistance>
+    <stickingFrameType>0</stickingFrameType>
+    <stickingFramePadding>0.2</stickingFramePadding>
+    <stickingFrameWidth>0.1</stickingFrameWidth>
+    <stickingFrameRound>0</stickingFrameRound>
+    <stickingFrameFgColor r="0" g="0" b="0" a="255"/>
+    <stickingFrameBgColor r="255" g="255" b="255" a="0"/>
+    <stickingPosition>center</stickingPosition>
+    <figuredBassFontFace>MScoreBC</figuredBassFontFace>
+    <figuredBassFontSize>8</figuredBassFontSize>
+    <figuredBassLineSpacing>1</figuredBassLineSpacing>
+    <figuredBassFontSpatiumDependent>1</figuredBassFontSpatiumDependent>
+    <figuredBassFontStyle>0</figuredBassFontStyle>
+    <figuredBassColor r="0" g="0" b="0" a="255"/>
+    <user1Name></user1Name>
+    <user1FontFace>Edwin</user1FontFace>
+    <user1FontSize>10</user1FontSize>
+    <user1LineSpacing>1</user1LineSpacing>
+    <user1FontSpatiumDependent>1</user1FontSpatiumDependent>
+    <user1FontStyle>0</user1FontStyle>
+    <user1Color r="0" g="0" b="0" a="255"/>
+    <user1Align>left,top</user1Align>
+    <user1Offset x="0" y="0"/>
+    <user1OffsetType>1</user1OffsetType>
+    <user1FrameType>0</user1FrameType>
+    <user1FramePadding>0.2</user1FramePadding>
+    <user1FrameWidth>0.1</user1FrameWidth>
+    <user1FrameRound>0</user1FrameRound>
+    <user1FrameFgColor r="0" g="0" b="0" a="255"/>
+    <user1FrameBgColor r="255" g="255" b="255" a="0"/>
+    <user1Position>left</user1Position>
+    <user2Name></user2Name>
+    <user2FontFace>Edwin</user2FontFace>
+    <user2FontSize>10</user2FontSize>
+    <user2LineSpacing>1</user2LineSpacing>
+    <user2FontSpatiumDependent>1</user2FontSpatiumDependent>
+    <user2FontStyle>0</user2FontStyle>
+    <user2Color r="0" g="0" b="0" a="255"/>
+    <user2Align>left,top</user2Align>
+    <user2Offset x="0" y="0"/>
+    <user2OffsetType>1</user2OffsetType>
+    <user2FrameType>0</user2FrameType>
+    <user2FramePadding>0.2</user2FramePadding>
+    <user2FrameWidth>0.1</user2FrameWidth>
+    <user2FrameRound>0</user2FrameRound>
+    <user2FrameFgColor r="0" g="0" b="0" a="255"/>
+    <user2FrameBgColor r="255" g="255" b="255" a="0"/>
+    <user2Position>left</user2Position>
+    <user3Name></user3Name>
+    <user3FontFace>Edwin</user3FontFace>
+    <user3FontSize>10</user3FontSize>
+    <user3LineSpacing>1</user3LineSpacing>
+    <user3FontSpatiumDependent>1</user3FontSpatiumDependent>
+    <user3FontStyle>0</user3FontStyle>
+    <user3Color r="0" g="0" b="0" a="255"/>
+    <user3Align>left,top</user3Align>
+    <user3Offset x="0" y="0"/>
+    <user3OffsetType>1</user3OffsetType>
+    <user3FrameType>0</user3FrameType>
+    <user3FramePadding>0.2</user3FramePadding>
+    <user3FrameWidth>0.1</user3FrameWidth>
+    <user3FrameRound>0</user3FrameRound>
+    <user3FrameFgColor r="0" g="0" b="0" a="255"/>
+    <user3FrameBgColor r="255" g="255" b="255" a="0"/>
+    <user3Position>left</user3Position>
+    <user4Name></user4Name>
+    <user4FontFace>Edwin</user4FontFace>
+    <user4FontSize>10</user4FontSize>
+    <user4LineSpacing>1</user4LineSpacing>
+    <user4FontSpatiumDependent>1</user4FontSpatiumDependent>
+    <user4FontStyle>0</user4FontStyle>
+    <user4Color r="0" g="0" b="0" a="255"/>
+    <user4Align>left,top</user4Align>
+    <user4Offset x="0" y="0"/>
+    <user4OffsetType>1</user4OffsetType>
+    <user4FrameType>0</user4FrameType>
+    <user4FramePadding>0.2</user4FramePadding>
+    <user4FrameWidth>0.1</user4FrameWidth>
+    <user4FrameRound>0</user4FrameRound>
+    <user4FrameFgColor r="0" g="0" b="0" a="255"/>
+    <user4FrameBgColor r="255" g="255" b="255" a="0"/>
+    <user4Position>left</user4Position>
+    <user5Name></user5Name>
+    <user5FontFace>Edwin</user5FontFace>
+    <user5FontSize>10</user5FontSize>
+    <user5LineSpacing>1</user5LineSpacing>
+    <user5FontSpatiumDependent>1</user5FontSpatiumDependent>
+    <user5FontStyle>0</user5FontStyle>
+    <user5Color r="0" g="0" b="0" a="255"/>
+    <user5Align>left,top</user5Align>
+    <user5Offset x="0" y="0"/>
+    <user5OffsetType>1</user5OffsetType>
+    <user5FrameType>0</user5FrameType>
+    <user5FramePadding>0.2</user5FramePadding>
+    <user5FrameWidth>0.1</user5FrameWidth>
+    <user5FrameRound>0</user5FrameRound>
+    <user5FrameFgColor r="0" g="0" b="0" a="255"/>
+    <user5FrameBgColor r="255" g="255" b="255" a="0"/>
+    <user5Position>left</user5Position>
+    <user6Name></user6Name>
+    <user6FontFace>Edwin</user6FontFace>
+    <user6FontSize>10</user6FontSize>
+    <user6LineSpacing>1</user6LineSpacing>
+    <user6FontSpatiumDependent>1</user6FontSpatiumDependent>
+    <user6FontStyle>0</user6FontStyle>
+    <user6Color r="0" g="0" b="0" a="255"/>
+    <user6Align>left,top</user6Align>
+    <user6Offset x="0" y="0"/>
+    <user6OffsetType>1</user6OffsetType>
+    <user6FrameType>0</user6FrameType>
+    <user6FramePadding>0.2</user6FramePadding>
+    <user6FrameWidth>0.1</user6FrameWidth>
+    <user6FrameRound>0</user6FrameRound>
+    <user6FrameFgColor r="0" g="0" b="0" a="255"/>
+    <user6FrameBgColor r="255" g="255" b="255" a="0"/>
+    <user6Position>left</user6Position>
+    <user7Name></user7Name>
+    <user7FontFace>Edwin</user7FontFace>
+    <user7FontSize>10</user7FontSize>
+    <user7LineSpacing>1</user7LineSpacing>
+    <user7FontSpatiumDependent>1</user7FontSpatiumDependent>
+    <user7FontStyle>0</user7FontStyle>
+    <user7Color r="0" g="0" b="0" a="255"/>
+    <user7Align>left,top</user7Align>
+    <user7Offset x="0" y="0"/>
+    <user7OffsetType>1</user7OffsetType>
+    <user7FrameType>0</user7FrameType>
+    <user7FramePadding>0.2</user7FramePadding>
+    <user7FrameWidth>0.1</user7FrameWidth>
+    <user7FrameRound>0</user7FrameRound>
+    <user7FrameFgColor r="0" g="0" b="0" a="255"/>
+    <user7FrameBgColor r="255" g="255" b="255" a="0"/>
+    <user7Position>left</user7Position>
+    <user8Name></user8Name>
+    <user8FontFace>Edwin</user8FontFace>
+    <user8FontSize>10</user8FontSize>
+    <user8LineSpacing>1</user8LineSpacing>
+    <user8FontSpatiumDependent>1</user8FontSpatiumDependent>
+    <user8FontStyle>0</user8FontStyle>
+    <user8Color r="0" g="0" b="0" a="255"/>
+    <user8Align>left,top</user8Align>
+    <user8Offset x="0" y="0"/>
+    <user8OffsetType>1</user8OffsetType>
+    <user8FrameType>0</user8FrameType>
+    <user8FramePadding>0.2</user8FramePadding>
+    <user8FrameWidth>0.1</user8FrameWidth>
+    <user8FrameRound>0</user8FrameRound>
+    <user8FrameFgColor r="0" g="0" b="0" a="255"/>
+    <user8FrameBgColor r="255" g="255" b="255" a="0"/>
+    <user8Position>left</user8Position>
+    <user9Name></user9Name>
+    <user9FontFace>Edwin</user9FontFace>
+    <user9FontSize>10</user9FontSize>
+    <user9LineSpacing>1</user9LineSpacing>
+    <user9FontSpatiumDependent>1</user9FontSpatiumDependent>
+    <user9FontStyle>0</user9FontStyle>
+    <user9Color r="0" g="0" b="0" a="255"/>
+    <user9Align>left,top</user9Align>
+    <user9Offset x="0" y="0"/>
+    <user9OffsetType>1</user9OffsetType>
+    <user9FrameType>0</user9FrameType>
+    <user9FramePadding>0.2</user9FramePadding>
+    <user9FrameWidth>0.1</user9FrameWidth>
+    <user9FrameRound>0</user9FrameRound>
+    <user9FrameFgColor r="0" g="0" b="0" a="255"/>
+    <user9FrameBgColor r="255" g="255" b="255" a="0"/>
+    <user9Position>left</user9Position>
+    <user10Name></user10Name>
+    <user10FontFace>Edwin</user10FontFace>
+    <user10FontSize>10</user10FontSize>
+    <user10LineSpacing>1</user10LineSpacing>
+    <user10FontSpatiumDependent>1</user10FontSpatiumDependent>
+    <user10FontStyle>0</user10FontStyle>
+    <user10Color r="0" g="0" b="0" a="255"/>
+    <user10Align>left,top</user10Align>
+    <user10Offset x="0" y="0"/>
+    <user10OffsetType>1</user10OffsetType>
+    <user10FrameType>0</user10FrameType>
+    <user10FramePadding>0.2</user10FramePadding>
+    <user10FrameWidth>0.1</user10FrameWidth>
+    <user10FrameRound>0</user10FrameRound>
+    <user10FrameFgColor r="0" g="0" b="0" a="255"/>
+    <user10FrameBgColor r="255" g="255" b="255" a="0"/>
+    <user10Position>left</user10Position>
+    <user11Name></user11Name>
+    <user11FontFace>Edwin</user11FontFace>
+    <user11FontSize>10</user11FontSize>
+    <user11LineSpacing>1</user11LineSpacing>
+    <user11FontSpatiumDependent>1</user11FontSpatiumDependent>
+    <user11FontStyle>0</user11FontStyle>
+    <user11Color r="0" g="0" b="0" a="255"/>
+    <user11Align>left,top</user11Align>
+    <user11Offset x="0" y="0"/>
+    <user11OffsetType>1</user11OffsetType>
+    <user11FrameType>0</user11FrameType>
+    <user11FramePadding>0.2</user11FramePadding>
+    <user11FrameWidth>0.1</user11FrameWidth>
+    <user11FrameRound>0</user11FrameRound>
+    <user11FrameFgColor r="0" g="0" b="0" a="255"/>
+    <user11FrameBgColor r="255" g="255" b="255" a="0"/>
+    <user11Position>left</user11Position>
+    <user12Name></user12Name>
+    <user12FontFace>Edwin</user12FontFace>
+    <user12FontSize>10</user12FontSize>
+    <user12LineSpacing>1</user12LineSpacing>
+    <user12FontSpatiumDependent>1</user12FontSpatiumDependent>
+    <user12FontStyle>0</user12FontStyle>
+    <user12Color r="0" g="0" b="0" a="255"/>
+    <user12Align>left,top</user12Align>
+    <user12Offset x="0" y="0"/>
+    <user12OffsetType>1</user12OffsetType>
+    <user12FrameType>0</user12FrameType>
+    <user12FramePadding>0.2</user12FramePadding>
+    <user12FrameWidth>0.1</user12FrameWidth>
+    <user12FrameRound>0</user12FrameRound>
+    <user12FrameFgColor r="0" g="0" b="0" a="255"/>
+    <user12FrameBgColor r="255" g="255" b="255" a="0"/>
+    <user12Position>left</user12Position>
+    <letRingFontFace>Edwin</letRingFontFace>
+    <letRingFontSize>10</letRingFontSize>
+    <letRingLineSpacing>1</letRingLineSpacing>
+    <letRingFontSpatiumDependent>1</letRingFontSpatiumDependent>
+    <letRingFontStyle>0</letRingFontStyle>
+    <letRingColor r="0" g="0" b="0" a="255"/>
+    <letRingTextAlign>left,center</letRingTextAlign>
+    <letRingHookHeight>0.6</letRingHookHeight>
+    <letRingPlacement>1</letRingPlacement>
+    <letRingPosAbove x="0" y="0"/>
+    <letRingPosBelow x="0" y="0"/>
+    <letRingLineWidth>0.11</letRingLineWidth>
+    <letRingLineStyle>dashed</letRingLineStyle>
+    <letRingDashLineLen>5</letRingDashLineLen>
+    <letRingDashGapLen>5</letRingDashGapLen>
+    <letRingText>let ring</letRingText>
+    <letRingFrameType>0</letRingFrameType>
+    <letRingFramePadding>0.2</letRingFramePadding>
+    <letRingFrameWidth>0.1</letRingFrameWidth>
+    <letRingFrameRound>0</letRingFrameRound>
+    <letRingFrameFgColor r="0" g="0" b="0" a="255"/>
+    <letRingFrameBgColor r="255" g="255" b="255" a="0"/>
+    <letRingPosition>left</letRingPosition>
+    <letRingEndHookType>3</letRingEndHookType>
+    <letRingOffset x="0" y="0"/>
+    <whammyBarFontFace>Edwin</whammyBarFontFace>
+    <whammyBarFontSize>10</whammyBarFontSize>
+    <whammyBarLineSpacing>1</whammyBarLineSpacing>
+    <whammyBarFontSpatiumDependent>1</whammyBarFontSpatiumDependent>
+    <whammyBarFontStyle>0</whammyBarFontStyle>
+    <whammyBarColor r="0" g="0" b="0" a="255"/>
+    <whammyBarTextAlign>left,center</whammyBarTextAlign>
+    <whammyBarHookHeight>0.6</whammyBarHookHeight>
+    <whammyBarPlacement>1</whammyBarPlacement>
+    <whammyBarPosAbove x="0" y="0"/>
+    <whammyBarPosBelow x="0" y="0"/>
+    <whammyBarLineWidth>0.11</whammyBarLineWidth>
+    <whammyBarLineStyle>dashed</whammyBarLineStyle>
+    <whammyBarDashLineLen>5</whammyBarDashLineLen>
+    <whammyBarDashGapLen>5</whammyBarDashGapLen>
+    <whammyBarText>w/bar</whammyBarText>
+    <whammyBarFrameType>0</whammyBarFrameType>
+    <whammyBarFramePadding>0.2</whammyBarFramePadding>
+    <whammyBarFrameWidth>0.1</whammyBarFrameWidth>
+    <whammyBarFrameRound>0</whammyBarFrameRound>
+    <whammyBarFrameFgColor r="0" g="0" b="0" a="255"/>
+    <whammyBarFrameBgColor r="255" g="255" b="255" a="0"/>
+    <whammyBarPosition>left</whammyBarPosition>
+    <whammyBarEndHookType>3</whammyBarEndHookType>
+    <whammyBarOffset x="0" y="0"/>
+    <palmMuteFontFace>Edwin</palmMuteFontFace>
+    <palmMuteFontSize>10</palmMuteFontSize>
+    <palmMuteLineSpacing>1</palmMuteLineSpacing>
+    <palmMuteFontSpatiumDependent>1</palmMuteFontSpatiumDependent>
+    <palmMuteFontStyle>0</palmMuteFontStyle>
+    <palmMuteColor r="0" g="0" b="0" a="255"/>
+    <palmMuteTextAlign>left,center</palmMuteTextAlign>
+    <palmMuteHookHeight>0.6</palmMuteHookHeight>
+    <palmMutePlacement>1</palmMutePlacement>
+    <palmMutePosAbove x="0" y="0"/>
+    <palmMutePosBelow x="0" y="0"/>
+    <palmMuteLineWidth>0.11</palmMuteLineWidth>
+    <palmMuteLineStyle>dashed</palmMuteLineStyle>
+    <palmMuteDashLineLen>5</palmMuteDashLineLen>
+    <palmMuteDashGapLen>5</palmMuteDashGapLen>
+    <palmMuteText>P.M.</palmMuteText>
+    <palmMuteFrameType>0</palmMuteFrameType>
+    <palmMuteFramePadding>0.2</palmMuteFramePadding>
+    <palmMuteFrameWidth>0.1</palmMuteFrameWidth>
+    <palmMuteFrameRound>0</palmMuteFrameRound>
+    <palmMuteFrameFgColor r="0" g="0" b="0" a="255"/>
+    <palmMuteFrameBgColor r="255" g="255" b="255" a="0"/>
+    <palmMutePosition>left</palmMutePosition>
+    <palmMuteEndHookType>3</palmMuteEndHookType>
+    <palmMuteOffset x="0" y="0"/>
+    <fermataPosAbove x="0" y="-0.5"/>
+    <fermataPosBelow x="0" y="0.5"/>
+    <fermataMinDistance>0.4</fermataMinDistance>
+    <fingeringPlacement>0</fingeringPlacement>
+    <articulationMinDistance>0.4</articulationMinDistance>
+    <fingeringMinDistance>0.5</fingeringMinDistance>
+    <hairpinMinDistance>0.7</hairpinMinDistance>
+    <letRingMinDistance>0.7</letRingMinDistance>
+    <ottavaMinDistance>0.7</ottavaMinDistance>
+    <palmMuteMinDistance>0.7</palmMuteMinDistance>
+    <pedalMinDistance>0.7</pedalMinDistance>
+    <repeatMinDistance>0.5</repeatMinDistance>
+    <textLineMinDistance>0.7</textLineMinDistance>
+    <systemTextLineMinDistance>0.7</systemTextLineMinDistance>
+    <trillMinDistance>0.5</trillMinDistance>
+    <vibratoMinDistance>1</vibratoMinDistance>
+    <voltaMinDistance>1</voltaMinDistance>
+    <figuredBassMinDistance>0.5</figuredBassMinDistance>
+    <tupletMinDistance>0.5</tupletMinDistance>
+    <slurShowTabSimple>1</slurShowTabSimple>
+    <slurShowTabCommon>1</slurShowTabCommon>
+    <fermataShowTabSimple>1</fermataShowTabSimple>
+    <fermataShowTabCommon>1</fermataShowTabCommon>
+    <dynamicsShowTabSimple>1</dynamicsShowTabSimple>
+    <dynamicsShowTabCommon>1</dynamicsShowTabCommon>
+    <hairpinShowTabSimple>1</hairpinShowTabSimple>
+    <hairpinShowTabCommon>1</hairpinShowTabCommon>
+    <accentShowTabSimple>1</accentShowTabSimple>
+    <accentShowTabCommon>1</accentShowTabCommon>
+    <staccatoShowTabSimple>1</staccatoShowTabSimple>
+    <staccatoShowTabCommon>1</staccatoShowTabCommon>
+    <harmonicMarkShowTabSimple>1</harmonicMarkShowTabSimple>
+    <harmonicMarkShowTabCommon>1</harmonicMarkShowTabCommon>
+    <letRingShowTabSimple>1</letRingShowTabSimple>
+    <letRingShowTabCommon>1</letRingShowTabCommon>
+    <palmMuteShowTabSimple>1</palmMuteShowTabSimple>
+    <palmMuteShowTabCommon>1</palmMuteShowTabCommon>
+    <rasgueadoShowTabSimple>1</rasgueadoShowTabSimple>
+    <rasgueadoShowTabCommon>1</rasgueadoShowTabCommon>
+    <mordentShowTabSimple>1</mordentShowTabSimple>
+    <mordentShowTabCommon>1</mordentShowTabCommon>
+    <turnShowTabSimple>1</turnShowTabSimple>
+    <turnShowTabCommon>1</turnShowTabCommon>
+    <wahShowTabSimple>1</wahShowTabSimple>
+    <wahShowTabCommon>1</wahShowTabCommon>
+    <golpeShowTabSimple>1</golpeShowTabSimple>
+    <golpeShowTabCommon>1</golpeShowTabCommon>
+    <tabShowTiedFret>0</tabShowTiedFret>
+    <tabParenthesizeTiedFret>0</tabParenthesizeTiedFret>
+    <parenthesizeTiedFretIfArticulation>1</parenthesizeTiedFretIfArticulation>
+    <tabFretPadding>0.1</tabFretPadding>
+    <chordlineThickness>0.16</chordlineThickness>
+    <dummyMusicalSymbolsScale>1</dummyMusicalSymbolsScale>
+    <dummyMusicalSymbolSize>12</dummyMusicalSymbolSize>
+    <articulationMusicalSymbolSize>8</articulationMusicalSymbolSize>
+    <bendMusicalSymbolSize>8</bendMusicalSymbolSize>
+    <chordSymbolAMusicalSymbolSize>10</chordSymbolAMusicalSymbolSize>
+    <chordSymbolBMusicalSymbolSize>10</chordSymbolBMusicalSymbolSize>
+    <composerMusicalSymbolSize>10</composerMusicalSymbolSize>
+    <copyrightMusicalSymbolSize>9</copyrightMusicalSymbolSize>
+    <defaultMusicalSymbolSize>10</defaultMusicalSymbolSize>
+    <dynamicsMusicalSymbolSize>10</dynamicsMusicalSymbolSize>
+    <expressionMusicalSymbolSize>10</expressionMusicalSymbolSize>
+    <figuredBassMusicalSymbolSize>8</figuredBassMusicalSymbolSize>
+    <fingeringMusicalSymbolSize>8</fingeringMusicalSymbolSize>
+    <footerMusicalSymbolSize>9</footerMusicalSymbolSize>
+    <frameMusicalSymbolSize>10</frameMusicalSymbolSize>
+    <fretDiagramFingeringMusicalSymbolSize>6</fretDiagramFingeringMusicalSymbolSize>
+    <fretDiagramFretNumberMusicalSymbolSize>6</fretDiagramFretNumberMusicalSymbolSize>
+    <glissandoMusicalSymbolSize>8</glissandoMusicalSymbolSize>
+    <groupBracketMusicalSymbolSize>10</groupBracketMusicalSymbolSize>
+    <hairpinMusicalSymbolSize>10</hairpinMusicalSymbolSize>
+    <hammerOnPullOffTappingMusicalSymbolSize>8</hammerOnPullOffTappingMusicalSymbolSize>
+    <harpPedalDiagramMusicalSymbolSize>10</harpPedalDiagramMusicalSymbolSize>
+    <harpPedalTextDiagramMusicalSymbolSize>8</harpPedalTextDiagramMusicalSymbolSize>
+    <headerMusicalSymbolSize>9</headerMusicalSymbolSize>
+    <instrumentChangeMusicalSymbolSize>10</instrumentChangeMusicalSymbolSize>
+    <letRingMusicalSymbolSize>10</letRingMusicalSymbolSize>
+    <lhGuitarFingeringMusicalSymbolSize>8</lhGuitarFingeringMusicalSymbolSize>
+    <longInstrumentMusicalSymbolSize>10</longInstrumentMusicalSymbolSize>
+    <lyricistMusicalSymbolSize>10</lyricistMusicalSymbolSize>
+    <lyricsEvenMusicalSymbolSize>10</lyricsEvenMusicalSymbolSize>
+    <lyricsOddMusicalSymbolSize>10</lyricsOddMusicalSymbolSize>
+    <measureNumberAlternateMusicalSymbolSize>10</measureNumberAlternateMusicalSymbolSize>
+    <measureNumberMusicalSymbolSize>8</measureNumberMusicalSymbolSize>
+    <metronomeMusicalSymbolSize>12</metronomeMusicalSymbolSize>
+    <mmRestRangeMusicalSymbolSize>8</mmRestRangeMusicalSymbolSize>
+    <nashvilleNumberMusicalSymbolSize>12</nashvilleNumberMusicalSymbolSize>
+    <noteLineMusicalSymbolSize>10</noteLineMusicalSymbolSize>
+    <ottavaMusicalSymbolSize>10</ottavaMusicalSymbolSize>
+    <pageNumberMusicalSymbolSize>11</pageNumberMusicalSymbolSize>
+    <palmMuteMusicalSymbolSize>10</palmMuteMusicalSymbolSize>
+    <whammyBarMusicalSymbolSize>10</whammyBarMusicalSymbolSize>
+    <partInstrumentMusicalSymbolSize>14</partInstrumentMusicalSymbolSize>
+    <pedalMusicalSymbolSize>10</pedalMusicalSymbolSize>
+    <rehearsalMarkMusicalSymbolSize>14</rehearsalMarkMusicalSymbolSize>
+    <repeatLeftMusicalSymbolSize>18</repeatLeftMusicalSymbolSize>
+    <repeatPlayCountMusicalSymbolSize>10</repeatPlayCountMusicalSymbolSize>
+    <repeatRightMusicalSymbolSize>18</repeatRightMusicalSymbolSize>
+    <rhGuitarFingeringMusicalSymbolSize>8</rhGuitarFingeringMusicalSymbolSize>
+    <romanNumeralMusicalSymbolSize>12</romanNumeralMusicalSymbolSize>
+    <shortInstrumentMusicalSymbolSize>10</shortInstrumentMusicalSymbolSize>
+    <staffTextMusicalSymbolSize>10</staffTextMusicalSymbolSize>
+    <stickingMusicalSymbolSize>10</stickingMusicalSymbolSize>
+    <stringNumberMusicalSymbolSize>8</stringNumberMusicalSymbolSize>
+    <stringTuningsMusicalSymbolSize>9</stringTuningsMusicalSymbolSize>
+    <subTitleMusicalSymbolSize>14</subTitleMusicalSymbolSize>
+    <systemTextLineMusicalSymbolSize>10</systemTextLineMusicalSymbolSize>
+    <systemTextMusicalSymbolSize>10</systemTextMusicalSymbolSize>
+    <tabFretNumberMusicalSymbolSize>9</tabFretNumberMusicalSymbolSize>
+    <tempoChangeMusicalSymbolSize>12</tempoChangeMusicalSymbolSize>
+    <tempoMusicalSymbolSize>20</tempoMusicalSymbolSize>
+    <textLineMusicalSymbolSize>10</textLineMusicalSymbolSize>
+    <titleMusicalSymbolSize>22</titleMusicalSymbolSize>
+    <translatorMusicalSymbolSize>10</translatorMusicalSymbolSize>
+    <tupletMusicalSymbolSize>9</tupletMusicalSymbolSize>
+    <user1MusicalSymbolSize>10</user1MusicalSymbolSize>
+    <user2MusicalSymbolSize>10</user2MusicalSymbolSize>
+    <user3MusicalSymbolSize>10</user3MusicalSymbolSize>
+    <user4MusicalSymbolSize>10</user4MusicalSymbolSize>
+    <user5MusicalSymbolSize>10</user5MusicalSymbolSize>
+    <user6MusicalSymbolSize>10</user6MusicalSymbolSize>
+    <user7MusicalSymbolSize>10</user7MusicalSymbolSize>
+    <user8MusicalSymbolSize>10</user8MusicalSymbolSize>
+    <user9MusicalSymbolSize>10</user9MusicalSymbolSize>
+    <user10MusicalSymbolSize>10</user10MusicalSymbolSize>
+    <user11MusicalSymbolSize>10</user11MusicalSymbolSize>
+    <user12MusicalSymbolSize>10</user12MusicalSymbolSize>
+    <voltaMusicalSymbolSize>11</voltaMusicalSymbolSize>
+    <autoplaceEnabled>1</autoplaceEnabled>
+    <defaultsVersion>500</defaultsVersion>
+    <changesBeforeBarlineRepeats>1</changesBeforeBarlineRepeats>
+    <changesBeforeBarlineOtherJumps>1</changesBeforeBarlineOtherJumps>
+    <placeClefsBeforeRepeats>0</placeClefsBeforeRepeats>
+    <changesBetweenEndStartRepeat>1</changesBetweenEndStartRepeat>
+    <showCourtesiesRepeats>1</showCourtesiesRepeats>
+    <useParensRepeatCourtesies>1</useParensRepeatCourtesies>
+    <showCourtesiesOtherJumps>1</showCourtesiesOtherJumps>
+    <useParensOtherJumpCourtesies>1</useParensOtherJumpCourtesies>
+    <showCourtesiesAfterCancellingRepeats>1</showCourtesiesAfterCancellingRepeats>
+    <useParensRepeatCourtesiesAfterCancelling>1</useParensRepeatCourtesiesAfterCancelling>
+    <showCourtesiesAfterCancellingOtherJumps>1</showCourtesiesAfterCancellingOtherJumps>
+    <useParensOtherJumpCourtesiesAfterCancelling>1</useParensOtherJumpCourtesiesAfterCancelling>
+    <smallParens>1</smallParens>
+    <harmonyParenUseSmuflSym>0</harmonyParenUseSmuflSym>
+    <repeatPlayCountPreset>nx</repeatPlayCountPreset>
+    <repeatPlayCountShow>1</repeatPlayCountShow>
+    <repeatPlayCountShowSingleRepeats>0</repeatPlayCountShowSingleRepeats>
+    <systemObjectsBelowBottomStaff>0</systemObjectsBelowBottomStaff>
+    <gradualTempoChangeBeginLineArrowHeight>1</gradualTempoChangeBeginLineArrowHeight>
+    <gradualTempoChangeBeginLineArrowWidth>0.5</gradualTempoChangeBeginLineArrowWidth>
+    <gradualTempoChangeEndLineArrowHeight>1</gradualTempoChangeEndLineArrowHeight>
+    <gradualTempoChangeEndLineArrowWidth>0.5</gradualTempoChangeEndLineArrowWidth>
+    <hairpinBeginLineArrowHeight>1</hairpinBeginLineArrowHeight>
+    <hairpinBeginLineArrowWidth>0.5</hairpinBeginLineArrowWidth>
+    <hairpinEndLineArrowHeight>1</hairpinEndLineArrowHeight>
+    <hairpinEndLineArrowWidth>0.5</hairpinEndLineArrowWidth>
+    <noteLineBeginLineArrowHeight>1</noteLineBeginLineArrowHeight>
+    <noteLineBeginLineArrowWidth>0.5</noteLineBeginLineArrowWidth>
+    <noteLineEndLineArrowHeight>1</noteLineEndLineArrowHeight>
+    <noteLineEndLineArrowWidth>0.5</noteLineEndLineArrowWidth>
+    <ottavaBeginLineArrowHeight>1</ottavaBeginLineArrowHeight>
+    <ottavaBeginLineArrowWidth>0.5</ottavaBeginLineArrowWidth>
+    <ottavaEndLineArrowHeight>1</ottavaEndLineArrowHeight>
+    <ottavaEndLineArrowWidth>0.5</ottavaEndLineArrowWidth>
+    <pedalBeginLineArrowHeight>1</pedalBeginLineArrowHeight>
+    <pedalBeginLineArrowWidth>0.5</pedalBeginLineArrowWidth>
+    <pedalEndLineArrowHeight>1</pedalEndLineArrowHeight>
+    <pedalEndLineArrowWidth>0.5</pedalEndLineArrowWidth>
+    <textLineBeginLineArrowHeight>1</textLineBeginLineArrowHeight>
+    <textLineBeginLineArrowWidth>0.5</textLineBeginLineArrowWidth>
+    <textLineEndLineArrowHeight>1</textLineEndLineArrowHeight>
+    <textLineEndLineArrowWidth>0.5</textLineEndLineArrowWidth>
+    <palmMuteBeginLineArrowHeight>1</palmMuteBeginLineArrowHeight>
+    <palmMuteBeginLineArrowWidth>0.5</palmMuteBeginLineArrowWidth>
+    <palmMuteEndLineArrowHeight>1</palmMuteEndLineArrowHeight>
+    <palmMuteEndLineArrowWidth>0.5</palmMuteEndLineArrowWidth>
+    <gradualTempoChangeBeginFilledArrowHeight>1</gradualTempoChangeBeginFilledArrowHeight>
+    <gradualTempoChangeBeginFilledArrowWidth>0.85</gradualTempoChangeBeginFilledArrowWidth>
+    <gradualTempoChangeEndFilledArrowHeight>1</gradualTempoChangeEndFilledArrowHeight>
+    <gradualTempoChangeEndFilledArrowWidth>0.85</gradualTempoChangeEndFilledArrowWidth>
+    <hairpinBeginFilledArrowHeight>1</hairpinBeginFilledArrowHeight>
+    <hairpinBeginFilledArrowWidth>0.85</hairpinBeginFilledArrowWidth>
+    <hairpinEndFilledArrowHeight>1</hairpinEndFilledArrowHeight>
+    <hairpinEndFilledArrowWidth>0.85</hairpinEndFilledArrowWidth>
+    <noteLineBeginFilledArrowHeight>1</noteLineBeginFilledArrowHeight>
+    <noteLineBeginFilledArrowWidth>0.85</noteLineBeginFilledArrowWidth>
+    <noteLineEndFilledArrowHeight>1</noteLineEndFilledArrowHeight>
+    <noteLineEndFilledArrowWidth>0.85</noteLineEndFilledArrowWidth>
+    <ottavaBeginFilledArrowHeight>1</ottavaBeginFilledArrowHeight>
+    <ottavaBeginFilledArrowWidth>0.85</ottavaBeginFilledArrowWidth>
+    <ottavaEndFilledArrowHeight>1</ottavaEndFilledArrowHeight>
+    <ottavaEndFilledArrowWidth>0.85</ottavaEndFilledArrowWidth>
+    <pedalBeginFilledArrowHeight>1</pedalBeginFilledArrowHeight>
+    <pedalBeginFilledArrowWidth>0.85</pedalBeginFilledArrowWidth>
+    <pedalEndFilledArrowHeight>1</pedalEndFilledArrowHeight>
+    <pedalEndFilledArrowWidth>0.85</pedalEndFilledArrowWidth>
+    <textLineBeginFilledArrowHeight>1</textLineBeginFilledArrowHeight>
+    <textLineBeginFilledArrowWidth>0.85</textLineBeginFilledArrowWidth>
+    <textLineEndFilledArrowHeight>1</textLineEndFilledArrowHeight>
+    <textLineEndFilledArrowWidth>0.85</textLineEndFilledArrowWidth>
+    <palmMuteBeginFilledArrowHeight>1</palmMuteBeginFilledArrowHeight>
+    <palmMuteBeginFilledArrowWidth>0.85</palmMuteBeginFilledArrowWidth>
+    <palmMuteEndFilledArrowHeight>1</palmMuteEndFilledArrowHeight>
+    <palmMuteEndFilledArrowWidth>0.85</palmMuteEndFilledArrowWidth>
+    <spatium>1.75</spatium>
+    </Style>
+    <eid>ohtXAPnvEdD_MV2ryD59wGJ</eid>
     <Division>480</Division>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
@@ -26,9 +2082,9 @@
     <metaTag name="workNumber"></metaTag>
     <metaTag name="workTitle">Untitled score</metaTag>
     <Part id="1">
-      <eid>00qWeYMzwWB_LaeZAOwdkRO</eid>
+      <eid>E8SsFvEjruO_F1iY212JcRP</eid>
       <Staff>
-        <eid>XnqkLuhDXbM_hZCn9nLbNIM</eid>
+        <eid>vuKQQG5QxuO_Y3AjTmD1mAG</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
@@ -40,7 +2096,7 @@
         <barLineSpan>1</barLineSpan>
         </Staff>
       <Staff>
-        <eid>5F3xCmm1gqO_nSKswAcMmsN</eid>
+        <eid>FIaJbUlknGM_t06/Zt5U+</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
@@ -105,9 +2161,9 @@
         </Instrument>
       </Part>
     <Part id="2">
-      <eid>/2TlBeBwj7N_wrbnxGp+1s</eid>
+      <eid>1PfeCGJhZdK_pqerp/xosjO</eid>
       <Staff>
-        <eid>QcZd2knjD8G_WM1onqKA8JB</eid>
+        <eid>IpYsy6gVdOD_8Thy/dRVKhM</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
@@ -132,66 +2188,66 @@
     <Staff id="1">
       <VBox>
         <height>10</height>
-        <eid>J3rVsAjBZMF_gdK1JPbohVJ</eid>
+        <eid>R1ezMplHiTB_l6w4hfXg0rH</eid>
         <Text>
           <style>title</style>
-          <eid>RmrJCmwzSyE_WMDbkiA0X7G</eid>
+          <eid>ltaccG921OM_Ez7oZtJa6jD</eid>
           <text>Dynamics on voices</text>
           </Text>
         </VBox>
       <Measure>
-        <eid>PQhU+FZd5ZB_gyuzRCnr2+</eid>
+        <eid>cSJHFjSOE0F_4q/ADgJOBmH</eid>
         <voice>
           <KeySig>
-            <eid>HCQmiOjWWdG_8qKqa64wO4J</eid>
+            <eid>5hrJsxCFfEM_5ZM+0WqCibN</eid>
             <concertKey>0</concertKey>
             </KeySig>
           <TimeSig>
-            <eid>iBX9Te8FEuC_rhClpPN1hYB</eid>
+            <eid>FeY+VFPk2aL_8WcpUTCgqTG</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Dynamic>
             <subtype>ppp</subtype>
             <velocity>16</velocity>
-            <eid>GBq5bfKYl6B_H2BXS6JyEJE</eid>
+            <eid>kky0KlLFTCN_qI+evH4BI7G</eid>
             </Dynamic>
           <StaffText>
-            <eid>k+0rNAGpDsJ_8uGDNjvUUgH</eid>
+            <eid>waw7WhtA9hI_MURzruDo1uM</eid>
             <text>all voices</text>
             </StaffText>
           <Chord>
-            <eid>ih/zCx4zyeO_QU+hyUHk7AD</eid>
+            <eid>eBjqJuyhYQF_6XBjCDdg9uJ</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>mYGtTq/ckKF_Bg1K+sf00gE</eid>
+              <eid>EjUy8yViE4K_I+JmGPbPsoI</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>qQcrr06BWlP_756Omd8nnZJ</eid>
+            <eid>g79BnsMnwsL_2P430k8nUCP</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>MC7Dr7kFjlF_RscQ1QAiSFK</eid>
+              <eid>PmfcYsdfZWO_5iMVC5O5gyI</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>0WgzgmbYLbF_uncpTJzxl9G</eid>
+            <eid>3jrcq52pw/I_Mq15El/C1eB</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>3EldbaIyu7P_xdBSJpRlFnL</eid>
+              <eid>OLlZenx9rkF_nRVh5x+n6NM</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>kVBmzY/ervK_hyOzoCEsDKE</eid>
+            <eid>zO8b9yyVkJF_cjEYf0qIxuL</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>i6+JhVVrq1M_jWwKl30HexO</eid>
+              <eid>mxTCy0Dm3aO_XFrxqYv5fYF</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
@@ -199,37 +2255,37 @@
           </voice>
         <voice>
           <Chord>
-            <eid>egBinrfYuzO_YiPRBVSX0tM</eid>
+            <eid>EjhLKVPyzWL_qennK5fV8cH</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>9YgWaDo7IF_73ny9FOrGPN</eid>
+              <eid>Oc9cTo0FXiD_OpLSEL0a5H</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>QojXpe2QucO_x72/0F/61eN</eid>
+            <eid>sMwAwZ7P2AK_ql5Dgs+KApG</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>/72B8mvtfDN_+BirGps+7dI</eid>
+              <eid>ie3KyWx6dHC_E/PskqYJXhM</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>CLSwxUpGYqK_eAcjlyZvqMO</eid>
+            <eid>RjSI8CzcLO_hKLOMZcll9M</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>mJ/4lxEv3tE_NJAuHR9qTS</eid>
+              <eid>fugq0VU94hI_5ODYS9nYGc</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>iBGGalDYAFE_DaJPqPAq6lJ</eid>
+            <eid>AdDe/AE8DbM_0iPoity+M9M</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>xhfWh9Kw7gP_qPfuKPAWA+I</eid>
+              <eid>obdyn9PnfSG_387BwNRzXSM</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
@@ -237,44 +2293,44 @@
           </voice>
         </Measure>
       <Measure>
-        <eid>zieNXemw5vG_ngTBopu19dH</eid>
+        <eid>TQ8xBPor6JD_SS2idmADFTL</eid>
         <voice>
           <StaffText>
-            <eid>wLKBSrTsXrJ_vGhboJLLjPG</eid>
+            <eid>QUZz4mzgQgI_SRlH+iaB+iE</eid>
             <text>2nd voice</text>
             </StaffText>
           <Chord>
-            <eid>7I0h4AwPDCN_k+EAk2qhnfE</eid>
+            <eid>sp0Q8j/ntiI_WhWbO11ZkKM</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>Qcsw0Gd6s5E_jozjjZU7S8</eid>
+              <eid>afgXpp7sImB_7Nk0FnV71WD</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>9RrptdVBvOL_X58B6X4n/PH</eid>
+            <eid>q2nFXgmsZwJ_LCbjeedU9wO</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>qwY7b6qLktB_AYUrZ/c96OK</eid>
+              <eid>tluULRKowpH_RYyn1rlk0jP</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>9S4H5SqTw5K_H01YUip0XVO</eid>
+            <eid>GiUKFIMYKeD_m0XdpzGdTJH</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>DmrGulREHFM_4CU10mXP2XB</eid>
+              <eid>woRq42cg2YK_mUKsLBpONDO</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>zNXg2QnbnmL_0OcZsGB4U7N</eid>
+            <eid>QcSWN5OedED_+zPnI/VHBQE</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>sBagG3sPBJM_IE0SUz1GFG</eid>
+              <eid>GfdfJc6GN0B_iKsT0vmksBB</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
@@ -285,40 +2341,40 @@
             <subtype>pp</subtype>
             <velocity>33</velocity>
             <voiceAssignment>currentVoiceOnly</voiceAssignment>
-            <eid>4/NdL1JEYq_TpssvIPkenE</eid>
+            <eid>kJqu0u6p1JE_AW6YZ8kBULL</eid>
             </Dynamic>
           <Chord>
-            <eid>nY/M0OYA+pL_L4yr89Pl80D</eid>
+            <eid>oiDixN6ikvC_lrMsHra/oUK</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>mUoWkrBEimH_ACFiIb6FdjI</eid>
+              <eid>o7566ZyFxUE_WuXJUWyQnXK</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>tHQ35hYvDWE_xS/rJ3UOv7M</eid>
+            <eid>lCxd3Em4McL_KLitiL7BjTP</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>bV6MurchxZO_FBFRrYFrFpM</eid>
+              <eid>+ZdOvutAPT_RbHKYGu5lIM</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>Ads1I0zmNkD_Y3sARNrY8EC</eid>
+            <eid>/5Lhpj3aDoP_xxrnYcAWUwF</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>XWZBuG+sHhP_u3/MZ6cK1oN</eid>
+              <eid>B/FxSI/+TFK_ASghJWrYoKH</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>XrEdusRbS2N_Z5xm0/F8aBE</eid>
+            <eid>01cEUHwBYUC_OaUt1d7Z13N</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>xTUSRRdY8JJ_j7yc6AC/FqN</eid>
+              <eid>76/EoDAdovL_jhBzKPLZAMI</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
@@ -326,51 +2382,51 @@
           </voice>
         </Measure>
       <Measure>
-        <eid>4iwgtGARBSL_uxD1LWUsoT</eid>
+        <eid>y547NUinYxC_u7uBBRZzvfM</eid>
         <voice>
           <Dynamic>
             <subtype>mf</subtype>
             <velocity>80</velocity>
             <voiceAssignment>currentVoiceOnly</voiceAssignment>
-            <eid>dnUIi/W5x9D_50GdFTMutLB</eid>
+            <eid>YKAJPzKSAmP_Su1m4bU8HRF</eid>
             </Dynamic>
           <Chord>
-            <eid>C54sESv9DJN_7ch0A7r+tLG</eid>
+            <eid>5SLwx7O8SzK_gR5hBXdMTcB</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>MqEYlhY/0HN_bGGkwhB5jkC</eid>
+              <eid>EV9hjkwRiDK_6IOZYA60OqO</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <StaffText>
-            <eid>V4xrIiNNH8L_H/d1/dj+QeP</eid>
+            <eid>4aaxVCghNMG_vSP5cEd/RAK</eid>
             <offset x="0.316952" y="-0.23771"/>
             <text>1st voice</text>
             </StaffText>
           <Chord>
-            <eid>pWfQrNRMip_gD/pPrU3R4H</eid>
+            <eid>wIrU/LqlD7M_tWKZ7S6t7FO</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>UyqBXnhO32C_jM2gvG42EMN</eid>
+              <eid>UZOqTNHAGAN_hJEj1E1Pk5I</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>j7ywjg6kDZF_ItAF3kkOBIO</eid>
+            <eid>JKb5VP1ibxC_ORxw4ulheh</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>Cj10PcjdDvJ_Hqk9NhPWpaE</eid>
+              <eid>6m/Jxp59i/I_Pg3KMU1KzGJ</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>N55T64HZdrM_Z4e2Az9jjTJ</eid>
+            <eid>ZDP9O6BjSiD_jfsH0bxr1wK</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>0jRph+oth4H_XROuEUxfMlN</eid>
+              <eid>s8bjrkCKqkG_DcAjawoizyH</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
@@ -378,37 +2434,37 @@
           </voice>
         <voice>
           <Chord>
-            <eid>9ZdJwodwJ3E_Qj4vCTUtQPH</eid>
+            <eid>lgZmcz02XeO_1IMDuGPfniE</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>nY8a3Xc3+3C_bDOhZqs5DbJ</eid>
+              <eid>yZKMpAUQvsB_/45YLd3D9QC</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>tKquI7yKAQO_uqt1u9X7MMJ</eid>
+            <eid>Co+lS+rC70H_cxEYfSiWwBI</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>G5t0dm7P/6B_LXR9NPSfROI</eid>
+              <eid>DgcTo1HhjlO_WSXZciwjOJG</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>9dmwXPOkklH_LWltsCFdaxH</eid>
+            <eid>6NAu6eEcLJB_+B8eT2MPQwL</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>RtM8QdYtiUF_+T7lCAbPgtC</eid>
+              <eid>skFwc4aGVmO_p78jyDk7DOO</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>wvF5zVNpRKI_Wg8w1TbpEHP</eid>
+            <eid>N2wWhhI0CfF_+if2J+w+Zy</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>tHTfGql8bnL_hzWJDlIW1cP</eid>
+              <eid>4rLSsW7WSKK_wF6xBuEKokC</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
@@ -416,129 +2472,50 @@
           </voice>
         </Measure>
       <Measure>
-        <eid>Z6zPJluybsE_FLzS8n59/uP</eid>
+        <eid>5M4DQo2bx6L_6M6UEe1tQWL</eid>
         <voice>
           <Dynamic>
             <subtype>f</subtype>
             <velocity>96</velocity>
             <voiceAssignment>allInStaff</voiceAssignment>
-            <eid>7NY0s5KMAsI_1wqOZW44yFE</eid>
+            <eid>XZs6cdZwPqK_pfx/MxYuw+O</eid>
             </Dynamic>
           <StaffText>
-            <eid>rV8PS+wNowJ_2Uy5o2MLwlN</eid>
+            <eid>2VCAdoMu+U_lQhDRLXZLlH</eid>
             <text>all v on this staff</text>
             </StaffText>
           <Chord>
-            <eid>RKuEdHgtBCM_iKmQil1KiSL</eid>
+            <eid>ucTzN0yrOJG_mIqYjUv2MKJ</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>qTsR7xRcckB_XPuGvLQ743E</eid>
+              <eid>Eoqxe8SEMQK_ygECZj2MtxG</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>L8gw7DbmecG_PgWGh45R+WJ</eid>
+            <eid>XbnmvD9Fl6C_DkTwuipE/JC</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>t0RmqxQ04UH_r4WLRWi56xG</eid>
+              <eid>9YJbmAcBVcG_ojy+aPq9moF</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>pHHx7j1SfKG_v86mjqdRBoM</eid>
+            <eid>epOiCYU6XHI_4gkEW19MmaM</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>SYyzOxHvXqB_pwiOeM/TKsF</eid>
+              <eid>1bN3fnWoomJ_8W67DzzoAZJ</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>7L6T7lI1EsC_edO3bNNSPFJ</eid>
+            <eid>mHuvfRBgo5L_cLdwrhT7tgB</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>brENfyGiTlG_1lnNG1riozO</eid>
-              <pitch>65</pitch>
-              <tpc>13</tpc>
-              </Note>
-            </Chord>
-          </voice>
-        <voice>
-          <Chord>
-            <eid>RTPF48UQiwJ_fgprgoKn96N</eid>
-            <durationType>quarter</durationType>
-            <Note>
-              <eid>ZvesvgzpNHN_uUg5X/00+WP</eid>
-              <pitch>67</pitch>
-              <tpc>15</tpc>
-              </Note>
-            </Chord>
-          <Chord>
-            <eid>P1qKN2WdH5_rBQLnjjR5NJ</eid>
-            <durationType>quarter</durationType>
-            <Note>
-              <eid>6v19ZtiY9gG_aQaqURwN24D</eid>
-              <pitch>67</pitch>
-              <tpc>15</tpc>
-              </Note>
-            </Chord>
-          <Chord>
-            <eid>jhuD+H1DOSM_o0xPXrHXu/C</eid>
-            <durationType>quarter</durationType>
-            <Note>
-              <eid>VG6cC85LfkF_28QF3xg4WHG</eid>
-              <pitch>67</pitch>
-              <tpc>15</tpc>
-              </Note>
-            </Chord>
-          <Chord>
-            <eid>bCh0HgMhd8J_67nRp41e8ID</eid>
-            <durationType>quarter</durationType>
-            <Note>
-              <eid>8cgt98i1RtK_b4ubOLAs23P</eid>
-              <pitch>67</pitch>
-              <tpc>15</tpc>
-              </Note>
-            </Chord>
-          </voice>
-        </Measure>
-      <Measure>
-        <eid>CqN6oGeQS3P_fpEIMCtKzLP</eid>
-        <voice>
-          <Chord>
-            <eid>zgxyyqinLe_K+TZApt06NP</eid>
-            <durationType>quarter</durationType>
-            <Note>
-              <eid>Fbck4GuDUTE_jOcBmJR8miK</eid>
-              <pitch>65</pitch>
-              <tpc>13</tpc>
-              </Note>
-            </Chord>
-          <Chord>
-            <eid>4AHBrSFxIcE_Js2WJi99OGI</eid>
-            <durationType>quarter</durationType>
-            <Note>
-              <eid>2H6qa9f6AtH_W6bWwTAidYG</eid>
-              <pitch>65</pitch>
-              <tpc>13</tpc>
-              </Note>
-            </Chord>
-          <Chord>
-            <eid>Ru3KvjEkdcI_ZloiE4vYnXP</eid>
-            <durationType>quarter</durationType>
-            <Note>
-              <eid>LGXvSGEnLW_C8wK0zE5D0N</eid>
-              <pitch>65</pitch>
-              <tpc>13</tpc>
-              </Note>
-            </Chord>
-          <Chord>
-            <eid>mhm+HxIoLD_5JIo1ZbH/6J</eid>
-            <durationType>quarter</durationType>
-            <Note>
-              <eid>Adt8bmzVrzM_vFmiKJ26MZB</eid>
+              <eid>aHqiiYANAwJ_ZGzCslNGmm</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
@@ -546,37 +2523,37 @@
           </voice>
         <voice>
           <Chord>
-            <eid>9m09yez45CB_ZNVU6wMFxAH</eid>
+            <eid>uRNx6BMbp+O_hTn4CPTHfsN</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>r6/Ss9DbkaD_YAJUjs15VMG</eid>
+              <eid>7k2V76bTXnJ_NRioOvnErmJ</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>fCSiXlfMgMJ_itUzS7eGYKE</eid>
+            <eid>hbnCc6fWN7J_+ZVlk/Fa8XC</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>hx3oWsfY8gM_G+reKgNBAiK</eid>
+              <eid>5hLXrBfq3yF_r19rHxUTpmO</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>tQD79ZtvAjK_ltAexJLCqtN</eid>
+            <eid>fu7yy6gnnzC_cfD++fFAMfN</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>kdH6bwuN/PH_o+titJIcrEG</eid>
+              <eid>k0/UHuPo2EN_4qjdmIFuB6M</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>FS+Kv3CADkO_ciEdydBLAaD</eid>
+            <eid>l1aTUfLJWpM_zns1Py4WLAD</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>wssiauAiFsG_svYfBeT1xEE</eid>
+              <eid>HJDMftQhBKJ_KClIdjuLNaP</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
@@ -584,40 +2561,40 @@
           </voice>
         </Measure>
       <Measure>
-        <eid>Ckc3oGhQO2E_xf57dyyHLAL</eid>
+        <eid>2l4bDKsYK0I_OKl7fEe9h5K</eid>
         <voice>
           <Chord>
-            <eid>DeyZZCqLfUK_hbLZRz9q+HD</eid>
+            <eid>Oif4nDevcxF_ubtPvGttRwC</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>YN6Ar7gUriK_hqESfimMVCM</eid>
+              <eid>s/lCVX2+B9N_04hDMZG+cyJ</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>HweBUMH5bDJ_v6KXtzwcMwB</eid>
+            <eid>m0w4CM6g5wB_IPJM0ky4yGL</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>ZFv4h4eXfp_lHw1wjNs1vB</eid>
+              <eid>TUgBO54EZAI_GJz51p4ntzI</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>hvxTIFhG8KK_A0XVckJbM7E</eid>
+            <eid>GC4Qfmy3IjI_I483Uz3HwNH</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>X0GqSwGRmzJ_Gc8HP689f4N</eid>
+              <eid>6QFxOEkZ4rG_TzR3ZZohyAD</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>D7w0xUMJJVL_LnBFOTP46PN</eid>
+            <eid>0aTJivc2+zM_wg4mfbItsuH</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>W2LbFgWQhMF_9V2iHngngqI</eid>
+              <eid>jsm0NCIidnD_VkYiNjPf7kG</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
@@ -625,37 +2602,116 @@
           </voice>
         <voice>
           <Chord>
-            <eid>tUUv8UJCWGL_JnXWZasaggP</eid>
+            <eid>WCgO5+c0CWH_bp81ifJ6LQJ</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>T4hQn6NGhhE_9FKxK+j8q7H</eid>
+              <eid>E2Y8CNPvHWE_q1CnHg+BhJM</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>HFV3rvaVz5_lqbGJqWcUfB</eid>
+            <eid>yRtB4u+HCjP_PL3h3cnlkIJ</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>WPOJy5kbVCH_/NyJoXGDdKJ</eid>
+              <eid>ir/N1erR1nC_dXapyWsTZ8O</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>FeJHJ8JTrxG_c8/CHOedzZP</eid>
+            <eid>oXXH00Q1WmO_T2t4am0YPdP</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>vyBidpq+jCG_JYLmPkDOkBL</eid>
+              <eid>+gmHKKwUrFE_xVOkBaQSp0H</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>IjXoY5COtnH_vUYspKbBKhD</eid>
+            <eid>awC1Bz/H9zE_o8dslGLdMCB</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>rAwnq8zJ8KE_Oc7NXRop2gP</eid>
+              <eid>hc9bOQiwIlJ_wLZSdhRnLBI</eid>
+              <pitch>67</pitch>
+              <tpc>15</tpc>
+              </Note>
+            </Chord>
+          </voice>
+        </Measure>
+      <Measure>
+        <eid>jI/mkNDgL8G_1t/lD0SLWxO</eid>
+        <voice>
+          <Chord>
+            <eid>fs9oYAgeYmN_0XouVR8Z5ZH</eid>
+            <durationType>quarter</durationType>
+            <Note>
+              <eid>6JACgyU4SW_c7QYbOzJDK</eid>
+              <pitch>65</pitch>
+              <tpc>13</tpc>
+              </Note>
+            </Chord>
+          <Chord>
+            <eid>4BuQ8D6a5GE_BF9OYu8aO2M</eid>
+            <durationType>quarter</durationType>
+            <Note>
+              <eid>wbWMvpSGjgN_VE5jHA6I+j</eid>
+              <pitch>65</pitch>
+              <tpc>13</tpc>
+              </Note>
+            </Chord>
+          <Chord>
+            <eid>jlExGPeD0W_S1JU6mW4w5K</eid>
+            <durationType>quarter</durationType>
+            <Note>
+              <eid>egRmDqzOC5E_sNwLg/069bK</eid>
+              <pitch>65</pitch>
+              <tpc>13</tpc>
+              </Note>
+            </Chord>
+          <Chord>
+            <eid>4AXmLgaMl1L_Ey/xYHALssE</eid>
+            <durationType>quarter</durationType>
+            <Note>
+              <eid>576QPYWYGwF_OJIvu1E/OlL</eid>
+              <pitch>65</pitch>
+              <tpc>13</tpc>
+              </Note>
+            </Chord>
+          </voice>
+        <voice>
+          <Chord>
+            <eid>1wVllFaXg3I_nJ/RkTlNdBE</eid>
+            <durationType>quarter</durationType>
+            <Note>
+              <eid>3SEQxNqf6RI_9Z9GuTDRmfD</eid>
+              <pitch>67</pitch>
+              <tpc>15</tpc>
+              </Note>
+            </Chord>
+          <Chord>
+            <eid>g4n5VpXo2vG_r9dpKJEKFbE</eid>
+            <durationType>quarter</durationType>
+            <Note>
+              <eid>jVbBt+ui3UC_dXmf+ntZHWO</eid>
+              <pitch>67</pitch>
+              <tpc>15</tpc>
+              </Note>
+            </Chord>
+          <Chord>
+            <eid>lek+GSyt6YC_Z/xAeCrmdCC</eid>
+            <durationType>quarter</durationType>
+            <Note>
+              <eid>8/BVxfMo97G_aJ67RWNb6fE</eid>
+              <pitch>67</pitch>
+              <tpc>15</tpc>
+              </Note>
+            </Chord>
+          <Chord>
+            <eid>IbffQNNhb0O_w5OshiUrbF</eid>
+            <durationType>quarter</durationType>
+            <Note>
+              <eid>rwve7olKt4E_gz4btI2Yk5L</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
@@ -667,46 +2723,46 @@
       <Measure>
         <voice>
           <KeySig>
-            <eid>V6N2NuqlMeI_egWh45KAnqJ</eid>
+            <eid>WiDIKb71CUO_7FdS6Y5J/NE</eid>
             <concertKey>0</concertKey>
             </KeySig>
           <TimeSig>
-            <eid>rpfr/u9JrPG_LUoAXx31qsJ</eid>
+            <eid>op0gsm2tFvK_DYRXewjPyWH</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Chord>
-            <eid>rvHmGyph4PJ_xhfJHMhGNuE</eid>
+            <eid>kJ7Er9d8zRM_CK1m9L27TbC</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>wY7HpD8e8HB_8MtNTquoAeB</eid>
+              <eid>CVUUbLgGfTF_Y3RzoomM23H</eid>
               <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>2rodAIIry4P_dS6s1KOFr5</eid>
+            <eid>pmaX9DKjSHE_qxKiONlsb7P</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>SfJAzAOkki_JxCgZZz+MOE</eid>
+              <eid>sGOwJBl4OUI_kouxZVgcEnG</eid>
               <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>KoXjSPs9hnE_CBlXnO7AxFK</eid>
+            <eid>HhK9YTrphGE_6jpWoFsOfK</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>ZGbpoQW4e+B_yO+EeBDn4mO</eid>
+              <eid>o+JssmKCxM_TSrKN6eI9cJ</eid>
               <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>Dm6eh3t2b6K_BQUyHqcJZdC</eid>
+            <eid>kdFvm/9HIrM_WurRIW4QUgO</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>x1GFlXDN9EM_OyelClXZDBD</eid>
+              <eid>MTrq0sW0fxG_OCOvtvVhpNG</eid>
               <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
@@ -714,37 +2770,37 @@
           </voice>
         <voice>
           <Chord>
-            <eid>l9ZFsDIGxk_TkIIGIcSiIC</eid>
+            <eid>1wrYEI2ts2K_4Zwvum2VUbC</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>j6k35v6ibx_kchmmVirPSJ</eid>
+              <eid>qYfq6uCWW0G_l5jlxKqd9gM</eid>
               <pitch>47</pitch>
               <tpc>19</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>pDAwRyclU8B_9Wvm837hyUK</eid>
+            <eid>TjAdmkm9DoO_+bfyFzf36uL</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>FnN4fdljf1P_vpg/Hb4UMCF</eid>
+              <eid>QWOcMxaMrOC_2ImUhClQObK</eid>
               <pitch>47</pitch>
               <tpc>19</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>Ni0ChbTho/I_OU7UGVOp4ND</eid>
+            <eid>OsMFJJ7GoxM_WlBWcHm94RG</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>cnPyDA71WfN_4XnvRVFFYTJ</eid>
+              <eid>Ojgxg0xfg5G_40wKu4Bx54B</eid>
               <pitch>47</pitch>
               <tpc>19</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>qUP68vuAdWB_Rq6B2QQohSO</eid>
+            <eid>+W2OJAafX+E_lIn/4IhG3MJ</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>udy6ujGQkxE_ERiOxggeHGO</eid>
+              <eid>QB3np0s22TH_RL3eH0v3c2I</eid>
               <pitch>47</pitch>
               <tpc>19</tpc>
               </Note>
@@ -754,37 +2810,37 @@
       <Measure>
         <voice>
           <Chord>
-            <eid>GsDBIKf2u7P_4OoWVHrNlLC</eid>
+            <eid>ABgX8thkcfF_CcoqE9IOjMO</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>u0KYPyD5OT_KnvP0MFIw0L</eid>
+              <eid>7STikey41IK_FC8/iFX9BVG</eid>
               <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>4Ym8e03pmQI_UtDld8ZEbaO</eid>
+            <eid>Jd6FJQAh/tF_Lxxq0K6kPk</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>UfgwAcpFhxD_0OuGSodyGQ</eid>
+              <eid>Wq/1CbTDVYJ_wGam4B9ls7C</eid>
               <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>9qsiw1+jCBM_uLl3lMwPcYJ</eid>
+            <eid>stdUGRzStLM_lkbP9xtgy6G</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>NQ3QB/vijH_Gv3U6rE6TvG</eid>
+              <eid>YsrQSwJ5GMO_n6G39FZP2eJ</eid>
               <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>tDBrLu9U14K_XCpoXYqJoYB</eid>
+            <eid>qDdDBT9Q/LE_Fb0d8p4QyGH</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>WrW8bp+g3jN_6qSYLirg2FH</eid>
+              <eid>Jt18mwvWP6C_AsVNhBlNA+F</eid>
               <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
@@ -792,37 +2848,37 @@
           </voice>
         <voice>
           <Chord>
-            <eid>EVgSk0Kki6C_UuO1z6nAkvC</eid>
+            <eid>jAQRFcCqNRN_Yh/cMP0MqbL</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>33KKXoz/T8N_wUhViesmnKM</eid>
+              <eid>sgocAxl//5K_KWXa1uUYJTH</eid>
               <pitch>47</pitch>
               <tpc>19</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>v0/ZiO3nL4N_y8eJNEUK8+K</eid>
+            <eid>XI1ZS5Lr0iL_h6MrCxsC7nJ</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>W/ZcaDDEltP_87stIJV1RNN</eid>
+              <eid>YUA1tqho53B_3i4MJ0aveKG</eid>
               <pitch>47</pitch>
               <tpc>19</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>P/Im4ZgdGFB_AV9p+YefecF</eid>
+            <eid>Jf7JwifdtJL_Zf+Vl7RE+jO</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>Hnv0TZZi4OL_+O8bBH3bhwC</eid>
+              <eid>0XbGxTEwWoB_zL9/BlNO8t</eid>
               <pitch>47</pitch>
               <tpc>19</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>0BUOWaa+hbL_CVcftrXUqIF</eid>
+            <eid>4PtQlYD/BbM_lj3wWH8aCwK</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>i+6vgAH2p4M_6fiYWJp0o2O</eid>
+              <eid>Xxq38JW5e+C_7ZTA+i7BmVK</eid>
               <pitch>47</pitch>
               <tpc>19</tpc>
               </Note>
@@ -834,45 +2890,45 @@
           <Dynamic>
             <subtype>p</subtype>
             <velocity>49</velocity>
-            <eid>vMhik8v/RdI_KV3/DU2R3sL</eid>
+            <eid>LxUmkzHThNN_HZFjVCo0XSO</eid>
             </Dynamic>
           <Chord>
-            <eid>OfvsaO+kiXL_4OWtt/MuQ+B</eid>
+            <eid>1khZNWUDfoM_pRomenzNO4D</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>BrqoSZprb9N_hHscBtLWKtH</eid>
+              <eid>smfS7V/hFSH_a9BJyyYr9tO</eid>
               <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <StaffText>
-            <eid>BlfAwXvuTKB_UDALYZlTnKP</eid>
+            <eid>CoDNX1K4PZ_N5UPkqa9ijE</eid>
             <offset x="0.316952" y="-0.23771"/>
             <text>all voices</text>
             </StaffText>
           <Chord>
-            <eid>SFhToRqI6DO_muTu23xN6GO</eid>
+            <eid>QbWA3U5NAGC_SGdvyaYHkWP</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>lnV9hqGYiBC_TlHoPdXQxVE</eid>
+              <eid>7XSWavKfJNE_UfPAwWe3TbE</eid>
               <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>jrM3ewvEipO_PyxwrIHUZNG</eid>
+            <eid>D310zpbJoQF_lv9XjOiqo+E</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>ovwXIhB0zaG_R5jTaxdw4YB</eid>
+              <eid>GrxV/QepNLI_pc6NrbAwkEM</eid>
               <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>utu+hb9UN3M_yLsICvAEr9I</eid>
+            <eid>nBy3IJYZl0M_arTOI2oQQ3E</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>PtOKoNZlSJO_3GVyOj1mgbO</eid>
+              <eid>ocb1roSGTCK_DITgAhAb4yE</eid>
               <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
@@ -880,37 +2936,37 @@
           </voice>
         <voice>
           <Chord>
-            <eid>18YZ4A2/0N_tUUdPtZLJ0G</eid>
+            <eid>v2IaDUPVP3I_BBzmI9wU0iH</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>+yvkqcGklLK_XGW+ea4VgBI</eid>
+              <eid>X3Y03TPO38J_cPoZ6fXOF+H</eid>
               <pitch>47</pitch>
               <tpc>19</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>4+XdceJjWCC_T4d1Cy2W5/K</eid>
+            <eid>OZKpc7130AK_Nn4/gyDmboF</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>zLMKanMLhOI_LtPYha8X5XM</eid>
+              <eid>ynwkNjsy3o_xtHdl/lQD1M</eid>
               <pitch>47</pitch>
               <tpc>19</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>Q6FRtsWi3wP_tZ6u24lZ7HM</eid>
+            <eid>1qyXQQFQR1B_rIOh7LOm0U</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>3rl/KvY3buL_z3PBMDlbrHK</eid>
+              <eid>tVutWUcFAcJ_5S71+mzFL9H</eid>
               <pitch>47</pitch>
               <tpc>19</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>1UNXNDOZgSN_RvfcRFm0BaJ</eid>
+            <eid>5SDkBqGpzSG_KxEMdFl/+wJ</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>7kuI7ljQpSC_eWtTAmops0J</eid>
+              <eid>BInMCdHK35E_HCCsvGUS8cM</eid>
               <pitch>47</pitch>
               <tpc>19</tpc>
               </Note>
@@ -920,37 +2976,37 @@
       <Measure>
         <voice>
           <Chord>
-            <eid>20YaSL4jI6K_rLqsD0AHp4I</eid>
+            <eid>DH2z58W17RN_T742512thwO</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>U6MhfbhzH/O_3pD3TuQKv6</eid>
+              <eid>Iy6j89q3nyI_wZDFwMVjCVD</eid>
               <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>YjJ3cAgavyE_DM3ehC31vvK</eid>
+            <eid>YZvKe4GHTd_VYkyezZKqIH</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>eTKLHPsSamD_/ir0vgkWGFF</eid>
+              <eid>EqgqVFb9/bC_ZnBSWOwhq7</eid>
               <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>sOGNYh6lXWD_w2RjxaNi+VF</eid>
+            <eid>kMPcK/+ENMG_unqrhS2vuaL</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>5s7XW7BWAKJ_6Q4OIILu6fN</eid>
+              <eid>GwD61icgBUL_i/UZdM3qPYH</eid>
               <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>Duu2iTHR8+O_lpLvHalpoMP</eid>
+            <eid>1Cz+7pmRhHM_Qjfxk3GwDBP</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>2EVCJzOoVqN_HeefwvehJFI</eid>
+              <eid>1Re6qUeBbvO_WXl0QZZFWCN</eid>
               <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
@@ -958,37 +3014,37 @@
           </voice>
         <voice>
           <Chord>
-            <eid>cBdYBz9HExM_xof7YU1YAwO</eid>
+            <eid>npkPIa0Ez7_2PgxPJXY0J</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>81Mlwac2BzF_zUTMMauhdWE</eid>
+              <eid>M7SdeRuyTIJ_y3KBmkz8JmP</eid>
               <pitch>47</pitch>
               <tpc>19</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>OM7YumNkKrP_aGRvphOXxCJ</eid>
+            <eid>p73je9wlA6L_bnu6Xmo7MgJ</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>5FHna5ZKGMH_dnhNJAC93DG</eid>
+              <eid>StLaQUcNinE_O1qD9B+SLDE</eid>
               <pitch>47</pitch>
               <tpc>19</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>E9S0pefIHUC_gBCDRZiFU2N</eid>
+            <eid>rcy1ejvKZ4J_U+Ii1Gvn0GG</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>sUH4H4/AuKI_zUq+HoXka5F</eid>
+              <eid>sPkCwpL8R8P_ptSZ8VX34GP</eid>
               <pitch>47</pitch>
               <tpc>19</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>MZk8rh5DieG_2yX5slrRPC</eid>
+            <eid>pEKvlVhvG7G_AnvRdNL6nU</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>k4KIkRq00JL_MsU+cOgv3GK</eid>
+              <eid>6QWJxSIvg2G_ITTp83sNge</eid>
               <pitch>47</pitch>
               <tpc>19</tpc>
               </Note>
@@ -1000,44 +3056,44 @@
           <Dynamic>
             <subtype>ff</subtype>
             <velocity>112</velocity>
-            <eid>GYSWfSJAPOG_gvRVZ+TBzkM</eid>
+            <eid>Wc1FoSnBjy_PfyAD9vQUQC</eid>
             </Dynamic>
           <StaffText>
-            <eid>4pIjLBCjleB_huaBXdYBfEC</eid>
+            <eid>83irC4tIZ/M_ritBY82tJUN</eid>
             <text>all voices</text>
             </StaffText>
           <Chord>
-            <eid>90sTprULMgB_OE7UQX+SM/</eid>
+            <eid>DZGaggKHLME_H7xrPfZvY1H</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>ystYskjBHKF_9CFRTAwnmWD</eid>
+              <eid>n9HrGJfNz7B_GIji7ZUIgfK</eid>
               <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>GqgR5e1x7rF_ocnd9+tJJnO</eid>
+            <eid>IZOLew8KZGG_t0SRKBqiQuB</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>0+Q/btfAUVH_2air6DA7D+F</eid>
+              <eid>kWaB5yiUySH_IIIQ5caHPUM</eid>
               <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>RWwxIbL3J/B_thLBX2fKvYN</eid>
+            <eid>b9ATBpAO+dO_M3MLfCmCarK</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>MNjIkeJx1hP_FLRzDyBuKTI</eid>
+              <eid>5f+I1WBXhaE_YHxGldIR3+D</eid>
               <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>MwLyvXxOBaF_xYjXk+/QnDP</eid>
+            <eid>ujiql4yq9VE_UJL6wBaJejJ</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>VsgELisJnMF_v9t5sr/oayG</eid>
+              <eid>rR9+Xua2JBB_Lgp2kzSliUN</eid>
               <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
@@ -1045,37 +3101,37 @@
           </voice>
         <voice>
           <Chord>
-            <eid>hmDJfO9pEVG_jozc+mg+WlC</eid>
+            <eid>dkI2H9KJrtB_WhWA3EahCRN</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>S6y46b0uc0F_BjPKTUMBAtN</eid>
+              <eid>CeqUZlEIW4F_YiRp8bjJdz</eid>
               <pitch>47</pitch>
               <tpc>19</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>I9m4a459KtM_VjrQGQXmDIK</eid>
+            <eid>v+TGFRAu9NK_bUEULXth45</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>dEMYlE+ZxCE_lgP2ZzhqDm</eid>
+              <eid>FYyvtXev3HD_UtRkXn1hF/E</eid>
               <pitch>47</pitch>
               <tpc>19</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>ja03AHIB5kK_6VK9pmp0dyK</eid>
+            <eid>j1mJLJBK1PB_Q895k3jjQnE</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>gC5eRvEmroK_EEtpWO2eiSC</eid>
+              <eid>v0Y1S0+I2AO_knI3fSTDqqL</eid>
               <pitch>47</pitch>
               <tpc>19</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>s/8/AIze06E_9K2dFYPPRWN</eid>
+            <eid>Pb44gkVffdE_Vo2qXkdqxeJ</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>uqC3Pq1ztKJ_fXAyV9C0cXN</eid>
+              <eid>/ZN0lFOFB3L_l1//h5HobpL</eid>
               <pitch>47</pitch>
               <tpc>19</tpc>
               </Note>
@@ -1085,37 +3141,37 @@
       <Measure>
         <voice>
           <Chord>
-            <eid>dK1JLTPxpaL_REEtVazEbkG</eid>
+            <eid>HTIjEHOwcnC_WBNf1N+sXhF</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>UpRwG1KetSO_1H783ARgPpP</eid>
+              <eid>daQhdiws+bG_hdVlywFTSvF</eid>
               <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>x6T/gPSRrSN_n0qcXflTWm</eid>
+            <eid>Sqlb5FtADpN_YdzR8KHsWGE</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>8tPons3KykN_21iiLRsGbxL</eid>
+              <eid>u0wNQPvj79_D2FxdLniLjG</eid>
               <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>+9B60ZrGS4P_iW8E8YeH4TF</eid>
+            <eid>edHmRQzw+kH_elKtA/YqpZE</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>tQ7QXjoZo9E_hlu4goTCYNJ</eid>
+              <eid>fpvvSOraXnP_9xy9vAAECMK</eid>
               <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>M76EPv3sJc_h90cJQ92cYG</eid>
+            <eid>p9xlLleKhaP_rVH0N6eXZ7E</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>kDVVWBP6DzK_g1QDiC2RrfE</eid>
+              <eid>Nmcuwy+63sN_wzpNW+gJ+1K</eid>
               <pitch>45</pitch>
               <tpc>17</tpc>
               </Note>
@@ -1123,37 +3179,37 @@
           </voice>
         <voice>
           <Chord>
-            <eid>xHggHeaDg3C_+gGod7IhKyC</eid>
+            <eid>/ggPlvrCI7F_YhRcW2liZrN</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>HFmTDLAUj0D_Q+p5htCY5uK</eid>
+              <eid>WD9WTxe/1KD_JgxTLrJ7eQ</eid>
               <pitch>47</pitch>
               <tpc>19</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>liusF91QdaO_oCkIFwmJEZB</eid>
+            <eid>jPC6+8md/vO_GgbhlYM0xiP</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>yzk8PbA7SPI_B6DM2cjgbgC</eid>
+              <eid>oMH533WnnWI_9t1bAGJpaYF</eid>
               <pitch>47</pitch>
               <tpc>19</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>yMo13UxwkIB_29zIInkEKEN</eid>
+            <eid>ljAdfvYSY8B_YQYpiEV3oq</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>7kIdRum9WED_eEXfJCS95YF</eid>
+              <eid>AAEy9BALMi_p7XrCEgYfWJ</eid>
               <pitch>47</pitch>
               <tpc>19</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>cbnqN8yWryM_RZ1doz3CNsF</eid>
+            <eid>4oRyvO/CIKH_3SW+ixprW7B</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>ogsDCq0W6MJ_WZXCUz79XgI</eid>
+              <eid>rSnAJXvrKwP_0sN/9iEgToJ</eid>
               <pitch>47</pitch>
               <tpc>19</tpc>
               </Note>
@@ -1165,129 +3221,51 @@
       <Measure>
         <voice>
           <KeySig>
-            <eid>o2oy2SLu0VP_yA6KPMNKrhP</eid>
+            <eid>o6bHoHXFqvB_ZGh5F+R+ZsN</eid>
             <concertKey>0</concertKey>
             </KeySig>
           <TimeSig>
-            <eid>dL0dAwzEYCF_s1BpDGrcOpN</eid>
+            <eid>8A0GS9oiUQM_4/Cth5URV5I</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Dynamic>
             <subtype>mp</subtype>
             <velocity>64</velocity>
-            <eid>AnY7XQN9kMM_xJXVe6rJmFO</eid>
+            <eid>YXeJcjTHzGL_m69LX52UxKF</eid>
             </Dynamic>
           <Chord>
-            <eid>P5CqccNYjbL_NQJqFlHaijD</eid>
+            <eid>nkC10wNPIvL_zrJNVeGa7fP</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>cDHP+bK/gPN_PQaHZG/uUhB</eid>
+              <eid>dsR7mUSg+d_ajPt3fB3DLI</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>o922cihb6fN_dax754YbVnJ</eid>
+            <eid>eed6QL+iXsH_gC6ZkWPhMjM</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>sRxtMhPDYwC_jiUGSyWaqnG</eid>
+              <eid>T8Tydd7VLZB_aBtbztvh/pI</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>3bYsMQPRQoM_egLpggWAQ6G</eid>
+            <eid>2saiCbDNYaE_mDwhXzmLWbH</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>2mDX1+7LZk_BkPl2vPTmBL</eid>
+              <eid>PFpZTwr0ToI_txRsc5oFRVO</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>kuK/LLOiSRJ_oNNSor8XFNG</eid>
+            <eid>y5B94FitOZK_ZaWH/tB0+LI</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>UxqNO+q+XqD_tvCFnFzk8rE</eid>
-              <pitch>65</pitch>
-              <tpc>13</tpc>
-              </Note>
-            </Chord>
-          </voice>
-        <voice>
-          <Chord>
-            <eid>yq7tPKTj8aF_0UWjHvyfSVG</eid>
-            <durationType>quarter</durationType>
-            <Note>
-              <eid>UiRg46FBWxM_WiIn5mx8CTD</eid>
-              <pitch>69</pitch>
-              <tpc>17</tpc>
-              </Note>
-            </Chord>
-          <Chord>
-            <eid>kdXk1LLLxzL_ijvbWqdJryK</eid>
-            <durationType>quarter</durationType>
-            <Note>
-              <eid>9+9n5rpzMXI_lDWlb1jtJa</eid>
-              <pitch>69</pitch>
-              <tpc>17</tpc>
-              </Note>
-            </Chord>
-          <Chord>
-            <eid>Vn5v+HtOXk_FSHtDJUl3/E</eid>
-            <durationType>quarter</durationType>
-            <Note>
-              <eid>s8xkNttR39I_7KAHMeQQOWK</eid>
-              <pitch>69</pitch>
-              <tpc>17</tpc>
-              </Note>
-            </Chord>
-          <Chord>
-            <eid>zeiIkc2EGjG_W5IoU74ePcE</eid>
-            <durationType>quarter</durationType>
-            <Note>
-              <eid>fsZ8ppXJGnP_Wvhew9t9hrF</eid>
-              <pitch>69</pitch>
-              <tpc>17</tpc>
-              </Note>
-            </Chord>
-          </voice>
-        </Measure>
-      <Measure>
-        <voice>
-          <Chord>
-            <eid>sfNYzXYCgfO_Sn8dzvQBG+N</eid>
-            <durationType>quarter</durationType>
-            <Note>
-              <eid>z/Xr7STBKeO_7G4DpqDEETM</eid>
-              <pitch>65</pitch>
-              <tpc>13</tpc>
-              </Note>
-            </Chord>
-          <Chord>
-            <eid>7nLt4+xZnKO_MSdT6mE9YBF</eid>
-            <durationType>quarter</durationType>
-            <Note>
-              <eid>WtIf2jm+1fN_Fg8RI4yvkMF</eid>
-              <pitch>65</pitch>
-              <tpc>13</tpc>
-              </Note>
-            </Chord>
-          <Chord>
-            <eid>LEFnHlyt9VH_fVxzIjMAP6M</eid>
-            <durationType>quarter</durationType>
-            <Note>
-              <eid>l6M+zYbr4TB_bmLlpM8EYgB</eid>
-              <pitch>65</pitch>
-              <tpc>13</tpc>
-              </Note>
-            </Chord>
-          <Chord>
-            <eid>KW8qUJ2C+XH_KwojToZIAED</eid>
-            <durationType>quarter</durationType>
-            <Note>
-              <eid>2xoOS92Qn+D_4Bqq1BI7T+I</eid>
+              <eid>VBD4+G+4BXB_KXm6yS8n9jG</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
@@ -1295,37 +3273,37 @@
           </voice>
         <voice>
           <Chord>
-            <eid>Yfj/Mgv3JiK_6Ln1FPAY+UO</eid>
+            <eid>l74uJJSTAEP_9c7v+sWbdjD</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>W8BzP5IlujM_xyoWHNIrQ9F</eid>
+              <eid>j1pfRQOTtJ_k/LyU6rAsm</eid>
               <pitch>69</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>I0lXNOOkGkF_rcD7FOfnthK</eid>
+            <eid>BAz3R17f8/D_6nuPA1T2q3</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>zc/w9r/Q+QK_I0zzpAYDPfH</eid>
+              <eid>2RMc5ePURhC_3yddIM+8EEE</eid>
               <pitch>69</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>2JzpI42K+NJ_yYvlQ3pRBmC</eid>
+            <eid>iOqnU/xphhN_zcftO44xtaF</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>+Xi7RKsluhL_ZSG6d3AAdPJ</eid>
+              <eid>Qf2w9cpArxO_NRHAH8JCXtB</eid>
               <pitch>69</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>X4FTeAC1UTL_VRu52O0xz8J</eid>
+            <eid>LkMA/htKqzD_532W4mFW7S</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>WtvXJQiwqVG_ymWVVPQSQAO</eid>
+              <eid>0p3sSM2isTI_LvZNCVo3enN</eid>
               <pitch>69</pitch>
               <tpc>17</tpc>
               </Note>
@@ -1335,115 +3313,37 @@
       <Measure>
         <voice>
           <Chord>
-            <eid>9eYjYc4nj5M_Rz1e2QXnLHF</eid>
+            <eid>xEbVJuG+qVM_mC7G3WsjpsP</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>7qwoR2QTQEM_EUWu4lrRstI</eid>
+              <eid>BHD0V/SY1LJ_b8GKnE4ezGO</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>/ntkJHLFlwD_041V1L6TiaC</eid>
+            <eid>rSNdTqGep+I_LPym+9fq9RO</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>g3o09NEBW8L_S+f4TEVp2JE</eid>
+              <eid>ciPZ+pYq+8_KCbDtYJ7tkO</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>LErqKL6XkpF_tkePIknraLH</eid>
+            <eid>Dg3yLmYwc4G_T0wZX8Sb2kN</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>Q1Std6kAmJF_j18o3aQLuvD</eid>
+              <eid>e/EAR7jEsEE_+rVvVs8KBGO</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>OOUry615A+C_K0ooiHp+GxF</eid>
+            <eid>QzFJ91rgtDJ_dVpdjgYJfFB</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>xqL8vb5IhNJ_L607UEFpj4F</eid>
-              <pitch>65</pitch>
-              <tpc>13</tpc>
-              </Note>
-            </Chord>
-          </voice>
-        <voice>
-          <Chord>
-            <eid>3rRlr2BPcDI_EQuuproXevI</eid>
-            <durationType>quarter</durationType>
-            <Note>
-              <eid>kt/F9UF0tiF_iSkRrgnEpIE</eid>
-              <pitch>69</pitch>
-              <tpc>17</tpc>
-              </Note>
-            </Chord>
-          <Chord>
-            <eid>Kux68uCrbnK_R4ngArzoID</eid>
-            <durationType>quarter</durationType>
-            <Note>
-              <eid>Xs0Tiu0mOeO_C51FEkk0YBF</eid>
-              <pitch>69</pitch>
-              <tpc>17</tpc>
-              </Note>
-            </Chord>
-          <Chord>
-            <eid>2I/YNcXqdeC_u9j5B4tN+YB</eid>
-            <durationType>quarter</durationType>
-            <Note>
-              <eid>aUTQ/CYzNa_ib3iGeElkrF</eid>
-              <pitch>69</pitch>
-              <tpc>17</tpc>
-              </Note>
-            </Chord>
-          <Chord>
-            <eid>QsRMcOgvvtL_8zMArg+W/TH</eid>
-            <durationType>quarter</durationType>
-            <Note>
-              <eid>dUJAXLQWsDI_wRnE8liztMG</eid>
-              <pitch>69</pitch>
-              <tpc>17</tpc>
-              </Note>
-            </Chord>
-          </voice>
-        </Measure>
-      <Measure>
-        <voice>
-          <Chord>
-            <eid>k4+85FyZFVK_uxmagNtCvmF</eid>
-            <durationType>quarter</durationType>
-            <Note>
-              <eid>803cm4OBfKH_Qb1FWLf2Y1B</eid>
-              <pitch>65</pitch>
-              <tpc>13</tpc>
-              </Note>
-            </Chord>
-          <Chord>
-            <eid>3Mbxd2nrd2G_sTCovdqrSmN</eid>
-            <durationType>quarter</durationType>
-            <Note>
-              <eid>a/WWHfMpi7G_6bTgESq/SoD</eid>
-              <pitch>65</pitch>
-              <tpc>13</tpc>
-              </Note>
-            </Chord>
-          <Chord>
-            <eid>Bbr/cF6RkIL_n0pbGRrgqZJ</eid>
-            <durationType>quarter</durationType>
-            <Note>
-              <eid>vUZP0frv8RH_8UGl+Uh0IwB</eid>
-              <pitch>65</pitch>
-              <tpc>13</tpc>
-              </Note>
-            </Chord>
-          <Chord>
-            <eid>NrfWI5d3NwD_bMXIL0qPtlB</eid>
-            <durationType>quarter</durationType>
-            <Note>
-              <eid>Zfu11rTZohG_iqmKG2PhGtC</eid>
+              <eid>IBVFADauWiP_N4Hi1wOi0xG</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
@@ -1451,37 +3351,37 @@
           </voice>
         <voice>
           <Chord>
-            <eid>AS8D9nK/z6N_U9mCBUySxr</eid>
+            <eid>tQi0vpSJ12H_+Oa5SuheveE</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>OnhCri5EIkE_nVLBtetNveE</eid>
+              <eid>r9K/xUDtHOB_y8iSXr4gOjE</eid>
               <pitch>69</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>7YKgFMqyg7F_sg1nbiP4jfK</eid>
+            <eid>iS75N9f094L_KQfV81r7GRF</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>s1hxJAPnm1I_/1m1EX+mOzC</eid>
+              <eid>LKMdrnjHOaN_4ABRWczDp+M</eid>
               <pitch>69</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>yL94v44GRBM_UoATHOCz3HJ</eid>
+            <eid>wStpYEfsyFM_BHUVz9fZBVC</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>2tY/MMs0ehI_QMIn3I2wvlC</eid>
+              <eid>vJlBfWbopPE_uZ2tWfmm4WP</eid>
               <pitch>69</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>3nMMNe6tgGP_kMz5SKhXySN</eid>
+            <eid>A27m6rndGaC_Ht1OgsgWi9K</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>UandjyOvcjF_P0jFJMvo0eI</eid>
+              <eid>QTtbJHZN1xN_0Aj9ZHBth3H</eid>
               <pitch>69</pitch>
               <tpc>17</tpc>
               </Note>
@@ -1491,37 +3391,37 @@
       <Measure>
         <voice>
           <Chord>
-            <eid>eCeDTrE9M6F_hhKbhXxPIuN</eid>
+            <eid>iSsw4u5HDeJ_MOSCfAgb4eD</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>9RbPZ4dKZAL_r/sLSqUATXL</eid>
+              <eid>4krpzBsBi6H_KYisnBB+oyI</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>uC0t682oefI_q8japUVl9KL</eid>
+            <eid>jQ3RH2CfPlM_7eV3KIqaUF</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>PmbbR3+TxUH_5xzfDGvIxhE</eid>
+              <eid>MYDScx+wnJP_kRfTpKCXJxN</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>pcZ0U6bBYsH_bTgU/nrhvaM</eid>
+            <eid>3oxRq2YHL9_gV6/hp31FFP</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>UuTBGL+z7pB_2UMx0c+bD6M</eid>
+              <eid>5aaC8bHIOPH_S7Sj88V0vYH</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>rvKnNXR//eI_RBex2IqGf+B</eid>
+            <eid>GZlZsppHmxG_IsrA4wvsF9H</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>WmcBrTJzdGM_hEFlL3U+yDJ</eid>
+              <eid>cNjUVZDUH0J_Cfr6ZtAeLuD</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
@@ -1529,37 +3429,37 @@
           </voice>
         <voice>
           <Chord>
-            <eid>mBd0B9/G1lN_bBiGVHHw49L</eid>
+            <eid>5x8AWgghUPG_KcSef0jYe5N</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>1kvDkgNaKdJ_zIGK7H1QBuN</eid>
+              <eid>OidyBdt9USK_IjPehQSxPwK</eid>
               <pitch>69</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>E30+/5J37HH_HgqT5T/rx+</eid>
+            <eid>Bm8BS3XmUOH_0doT8yZgKtI</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>6aVD7AKtePL_S0HSKUAC5h</eid>
+              <eid>BR1/xQZd04I_5ATwQLLArwK</eid>
               <pitch>69</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>SZRHHjpMaqE_6fgFsTIub/K</eid>
+            <eid>mtNcgfrUbBF_A9BVKXm9mpI</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>JFQdHY/FyWD_2mtZF2B446L</eid>
+              <eid>0DnBwBVc6yK_Sh02SuBlZ2O</eid>
               <pitch>69</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>rAGXwF/RkRD_7i4pm9GWdF</eid>
+            <eid>Cq7IgHOrEoD_fezZF/EDz2P</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>FpD53eR2sqJ_96YJ+4qIMPP</eid>
+              <eid>Nzc8xvHX6iD_S5yVPqgRROP</eid>
               <pitch>69</pitch>
               <tpc>17</tpc>
               </Note>
@@ -1569,37 +3469,37 @@
       <Measure>
         <voice>
           <Chord>
-            <eid>L/WikU8JrT_8kqMR0TXoIM</eid>
+            <eid>5y5UTBP26eB_MISsM9oKypC</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>d7oVFtS+7VM_OJkEn2ZZVqH</eid>
+              <eid>hNe9SLoB9mE_+GrCaxaYd+H</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>to4J8bkRvXD_P1zY4Tf584I</eid>
+            <eid>H3UoS4reGgO_wyV2httygJC</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>Ru1rmTMej7G_xL5b9wIkFnD</eid>
+              <eid>nCahrp36jy_5ngDoBF1wWF</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>SJqyXJkj7PE_JN7i8PhQEZK</eid>
+            <eid>LjPvD8iU/XK_AubJjmN1MTE</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>bs/4F6P1stF_yUOy5wT4eiF</eid>
+              <eid>lOFp7M1B0MI_a88+s3n9ZHD</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>8h/+YdHAksP_RaQDLKDk7+F</eid>
+            <eid>PLfs/+vg49B_lZHMDG8jGOK</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>HqrEzVcbY1O_S3Mu7jM4tvB</eid>
+              <eid>LCIusimabGB_IuqDs8QTxfE</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
@@ -1607,37 +3507,193 @@
           </voice>
         <voice>
           <Chord>
-            <eid>79P457iB1qO_tNS2wG9dqWJ</eid>
+            <eid>BBemmRSfTBB_Kn7DfWThOnO</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>yzlUi6crl4P_GAxofKZzFmM</eid>
+              <eid>JLWKDPJockG_YTqWvyX2eZJ</eid>
               <pitch>69</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>ezwr5B33LbB_1IQt2LtfBLF</eid>
+            <eid>BY3tIjmHXWJ_iEGUsEPnsBE</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>kxmFzdWn/zD_RLa4ijbdSQL</eid>
+              <eid>SBFZjhYcCdL_n4dzD8f2fNC</eid>
               <pitch>69</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>I28OXTDWxVN_/hn2Y8pB2CC</eid>
+            <eid>ETYupWuXrmH_p33zy75YttJ</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>skiBfhmOz0M_Dk+vYikLhdE</eid>
+              <eid>66RWXmARQnH_Vz7SbJeg82M</eid>
               <pitch>69</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>agnEY3msvE_d7K3OYHeRlC</eid>
+            <eid>Qdro4kgGPnF_R6FEjYJyBUF</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>DmacetSc2kE_qRrabBfnu4I</eid>
+              <eid>j63h0dO+vdO_Eh283gvpKVK</eid>
+              <pitch>69</pitch>
+              <tpc>17</tpc>
+              </Note>
+            </Chord>
+          </voice>
+        </Measure>
+      <Measure>
+        <voice>
+          <Chord>
+            <eid>Kwe4nM4bFgC_kkpzdoMD6vH</eid>
+            <durationType>quarter</durationType>
+            <Note>
+              <eid>c1sL/D+WMD_CAldFi4inrB</eid>
+              <pitch>65</pitch>
+              <tpc>13</tpc>
+              </Note>
+            </Chord>
+          <Chord>
+            <eid>woi11bydqRO_yYCKlI++ZQG</eid>
+            <durationType>quarter</durationType>
+            <Note>
+              <eid>RKvZgFYT5aP_3NipFpcx/VI</eid>
+              <pitch>65</pitch>
+              <tpc>13</tpc>
+              </Note>
+            </Chord>
+          <Chord>
+            <eid>CZytcrkOs8K_sH4P+xwqD5L</eid>
+            <durationType>quarter</durationType>
+            <Note>
+              <eid>nSaMXlG2zVB_E68zsP6+C8B</eid>
+              <pitch>65</pitch>
+              <tpc>13</tpc>
+              </Note>
+            </Chord>
+          <Chord>
+            <eid>+j89JeQFA3O_ArixWTa3ZOM</eid>
+            <durationType>quarter</durationType>
+            <Note>
+              <eid>R83DbV/txtD_E3aVtizlTlM</eid>
+              <pitch>65</pitch>
+              <tpc>13</tpc>
+              </Note>
+            </Chord>
+          </voice>
+        <voice>
+          <Chord>
+            <eid>qLeh9EMKX4M_+QRUVeL1CTI</eid>
+            <durationType>quarter</durationType>
+            <Note>
+              <eid>+VCeaj7HUkB_ne9vY251RCB</eid>
+              <pitch>69</pitch>
+              <tpc>17</tpc>
+              </Note>
+            </Chord>
+          <Chord>
+            <eid>BR5x5m2MEBO_xo//q8f5nqK</eid>
+            <durationType>quarter</durationType>
+            <Note>
+              <eid>Um+rsWkByMI_5ixKLanmzmO</eid>
+              <pitch>69</pitch>
+              <tpc>17</tpc>
+              </Note>
+            </Chord>
+          <Chord>
+            <eid>DWrnmWRGr5K_ukLZEn0AAgG</eid>
+            <durationType>quarter</durationType>
+            <Note>
+              <eid>vWDiTPcKQS_NuoBvl7D4JD</eid>
+              <pitch>69</pitch>
+              <tpc>17</tpc>
+              </Note>
+            </Chord>
+          <Chord>
+            <eid>3K02GaZKiPE_Pl3ecJsgHvG</eid>
+            <durationType>quarter</durationType>
+            <Note>
+              <eid>es5drlrDJuL_PTOEwHZeE3O</eid>
+              <pitch>69</pitch>
+              <tpc>17</tpc>
+              </Note>
+            </Chord>
+          </voice>
+        </Measure>
+      <Measure>
+        <voice>
+          <Chord>
+            <eid>rotG+ZfzliC_uHsbrbrrh9E</eid>
+            <durationType>quarter</durationType>
+            <Note>
+              <eid>cFyylOVhYiF_yV5o88Blc9F</eid>
+              <pitch>65</pitch>
+              <tpc>13</tpc>
+              </Note>
+            </Chord>
+          <Chord>
+            <eid>1LuqzzgKjcD_lkoVBMY/zjE</eid>
+            <durationType>quarter</durationType>
+            <Note>
+              <eid>gAcApqB8ZeD_m+lYeTojQAF</eid>
+              <pitch>65</pitch>
+              <tpc>13</tpc>
+              </Note>
+            </Chord>
+          <Chord>
+            <eid>wRAkhyNVqBM_csdPASYw5GK</eid>
+            <durationType>quarter</durationType>
+            <Note>
+              <eid>rrRfKEpRmGL_sHke8yNeYyI</eid>
+              <pitch>65</pitch>
+              <tpc>13</tpc>
+              </Note>
+            </Chord>
+          <Chord>
+            <eid>yV0QqR/vU9B_9K3mO3JzuP</eid>
+            <durationType>quarter</durationType>
+            <Note>
+              <eid>Ue2TcnlAorI_J+wpje5rME</eid>
+              <pitch>65</pitch>
+              <tpc>13</tpc>
+              </Note>
+            </Chord>
+          </voice>
+        <voice>
+          <Chord>
+            <eid>i39bUB6cCFH_8Gh2zHGoR4P</eid>
+            <durationType>quarter</durationType>
+            <Note>
+              <eid>SkFUqxXMYNL_jehdajmqAPF</eid>
+              <pitch>69</pitch>
+              <tpc>17</tpc>
+              </Note>
+            </Chord>
+          <Chord>
+            <eid>BnNjFZjaEG_2BACDY0lUUB</eid>
+            <durationType>quarter</durationType>
+            <Note>
+              <eid>Uv3byNgTfdE_PWwr5QTXbUG</eid>
+              <pitch>69</pitch>
+              <tpc>17</tpc>
+              </Note>
+            </Chord>
+          <Chord>
+            <eid>lIRvQOa/IDC_HTwFEJbPw8</eid>
+            <durationType>quarter</durationType>
+            <Note>
+              <eid>XuGGueb4RkG_GAACZKHAFND</eid>
+              <pitch>69</pitch>
+              <tpc>17</tpc>
+              </Note>
+            </Chord>
+          <Chord>
+            <eid>seL/8IolzNF_izNDFn1OQmC</eid>
+            <durationType>quarter</durationType>
+            <Note>
+              <eid>A1oGtUlA/7P_pnxYd73rRvH</eid>
               <pitch>69</pitch>
               <tpc>17</tpc>
               </Note>

@@ -1,0 +1,1150 @@
+{
+  "date": "2026-10-31",
+  "source_commit": "d8c21df149",
+  "writer_tree": "engrave-4 (d8c21df149)",
+  "writer_binary_sha256": "6f039df5c97a27d633ff8b89f204428479c550081efe61d6e02193b28b165b8e",
+  "method": "Read original bytes with the retained final A4 engine and export MSCZ. Preserve MSCZ inputs as archives. For MSCX, embed the engine-produced master Style and every excerpt Score/Style from the archive in the current-format XML. No music or style values are handwritten.",
+  "files": [
+    {
+      "source": "src/engraving/tests/test.mscx",
+      "file": "src/engraving/tests/test.mscx",
+      "source_sha256": "de63a0267669f025b59d091a85dc31ea0b69675572648ca8c430403bed57fab5",
+      "sha256": "7ad28ac43a26ad678123e18bf39338d7610e6581a4e8761cf986b28f55be3282",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/instrumentchange_data/add.mscx",
+      "file": "src/engraving/tests/instrumentchange_data/add.mscx",
+      "source_sha256": "42f17ac4a4b5c78db9f2f23ac4cf4e69cd58faa2fa5eec6371177fc1ad03cdd6",
+      "sha256": "e5826657170090bd758b6130a22bf015dd32954e18db79b64922ea97724b314b",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/instrumentchange_data/change.mscx",
+      "file": "src/engraving/tests/instrumentchange_data/change.mscx",
+      "source_sha256": "a5baa2a267d9346390f0d7db520ef464c16bcd5642efe22c3800b2e8a9f19dee",
+      "sha256": "29452f3b374da90263450dd1357bb4bde7dac21da4f5c152107dc9c3eb2ca8e0",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/instrumentchange_data/copy.mscx",
+      "file": "src/engraving/tests/instrumentchange_data/copy.mscx",
+      "source_sha256": "80aea7b2db6844056ced1c9b8ddbdc2bfa2161f1092277f65911c8e86556c665",
+      "sha256": "930a8c88c3f0d02b0ffbf2d56c0439e1322f66335187b9d7bf49ab1bf5cb5ad9",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/instrumentchange_data/delete.mscx",
+      "file": "src/engraving/tests/instrumentchange_data/delete.mscx",
+      "source_sha256": "c6de1af1ed694f4c54af8b81767e1352698d414fbe5a730ebccba1d7385b3cb0",
+      "sha256": "082ded485d2fabff95b4394edb1a17bc7a356984a0f0ecfbe39000ecc3ef8c4b",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/instrumentchange_data/mixer.mscx",
+      "file": "src/engraving/tests/instrumentchange_data/mixer.mscx",
+      "source_sha256": "a5baa2a267d9346390f0d7db520ef464c16bcd5642efe22c3800b2e8a9f19dee",
+      "sha256": "471ed41a5837c5417ed1c18908c441845da964aae9d15833ecf6312eb4ebded1",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/parts_data/part-54346-parts_resaved.mscx",
+      "file": "src/engraving/tests/parts_data/part-54346-parts_resaved.mscx",
+      "source_sha256": "58873d4854c72b8e3a4222088e48a7ac2da43396a1c415ea38087d567146d7b3",
+      "sha256": "9dd07eb2540d6e83a02e4f0355bd1398c3598f7a84d38909c4d15a759bb8c5ff",
+      "excerpts": 2
+    },
+    {
+      "source": "src/engraving/tests/parts_data/partStyle-score-reload.mscx",
+      "file": "src/engraving/tests/parts_data/partStyle-score-reload.mscx",
+      "source_sha256": "2b6d90fabe561019be84d8ad05df27d1cd81eadcda4e04b94c0396eaf470332e",
+      "sha256": "a09190f2b481f13692315cfa31fe36c6b250ab57f41504dff9c3cc77dc4d4d50",
+      "excerpts": 2
+    },
+    {
+      "source": "src/engraving/tests/parts_data/partStyle.mscx",
+      "file": "src/engraving/tests/parts_data/partStyle.mscx",
+      "source_sha256": "db9a5bc56002587f07af2ffaa5c6821e468a7a175daabadf9381d5c8e044eb67",
+      "sha256": "58d050d7d06e03b9a3444b29567afe2b33ed4a524af49cfee16b037bdd63af41",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/parts_data/voices-ref1.mscx",
+      "file": "src/engraving/tests/parts_data/voices-ref1.mscx",
+      "source_sha256": "ee1a84b06e321621fd90fe41ee594d0fde686491bff223fd9c801aeb8f5c1702",
+      "sha256": "8ca911f569647ae71f17511b22cd9ef152b01d964b0229682fb325be718cf9b4",
+      "excerpts": 2
+    },
+    {
+      "source": "src/engraving/tests/parts_data/voices.mscx",
+      "file": "src/engraving/tests/parts_data/voices.mscx",
+      "source_sha256": "63e39246b0c3953d808e11ac2c60e9db48fbca3e3f76e343a83a95c53d44e86b",
+      "sha256": "fe034edbbd186fbd1291d56e52ba91d79014f77b1bd33d9ffe7e07b81d474dee",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat01.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat01.mscx",
+      "source_sha256": "7441aeefd5a9fe7715f063790ef1e0e933309008b90c64254d65ae0050fa029b",
+      "sha256": "a5f25d53001bd7661a7e7a2ea6361cd1ce9e28e27ee63625d08519d645bf7b9a",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat02.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat02.mscx",
+      "source_sha256": "4ee6b45ff14b27e0b2c9bd311ed951ff9fff64d81689bb63b76956468bf5f12f",
+      "sha256": "58a2ac00ee1aea7ae4ce2ec02f155b7260dcb67a395dc85fb0a3d595f986bfca",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat03.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat03.mscx",
+      "source_sha256": "2b536dfbb6abc68dc5ebe4399bac1a8b6fb947d76dd39492cc72c6b515721cf3",
+      "sha256": "2edf9a2ed04cd1eb58596173da6cacc60780c5233e13e97deaf18b455d3caee7",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat04.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat04.mscx",
+      "source_sha256": "f33af7368d40a32c70433032d4fdef5892e858a326cdadbd51e09405ec62d3b1",
+      "sha256": "88c5e54850608de3417f236e25d50d4f49a577e66f4f4302914fe313e133f097",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat05.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat05.mscx",
+      "source_sha256": "64328cb7ff8b0d226375504ad2cfe3f411b45d7e9ec97567ae011eaa8133cdc9",
+      "sha256": "77f615ef6da30156b73e48d3d6aaa200a956ceb626634517322902806be337c3",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat06.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat06.mscx",
+      "source_sha256": "4e14f5955dc427fc3267bceed85f26947e249ff425f1c7ef1b0ad2f886f0a6f4",
+      "sha256": "ba3d845d8fc343b4a31bcdb681351fabe5fbccba920cafb6bae0bda99d196193",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat07.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat07.mscx",
+      "source_sha256": "7b7fab82ed81b872a6648a1c52cbdc41e73995021df7aa8b8ad219475a66ad8a",
+      "sha256": "5af226f581c2e9d843f99b00732dca0b5766f88ccc48859d2e43437f06394e78",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat08.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat08.mscx",
+      "source_sha256": "24299de1a021c792517f95bd80340b203e47374bb57b9026f2a960a75c48f78d",
+      "sha256": "f3018047663e119868149c98c623a12b6fe24a09aecaa55c4b4eb79b46ad82d3",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat09.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat09.mscx",
+      "source_sha256": "41e2adfdcd8328b6a2a1d65a550e7787dfca1e809bf300cb20c0e5f8c78128f9",
+      "sha256": "0ed1bdf04a86c3ae490fef9c3a01edeea8bac304f6f41f5f6eb42045f60a914e",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat10.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat10.mscx",
+      "source_sha256": "d3e4631baeded97c8f98c53ec24bd318341d6bfb385e40f14da85f3c9d50f8d5",
+      "sha256": "ab3a38506b8dec00c9d08e3c36b73c5a1dc1672ab06ff63a2e03446e748c7315",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat11.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat11.mscx",
+      "source_sha256": "4fe7203f0aae40dd1970d517299e81700a59d6eccacc0f86096bf46ab8fa6d58",
+      "sha256": "912521cdb26d97ce802cd0d08d362ca1ce8c99168ae1c873c3f01004ba4111d6",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat12.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat12.mscx",
+      "source_sha256": "4325df0b9e9f0624c7685d8417525eda5b91245dbb10dff7d7e2e1008c608a38",
+      "sha256": "435f2415ff0e964ab931f7a947f9430a854e407486c0c8092b3ef2737a7ec892",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat13.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat13.mscx",
+      "source_sha256": "409cad562e45da0ca09163c8837837a6dcadf73108f576655d2fb7e7d06700a6",
+      "sha256": "59df8a1efc91ce8baf4154fae3dbdbc413b40419876cab87974176787aa90274",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat14.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat14.mscx",
+      "source_sha256": "10dc5640db1379c6a2f0b6fad3900a3f17623a1162cc1799d21bfca865cb949d",
+      "sha256": "2e25d6975221725570a38af12234f11922537fc0e0a2b9d90e622559da7dd367",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat15.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat15.mscx",
+      "source_sha256": "bb0f052ea44f96753000742fd53ce40bb9f944dee54fda6d24373fd6c1441abd",
+      "sha256": "4b45f71f31b3ae32a1b6e5888cd66900c51b206ac9eb7a0544a3c99c5f0af08a",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat16.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat16.mscx",
+      "source_sha256": "344c2c5565e28983b827185c38ed3db844963ef8843f4bfa41225def00d37179",
+      "sha256": "565f78ded2b77bacdc8c1f8e03345af42ed4aaa1504d464c729d7d181c51c284",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat17.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat17.mscx",
+      "source_sha256": "e2e14c51643536864cfabc5fa8e93bc4423b838410bb403e691bece5600c4fca",
+      "sha256": "b30a191e2ab3497a5c0d3d8f31de21fed46d8810acb5dd34275fe59839b0dc24",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat18.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat18.mscx",
+      "source_sha256": "cf30f43ddfe98207bb0c189105ff0017aed7f3cca90547b3647e73a5aa351f92",
+      "sha256": "3228b482ae777fe086005b677ed8fae474813062793eb85f301b13169d335401",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat19.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat19.mscx",
+      "source_sha256": "f822a474424c6deef627ab7b7f95ebb65572cc9cf597ee5e9ad12da6783fad92",
+      "sha256": "64bce24969e9e6ae3b857f01e0758feb089ee9f6005dd37c25b5936d6114cb48",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat20.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat20.mscx",
+      "source_sha256": "b989d9368f98d02ce6ac30f5e958da477cba2931a40d7026eea6729c1f9ae8d4",
+      "sha256": "5ea7424dbc9af6efe3fa6548deaf2b692534da066ccae3c013d134d5126b26f8",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat21.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat21.mscx",
+      "source_sha256": "dc64c6d9d51936f9ff4135572b0f9052e075079d5f7ad236bc9e45cc6cc3c451",
+      "sha256": "f9c1b02eaf7684a7d43c53218528e00135ead80801ddb6eb44d62cb0b7d1e597",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat22.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat22.mscx",
+      "source_sha256": "780d83c1e773fc0a4c6a16d42182c4c11fcd206c299e02e1f320ef915ddc8558",
+      "sha256": "36cd7ec2829037bc4279d0ed5f4eb4dd6ec351aeb08032135106b916fe3d92e8",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat23.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat23.mscx",
+      "source_sha256": "68ac0a5d92d87ea38585848ed6ff02865177b6dcfdcfb9397e4ff1863df87bf3",
+      "sha256": "304ac305d19ff1d529ae0f7b80845e689ae57d105cd9a485b52cf4e53e78b355",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat24.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat24.mscx",
+      "source_sha256": "5db1163be6569a0cbc955a2e8dd2f59ffe597d2e000ee9ee2b165c3b472bfa0d",
+      "sha256": "9a383532da778be3627660394dfbfc66bdfa8a87a368796c1e5b9841591e374e",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat25.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat25.mscx",
+      "source_sha256": "d29759eaabd9d37ff7e6a683f111406a077c7134dbb3beeb961a079c211b1eb7",
+      "sha256": "8775c2316662c3f3b946a8a86d5df6e8fc11ec97a375f8cd2a99fe951d698bd3",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat26.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat26.mscx",
+      "source_sha256": "5042ab290d0e4e6d7e089ae2fad472a908137e08932229d4d661057b43fc4a7d",
+      "sha256": "61c5b49f0ab06f874ac41bd73e3c5e2270c1b5c368d3151f5abb2406548e63c9",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat27.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat27.mscx",
+      "source_sha256": "0521a139ec65d4510477e013e1d2d02f96f2b197ee44d5963d63d32d416aa60d",
+      "sha256": "6ce9c0722986c87e407fc1a66aebe5bf047797cc252d24216794aeb9f47a15bc",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat28.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat28.mscx",
+      "source_sha256": "9b26c45c441307aa16fb6a69566acd7c6609e3e65c53b4ff24d6db8e8f46c631",
+      "sha256": "5950dfe2c03430d9bb75c6b0994f7eb775bbec476835f08084eefbde553b97b8",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat29.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat29.mscx",
+      "source_sha256": "5fea8b698322c579dcb8d5fcf233930ebeee5d09638169011a0d0d412f5ab875",
+      "sha256": "853a5fd9eaffa332794fa0366fdd890d21154b90cb9d2b542b3ae4e0cd203ef3",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat30.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat30.mscx",
+      "source_sha256": "ffe8a82cbc68582951a30f5723d6c443f020a5ec54f70b5f376669f8b2d19f5a",
+      "sha256": "430df6b51660e9d81e6f6001b91e716c2c35e9d2681a40d06c01d03bf93d3e61",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat31.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat31.mscx",
+      "source_sha256": "2c32bb93922c5fc18713cf7f26ec2616adea71b27b2f351b733c6eeee9d3bb78",
+      "sha256": "726298a180dcb9169ab50a2c8a09d50e30e8dba028d469ba3712acecb9c6ecbe",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat32.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat32.mscx",
+      "source_sha256": "7772a2775fb790993316b06c5f6d5c46affc421f6c6881c166eb80adcbe4e890",
+      "sha256": "65e7faaf4455f4e456b1bd2c1323923185e42b2d0df384c721c6df935459a207",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat33.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat33.mscx",
+      "source_sha256": "2be01a6e9e51eaeca606f630f02e6ab71d118939209858c77c0b4a2cf324fbc4",
+      "sha256": "656d7298f4b10acb23595951a32e6bdc718afdcd75c31cb886cdf6bc8faf4411",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat34.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat34.mscx",
+      "source_sha256": "b9fee73726615422637dbc8884559f064bed0f76166e792442c7c37bf75f0058",
+      "sha256": "d6f19c3594f8bed99a32c719a8690686315fb116d0eb660cc2e68141976ec417",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat35.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat35.mscx",
+      "source_sha256": "fbd288f02abb35560542a4e66d55d8bfe1453f2428f7c3d8e2f657ce9569fcbd",
+      "sha256": "9a9b4c11d5feda0212c185181bc6711bfd7fd6a08cbcd6de938a8e118300e582",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat36.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat36.mscx",
+      "source_sha256": "6ff07d60f5d4d6cfdba7372027c52d2ecfae1a999f295257aaacc0ed4db6091c",
+      "sha256": "89f1b3e68a740871b8b5efc74515439a9af8c4d204a320dddb800ce7dc1e416e",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat37.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat37.mscx",
+      "source_sha256": "b788f150d3ba53bb758d3d365f4aad6ad2a3f50867f534e3908a46fbcb463962",
+      "sha256": "7163e2350999b5b45cb9b2cb805fbdaacebaf07f8e1631e332a011cdfe5e772a",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat38.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat38.mscx",
+      "source_sha256": "e9c8c432082c945f981f4b32e8d871278e37a894454dc1eb435e776c44f8719e",
+      "sha256": "eb5638f0f51608740fac312e5ca0afca87dcacf1283759390b7e82957b132e9b",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat39.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat39.mscx",
+      "source_sha256": "f9503f25b77c1400ac7673882275c3f814b87f675802eb8adb122f301d218267",
+      "sha256": "d81a3aafc7f8d25c274ca04df34f0ec5426254dd2f8da96fcc29b9b2824a47a5",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat40.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat40.mscx",
+      "source_sha256": "b83c072e5b498b2c7efb78a0db7c30f072a78d847d82fae0033e88fb363f7cf2",
+      "sha256": "d5396973024b0bc0422e6e19879c282b53ff4f6c0f077dfe917735d9cbaf0456",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat41.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat41.mscx",
+      "source_sha256": "36a7bf9ee2f17624a75392641f422e2168e97682a7a747c2d3c5c1d952b2cb66",
+      "sha256": "b61b6aeea79eb6558ed6eb5e86e6eed44778392285485439f65c92e8287e8a48",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat42.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat42.mscx",
+      "source_sha256": "df3a1d917ecace4f2f159cbad10d0206048a54129a083bb54ab4e82c094ba372",
+      "sha256": "ef045f596a187fa616a61c8cb24ea7857dfa880f051513e5b48470897e342507",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat43.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat43.mscx",
+      "source_sha256": "b9231e4febe3082cdd28b699bf14ba17b7f3b91b9eedc2cd4c6e03e1e25bfbea",
+      "sha256": "6b159b38843e450754c81a67b1ebe8ae32ba4f16b9e126e58332dc7ef9786ed3",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat44.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat44.mscx",
+      "source_sha256": "94dead24413e064457869ad7dcfe2c6a374ecf193981c0a2efcd59211a705e99",
+      "sha256": "7f92df48204182d3bc15ab72cd81cfc9eb914311cb42cfee54147cf62833d04e",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat45.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat45.mscx",
+      "source_sha256": "c28d550f2ed21084433aed53832a67541297a7c623e7551f5f3782db1526e21b",
+      "sha256": "5d4dc8f8ac5519f77ffa436dc10089642f492fad7ae4954f2c7767c65a058c19",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat46.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat46.mscx",
+      "source_sha256": "1e843dc2beaa11e513095e4b808c8fce808a517714b6ecc8e3054e108bf7b1bd",
+      "sha256": "ed657822037bc70f91bd8e97cd6eb4bed7e47dda2b4cb4da083a5a7c84caeb40",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat47.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat47.mscx",
+      "source_sha256": "25f5fb231386979a5661230e9033d122686f21a444079e0d4e109958783ec276",
+      "sha256": "3530d01fb0807ffac5e85614ae004688d9413135decfd74c2ac6bac331a16493",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat48.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat48.mscx",
+      "source_sha256": "532d3a177573ea9fe29a3e0e86616d03c233d1018203c75d91cac8f3d8325707",
+      "sha256": "399eb26127c53cd53ddd3679a718a9727e0025e52b74beff456b0dc4c8db9536",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat49.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat49.mscx",
+      "source_sha256": "0b2a65d65df6e655adfc6d8abba6ecd1d9ac645b8ce9e613bd80a28884a53e72",
+      "sha256": "d626aa1465aff43883511f36af4e3b0d1621c9d024f30db3ff1480493f0714ab",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat50.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat50.mscx",
+      "source_sha256": "bc929a3550b3ef2ae79240370af04041b21f1a8fb4f19c310fa3cf158adb54a3",
+      "sha256": "b5dc7a7ffde8bf36637b6d2f2a1c1709e868c9019ae4e52877fb9ea77c97f768",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat51.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat51.mscx",
+      "source_sha256": "6ac6307b58150956493527f83ec71f7b28b411da06dba0c4e17530d079af760e",
+      "sha256": "5c32d008bd48f9b4619222d8ea43c704aaf1aa149136dd449b2c1c8f06af2388",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat52.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat52.mscx",
+      "source_sha256": "772620db5a32fcb3cbc17793f2bb811d57f3910d7f45a4c9d76178232446eda1",
+      "sha256": "7d9d5c285f09d9d92cb4fff83edcef06eae2a2ffcc9a0dfce20e6293f88f8bef",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat53.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat53.mscx",
+      "source_sha256": "424575f228e7f606a5e0f234c96eef5ab92c8bcd634dbf94b474cab4eb74dc87",
+      "sha256": "8ae29f1b3dc0240b4294af8482624d5602f889c37c8e049c45493079d02652ce",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat54.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat54.mscx",
+      "source_sha256": "55c97e32143d7354c81f380aca56d163c5fbc4511707cd6aa8f3724a04952cc5",
+      "sha256": "35880196e146301e92c4c76a3674d3b738510cc5eae8c381fbcab39c89c7666e",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat55.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat55.mscx",
+      "source_sha256": "82603a26054e091521ed5a2451d630a24f98f4bd141a4781a36c419bd4693f73",
+      "sha256": "5b907936a529e8c5ac94347ea6350b0009d5c5687379c053d505cd99c950eeed",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat56.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat56.mscx",
+      "source_sha256": "60c1a30e04d6fb7b3a04d63b4630985ac11d7fac93dc0b1520f86d03166f3539",
+      "sha256": "fcbccaa3521b126cc2774b2f683737a315553f97df8a1b1f36f3b0776931a681",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat57.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat57.mscx",
+      "source_sha256": "5dd9327c4a306f05e521ee73f4defa18a932f0d9dececa9892c2fd5ac66702b3",
+      "sha256": "0b731be951ab618db282a03dbc346265827f9a3defcc7eafba32b1de7a62114e",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat58.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat58.mscx",
+      "source_sha256": "f100e52209384f5495b71aaa0496275735ba9156b01ce3734c664e804342a4f5",
+      "sha256": "29a7ee4b02d353de9bf8880d3e7e3f2463b77baf925ee6e90f94952f5158f340",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat59.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat59.mscx",
+      "source_sha256": "9d53b1829919a2f789578a3cdd026e698914fcfcacb9e116ee26ba9573e71728",
+      "sha256": "8f48c625f9ab9a3b1ca7032480cafb90f4fcc6f45b2ad3b49de2caea37e61797",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat60.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat60.mscx",
+      "source_sha256": "e4a0efa653be3c94337085467ae562d4168aedc29e2b7d661f41e5f44f0410fb",
+      "sha256": "da7936608f96e43a0e09f29e85a4528b88fe28d145c67d0e5f6e1bf6ea7c1362",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat61.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat61.mscx",
+      "source_sha256": "4b5effc2d0e96f5f79d61d04ebd18c2f8546eee2e8e4cec2eda4f0da78be09ec",
+      "sha256": "a165954cd97d87afbca60a1610da29662fe6bf4be0f1c667afe3adda70728e0d",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat62.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat62.mscx",
+      "source_sha256": "787e444bdeedf3b5e5bb2723f54b176d7fee4dedc99ad4c684fbce5bdc909af9",
+      "sha256": "24815d19f0d8024b79a70a6b612442f16790e1138c8c5988d883a21d4f1edc7b",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat63.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat63.mscx",
+      "source_sha256": "ffe2100379656d0d07526e1a5d46b8f48905a403412d9aa465d1dce91bedab93",
+      "sha256": "2398719b5f73a084c435206ee6165a7b3e58572f15aaf3be77246b336b58a62f",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat64.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat64.mscx",
+      "source_sha256": "d8ef124ea447af3aed86dbc7792815c7a03e53e0f54aeabdf363f29554f3264c",
+      "sha256": "009c6861b588f47aa2fab87eb7b97638ef7f72ccba4d7a895b3acc0ae90dd035",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat67.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat67.mscx",
+      "source_sha256": "e6a04e4885a7d7a88e9978db2eccd8276a8d112a8eb68e571ab971907e71e7fe",
+      "sha256": "2ea9c8c0d1e69d15cec9794b44a2ecdb9c743712426bf63abc68556222e163e4",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat70.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat70.mscx",
+      "source_sha256": "d4c05d16b24b5ea6fc95448322bc051239c95ab64ab0b483c30e92351d44ebec",
+      "sha256": "e89cd3c354b4a4416a936760778a3b94b63fa7d1ab69edf4f17af5dc7f455634",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat71.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat71.mscx",
+      "source_sha256": "66c66fdd8f59d71ae5cade51a6631c69c649ac30f3635052a0374d991b397302",
+      "sha256": "3993716f646bcf620c1be58faf8dc0cc159bcd7b629c7a875c480ee25a66c001",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat72.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat72.mscx",
+      "source_sha256": "291eb878e13d9362c95dc5b314ebf24c9e5cad60f0308ff78400a9bf22d62ce1",
+      "sha256": "81c60e6669cf65e982095aeb147e2675c43eb90a8c72393149fd21ef1346cd5d",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/parts_data/cross-measure-gliss.mscx",
+      "file": "src/engraving/tests/parts_data/cross-measure-gliss.mscx",
+      "source_sha256": "dfeb55d033aeacac86702ac9c72fc98970fe0efb26afba1b85e61aef861fdfa8",
+      "sha256": "0d64f8f1a522c135e4013df472940b11d5a97707b89a2103ae82efaa047eb575",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/parts_data/input-from-parts.mscz",
+      "file": "src/engraving/tests/parts_data/input-from-parts.mscz",
+      "source_sha256": "9719ccba165d58ae60b54d0569d7c467deb83d872bdbc34a6c54d56297c9b22c",
+      "sha256": "0708a5aed9ae70d3f7e749ce4039dd95c5adbe9fae43b6d91bb43ad3f4b57025",
+      "excerpts": 4
+    },
+    {
+      "source": "src/engraving/tests/parts_data/linked-ties.mscx",
+      "file": "src/engraving/tests/parts_data/linked-ties.mscx",
+      "source_sha256": "ef7a6489a3b7f01e5ca64f9e736979e1bbb8a715eca625f8c0c263fe0f8c72f4",
+      "sha256": "2fa05fdb0e0857462988e76981e5400e617c5a49963c79c2b5512264bb79db07",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/parts_data/part-textlines-parts.mscx",
+      "file": "src/engraving/tests/parts_data/part-textlines-parts.mscx",
+      "source_sha256": "56a6017930441c0714206d3c3c99feb290355e7ae991084d04018a83e5a52883",
+      "sha256": "5e1a7fceddedb4ccefd9b1f797bf3e32d75a9ca0af4ae3f6311eebf2d427e442",
+      "excerpts": 2
+    },
+    {
+      "source": "src/engraving/tests/parts_data/part-textlines.mscx",
+      "file": "src/engraving/tests/parts_data/part-textlines.mscx",
+      "source_sha256": "500f56e81777600a91c5a839b6fe69eeb45e55b850c6f98c339d6839c2690fbb",
+      "sha256": "e99c73f72bb947525fa8494d43c126da5b281cf103f20b9cc73ada0df54ac31d",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/parts_data/part-visibility-beams.mscx",
+      "file": "src/engraving/tests/parts_data/part-visibility-beams.mscx",
+      "source_sha256": "d7e14a62670149e04d85bf139a3ca3f1e5ac1f6e436b0d826d6626adb7acb137",
+      "sha256": "fc81f85d23fb91e6787c707c5e52a4bfdc6f059b6f266612b9f091284179a887",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/parts_data/part-visible-tracks.mscx",
+      "file": "src/engraving/tests/parts_data/part-visible-tracks.mscz",
+      "source_sha256": "89ee67554aa6838caea378ab1ba605c7063622a5c29b66cba7f81f3096e78bcb",
+      "sha256": "d1b8f03dd593a7eebb94ee42ccbcf0df6c32a0ee480697b2ee280027f400a994",
+      "excerpts": 1
+    },
+    {
+      "source": "src/engraving/tests/parts_data/partExclusion.mscx",
+      "file": "src/engraving/tests/parts_data/partExclusion.mscx",
+      "source_sha256": "937867976014cdee30e77a5c39e0ad182e608484ab0ee375055a065a5a9dbfd0",
+      "sha256": "874f11b5df0a5313f66f6ae0a79f8c9e09478f6bf5be2d1c4975a3bac1b8809d",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/parts_data/partPropertyLinking.mscx",
+      "file": "src/engraving/tests/parts_data/partPropertyLinking.mscx",
+      "source_sha256": "21971a2eb5cae00d8d9aa4d9fbcc40149b0dc9b844cc699ea239848a14d69c3c",
+      "sha256": "8d713d2045dda809c461c302183ecc91b261f6a24436766f2e6e003166475811",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat65.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat65.mscx",
+      "source_sha256": "d7108c8b24077926a0aecd613474d281052d57e523c11efc1b20a93bb66b4531",
+      "sha256": "1e554c748d6f7a49e59f189941144e3eec231313af3e401ce4f450a243feead2",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat66.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat66.mscx",
+      "source_sha256": "3437853f7dc95c132717e48be93cb7397d9d30c60c252a5640d53b160a8b9c52",
+      "sha256": "edf2eb042ea4863cfaa794a715671f2c7137471650ca65f5da35139a6bb19e54",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat68.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat68.mscx",
+      "source_sha256": "faa2138ebec5d918d9fa5dc232ab0f0002b729772bc41f37d0d6cbdaf4c916d9",
+      "sha256": "c9902d7f15ec4be1466f2d3f61a130e14f987663cfd8071e4f1523db9b260c5f",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/repeat_data/repeat69.mscx",
+      "file": "src/engraving/tests/repeat_data/repeat69.mscx",
+      "source_sha256": "da8eece767b631900fd75937b3d5676e04c00385f6a05410804e814fc7668d0e",
+      "sha256": "ac207a65063ce78eb10c0523fbac817a9e68795eb7280441a435c330fdb3b81f",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/count_in.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/count_in.mscx",
+      "source_sha256": "e80d20af2c4a20e264ae5bf02340d0383901f6bbe4479144901d94f10e0f88f1",
+      "sha256": "f84ad065867ba304ccaeea9a7f09905094ea001d4be6387a09ea8f18696e5ee7",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/partially_tied_arpeggio.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/partially_tied_arpeggio.mscx",
+      "source_sha256": "736f3f8d84020e323b18c4f302e90d8e276b42f4095c6aa78cb727a65739b5ec",
+      "sha256": "a5097d27ef0c428aa7df33f22cfd9aa260f6ae81f52931846cb033ccbde400a7",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/partially_tied_tremolo.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/partially_tied_tremolo.mscx",
+      "source_sha256": "735c9aa4e902d5ddb64d3c51c0f472385e3e22dde268a7b2fa0bf0e2c0f2c4b4",
+      "sha256": "c2cc3bafac3c7b09cfa000de4e3e1861640d05e031c4774025307ca3961c9d3f",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/partial_tie.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/partial_tie.mscx",
+      "source_sha256": "31fb574607b956fc19d82ecb921f7fbd7a2c991285bb8c3ee2278356ce112ca9",
+      "sha256": "a293821afac90bce25e6d659b60a509b18b79b799dff71998ed6b11dc16f7bc2",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/tied_notes_and_repeats.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/tied_notes_and_repeats.mscx",
+      "source_sha256": "d64dd0b33d53965c7eb38839e6af861fa431f65f96780e04b0c33cb7243510ca",
+      "sha256": "0dc6f37b60e193c8cdfec3358ee66511695f2f34f79031d9dbd607127024e1c6",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/trill_line_on_tied_notes.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/trill_line_on_tied_notes.mscx",
+      "source_sha256": "9821bd7ce4c2eeb4fa0979832115948e5a0bf5a615689d7970159f39c490f05f",
+      "sha256": "1b017d4e09cf215d910e5bf01c10e7be48d5ce5a379ca3ce50c5714278cb2bd9",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/trill_on_tied_notes.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/trill_on_tied_notes.mscx",
+      "source_sha256": "04dc2b9a40c9b53aeab66984b6dfe8859263fb318184e60a0ecb2056068b9c9e",
+      "sha256": "382f32f566bdad20b3aae861e10ccbc610073ea4881ce2194f4a5cb5bdd117bf",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackmodel_data/dal_segno_al_coda/dal_segno_al_coda.mscx",
+      "file": "src/engraving/tests/playback/playbackmodel_data/dal_segno_al_coda/dal_segno_al_coda.mscx",
+      "source_sha256": "23869538600de139a1adab32494ab864584b8c1cb43066947ccf092da8502b6c",
+      "sha256": "1aa11594ad87bc1d2a977dc4dc8f1a42942091cfe8cc8caaff7f271b005ba639",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackmodel_data/dal_segno_al_fine/dal_segno_al_fine.mscx",
+      "file": "src/engraving/tests/playback/playbackmodel_data/dal_segno_al_fine/dal_segno_al_fine.mscx",
+      "source_sha256": "62c9dfea0a4d1bcaa3619ad1651da37206742f98a60bee508571f4e6d5ca84b9",
+      "sha256": "d26acad6194e2a8b828febb64c80ebf84f4d1b292c1ca70c71c5e3e42f3945ef",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackmodel_data/da_capo_al_coda/da_capo_al_coda.mscx",
+      "file": "src/engraving/tests/playback/playbackmodel_data/da_capo_al_coda/da_capo_al_coda.mscx",
+      "source_sha256": "ecf91be7f1e84fc2e123179a6e7bf94ed7233a403191159b67d444930c43e42d",
+      "sha256": "1f2892dc8f1b866bb5f443e60dcb5ce18c2763902d940c5bd73a598e8b725e9b",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackmodel_data/da_capo_al_fine/da_capo_al_fine.mscx",
+      "file": "src/engraving/tests/playback/playbackmodel_data/da_capo_al_fine/da_capo_al_fine.mscx",
+      "source_sha256": "dc7d2dfaecc6e9787c22ede23bc44e486ec84442d9def6e9ae2921b730247fd9",
+      "sha256": "71c9b7908f2cf2a1fcd925a57de65955bf4b97636c63e9046ef0be86224238d6",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackmodel_data/dynamics/dynamics.mscx",
+      "file": "src/engraving/tests/playback/playbackmodel_data/dynamics/dynamics.mscx",
+      "source_sha256": "1f22efa1d6bbb0aa8267858460b0c498e8ea15f3a6a4d082962cb0f8cf1d3d9c",
+      "sha256": "dcb5bb72ad6a9f3633b495ad4eece1b6836ab0eb571600bc2c4c0cb7648486a0",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackmodel_data/metronome_4_4/metronome_4_4.mscx",
+      "file": "src/engraving/tests/playback/playbackmodel_data/metronome_4_4/metronome_4_4.mscx",
+      "source_sha256": "12d05f4d5a9a05a960c47a94cf50a839745956c7799a25e2c2e95ecfc373f8a9",
+      "sha256": "741d3b4422e7bff976136b07c74ddcfa33abd8e311269675ee89fc6a9c41d32b",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackmodel_data/metronome_6_4_with_repeat/metronome_6_4_with_repeat.mscx",
+      "file": "src/engraving/tests/playback/playbackmodel_data/metronome_6_4_with_repeat/metronome_6_4_with_repeat.mscx",
+      "source_sha256": "db568f0167a6cb9b8470d631d261850535bddebc6c489306bc11e027e1568d46",
+      "sha256": "e50ecb70af22d34997041f13a7ea1fd131a0f0cedde53653aa12c400663e8a39",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackmodel_data/multi_measure_repeat/multi_measure_repeat.mscx",
+      "file": "src/engraving/tests/playback/playbackmodel_data/multi_measure_repeat/multi_measure_repeat.mscx",
+      "source_sha256": "c89119f80c4b967ffc00cb34ef4d609da474fbc57a80ed783e83ec08d6315b6c",
+      "sha256": "23b5ef25ef083331bcbd5dd7b54005629f22a50a3295ed1612673e1c096bb0b4",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackmodel_data/pizz_to_arco/pizz_to_arco.mscx",
+      "file": "src/engraving/tests/playback/playbackmodel_data/pizz_to_arco/pizz_to_arco.mscx",
+      "source_sha256": "a5b55bf69e88e139ad9c1010d70de4a4ae4645702f4486154d40540ba7fdbb33",
+      "sha256": "b63b2626f0d3901d0a900cf130c0d58d28474cd304113a95a20a908604c88d16",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackmodel_data/playback_setup_instruments/playback_setup_instruments.mscx",
+      "file": "src/engraving/tests/playback/playbackmodel_data/playback_setup_instruments/playback_setup_instruments.mscx",
+      "source_sha256": "8d8f03a8f4def4d5653a75d764c4e1d38c2c7ffabb4a0691e8e8e65f8c66f5f0",
+      "sha256": "cb39db1bca949a93f148222ee860ffb6106a49aeb53dd38f9fd45be659fcdc7c",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackmodel_data/repeat_and_tremolo/repeat_and_tremolo.mscx",
+      "file": "src/engraving/tests/playback/playbackmodel_data/repeat_and_tremolo/repeat_and_tremolo.mscx",
+      "source_sha256": "b548104ef62e8f3ea5a8620a55518cd382773044898b20b8baa3cdae2e21f77f",
+      "sha256": "be09e3d970817ebd3c893bcdfe014a578bffcf03fa6c0bb6434c4f69ec5a1e94",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackmodel_data/repeat_range/repeat_range.mscx",
+      "file": "src/engraving/tests/playback/playbackmodel_data/repeat_range/repeat_range.mscx",
+      "source_sha256": "04acf89f3b43bda2fdc7746098d7333e4eb31b531d6e01ccee94df1cc2daccd1",
+      "sha256": "f3ba3690ccfc4cc4d6411d493605c5ebfbed51b8f8abcd2c9e728631776871ca",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackmodel_data/repeat_tempo_changes_and_tie/repeat_tempo_changes_and_tie.mscx",
+      "file": "src/engraving/tests/playback/playbackmodel_data/repeat_tempo_changes_and_tie/repeat_tempo_changes_and_tie.mscx",
+      "source_sha256": "9ec4d54e711942992fd939ace33e56fa3937ddb2de36a56b19e1dcccff0438ab",
+      "sha256": "378d5ac7146c173f2d4643470a8ec7c5ef8e1b09d688b4073405448a626d2c2d",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackmodel_data/repeat_with_2_voltas/repeat_with_2_voltas.mscx",
+      "file": "src/engraving/tests/playback/playbackmodel_data/repeat_with_2_voltas/repeat_with_2_voltas.mscx",
+      "source_sha256": "6260026ad28fe82a4fadb9061ea00834b897b2a6ffc795c0966ffbdf657ffc53",
+      "sha256": "4c63fef95ad98f4d0f52ac841d07fcee846948a30a244de9b9c143aea53626f2",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackmodel_data/single_measure_repeat/single_measure_repeat.mscx",
+      "file": "src/engraving/tests/playback/playbackmodel_data/single_measure_repeat/single_measure_repeat.mscx",
+      "source_sha256": "1d64d80217af1e055aa74b0cb4a027a115d7cdef561e732c0b637f7e0de930f7",
+      "sha256": "a8019786f84345ba72511512b8a24a23b6bff3429120f9b71ba423f7d54dbd67",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackmodel_data/spanners/spanners.mscx",
+      "file": "src/engraving/tests/playback/playbackmodel_data/spanners/spanners.mscx",
+      "source_sha256": "fa930b7bbee0b8b15e313a06602919ff9f2ccee2f408b0c743eec4e034581d24",
+      "sha256": "08cf5f153d2cc0f3851845bab537a42de1b90a2858717fdd999b7e3dc1b56951",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackmodel_data/tempo_changes_during_notes/tempo_changes_during_notes.mscx",
+      "file": "src/engraving/tests/playback/playbackmodel_data/tempo_changes_during_notes/tempo_changes_during_notes.mscx",
+      "source_sha256": "189a18b18f3e28664680f15b3a0ca770dd949e22306c204097050835f9308e28",
+      "sha256": "8f0bfd69a9fb63dfd035525c7c9c1cbc7b01ed72d529aaca4d073142d58e21a2",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackmodel_data/wrong_articulations/wrong_articulations.mscx",
+      "file": "src/engraving/tests/playback/playbackmodel_data/wrong_articulations/wrong_articulations.mscx",
+      "source_sha256": "7f359fded7389569f1969d2b627600ebd329707446ff02cb11d660b6c3ae595d",
+      "sha256": "d804684771d82f641cc37aad5bdedb124bddc4bf6bf437870897135307134ece",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/chord_arpeggio/chord_arpeggio.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/chord_arpeggio/chord_arpeggio.mscx",
+      "source_sha256": "67f4d773a5138666130bb1a1efd3cba86599c8016b00bf8c10697cdcb0c8e180",
+      "sha256": "38508008e8c6bdc1fedf14590c4d92e84f7683dc5e08679ac97d1c5e1ef24051",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/chord_arpeggio_bracket/chord_arpeggio_bracket.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/chord_arpeggio_bracket/chord_arpeggio_bracket.mscx",
+      "source_sha256": "0d13863c73f96dbbd21e3031cc106d4c00041c2109a26c089d5a46a5735a4e9f",
+      "sha256": "6809109e9158cfe88b06cfab369e2d40b4c88542017c5fc9ab3b95caec5f92d1",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/chord_arpeggio_down/chord_arpeggio_down.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/chord_arpeggio_down/chord_arpeggio_down.mscx",
+      "source_sha256": "123f5888f0e434ef0e0d90d2815163ed8d01fcc8aa622a466c645531b0ed9881",
+      "sha256": "94900f9061f735fcc6c1809c749a4f09c43a940f395d6e62b0b469cef6ed18b1",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/chord_arpeggio_grace/chord_arpeggio_grace.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/chord_arpeggio_grace/chord_arpeggio_grace.mscx",
+      "source_sha256": "f1310503f040e03e6775cca075e3c559147d44f9fe18346bb248b1ccbe871bd0",
+      "sha256": "13dadba964bf97516156116a9119c739cef686ec044d832e11e7dc1f3e4420a1",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/chord_arpeggio_straight_down/chord_arpeggio_straight_down.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/chord_arpeggio_straight_down/chord_arpeggio_straight_down.mscx",
+      "source_sha256": "0233eb7961951d2efccec54bce01939a4c21c58cf47cae08fbad55ff5a6442d8",
+      "sha256": "729c60a3a05b173960083b8b3496bbe6bde9596c7b7559b9c8e48af8d28cf630",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/chord_arpeggio_straight_up/chord_arpeggio_straight_up.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/chord_arpeggio_straight_up/chord_arpeggio_straight_up.mscx",
+      "source_sha256": "3a7d0b5281483bdbe8461df67bba8332411f992f1088d7ef552fd315aaa86074",
+      "sha256": "61ee273b97ffd146d562873725dd957a6ee06fa0fc83b288cd1c79355f5ba617",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/chord_arpeggio_up/chord_arpeggio_up.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/chord_arpeggio_up/chord_arpeggio_up.mscx",
+      "source_sha256": "53de15f8ec53b83d47a2cfb99beb73ad56f4a6931e825e0cb400af19c60772b9",
+      "sha256": "4ec58ef54f4f2eeb9937e259572aab5368424a3b262e2f5f2568abaafc0e2be7",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/chord_arpeggio_with_tied_notes/chord_arpeggio_with_tied_notes.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/chord_arpeggio_with_tied_notes/chord_arpeggio_with_tied_notes.mscx",
+      "source_sha256": "7e9c46e9b1df337c4867837c778ef17f154188a7ce9172aac9625fbfb02abdfb",
+      "sha256": "be3963dcd62f783ffd68b2f3143038b840518f9f704a9e283e939748376bbb45",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/glissando_on_tied_notes/glissando_on_tied_notes.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/glissando_on_tied_notes/glissando_on_tied_notes.mscx",
+      "source_sha256": "8731625c3ffd1faa1d32816dd57252f519c44dd0bb94632222064a0b005ee971",
+      "sha256": "777bf5b2a6a377ad0394b6aedeb3b667baf9b824a93e07fe860bc32971ce0cc9",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/grace_note_with_tied_notes/grace_note_with_tied_notes.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/grace_note_with_tied_notes/grace_note_with_tied_notes.mscx",
+      "source_sha256": "b2b9a02304609db7884c245862cd75363df8dc73d538f080815d47a5aac374d1",
+      "sha256": "834f7a0961fbfe1535f0ece95fb044ada5ec9afeb530030ac9cdad1dcfd27140",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/pauses/pauses.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/pauses/pauses.mscx",
+      "source_sha256": "0f9888979302bc0dfe90159bcdc75ceae35268043698f6c429b46979ce68afd9",
+      "sha256": "9e1e08ed5f4f649030dc943464bf6ac18586a8d8e85cc058aaffe0b3cc7bfb82",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/single_chord_tremolo/single_chord_tremolo.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/single_chord_tremolo/single_chord_tremolo.mscx",
+      "source_sha256": "53a08ae5158d83570f9bf47e40a06e9458bf0b7c6112f632d319569b8aa2acec",
+      "sha256": "5998b8735c422a86c662fea10197fa7d54101904bee183815195663ad21ea8b0",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/single_chord_tremolo_tied_notes/single_chord_tremolo_tied_notes.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/single_chord_tremolo_tied_notes/single_chord_tremolo_tied_notes.mscx",
+      "source_sha256": "c250d1645cf60cd5ee115a36165a003fa728a69d4b069bdcd7b82c55f0808a89",
+      "sha256": "8647a56f4627909c23d4244898475a7a559372d410f57649f1514e1cb4799d72",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_acciaccatura/single_note_acciaccatura.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_acciaccatura/single_note_acciaccatura.mscx",
+      "source_sha256": "fa80136f53c2c31edcdace047a1ef9f47fb8d5bac030a4c9b759a801a049ce82",
+      "sha256": "c6f458321003b444708eb02ac92a4730723e278c30fbb6d6a738a692dac23a41",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_acciaccatura_chord/single_note_acciaccatura_chord.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_acciaccatura_chord/single_note_acciaccatura_chord.mscx",
+      "source_sha256": "7af7931286fcf80f656262d8b0370aa5d59213f3326b5749d977436c12c2ae25",
+      "sha256": "c3978e06bf478ef0f9de571183c96bfa50c12059d63974decd3b341bcd8e0fb3",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_appoggiatura_chord_post/single_note_appoggiatura_chord_post.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_appoggiatura_chord_post/single_note_appoggiatura_chord_post.mscx",
+      "source_sha256": "e7eb49a7152c4d41feab37a87746cb342a5a1a3130f02bc7e689ad8d53fca816",
+      "sha256": "a1ce38160832f20292f5d4c98c0adc0645b282dcdfab3aa87f229268ee5c3c93",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_appoggiatura_post/single_note_appoggiatura_post.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_appoggiatura_post/single_note_appoggiatura_post.mscx",
+      "source_sha256": "bc3b2b37ca158fbc65cb813fe241701de0762fb39d011d57e59ea56092caeb8b",
+      "sha256": "cd222d25867a03068b9fbcb7e68d970b578a02f1537d6d1ee2a16f25dc68ec58",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_inverted_turn/single_note_inverted_turn.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_inverted_turn/single_note_inverted_turn.mscx",
+      "source_sha256": "a6275abd422e13a3c3aa44c1eff0a8ab7cb088f48893a56003ad3f68ca58b4c8",
+      "sha256": "026aa416e2b1ef3dc828ebbe8ba69a9b01a7536b11877531178ba8a21eb2b453",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_inverted_turn_slash_variation/single_note_inverted_turn_slash_variation.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_inverted_turn_slash_variation/single_note_inverted_turn_slash_variation.mscx",
+      "source_sha256": "1d25e417ec847ebbc3021e52f6a9f62421a161d52a0228ff5ab72f0da447b115",
+      "sha256": "b87b8d0a280ac72cfac1d3a71f4c06c658a819c70f8ff3715c264df4b93d8ed9",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_lower_mordent/single_note_lower_mordent.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_lower_mordent/single_note_lower_mordent.mscx",
+      "source_sha256": "095712094e3eae8b32a903dda099c37e4fe15d82c5ac7a11d45fc878f2386f44",
+      "sha256": "66cb2bc5caf4451c765eca938fe355375bbd1f0617a3a7d08858bdf6ae5cf3b5",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_multi_acciaccatura/single_note_multi_acciaccatura.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_multi_acciaccatura/single_note_multi_acciaccatura.mscx",
+      "source_sha256": "2f2219db5fc1ff4c4b866e6807b28f0323018b06c7d00959ad43252bf5c45552",
+      "sha256": "848d8452009f004a24f26fc0193625d1f00f8547f85ea628b33b1ffd2b1f5c9f",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_multi_appoggiatura_post/single_note_multi_appoggiatura_post.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_multi_appoggiatura_post/single_note_multi_appoggiatura_post.mscx",
+      "source_sha256": "6abf28dd6ec072b324dbdc8b0d3e4881689254fd5674400667af186dd27fd1d8",
+      "sha256": "92c1d9927355e7c58a1801073761cb51c416d8ac8ed8a7ebb617a7158681e961",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_no_articulations/no_articulations.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_no_articulations/no_articulations.mscx",
+      "source_sha256": "6f2115ed8d20442bf76803d98bf3d904bbb7eb0c9e927502cfb2d3c3a341da66",
+      "sha256": "9b376e94aa48bee4d205331fc939633cd60a98fdec14c30950a3cfe21af1872e",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_regular_turn/single_note_regular_turn.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_regular_turn/single_note_regular_turn.mscx",
+      "source_sha256": "f92c62716a13803179f5c29d32814347ffc9f75ea51b4c25fc5ce79c78f02719",
+      "sha256": "fe78ebf933b817e070ebeab64cf3a40e1915f3c94e5eb9785dd1a3bc7313b855",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_tenuto_accent/tenuto_accent.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_tenuto_accent/tenuto_accent.mscx",
+      "source_sha256": "732d474b8991599aa41b70715ed1a55986208c036b2cb3f4c4804bdb4ca9e4dc",
+      "sha256": "f128936ff832e20019212d77aca26f91167196ebb066a3b77c5723617c428666",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_tremolo/single_note_tremolo.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_tremolo/single_note_tremolo.mscx",
+      "source_sha256": "391734275704c1cdd266f9ca11ce7e00b3b5a51a514da04559c566c9ffbb6235",
+      "sha256": "eaf3df407e6b8953cc2cc9e05c297442179f52f5867295207ae28f5f8b66c62e",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_tremolo_on_tied_note/single_note_tremolo_on_tied_note.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_tremolo_on_tied_note/single_note_tremolo_on_tied_note.mscx",
+      "source_sha256": "8ab865f8165165cbf8fbf259e289634e41ab47309b84c05ce01c7724241d1326",
+      "sha256": "836e7a1a19b804d7e9332eee49637bb963bf68ff428c0eb08a5d8c09159b2d81",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_trill_baroque/single_note_trill_baroque.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_trill_baroque/single_note_trill_baroque.mscx",
+      "source_sha256": "5c7dc20e495451a0c3ecc762d44dbb9b13e6b4cdf0e3fccf19f9b4d0f129feab",
+      "sha256": "924b020f507ce0fb68805981a4e9eeb41dbb221140a09339cf6a50ff891c5ad7",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_trill_default_tempo/single_note_trill_default_tempo.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_trill_default_tempo/single_note_trill_default_tempo.mscx",
+      "source_sha256": "3b617cf70b0b6c81f5348fd2caa408f3171676b0400f3842062b04eb1118b070",
+      "sha256": "66a23240489efdd8d1ee62f476a6918a794e210f5fd46ca11bedbe52d72e290f",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_unexpandable_trill/single_note_unexpandable_trill.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_unexpandable_trill/single_note_unexpandable_trill.mscx",
+      "source_sha256": "cdb11e61d49b6e42e6ce07ae00746d6c8d3c8e0d74dee3f4a4fa8408d13a5efc",
+      "sha256": "2d34c56705924d65b93cf37c37a7c9737678cb053bb1246894f086bf5c273fcb",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_upper_mordent/single_note_upper_mordent.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/single_note_upper_mordent/single_note_upper_mordent.mscx",
+      "source_sha256": "180fa5ba608087775d9eb73ec5926d7bf75594edadf0c78057647264e4577c5c",
+      "sha256": "a0e4ce17961091a145c610605ffe8bed2e2aba92ba97c5e2f2a5de196b91c881",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/TwoNotes_Discrete_Harp_Glissando/TwoNotes_Discrete_Harp_Glissando.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/TwoNotes_Discrete_Harp_Glissando/TwoNotes_Discrete_Harp_Glissando.mscx",
+      "source_sha256": "fc8146c546357e64f75ee99d61fc72687abe8ceb4e4634669f2d1d151d247606",
+      "sha256": "ec5a5bef7a45d7818202e8efdd40c916c3231be0f20005c1386a456749a014a9",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/two_chords_tremolo/two_chords_tremolo.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/two_chords_tremolo/two_chords_tremolo.mscx",
+      "source_sha256": "304b8dbaa45be4e2c6f6c31807d7330b6ff0b130fad6667c6efb2a67e93b5ad0",
+      "sha256": "48f6336f58ed81e43b485ebdf725435990a1607c941a8a40b79b215b55bd4dce",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/two_notes_continuous_glissando/two_notes_continuous_glissando.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/two_notes_continuous_glissando/two_notes_continuous_glissando.mscx",
+      "source_sha256": "18c25285bfa72937c3adea3598bb4b3904ddad00c671ce70915f8766456dd95b",
+      "sha256": "9ffb56d6072e5b4e2cb8b0c16bbd8e5d03887ea3a3cf0423e65b51250ae7ff4b",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/two_notes_continuous_glissando_no_play/two_notes_continuous_glissando_no_play.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/two_notes_continuous_glissando_no_play/two_notes_continuous_glissando_no_play.mscx",
+      "source_sha256": "be22a029acb5b3034f0336f690d39febb2962e1619deb15ec1ff0e8cf213db26",
+      "sha256": "fae77db4a606adaca742f42565399d1123761dd83cf66bb3b165cc4440053282",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackeventsrenderer_data/two_notes_discrete_glissando/two_notes_discrete_glissando.mscx",
+      "file": "src/engraving/tests/playback/playbackeventsrenderer_data/two_notes_discrete_glissando/two_notes_discrete_glissando.mscx",
+      "source_sha256": "55112c6e40e748b12722e8356500c9a20a7c1a01d60fc67d682944079e15eec9",
+      "sha256": "0ed16e13f2b00baedd2a063408b0e1d11add73759824949ba405138defcfd999",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackcontext_data/dynamics/dynamics_and_measure_repeats.mscx",
+      "file": "src/engraving/tests/playback/playbackcontext_data/dynamics/dynamics_and_measure_repeats.mscx",
+      "source_sha256": "4e71a9da88c8dd61a4be1170e75099cff3a52e983130afdaa8d7e46117a2ff4c",
+      "sha256": "d77172de5ba9c5554c2efe907354d15bd06c2b0733911d6c7b698154da690137",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackcontext_data/dynamics/dynamics_compound.mscx",
+      "file": "src/engraving/tests/playback/playbackcontext_data/dynamics/dynamics_compound.mscx",
+      "source_sha256": "e905fdb0b2637120b4421be427b9683a973e17d224a08b606cc3e9c049979501",
+      "sha256": "9cb2edd67c6fbd903ac8711798defc6f48e7f2d7e5e8a7a87e99a90fec089399",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackcontext_data/dynamics/dynamics_niente.mscx",
+      "file": "src/engraving/tests/playback/playbackcontext_data/dynamics/dynamics_niente.mscx",
+      "source_sha256": "1d76c93efd090927719feb6095d18f20b6d79de089f0c4d435be64cb591235d4",
+      "sha256": "eb3b8b766e0cdc06ada2ef08c9b27014c69da07698c4c6cebd39898341841fba",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackcontext_data/dynamics/dynamics_on_voices.mscx",
+      "file": "src/engraving/tests/playback/playbackcontext_data/dynamics/dynamics_on_voices.mscx",
+      "source_sha256": "6e1f0679e0a9007b6f3d18f202dbf5d973412575ee8938003ffb25cce0071365",
+      "sha256": "1a61f131f5299970ef3a95a8b0b98740938c83ec39bf6019bd7b5836c1130fe7",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackcontext_data/dynamics/dynamics_overlap.mscx",
+      "file": "src/engraving/tests/playback/playbackcontext_data/dynamics/dynamics_overlap.mscx",
+      "source_sha256": "d07f0c9fe325aff1e89fb7c4d51c92e86a6797dbffa49e9587b22beb161a27a8",
+      "sha256": "e7edc23ebda93c0bf6b65b1114b5faa2bbbbb6a474fc86c1a1601f09e53b551f",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackcontext_data/dynamics/hairpins_and_repeats.mscx",
+      "file": "src/engraving/tests/playback/playbackcontext_data/dynamics/hairpins_and_repeats.mscx",
+      "source_sha256": "26c0b2361681907e96712183bd2c27049060652a3762267c201c782f8a2cde34",
+      "sha256": "b1b9106617e3a86ed1e77d6d173f18da99f793045a41b3e146d428edfb11cfe8",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackcontext_data/play_techniques/play_techniques_measure_repeats.mscx",
+      "file": "src/engraving/tests/playback/playbackcontext_data/play_techniques/play_techniques_measure_repeats.mscx",
+      "source_sha256": "7ee4381507ae79d05bc7fb451a5b8eebd35e57c3cca10c596e4d4a59bd158cd9",
+      "sha256": "ac5c3c0cf2ae486e69c68165253e21c877e894b1daf87451beabb7b68903eb09",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackcontext_data/sound_flags/cancel_playing_technique.mscx",
+      "file": "src/engraving/tests/playback/playbackcontext_data/sound_flags/cancel_playing_technique.mscx",
+      "source_sha256": "5a63a4bb0a93fc8f8b33263b146e4c5c259441e034eb62226bf741ec24140d69",
+      "sha256": "46c14bfda91fb20e8aea2b1fdf1a7cf904e7f9edf74dbae31e9fc6e7a525e29d",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackcontext_data/sound_flags/sound_flags.mscx",
+      "file": "src/engraving/tests/playback/playbackcontext_data/sound_flags/sound_flags.mscx",
+      "source_sha256": "7bf6e32ac8c78b2a265527f306c217e403c05ff37ce8a662000a2245298d3652",
+      "sha256": "53980a419d43e073fd8c8aabf86c72c48e3911760ed8e65ea8cd733e1aceaaad",
+      "excerpts": 0
+    },
+    {
+      "source": "src/engraving/tests/playback/playbackcontext_data/sound_flags/sound_flags_measure_repeats.mscx",
+      "file": "src/engraving/tests/playback/playbackcontext_data/sound_flags/sound_flags_measure_repeats.mscx",
+      "source_sha256": "af373aa89294957769295740bfc212424b08d0c266e677c27a08cd22a5ab8fdb",
+      "sha256": "07207d50ad026eb7090388a73b6b5bf0239ed41724beebe43560118f020004a0",
+      "excerpts": 0
+    }
+  ]
+}
