@@ -126,8 +126,11 @@ Result<Step> prepare(EditContext& context, const InsertMeasures& op) {
         // The master inserts a measure into every score of the document; a frame goes
         // into the master only, which is what the editor does.
         Score* score = &context.master();
+        Score::InsertMeasureOptions options;
+        options.needDeselectAll = false;
         for (int i = 0; i < count; ++i) {
-            MeasureBase* made = kind == ElementType::MEASURE ? score->insertMeasure(kind, at) : score->insertBox(kind, at);
+            MeasureBase* made = kind == ElementType::MEASURE ? score->insertMeasure(kind, at, options)
+                                                            : score->insertBox(kind, at, options);
             if (!made) return refused(std::format("the engine did not insert a {}", name));
             context.created(made);
         }
