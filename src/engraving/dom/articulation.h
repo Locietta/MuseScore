@@ -165,7 +165,7 @@ public:
     String channelName() const { return m_channelName; }
     void setChannelName(const String& s) { m_channelName = s; }
 
-    virtual String accessibleInfo() const override;
+
 
     bool isDouble() const { return m_categories & ArticulationCategory::DOUBLE; }
     bool isTenuto() const { return m_categories & ArticulationCategory::TENUTO; }

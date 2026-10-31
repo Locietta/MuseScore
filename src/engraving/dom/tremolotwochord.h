@@ -83,7 +83,7 @@ public:
 
     bool crossStaffBeamBetween() const;
 
-    String accessibleInfo() const override;
+
     void triggerLayout() const override;
 
     TremoloStyle tremoloStyle() const { return m_style; }

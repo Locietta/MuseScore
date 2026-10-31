@@ -70,7 +70,7 @@ public:
     void localSpatiumChanged(double oldValue, double newValue) override;
     void styleChanged() override;
     staff_idx_t vStaffIdx() const override;
-    String accessibleInfo() const override;
+
 
     bool playTremolo() const { return m_playTremolo; }
     void setPlayTremolo(bool v) { m_playTremolo = v; }

@@ -247,7 +247,7 @@ public:
     bool operator<(const Segment&) const;
     bool operator>(const Segment&) const;
 
-    String accessibleExtraInfo() const override;
+
 
 
     EngravingItem* firstInNextSegments(staff_idx_t activeStaff) const;   //<

@@ -1213,122 +1213,13 @@ void FretDiagram::setTrack(track_idx_t val)
 //   accessibleInfo
 //---------------------------------------------------------
 
-String FretDiagram::accessibleInfo() const
-{
-    String chordName;
-    if (m_harmony) {
-        chordName = muse::mtrc("engraving", "with chord symbol %1").arg(m_harmony->harmonyName());
-    } else {
-        chordName = muse::mtrc("engraving", "without chord symbol");
-    }
-    return String(u"%1 %2").arg(translatedTypeUserName(), chordName);
-}
+
 
 //---------------------------------------------------------
 //   screenReaderInfo
 //---------------------------------------------------------
 
-String FretDiagram::screenReaderInfo() const
-{
-    String detailedInfo;
-    for (int i = 0; i < m_strings; i++) {
-        String stringIdent = muse::mtrc("engraving", "string %1").arg(i + 1);
 
-        const FretItem::Marker& m = marker(i);
-        String markerName;
-        switch (m.mtype) {
-        case FretMarkerType::CIRCLE:
-            markerName = muse::mtrc("engraving", "circle marker");
-            break;
-        case FretMarkerType::CROSS:
-            markerName = muse::mtrc("engraving", "cross marker");
-            break;
-        case FretMarkerType::NONE:
-        default:
-            break;
-        }
-
-        int dotsCount = 0;
-        std::vector<int> fretsWithDots;
-        for (auto const& d : dot(i)) {
-            if (!d.exists()) {
-                continue;
-            }
-            fretsWithDots.push_back(d.fret + m_fretOffset);
-            dotsCount += 1;
-            // TODO consider: do we need to announce what type of dot a dot is?
-            // i.e. triangle, square, normal dot. It's mostly just information
-            // that clutters the screenreader output and makes it harder to
-            // understand, so leaving it out for now.
-        }
-
-        if (dotsCount == 0 && markerName.size() == 0) {
-            continue;
-        }
-
-        String fretInfo;
-        if (dotsCount == 1) {
-            fretInfo = String::number(fretsWithDots.front());
-        } else if (dotsCount > 1) {
-            int max = int(fretsWithDots.size());
-            for (int j = 0; j < max; j++) {
-                if (j == max - 1) {
-                    fretInfo = muse::mtrc("engraving", "%1 and %2").arg(fretInfo).arg(fretsWithDots[j]);
-                } else {
-                    fretInfo = String(u"%1 %2").arg(fretInfo).arg(fretsWithDots[j]);
-                }
-            }
-        }
-
-        //: Omit the "%n " for the singular translation (and the "(s)" too)
-        String dotsInfo = muse::mtrc("engraving", "%n dot(s) on fret(s) %1", "", dotsCount).arg(fretInfo);
-
-        detailedInfo = String(u"%1 %2 %3 %4").arg(detailedInfo, stringIdent, markerName, dotsInfo);
-    }
-
-    String barreInfo;
-    for (auto const& iter : m_barres) {
-        const FretItem::Barre& b = iter.second;
-        if (!b.exists()) {
-            continue;
-        }
-
-        String fretInfo = muse::mtrc("engraving", "fret %1").arg(iter.first);
-
-        String newBarreInfo;
-        if (b.startString == 0 && (b.endString == -1 || b.endString == m_strings - 1)) {
-            newBarreInfo = muse::mtrc("engraving", "barré %1").arg(fretInfo);
-        } else {
-            String startPart = muse::mtrc("engraving", "beginning string %1").arg(b.startString + 1);
-            String endPart;
-            if (b.endString != -1) {
-                endPart = muse::mtrc("engraving", "and ending string %1").arg(b.endString + 1);
-            }
-
-            newBarreInfo = muse::mtrc("engraving", "partial barré %1 %2 %3").arg(fretInfo, startPart, endPart);
-        }
-
-        barreInfo = String(u"%1 %2").arg(barreInfo, newBarreInfo);
-    }
-
-    detailedInfo = String(u"%1 %2").arg(detailedInfo, barreInfo);
-
-    if (detailedInfo.trimmed().size() == 0) {
-        detailedInfo = muse::mtrc("engraving", "no content");
-    }
-
-    String chordName = m_harmony
-                       ? muse::mtrc("engraving", "with chord symbol %1").arg(m_harmony->generateScreenReaderInfo())
-                       : muse::mtrc("engraving", "without chord symbol");
-
-    String basicInfo = String(u"%1 %2").arg(translatedTypeUserName(), chordName);
-
-    String generalInfo = muse::mtrc("engraving", "%n string(s) total", "", m_strings);
-
-    String res = String(u"%1 %2 %3").arg(basicInfo, generalInfo, detailedInfo);
-
-    return res;
-}
 
 void FretDiagram::setFingering(std::vector<int> v)
 {

@@ -78,7 +78,7 @@ public:
     bool play() const { return m_play; }
     void setPlay(bool val) { m_play = val; }
 
-    String accessibleInfo() const override;
+
 
     Sid defaultPosSid() const override;
 

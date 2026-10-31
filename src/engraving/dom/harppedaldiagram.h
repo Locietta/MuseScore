@@ -62,8 +62,8 @@ public:
     bool setProperty(Pid propertyId, const PropertyValue& v) override;
     PropertyValue propertyDefault(Pid id) const override;
 
-    String accessibleInfo() const override;
-    String screenReaderInfo() const override;
+
+
 
     void setIsDiagram(bool diagram);
     bool isDiagram() const { return m_isDiagram; }

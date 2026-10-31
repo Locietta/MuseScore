@@ -2519,71 +2519,7 @@ EngravingItem* Segment::lastInPrevSegments(staff_idx_t activeStaff) const
 //   accessibleExtraInfo
 //---------------------------------------------------------
 
-String Segment::accessibleExtraInfo() const
-{
-    String rez;
-    if (!annotations().empty()) {
-        String temp;
-        for (const EngravingItem* a : annotations()) {
-            if (!score()->selectionFilter().canSelect(a)) {
-                continue;
-            }
-            switch (a->type()) {
-            case ElementType::DYNAMIC:
-                //they are added in the chordrest, because they are for only one staff
-                break;
-            default:
-                temp = temp + u' ' + a->accessibleInfo();
-            }
-        }
-        if (!temp.isEmpty()) {
-            rez = rez + muse::mtrc("engraving", "Annotations:") + temp;
-        }
-    }
 
-    String startSpanners;
-    String endSpanners;
-
-    auto spanners = score()->spannerMap().findOverlapping(tick().ticks(), tick().ticks());
-    for (auto interval : spanners) {
-        Spanner* s = interval.value;
-        if (!score()->selectionFilter().canSelect(s)) {
-            continue;
-        }
-        if (segmentType() == SegmentType::EndBarLine
-            || segmentType() == SegmentType::BarLine
-            || segmentType() == SegmentType::StartRepeatBarLine) {
-            if (s->isVolta()) {
-                continue;
-            }
-        } else {
-            if (s->isVolta() || s->isTie()) {     //ties are added in Note
-                continue;
-            }
-        }
-
-        if (s->tick() == tick()) {
-            startSpanners += u" " + muse::mtrc("engraving", "Start of %1").arg(s->accessibleInfo());
-        }
-
-        const Segment* seg = 0;
-        switch (s->type()) {
-        case ElementType::VOLTA:
-        case ElementType::SLUR:
-            seg = this;
-            break;
-        default:
-            seg = next1MM(SegmentType::ChordRest);
-            break;
-        }
-
-        if (seg && s->tick2() == seg->tick()) {
-            endSpanners += u" " + muse::mtrc("engraving", "End of %1").arg(s->accessibleInfo());
-        }
-    }
-
-    return rez + startSpanners + endSpanners;
-}
 
 //---------------------------------------------------------
 //   createShapes

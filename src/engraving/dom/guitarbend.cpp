@@ -20,6 +20,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "log.h"
 #include "../iengravingconfiguration.h" // IWYU pragma: keep
 
 #include "../editing/editdata.h"

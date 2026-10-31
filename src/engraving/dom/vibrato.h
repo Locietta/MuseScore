@@ -85,7 +85,7 @@ public:
     PropertyValue getProperty(Pid propertyId) const override;
     bool setProperty(Pid propertyId, const PropertyValue&) override;
     PropertyValue propertyDefault(Pid) const override;
-    String accessibleInfo() const override;
+
 
     int subtype() const override { return int(m_vibratoType); }
     TranslatableString subtypeUserName() const override;

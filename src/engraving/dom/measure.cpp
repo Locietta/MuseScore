@@ -3258,10 +3258,7 @@ double Measure::endingXForOpenEndedLines() const
 //   accessibleInfo
 //---------------------------------------------------------
 
-String Measure::accessibleInfo() const
-{
-    return String(u"%1: %2").arg(EngravingItem::accessibleInfo(), String::number(measureNumber() + 1));
-}
+
 
 void Measure::styleChanged()
 {

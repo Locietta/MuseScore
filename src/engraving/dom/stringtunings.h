@@ -43,8 +43,8 @@ public:
     PropertyValue propertyDefault(Pid id) const override;
     bool setProperty(Pid id, const PropertyValue& val) override;
 
-    String accessibleInfo() const override;
-    String screenReaderInfo() const override;
+
+
 
     const StringData* stringData() const;
     void setStringData(const StringData& stringData);

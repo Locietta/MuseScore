@@ -182,10 +182,7 @@ Fraction MeasureRepeat::ticks() const
 //   accessibleInfo
 //---------------------------------------------------------
 
-String MeasureRepeat::accessibleInfo() const
-{
-    return muse::mtrc("engraving", "%1; Duration: %Ln measure(s)", nullptr, numMeasures()).arg(EngravingItem::accessibleInfo());
-}
+
 
 //---------------------------------------------------------
 //   subtypeUserName

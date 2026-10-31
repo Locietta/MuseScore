@@ -209,8 +209,5 @@ TranslatableString TripletFeel::subtypeUserName() const
 //   accessibleInfo
 //---------------------------------------------------------
 
-String TripletFeel::accessibleInfo() const
-{
-    return String(u"%1: %2").arg(EngravingItem::accessibleInfo(), translatedTypeUserName());
-}
+
 }

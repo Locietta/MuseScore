@@ -220,10 +220,7 @@ EngravingItem* Marker::prevSegmentElement()
 //   accessibleInfo
 //---------------------------------------------------------
 
-String Marker::accessibleInfo() const
-{
-    return String(u"%1: %2").arg(EngravingItem::accessibleInfo(), markerTypeUserName());
-}
+
 
 std::vector<LineF> Marker::dragAnchorLines() const
 {

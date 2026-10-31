@@ -67,7 +67,7 @@ public:
 
     EngravingItem* nextSegmentElement() override;
     EngravingItem* prevSegmentElement() override;
-    String accessibleInfo() const override;
+
 
     int subtype() const override { return int(m_symId); }
     TranslatableString subtypeUserName() const override;

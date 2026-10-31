@@ -781,10 +781,7 @@ PropertyValue Hairpin::propertyDefault(Pid id) const
 //   accessibleInfo
 //---------------------------------------------------------
 
-String Hairpin::accessibleInfo() const
-{
-    return String(u"%1: %2").arg(TextLineBase::accessibleInfo(), translatedSubtypeUserName());
-}
+
 
 PointF Hairpin::linePos(Grip grip, System** system) const
 {

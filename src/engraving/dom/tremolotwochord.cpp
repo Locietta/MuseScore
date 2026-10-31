@@ -394,10 +394,7 @@ TranslatableString TremoloTwoChord::subtypeUserName() const
 //   accessibleInfo
 //---------------------------------------------------------
 
-String TremoloTwoChord::accessibleInfo() const
-{
-    return String(u"%1: %2").arg(EngravingItem::accessibleInfo(), translatedSubtypeUserName());
-}
+
 
 //---------------------------------------------------------
 //   customStyleApplicable

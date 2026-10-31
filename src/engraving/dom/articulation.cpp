@@ -639,10 +639,7 @@ bool Articulation::isBasicArticulation() const
 //   accessibleInfo
 //---------------------------------------------------------
 
-String Articulation::accessibleInfo() const
-{
-    return String(u"%1: %2").arg(EngravingItem::accessibleInfo(), translatedSubtypeUserName());
-}
+
 
 void Articulation::setupShowOnTabStyles()
 {
