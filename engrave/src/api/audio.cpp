@@ -283,7 +283,7 @@ Result<AudioRenderResult> Document::render_audio(const AudioOptions& options, co
                                  file_extension(options.format)) };
     request.output_path = utf8(file.path);
 
-    const music::AudioRenderResult rendered = music::export_score_audio(&master, request);
+    const music::AudioRenderResult rendered = music::export_score_audio(&master, request, engine.context->articulationProfiles());
     if (!rendered.ok) {
         switch (rendered.failure) {
         case music::AudioRenderResult::Failure::ResourceLimit: return fail(ErrorCode::ResourceLimit, rendered.error);

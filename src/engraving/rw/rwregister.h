@@ -24,7 +24,6 @@
 
 #include "ireader.h"
 #include "iwriter.h"
-#include "modularity/ioc.h"
 
 namespace mu::engraving::rw {
 class RWRegister

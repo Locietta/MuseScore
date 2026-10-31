@@ -27,7 +27,6 @@
 #include "../types/types.h"
 #include "types/string.h"
 
-#include "async/notification.h"
 
 namespace mu::engraving {
 class MasterScore;
@@ -60,7 +59,6 @@ public:
 
     const String& name() const;
     void setName(const String& name, bool saveAndNotify = true);
-    muse::async::Notification nameChanged() const;
 
     // The name used to store this excerpt in the msc file/folder.
     // When reading/writing, the engraving module sets this value, so that other
@@ -114,7 +112,6 @@ private:
     Score* m_excerptScore = nullptr;
     String m_name;
     String m_fileName;
-    muse::async::Notification m_nameChanged;
     std::vector<Part*> m_parts;
     TracksMap m_tracksMapping;
     bool m_inited = false;

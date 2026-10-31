@@ -24,15 +24,10 @@
 
 #include "../iengravingcontextconfiguration.h"
 
-#include "modularity/ioc.h"
-
 namespace mu::engraving {
-class EngravingContextConfiguration : public IEngravingContextConfiguration, public muse::Contextable
+class EngravingContextConfiguration : public IEngravingContextConfiguration
 {
-
 public:
-    EngravingContextConfiguration(const muse::modularity::ContextPtr& iocCtx)
-        : Contextable(iocCtx) {}
 
     double guiScaling() const override;
 

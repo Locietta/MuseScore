@@ -21,7 +21,6 @@
  */
 #pragma once
 
-#include "global/async/channel.h"
 
 #include "automationtypes.h"
 
@@ -46,15 +45,11 @@ public:
     //! NOTE: writes, moves, or erases points in one batch, per each edit's SetPoint/MovePoint/ErasePoint
     void editPoints(const AutomationCurveKey& key, const AutomationPointEdits& edits);
 
-    muse::async::Channel<AutomationChanges> changed() const;
-
     std::string dump() const;
 
 private:
-    void notifyChanged(const AutomationChanges& changes);
 
     AutomationCurveMap m_curveMap;
-    muse::async::Channel<AutomationChanges> m_changesChannel;
 };
 
 using AutomationDataPtr = std::shared_ptr<AutomationData>;

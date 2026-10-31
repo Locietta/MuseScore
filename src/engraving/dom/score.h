@@ -31,10 +31,9 @@
 #include <memory>
 #include <optional>
 
-#include "global/async/channel.h"
 #include "global/types/ret.h"
 
-#include "modularity/ioc.h"
+#include "../engravingservices.h"
 
 #include "../automation/automationtypes_fwd.h"
 #include "../types/constants.h"
@@ -247,6 +246,16 @@ struct ScoreChanges {
     }
 };
 
+// A cache that follows the committed changes of a master score (the playback
+// model). MasterScore calls it synchronously, in registration order, when a
+// transaction commits or an undo/redo completes.
+class IScoreChangesListener
+{
+public:
+    virtual ~IScoreChangesListener() = default;
+    virtual void onScoreChanges(const ScoreChanges& changes) = 0;
+};
+
 //---------------------------------------------------------------------------------------
 //   @@ Score
 //   @P composer        string            composer of the score (read only)
@@ -273,20 +282,21 @@ struct ScoreChanges {
 //    a Score has always an associated MasterScore
 //---------------------------------------------------------------------------------------
 
-class Score : public EngravingObject, public muse::Contextable
+class Score : public EngravingObject
 {
     OBJECT_ALLOCATOR(engraving, Score)
     DECLARE_CLASSOF(ElementType::SCORE)
 
-    muse::GlobalInject<class IEngravingConfiguration> configuration;
-    muse::GlobalInject<class IEngravingFontsProvider> engravingFonts;
-    muse::ContextInject<class IEngravingContextConfiguration> contextConfiguration;
-    muse::ContextInject<class IEngravingElementsProvider> elementsProvider;
-    muse::ContextInject<class IPaletteScoreProvider> paletteScoreProvider;
-    // internal
-    muse::GlobalInject<rendering::IScoreRenderer> renderer;
-
 public:
+    const EngravingServices& services() const { return m_services; }
+    const std::shared_ptr<IEngravingConfiguration>& configuration() const { return m_services.configuration; }
+    const std::shared_ptr<IEngravingFontsProvider>& engravingFonts() const { return m_services.engravingFonts; }
+    const std::shared_ptr<IEngravingContextConfiguration>& contextConfiguration() const
+    {
+        return m_services.contextConfiguration;
+    }
+    const std::shared_ptr<rendering::IScoreRenderer>& renderer() const { return m_services.renderer; }
+
     Score(const Score&) = delete;
     Score& operator=(const Score&) = delete;
     virtual ~Score();
@@ -309,13 +319,6 @@ public:
     DummyParent* dummy() const { return m_dummy; }
 
     ShadowNote* shadowNote() const;
-
-    muse::async::Channel<LoopBoundaryType, unsigned> loopBoundaryTickChanged() const;
-    void notifyLoopBoundaryTickChanged(LoopBoundaryType type, unsigned ticks);
-
-    muse::async::Channel<EngravingItem*> elementDestroyed();
-
-    muse::async::Channel<float> layoutProgressChannel() const;
 
     void rebuildBspTree();
     bool noStaves() const { return m_staves.empty(); }
@@ -455,8 +458,6 @@ public:
     void endCmd(bool rollback = false, bool layoutAllParts = false, bool keepRolledBackElements = false); // end undoable command
     void update();
     void undoRedo(bool undo, EditData*);
-
-    virtual muse::async::Channel<ScoreChanges> changesChannel() const;
 
     virtual void setUpdateAll();
     void setLayoutAll(staff_idx_t staff = muse::nidx, const EngravingItem* e = nullptr);
@@ -882,7 +883,7 @@ protected:
     virtual void onTimeInserted(const Fraction& tick, const Fraction& len, const std::vector<RepeatSegmentInfo>& oldSegments);
 
     friend class MasterScore;
-    Score(const muse::modularity::ContextPtr& iocCtx);
+    explicit Score(const EngravingServices& services);
     Score(MasterScore*, bool forcePartStyle = true);
     Score(MasterScore*, const MStyle&);
 
@@ -942,6 +943,7 @@ private:
 
     FBox* findFretBox() const;
 
+    const EngravingServices& m_services;
     MasterScore* m_masterScore = nullptr;
     std::list<MuseScoreView*> m_viewer;
     Excerpt* m_excerpt = nullptr;
@@ -1008,13 +1010,7 @@ private:
     DummyParent* m_dummy = nullptr;
     LayoutOptions m_layoutOptions;
 
-    muse::async::Channel<EngravingItem*> m_elementDestroyed;
-
     ShadowNote* m_shadowNote = nullptr;
-
-    muse::async::Channel<LoopBoundaryType, unsigned> m_loopBoundaryTickChanged;
-
-    muse::async::Channel<float> m_layoutProgressChannel;
 
     PaddingTables m_paddingTables;
     double m_minimumPaddingUnit = 0.0;

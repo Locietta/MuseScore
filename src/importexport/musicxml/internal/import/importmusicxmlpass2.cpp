@@ -101,7 +101,6 @@
 #include "../shared/musicxmlsupport.h"
 #include "../shared/musicxmltypes.h"
 
-#include "modularity/ioc.h"
 #include "importexport/musicxml/imusicxmlconfiguration.h"
 #include "engraving/iengravingfontsprovider.h"
 #include "engraving/rendering/score/tlayout.h"
@@ -115,15 +114,6 @@ using namespace mu::engraving::rendering::score;
 using namespace mu::iex::musicxml;
 
 namespace mu::iex::musicxml {
-static std::shared_ptr<mu::iex::musicxml::IMusicXmlConfiguration> configuration()
-{
-    return muse::modularity::globalIoc()->resolve<mu::iex::musicxml::IMusicXmlConfiguration>("iex_musicxml");
-}
-
-static std::shared_ptr<mu::engraving::IEngravingFontsProvider> engravingFonts()
-{
-    return muse::modularity::globalIoc()->resolve<mu::engraving::IEngravingFontsProvider>("iex_musicxml");
-}
 
 //---------------------------------------------------------
 //   local defines for debug output
@@ -139,7 +129,7 @@ constexpr int MAX_LYRICS       = 16;
 
 static void addTie(const Notation& notation, Note* note, const track_idx_t track, MusicXmlTieMap& tie,
                    std::vector<Note*>& unstartedTieNotes, std::vector<Note*>& unendedTieNotes, MusicXmlLogger* logger,
-                   const XmlStreamReader* const xmlreader);
+                   const XmlStreamReader* const xmlreader, bool importLayout);
 
 //---------------------------------------------------------
 //   support enums / structs / classes
@@ -762,7 +752,7 @@ static void setPartInstruments(MusicXmlLogger* logger, const XmlStreamReader* xm
  characters are preserved as-is.
  */
 namespace xmlpass2 {
-static String text2syms(const String& t, bool isDolet = false)
+static String text2syms(const String& t, const IEngravingFontsProvider& fonts, bool isDolet = false)
 {
     //QTime time;
     //time.start();
@@ -771,7 +761,7 @@ static String text2syms(const String& t, bool isDolet = false)
     // note that this takes about 1 msec on a Core i5,
     // caching does not gain much
 
-    IEngravingFontPtr sf = engravingFonts()->fallbackFont();
+    IEngravingFontPtr sf = fonts.fallbackFont();
     std::map<String, SymId> map;
     size_t maxStringSize = 0;          // maximum string size found
 
@@ -836,7 +826,8 @@ static String text2syms(const String& t, bool isDolet = false)
 // TODO: probably should be shared between pass 1 and 2
 
 namespace xmlpass2 {
-static String nextPartOfFormattedString(XmlStreamReader& e, bool isDolet = false)
+static String nextPartOfFormattedString(XmlStreamReader& e, const IMusicXmlConfiguration& configuration,
+                                        const IEngravingFontsProvider& fonts, bool isDolet = false)
 {
     //String lang       = e.attribute(String("xml:lang"), "it");
     String fontWeight = e.attribute("font-weight");
@@ -850,7 +841,7 @@ static String nextPartOfFormattedString(XmlStreamReader& e, bool isDolet = false
     String txt = e.readText();
     // replace HTML entities
     txt = String::decodeXmlEntities(txt);
-    String syms = xmlpass2::text2syms(txt, isDolet);
+    String syms = xmlpass2::text2syms(txt, fonts, isDolet);
 
     String importedtext;
 
@@ -862,7 +853,7 @@ static String nextPartOfFormattedString(XmlStreamReader& e, bool isDolet = false
         }
     }
 
-    bool needUseDefaultFont = configuration()->needUseDefaultFont();
+    bool needUseDefaultFont = configuration.needUseDefaultFont();
     if (!fontFamily.empty() && txt == syms && !needUseDefaultFont) {
         // add font family only if no <sym> replacement made
         importedtext += String(u"<font face=\"%1\"/>").arg(fontFamily);
@@ -1594,13 +1585,12 @@ static NoteHeadGroup convertNotehead(String mxmlName)
 
 static void addTextToNote(int64_t byteOffset, String txt, String placement, String fontWeight,
                           double fontSize, String fontStyle, String fontFamily, bool visible, Color color,
-                          TextStyleType subType, const Score*, Note* note)
+                          TextStyleType subType, const Score*, Note* note, bool needUseDefaultFont)
 {
     if (note) {
         if (!txt.empty()) {
             TextBase* t = Factory::createFingering(note, subType);
             t->setPlainText(txt);
-            bool needUseDefaultFont = configuration()->needUseDefaultFont();
             if (!fontFamily.empty() && !needUseDefaultFont) {
                 t->setFamily(fontFamily);
                 t->setPropertyFlags(Pid::FONT_FACE, PropertyFlags::UNSTYLED);
@@ -3410,10 +3400,11 @@ static GradualTempoChangeType getTempoChangeTypeFromString(String txt)
     }
 }
 
-static void terminateInferredLine(const std::vector<TextLineBase*> lines, const Fraction& tick, const track_idx_t track)
+static void terminateInferredLine(const std::vector<TextLineBase*> lines, const Fraction& tick, const track_idx_t track,
+                                  bool inferTextType)
 {
     // Check staff and end any lines which are waiting
-    if (configuration()->inferTextType()) {
+    if (inferTextType) {
         // To avoid extending lines which aren't intended to be terminated by their end markings,
         // only extend lines to markings within 24 quarter notes
         static const Fraction MAX_INFERRED_LINE_LEN = Fraction(24, 4);
@@ -3670,7 +3661,8 @@ void MusicXmlParserDirection::direction(const String& partId,
                 m_logger->logDebugInfo(String(u"Inferring fingering: %1").arg(fingeringStr));
                 t->setXmlText(fingeringStr);
                 MusicXmlInferredFingering* inferredFingering = new MusicXmlInferredFingering(totalY(), t, fingeringStr, m_track,
-                                                                                             placement(), measure, tick + m_offset);
+                                                                                             placement(), measure, tick + m_offset,
+                                                                                             configuration()->needUseDefaultFont());
                 inferredFingerings.push_back(inferredFingering);
             } else {
                 if (hasTotalY()) {
@@ -3704,7 +3696,8 @@ void MusicXmlParserDirection::direction(const String& partId,
 
     if (tempoTextAdded) {
         const InferredTempoLineStack& lines = m_pass2.getInferredTempoLine();
-        terminateInferredLine(std::vector<TextLineBase*>(lines.begin(), lines.end()), tick + m_offset, m_track);
+        terminateInferredLine(std::vector<TextLineBase*>(lines.begin(), lines.end()), tick + m_offset, m_track,
+                              configuration()->inferTextType());
     }
     addInferredTempoLine(tick + m_offset);
 
@@ -3756,7 +3749,8 @@ void MusicXmlParserDirection::direction(const String& partId,
         }
 
         const InferredHairpinsStack& hairpins = m_pass2.getInferredHairpins();
-        terminateInferredLine(std::vector<TextLineBase*>(hairpins.begin(), hairpins.end()), tick + m_offset, m_track);
+        terminateInferredLine(std::vector<TextLineBase*>(hairpins.begin(), hairpins.end()), tick + m_offset, m_track,
+                              configuration()->inferTextType());
 
         // Add element to score later, after collecting all the others and sorting by default-y
         // This allows default-y to be at least respected by the order of elements
@@ -4043,7 +4037,8 @@ void MusicXmlParserDirection::directionType(std::vector<MusicXmlSpannerDesc>& st
         } else if (m_e.name() == "words") {
             m_enclosure = m_e.attribute("enclosure");
             m_fontFamily = m_e.attribute("font-family");
-            String nextPart = xmlpass2::nextPartOfFormattedString(m_e, m_pass1.dolet());
+            String nextPart = xmlpass2::nextPartOfFormattedString(m_e, *configuration(), *m_score->engravingFonts(),
+                                                                         m_pass1.dolet());
 
             textToDynamic(nextPart);
             textToCrescLine(nextPart);
@@ -4054,7 +4049,8 @@ void MusicXmlParserDirection::directionType(std::vector<MusicXmlSpannerDesc>& st
             if (m_enclosure.empty()) {
                 m_enclosure = u"square";          // note different default
             }
-            m_rehearsalText += xmlpass2::nextPartOfFormattedString(m_e, m_pass1.dolet());
+            m_rehearsalText += xmlpass2::nextPartOfFormattedString(m_e, *configuration(), *m_score->engravingFonts(),
+                                                                    m_pass1.dolet());
         } else if (m_e.name() == "harp-pedals") {
             harpPedal();
         } else if (m_e.name() == "pedal") {
@@ -4415,8 +4411,10 @@ MusicXmlInferredFingering::MusicXmlInferredFingering(double totalY,
                                                      track_idx_t track,
                                                      String placement,
                                                      Measure* measure,
-                                                     Fraction tick)
-    : m_totalY(totalY), m_element(element),  m_text(text), m_track(track), m_placement(placement), m_measure(measure), m_tick(tick)
+                                                     Fraction tick,
+                                                     bool needUseDefaultFont)
+    : m_totalY(totalY), m_element(element),  m_text(text), m_track(track), m_placement(placement), m_measure(measure), m_tick(tick),
+    m_needUseDefaultFont(needUseDefaultFont)
 {
     m_fingerings = m_text.simplified().split(u" ");
 }
@@ -4492,7 +4490,7 @@ void MusicXmlInferredFingering::addToNotes(std::vector<Note*>& notes) const
                       m_fingerings[m_fingerings.size() - 1 - i], m_placement, u"", -1, u"", u"",
                       true, Color::BLACK, TextStyleType::FINGERING,
                       notes[i]->score(),
-                      notes[i]);
+                      notes[i], m_needUseDefaultFont);
     }
 }
 
@@ -5859,7 +5857,8 @@ void MusicXmlParserPass2::barline(const String& partId, Measure* measure, const 
 
             // Terminate tempo lines
             const InferredTempoLineStack& lines = getInferredTempoLine();
-            terminateInferredLine(std::vector<TextLineBase*>(lines.begin(), lines.end()), locTick, track);
+            terminateInferredLine(std::vector<TextLineBase*>(lines.begin(), lines.end()), locTick, track,
+                                  configuration()->inferTextType());
         } else if (m_e.name() == "ending") {
             endingNumber = m_e.attribute("number");
             endingType   = m_e.attribute("type");
@@ -7041,7 +7040,7 @@ Note* MusicXmlParserPass2::note(const String& partId,
     String beamFan;
     String instrumentId;
     String tieType;
-    MusicXmlParserLyric lyric { m_pass1.getMusicXmlPart(partId).lyricNumberHandler(), m_e, m_score, m_logger,
+    MusicXmlParserLyric lyric { m_pass1.getMusicXmlPart(partId).lyricNumberHandler(), m_e, m_score, *configuration(), m_logger,
                                 m_pass1.isVocalStaff(partId) };
     MusicXmlParserNotations notations { m_e, m_score, m_logger, *this };
 
@@ -7410,7 +7409,8 @@ Note* MusicXmlParserPass2::note(const String& partId,
             Notation notation = Notation(u"tied");
             const String type2 = u"type";
             notation.addAttribute(type2, tieType);
-            addTie(notation, note, cr->track(), m_ties, m_unstartedTieNotes, m_unendedTieNotes, m_logger, &m_e);
+            addTie(notation, note, cr->track(), m_ties, m_unstartedTieNotes, m_unendedTieNotes, m_logger, &m_e,
+                   configuration()->importLayout());
         }
     }
 
@@ -8164,8 +8164,10 @@ void MusicXmlParserPass2::backup(Fraction& dura)
 //---------------------------------------------------------
 
 MusicXmlParserLyric::MusicXmlParserLyric(const LyricNumberHandler lyricNumberHandler,
-                                         XmlStreamReader& e, Score* score, MusicXmlLogger* logger, bool isVoiceStaff)
-    : m_lyricNumberHandler(lyricNumberHandler), m_e(e), m_score(score), m_logger(logger), m_isVoiceStaff(isVoiceStaff)
+                                         XmlStreamReader& e, Score* score, const IMusicXmlConfiguration& configuration,
+                                         MusicXmlLogger* logger, bool isVoiceStaff)
+    : m_lyricNumberHandler(lyricNumberHandler), m_e(e), m_score(score), m_configuration(configuration), m_logger(logger),
+    m_isVoiceStaff(isVoiceStaff)
 {
     // nothing
 }
@@ -8237,7 +8239,7 @@ void MusicXmlParserLyric::parse(bool visibility)
                 LOGD("unknown syllabic %s", muPrintable(syll));                      // TODO
             }
         } else if (m_e.name() == "text") {
-            formattedText += xmlpass2::nextPartOfFormattedString(m_e);
+            formattedText += xmlpass2::nextPartOfFormattedString(m_e, m_configuration, *m_score->engravingFonts());
         } else {
             skipLogCurrElem();
         }
@@ -8312,7 +8314,7 @@ String MusicXmlParserLyric::placement() const
 
 bool MusicXmlParserLyric::isLikelySticking(const String& text, const LyricsSyllabic syllabic, const bool hasExtend)
 {
-    if (!configuration()->inferTextType()) {
+    if (!m_configuration.inferTextType()) {
         return false;
     }
     String plainWords = MScoreTextToMusicXml::toPlainText(text.simplified());
@@ -8352,7 +8354,7 @@ void MusicXmlParserNotations::slur()
 //---------------------------------------------------------
 
 static void addSlur(const Notation& notation, SlurStack& slurs, ChordRest* cr, Note* note, const Fraction& tick,
-                    MusicXmlLogger* logger, const XmlStreamReader* const xmlreader)
+                    MusicXmlLogger* logger, const XmlStreamReader* const xmlreader, bool importLayout)
 {
     int slurNo = notation.attribute(u"number").toInt();
     if (slurNo > 0) {
@@ -8414,7 +8416,7 @@ static void addSlur(const Notation& notation, SlurStack& slurs, ChordRest* cr, N
             colorItem(newSlur, Color::fromString(notation.attribute(u"color")));
             newSlur->setTick(tick);
             newSlur->setStartElement(cr);
-            if (configuration()->importLayout()) {
+            if (importLayout) {
                 const String orientation = notation.attribute(u"orientation");
                 const String placement = notation.attribute(u"placement");
                 if (orientation == u"over" || placement == u"above") {
@@ -8881,7 +8883,8 @@ void MusicXmlParserNotations::addTechnical(const Notation& notation, Note* note)
         // TODO: distinguish between keyboards (style TextStyleName::FINGERING)
         // and (plucked) strings (style TextStyleName::LH_GUITAR_FINGERING)
         addTextToNote(m_e.byteOffset(), notation.text(), placement, fontWeight, fontSize, fontStyle, fontFamily,
-                      notation.visible(), color, TextStyleType::FINGERING, m_score, note);
+                      notation.visible(), color, TextStyleType::FINGERING, m_score, note,
+                      m_pass2.configuration()->needUseDefaultFont());
     } else if (notation.name() == u"fret") {
         int fret = notation.text().toInt();
         if (note) {
@@ -8893,14 +8896,16 @@ void MusicXmlParserNotations::addTechnical(const Notation& notation, Note* note)
         }
     } else if (notation.name() == "pluck") {
         addTextToNote(m_e.byteOffset(), notation.text(), placement, fontWeight, fontSize, fontStyle, fontFamily,
-                      notation.visible(), color, TextStyleType::RH_GUITAR_FINGERING, m_score, note);
+                      notation.visible(), color, TextStyleType::RH_GUITAR_FINGERING, m_score, note,
+                      m_pass2.configuration()->needUseDefaultFont());
     } else if (notation.name() == "string") {
         if (note) {
             if (note->staff()->isTabStaff(Fraction(0, 1))) {
                 note->setString(notation.text().toInt() - 1);
             } else {
                 addTextToNote(m_e.byteOffset(), notation.text(), placement, fontWeight, fontSize, fontStyle, fontFamily,
-                              notation.visible(), color, TextStyleType::STRING_NUMBER, m_score, note);
+                              notation.visible(), color, TextStyleType::STRING_NUMBER, m_score, note,
+                              m_pass2.configuration()->needUseDefaultFont());
             }
         } else {
             m_logger->logError(u"no note for string", &m_e);
@@ -9117,7 +9122,7 @@ static void addArpeggio(ChordRest* cr, String& arpeggioType, int arpeggioNo, Col
 
 static void addTie(const Notation& notation, Note* note, const track_idx_t track, MusicXmlTieMap& ties,
                    std::vector<Note*>& unstartedTieNotes, std::vector<Note*>& unendedTieNotes, MusicXmlLogger* logger,
-                   const XmlStreamReader* const xmlreader)
+                   const XmlStreamReader* const xmlreader, bool importLayout)
 {
     IF_ASSERT_FAILED(note) {
         return;
@@ -9146,7 +9151,7 @@ static void addTie(const Notation& notation, Note* note, const track_idx_t track
         currTie->setVisible(notation.visible());
         colorItem(currTie, Color::fromString(notation.attribute(u"color")));
 
-        if (configuration()->importLayout()) {
+        if (importLayout) {
             if (orientation == u"over" || placement == u"above") {
                 currTie->setSlurDirection(DirectionV::UP);
             } else if (orientation == u"under" || placement == u"below") {
@@ -9190,7 +9195,7 @@ static void addTie(const Notation& notation, Note* note, const track_idx_t track
         lvTie->setVisible(notation.visible());
         colorItem(lvTie, Color::fromString(notation.attribute(u"color")));
 
-        if (configuration()->importLayout()) {
+        if (importLayout) {
             if (orientation == u"over" || placement == u"above") {
                 lvTie->setSlurDirection(DirectionV::UP);
             } else if (orientation == u"under" || placement == u"below") {
@@ -9491,7 +9496,8 @@ void MusicXmlParserNotations::addNotation(const Notation& notation, ChordRest* c
 
             // Terminate tempo line
             const InferredTempoLineStack& lines = m_pass2.getInferredTempoLine();
-            terminateInferredLine(std::vector<TextLineBase*>(lines.begin(), lines.end()), cr->tick(), cr->track());
+            terminateInferredLine(std::vector<TextLineBase*>(lines.begin(), lines.end()), cr->tick(), cr->track(),
+                                  m_pass2.configuration()->inferTextType());
         } else if (notation.parent() == u"ornaments") {
             addTurnToChord(notation, cr);
         } else {
@@ -9536,11 +9542,12 @@ void MusicXmlParserNotations::addToScore(ChordRest* const cr, Note* const note, 
         if (notation.symId() != SymId::noSym) {
             addNotation(notation, cr, note);
         } else if (notation.name() == "slur" || notation.name() == "hammer-on" || notation.name() == "pull-off") {
-            addSlur(notation, slurs, cr, note, tick, m_logger, &m_e);
+            addSlur(notation, slurs, cr, note, tick, m_logger, &m_e, m_pass2.configuration()->importLayout());
         } else if (note && (notation.name() == "glissando" || notation.name() == "slide")) {
             addGlissandoSlide(notation, note, glissandi, spanners, m_logger, &m_e);
         } else if (note && notation.name() == "tied") {
-            addTie(notation, note, cr->track(), ties, unstartedTieNotes, unendedTieNotes, m_logger, &m_e);
+            addTie(notation, note, cr->track(), ties, unstartedTieNotes, unendedTieNotes, m_logger, &m_e,
+                   m_pass2.configuration()->importLayout());
         } else if (note && notation.parent() == "technical") {
             addTechnical(notation, note);
         } else {

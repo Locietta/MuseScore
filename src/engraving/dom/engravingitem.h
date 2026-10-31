@@ -25,7 +25,6 @@
 #include "draw/types/color.h"
 #include "draw/types/geometry.h"
 
-#include "modularity/ioc.h"
 #include "../rendering/paintoptions.h"
 
 #include "../infrastructure/ld_access.h"
@@ -167,7 +166,6 @@ public:
     virtual EngravingItem* layoutParent() const;
 
     const std::shared_ptr<IEngravingConfiguration>& configuration() const;
-    const muse::modularity::ContextPtr& iocContext() const;
     const std::shared_ptr<IEngravingContextConfiguration>& contextConfiguration() const;
     const std::shared_ptr<rendering::IScoreRenderer>& renderer() const;
 

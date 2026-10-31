@@ -281,7 +281,7 @@ int main(int argc, char** argv)
 
         auto runtimeStart = std::chrono::steady_clock::now();
         music::EngineContext context(assets);
-        auto score = music::load_native_score(scoreBytes, scoreFormat);
+        auto score = music::load_native_score(context, scoreBytes, scoreFormat);
         mu::engraving::MasterScore* master = score->masterScore();
         out["loadSeconds"] = seconds_since(runtimeStart);
 
@@ -353,7 +353,7 @@ int main(int argc, char** argv)
                     }
                 });
         }
-        const music::AudioRenderResult result = music::export_score_audio(master, request);
+        const music::AudioRenderResult result = music::export_score_audio(master, request, context.articulationProfiles());
         if (captureMidi) {
             music::set_engine_audio_midi_event_hook(nullptr);
         }

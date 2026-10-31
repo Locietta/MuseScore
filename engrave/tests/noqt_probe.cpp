@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
         std::ifstream in(std::filesystem::u8path(argv[2]), std::ios::binary);
         if (!in) throw std::runtime_error("Cannot read input");
         const std::string input{std::istreambuf_iterator<char>(in), {}};
-        auto project = music::load_native_score(input, "musicxml");
+        auto project = music::load_native_score(context, input, "musicxml");
         const std::string xml = music::export_native_score(context, project, "musicxml", 0, {});
         const std::string midi = music::export_native_score(context, project, "midi", 0, {});
         std::ofstream(std::filesystem::u8path(argv[3]), std::ios::binary) << xml;

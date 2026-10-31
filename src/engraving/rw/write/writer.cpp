@@ -19,6 +19,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include "global/appinfo.h"
 #include "writer.h"
 
 #include "../types/types.h"
@@ -61,8 +62,8 @@ bool Writer::writeScore(Score* score, io::IODevice* device, rw::WriteInOutData* 
     xml.startElement("museScore", { { "version", Constants::MSC_VERSION_STR } });
 
     if (!MScore::testMode) {
-        xml.tag("programVersion", application()->version().toString());
-        xml.tag("programRevision", application()->revision());
+        xml.tag("programVersion", muse::appinfo::version().toString());
+        xml.tag("programRevision", muse::appinfo::revision());
     }
 
     compat::WriteScoreHook hook;
@@ -73,8 +74,8 @@ bool Writer::writeScore(Score* score, io::IODevice* device, rw::WriteInOutData* 
 
     if (!inout || !inout->ctx.shouldWriteRange()) {
         //update version values for i.e. plugin access
-        score->m_mscoreVersion = application()->version().toString();
-        score->m_mscoreRevision = application()->revision().toInt(nullptr, 16);
+        score->m_mscoreVersion = muse::appinfo::version().toString();
+        score->m_mscoreRevision = muse::appinfo::revision().toInt(nullptr, 16);
         score->m_mscVersion = Constants::MSC_VERSION;
     }
 

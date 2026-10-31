@@ -124,9 +124,6 @@ void AutomationData::setCurves(const AutomationCurveMap& curves)
 
     if (m_curveMap.empty() && !curves.empty()) {
         m_curveMap = curves;
-        AutomationChanges changes;
-        changes.isFullReset = true;
-        notifyChanged(changes);
         return;
     }
 
@@ -158,7 +155,6 @@ void AutomationData::setCurves(const AutomationCurveMap& curves)
 
     m_curveMap = curves;
 
-    notifyChanged(changes);
 }
 
 void AutomationData::replaceCurves(const AutomationCurveMap& curves)
@@ -167,9 +163,6 @@ void AutomationData::replaceCurves(const AutomationCurveMap& curves)
 
     if (m_curveMap.empty() && !curves.empty()) {
         m_curveMap = curves;
-        AutomationChanges changes;
-        changes.isFullReset = true;
-        notifyChanged(changes);
         return;
     }
 
@@ -204,7 +197,6 @@ void AutomationData::replaceCurves(const AutomationCurveMap& curves)
         changes.isFullReset = true;
     }
 
-    notifyChanged(changes);
 }
 
 void AutomationData::editPoints(const AutomationCurveKey& key, const AutomationPointEdits& edits)
@@ -274,12 +266,6 @@ void AutomationData::editPoints(const AutomationCurveKey& key, const AutomationP
         changes.affectedKeys.insert(key);
     }
 
-    notifyChanged(changes);
-}
-
-muse::async::Channel<AutomationChanges> AutomationData::changed() const
-{
-    return m_changesChannel;
 }
 
 std::string AutomationData::dump() const
@@ -342,13 +328,4 @@ std::string AutomationData::dump() const
     }
 
     return result;
-}
-
-void AutomationData::notifyChanged(const AutomationChanges& changes)
-{
-    if (changes.isEmpty()) {
-        return;
-    }
-
-    m_changesChannel.send(changes);
 }

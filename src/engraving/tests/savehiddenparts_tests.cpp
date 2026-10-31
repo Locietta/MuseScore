@@ -38,6 +38,7 @@
 #include "engraving/editing/transaction/undostack.h"
 #include "engraving/infrastructure/localfileinfoprovider.h"
 #include "engraving/infrastructure/mscreader.h"
+#include "engraving/tests/utils/scorerw.h"
 #include "engraving/infrastructure/mscwriter.h"
 #include "engraving/rw/mscloader.h"
 #include "engraving/rw/mscsaver.h"
@@ -61,7 +62,7 @@ public:
     */
     std::unique_ptr<MasterScore> createScoreWithHiddenInstrument(int hiddenNoteMeasure)
     {
-        MasterScore* score = compat::ScoreAccess::createMasterScore(nullptr);
+        MasterScore* score = compat::ScoreAccess::createMasterScore(ScoreRW::services());
         for (int i = 0; i < 2; ++i) {
             Part* part = new Part(score);
             score->appendPart(part);
@@ -94,7 +95,7 @@ public:
 
         MscWriter writer(params);
         EXPECT_TRUE(writer.open());
-        EXPECT_TRUE(MscSaver(score->iocContext()).writeMscz(score, writer, /*createThumbnail*/ false));
+        EXPECT_TRUE(MscSaver(score->services()).writeMscz(score, writer, /*createThumbnail*/ false));
         writer.close();
 
         return data;
@@ -110,7 +111,7 @@ public:
         MscReader reader(params);
         EXPECT_TRUE(reader.open());
 
-        MasterScore* score = compat::ScoreAccess::createMasterScore(nullptr);
+        MasterScore* score = compat::ScoreAccess::createMasterScore(ScoreRW::services());
         score->setFileInfoProvider(std::make_shared<LocalFileInfoProvider>(path_t()));
         EXPECT_TRUE(MscLoader().loadMscz(score, reader, nullptr, /*ignoreVersionError*/ true));
         score->doLayout();

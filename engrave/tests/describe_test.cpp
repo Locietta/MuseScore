@@ -42,6 +42,7 @@
 #include "engrave/src/api/pid_support.h"
 #include "engrave/src/api/sniff.h"
 #include "engrave/src/api/value_codec.h"
+#include "engrave/src/api/state.h"
 #include "engrave/src/runtime/noqt_runtime.h"
 
 namespace {
@@ -64,6 +65,8 @@ std::filesystem::path g_assets;
 std::filesystem::path g_python;
 std::vector<std::filesystem::path> g_corpus_files;
 std::unique_ptr<engrave::Engine> g_engine;
+// A document of g_engine through which the corpus loader reaches the engine context.
+std::unique_ptr<engrave::Document> g_anchor;
 
 std::string read_file(const std::filesystem::path& path) {
     std::ifstream in(path, std::ios::binary);
@@ -130,7 +133,8 @@ struct Corpus {
             return;
         }
         try {
-            projects.push_back(music::load_native_score(bytes, backend_name(*format)));
+            projects.push_back(music::load_native_score(engrave::DocumentAccess::context(*g_anchor), bytes,
+                                                        backend_name(*format)));
         } catch (const std::exception&) {
             unreadable.push_back(file);
             return;
@@ -468,7 +472,16 @@ int main(int argc, char** argv) {
         return 1;
     }
     g_engine = std::move(*engine);
+    const std::string anchor = R"(<score-partwise version="4.0"><part-list><score-part id="P1"><part-name>P</part-name></score-part></part-list>
+<part id="P1"><measure number="1"><note><rest/><duration>4</duration></note></measure></part></score-partwise>)";
+    auto document = g_engine->open(std::as_bytes(std::span(anchor.data(), anchor.size())));
+    if (!document) {
+        std::fprintf(stderr, "Engine::open: %s\n", document.error().message.c_str());
+        return 1;
+    }
+    g_anchor = std::move(*document);
     const int result = RUN_ALL_TESTS();
+    g_anchor.reset();
     g_engine.reset();
     return result;
 }

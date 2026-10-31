@@ -118,13 +118,13 @@ void copy_score_versions(engraving::MasterScore* source, engraving::MasterScore*
                          source->mscoreRevision(), source->mscVersion());
 }
 
-ScoreProject load_native_score(const std::string& input, const std::string& format) {
+ScoreProject load_native_score(const EngineContext& context, const std::string& input, const std::string& format) {
     if (input.empty() || input.size() > 8 * 1024 * 1024) throw std::invalid_argument("Input must contain 1..8388608 bytes");
     // Like NotationProject::doImport (project/internal/notationproject.cpp:304) and
     // importMusicXmlfromBuffer, the whole reading + setup phase is a load: layout
     // inside it runs outside a transaction and must not push undo commands or warn.
     engraving::ScoreLoad scoreLoad;
-    auto project = engraving::EngravingProject::create(modularity::globalCtx());
+    auto project = engraving::EngravingProject::create(context.engraving());
     project->setFileInfoProvider(std::make_shared<engraving::LocalFileInfoProvider>("Untitled.mscz"));
     ByteArray data = byte_array(input);
     if (format == "mxl" || format == "mscz") {
@@ -179,7 +179,7 @@ ScoreProject load_native_score(const std::string& input, const std::string& form
                 throw std::invalid_argument("Embedded score images are not yet supported by the native backend");
         }
         if (scan.error() != XmlStreamReader::NoError) throw std::invalid_argument("Malformed MusicXML");
-        if (iex::musicxml::importMusicXmlfromBuffer(project->masterScore(), u"input.musicxml", data) != engraving::Err::NoError)
+        if (iex::musicxml::importMusicXmlfromBuffer(project->masterScore(), u"input.musicxml", data, context.musicXml()) != engraving::Err::NoError)
             throw std::runtime_error("MusicXML import failed");
     } else if (format == "mid" || format == "midi" || format == "kar") {
         if (import_midi_score(project->masterScore(), input) != engraving::Err::NoError)
@@ -192,9 +192,9 @@ ScoreProject load_native_score(const std::string& input, const std::string& form
     return project;
 }
 
-ScoreProject load_native_score_dir(const std::string& mscx_path) {
+ScoreProject load_native_score_dir(const EngineContext& context, const std::string& mscx_path) {
     engraving::ScoreLoad scoreLoad;
-    auto project = engraving::EngravingProject::create(modularity::globalCtx());
+    auto project = engraving::EngravingProject::create(context.engraving());
     project->setFileInfoProvider(std::make_shared<engraving::LocalFileInfoProvider>("Untitled.mscz"));
     engraving::MscReader::Params params;
     params.filePath = io::path_t(mscx_path);
@@ -231,8 +231,8 @@ std::string export_native_score(const EngineContext& context, const ScoreProject
     io::Buffer buffer(&data);
     buffer.open(io::IODevice::WriteOnly);
     bool success = false;
-    if (format == "musicxml") success = iex::musicxml::saveXml(score, &buffer);
-    else if (format == "mxl") success = iex::musicxml::saveMxl(score, &buffer);
+    if (format == "musicxml") success = iex::musicxml::saveXml(score, &buffer, context.musicXml());
+    else if (format == "mxl") success = iex::musicxml::saveMxl(score, &buffer, context.musicXml());
     else if (format == "mscz" || format == "mscx") {
         // Writer::writeScore stamps the writing program's version into every score it
         // writes; an export is read-only for the document, so restore the file's values

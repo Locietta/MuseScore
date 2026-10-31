@@ -49,7 +49,6 @@
 #include "../shared/musicxmltypes.h"
 #include "../shared/musicxmlsupport.h"
 
-#include "modularity/ioc.h"
 #include "importexport/musicxml/imusicxmlconfiguration.h"
 
 #include "log.h"
@@ -59,28 +58,6 @@ using namespace muse;
 using namespace muse::draw;
 using namespace mu::engraving;
 using namespace mu::engraving::rendering::score;
-
-static std::shared_ptr<mu::iex::musicxml::IMusicXmlConfiguration> configuration()
-{
-    return muse::modularity::globalIoc()->resolve<mu::iex::musicxml::IMusicXmlConfiguration>("iex_musicxml");
-}
-
-static std::shared_ptr<mu::engraving::IEngravingFontsProvider> engravingFonts()
-{
-    return muse::modularity::globalIoc()->resolve<mu::engraving::IEngravingFontsProvider>("iex_musicxml");
-}
-
-static bool musicXmlImportBreaks()
-{
-    auto conf = configuration();
-    return conf ? conf->importBreaks() : true;
-}
-
-static bool musicXmlImportLayout()
-{
-    auto conf = configuration();
-    return conf ? conf->importLayout() : true;
-}
 
 namespace mu::iex::musicxml {
 //---------------------------------------------------------
@@ -390,8 +367,8 @@ static void copyOverlapData(VoiceOverlapDetector& vod, VoiceList& vcLst)
 //   MusicXmlParserPass1
 //---------------------------------------------------------
 
-MusicXmlParserPass1::MusicXmlParserPass1(Score* score, MusicXmlLogger* logger)
-    : m_divs(0), m_score(score), m_logger(logger), m_hasBeamingInfo(false)
+MusicXmlParserPass1::MusicXmlParserPass1(Score* score, const IMusicXmlConfiguration& configuration, MusicXmlLogger* logger)
+    : m_divs(0), m_score(score), m_configuration(configuration), m_logger(logger), m_hasBeamingInfo(false)
 {
     // nothing
 }
@@ -729,10 +706,11 @@ static void addBreak(Score* const, MeasureBase* const mb, const LayoutBreakType 
 //   addBreakToPreviousMeasureBase
 //---------------------------------------------------------
 
-static void addBreakToPreviousMeasureBase(Score* const score, MeasureBase* const mb, const LayoutBreakType type)
+static void addBreakToPreviousMeasureBase(Score* const score, MeasureBase* const mb, const LayoutBreakType type,
+                                          bool importBreaks)
 {
     MeasureBase* const pm = mb->prev();
-    if (pm && musicXmlImportBreaks()) {
+    if (pm && importBreaks) {
         addBreak(score, pm, type);
     }
 }
@@ -1208,9 +1186,9 @@ void MusicXmlParserPass1::createMeasuresAndVboxes(Score* score,
             mb = measure;
         }
         if (pageStartMeasureNrs.count(int(i))) {
-            addBreakToPreviousMeasureBase(score, mb, LayoutBreakType::PAGE);
+            addBreakToPreviousMeasureBase(score, mb, LayoutBreakType::PAGE, configuration()->importBreaks());
         } else if (systemStartMeasureNrs.count(int(i))) {
-            addBreakToPreviousMeasureBase(score, mb, LayoutBreakType::LINE);
+            addBreakToPreviousMeasureBase(score, mb, LayoutBreakType::LINE, configuration()->importBreaks());
         }
 
         // add a footer vbox if the next measure is on a new page or end of score has been reached
@@ -1577,7 +1555,7 @@ void MusicXmlParserPass1::identification()
  Convert SMuFL code points to MuseScore <sym>...</sym>
  */
 
-static String text2syms(const String& t)
+static String text2syms(const String& t, const IEngravingFontsProvider& fonts)
 {
     //QTime time;
     //time.start();
@@ -1586,7 +1564,7 @@ static String text2syms(const String& t)
     // note that this takes about 1 msec on a Core i5,
     // caching does not gain much
 
-    IEngravingFontPtr sf = engravingFonts()->fallbackFont();
+    IEngravingFontPtr sf = fonts.fallbackFont();
     std::map<String, SymId> map;
     size_t maxStringSize = 0;          // maximum string size found
 
@@ -1647,7 +1625,8 @@ static String text2syms(const String& t)
  Read the next part of a MusicXML formatted string and convert to MuseScore internal encoding.
  */
 
-static String nextPartOfFormattedString(XmlStreamReader& e)
+static String nextPartOfFormattedString(XmlStreamReader& e, const IMusicXmlConfiguration& configuration,
+                                        const IEngravingFontsProvider& fonts)
 {
     //String lang       = e.attribute(String("xml:lang"), "it");
     String fontWeight = e.attribute("font-weight");
@@ -1661,7 +1640,7 @@ static String nextPartOfFormattedString(XmlStreamReader& e)
     String txt = e.readText();
     // replace HTML entities
     txt = String::decodeXmlEntities(txt);
-    String syms       = text2syms(txt);
+    String syms       = text2syms(txt, fonts);
     if (overrideTextStyleForComposer(syms)) {
         return syms;
     }
@@ -1676,7 +1655,7 @@ static String nextPartOfFormattedString(XmlStreamReader& e)
         }
     }
 
-    bool needUseDefaultFont = configuration()->needUseDefaultFont();
+    bool needUseDefaultFont = configuration.needUseDefaultFont();
     if (!fontFamily.isEmpty() && txt == syms && !needUseDefaultFont) {
         // add font family only if no <sym> replacement made
         importedtext += String(u"<font face=\"%1\"/>").arg(fontFamily);
@@ -1768,7 +1747,7 @@ void MusicXmlParserPass1::credit(CreditWordsList& credits)
                 valign   = m_e.attribute("valign");
                 creditWordsRead = true;
             }
-            crwords += nextPartOfFormattedString(m_e);
+            crwords += nextPartOfFormattedString(m_e, *configuration(), *m_score->engravingFonts());
         } else if (m_e.name() == "credit-type") {
             // multiple credit-type elements may be present, supported by
             // e.g. Finale v26.3 for Mac.
@@ -1830,13 +1809,14 @@ static bool isHarpPedalStyle(const TextStyleType tid)
 
 static void updateStyles(Score* score,
                          const String& wordFamily, const String& wordSize,
-                         const String& lyricFamily, const String& lyricSize)
+                         const String& lyricFamily, const String& lyricSize,
+                         const IMusicXmlConfiguration& configuration)
 {
     const double dblWordSize = wordSize.toDouble();     // note conversion error results in value 0.0
     const double dblLyricSize = lyricSize.toDouble();   // but avoid comparing (double) floating point number with exact value later
     const double epsilon = 0.001;                       // use epsilon instead
 
-    bool needUseDefaultFont = configuration()->needUseDefaultFont();
+    bool needUseDefaultFont = configuration.needUseDefaultFont();
 
     // loop over all text styles (except the empty, always hidden, first one)
     // set all text styles to the MusicXML defaults
@@ -1859,7 +1839,7 @@ static void updateStyles(Score* score,
             continue;
         }
 
-        bool needUseDefaultSize = configuration()->needUseDefaultFont()
+        bool needUseDefaultSize = configuration.needUseDefaultFont()
                                   || tid == TextStyleType::HAMMER_ON_PULL_OFF
                                   || isTitleFrameStyle(tid)
                                   || isHarpPedalStyle(tid);
@@ -1980,7 +1960,7 @@ void MusicXmlParserPass1::defaults()
     String wordFontFamily;
     String wordFontSize;
 
-    bool isImportLayout = musicXmlImportLayout();
+    bool isImportLayout = configuration()->importLayout();
 
     while (m_e.readNextStartElement()) {
         if (m_e.name() == "scaling") {
@@ -2099,7 +2079,7 @@ void MusicXmlParserPass1::defaults()
            muPrintable(lyricFontFamily), muPrintable(lyricFontSize));
     */
     lyricFontFamily = lyricFontFamily.empty() ? wordFontFamily : lyricFontFamily;
-    updateStyles(m_score, wordFontFamily, wordFontSize, lyricFontFamily, lyricFontSize);
+    updateStyles(m_score, wordFontFamily, wordFontSize, lyricFontFamily, lyricFontSize, *configuration());
 
     scaleCopyrightText(m_score);
 }

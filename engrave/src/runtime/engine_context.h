@@ -9,6 +9,15 @@ class IFileSystem;
 namespace muse::draw {
 class IFontsDatabase;
 }
+namespace muse::mpe {
+class IArticulationProfilesRepository;
+}
+namespace mu::engraving {
+struct EngravingServices;
+}
+namespace mu::iex::musicxml {
+class IMusicXmlConfiguration;
+}
 
 namespace music {
 class RuntimeAssets;
@@ -34,6 +43,11 @@ public:
     muse::io::IFileSystem& fileSystem() const;
     RuntimeAssets& assets() const;
     muse::draw::IFontsDatabase& fontsDatabase() const;
+    // The services every score of this engine is built with. Tests may replace
+    // a service before they create scores.
+    mu::engraving::EngravingServices& engraving() const;
+    const muse::mpe::IArticulationProfilesRepository& articulationProfiles() const;
+    const mu::iex::musicxml::IMusicXmlConfiguration& musicXml() const;
 
 private:
     struct Impl;

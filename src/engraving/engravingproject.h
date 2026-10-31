@@ -29,8 +29,7 @@
 #include "infrastructure/ifileinfoprovider.h"
 #include "types/types.h"
 
-#include "modularity/ioc.h"
-#include "devtools/iengravingelementsprovider.h"
+#include "engravingservices.h"
 
 //! NOTE In addition to the score itself, the mscz file also stores other data,
 //! such as synthesizer, mixer settings, omr, etc.
@@ -54,16 +53,14 @@ namespace mu::engraving {
 class MasterScore;
 class MStyle;
 
-class EngravingProject : public std::enable_shared_from_this<EngravingProject>, public muse::Contextable
+class EngravingProject : public std::enable_shared_from_this<EngravingProject>
 {
-public:
-    muse::ContextInject<IEngravingElementsProvider> engravingElementsProvider = { this };
-
 public:
     ~EngravingProject();
 
-    static std::shared_ptr<EngravingProject> create(const muse::modularity::ContextPtr& iocCtx);
-    static std::shared_ptr<EngravingProject> create(const MStyle& style, const muse::modularity::ContextPtr& iocCtx);
+    // services must outlive the project.
+    static std::shared_ptr<EngravingProject> create(const EngravingServices& services);
+    static std::shared_ptr<EngravingProject> create(const MStyle& style, const EngravingServices& services);
 
     IFileInfoProviderPtr fileInfoProvider() const;
     void setFileInfoProvider(IFileInfoProviderPtr fileInfoProvider);
@@ -86,10 +83,11 @@ public:
 private:
     friend class MasterScore;
 
-    EngravingProject(const muse::modularity::ContextPtr& iocCtx);
+    explicit EngravingProject(const EngravingServices& services);
 
     void init(const MStyle& style);
 
+    const EngravingServices& m_services;
     MasterScore* m_masterScore = nullptr;
 
     bool m_isCorruptedUponLoading = false;

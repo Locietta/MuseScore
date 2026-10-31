@@ -25,17 +25,14 @@
 #include <memory>
 #include <string>
 
-#include "global/modularity/imoduleinterface.h"
 #include "global/io/path.h"
 #include "global/io/iodevice.h"
 
 #include "iengravingfont.h"
 
 namespace mu::engraving {
-class IEngravingFontsProvider : MODULE_GLOBAL_INTERFACE
+class IEngravingFontsProvider
 {
-    INTERFACE_ID(IEngravingFontsProvider)
-
 public:
     virtual ~IEngravingFontsProvider() = default;
 

@@ -40,8 +40,6 @@
 #include "importmidi_tempo.h"
 #include "importmidi_operations.h"
 
-#include "modularity/ioc.h"
-#include "importexport/midi/imidiconfiguration.h"
 
 #include "log.h"
 
@@ -125,8 +123,8 @@ MidiOperations::QuantValue fractionToQuantValue(const ReducedFraction& fraction)
 
 MidiOperations::QuantValue defaultQuantValueFromPreferences()
 {
-    auto conf = muse::modularity::globalIoc()->resolve<mu::iex::midi::IMidiImportExportConfiguration>("iex_midi");
-    int ticks = conf ? conf->midiShortestNote() : (Constants::DIVISION / 4);
+    // The engine has no MIDI import preferences: the upstream default, a 16th.
+    int ticks = Constants::DIVISION / 4;
     const auto fraction = ReducedFraction::fromTicks(ticks);
     MidiOperations::QuantValue quantValue = fractionToQuantValue(fraction);
     if (quantValue == MidiOperations::QuantValue::Q_INVALID) {

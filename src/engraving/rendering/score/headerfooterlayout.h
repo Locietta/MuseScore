@@ -24,8 +24,6 @@
 
 #include "layoutcontext.h"
 
-#include "modularity/ioc.h"
-#include "iapplication.h"
 
 namespace mu::engraving {
 class Page;
@@ -41,8 +39,6 @@ enum class TextStyleType : unsigned char;
 namespace mu::engraving::rendering::score {
 class HeaderFooterLayout
 {
-    static inline muse::GlobalInject<muse::IApplication> application;
-
 public:
     static void layoutHeaderFooter(LayoutContext& ctx, Page* page);
 

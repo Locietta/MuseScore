@@ -4,12 +4,10 @@
 #include <filesystem>
 #include <stdexcept>
 
-#include "noqt_application.h"
 #include "noqt_filesystem.h"
 #include "noqt_runtime.h"
 #include "runtime_assets.h"
 
-#include "global/modularity/ioc.h"
 #include "draw/fontmetrics.h"
 #include "draw/internal/ifontsdatabase.h"
 #include "mpe/internal/articulationprofilesrepository.h"
@@ -19,6 +17,7 @@
 #include "engraving/dom/instrtemplate.h"
 #include "engraving/dom/mscore.h"
 #include "engraving/dom/stafftype.h"
+#include "engraving/engravingservices.h"
 #include "engraving/infrastructure/smufl.h"
 #include "engraving/internal/engravingconfiguration.h"
 #include "engraving/internal/engravingcontextconfiguration.h"
@@ -124,12 +123,11 @@ struct EngineContext::Impl {
     std::shared_ptr<EngravingFontsProvider> engravingFonts;
     std::shared_ptr<EngravingConfiguration> configuration;
     std::shared_ptr<rendering::score::ScoreRenderer> renderer;
-    std::shared_ptr<mpe::ArticulationProfilesRepository> articulationProfiles;
-    std::shared_ptr<mu::iex::musicxml::MusicXmlConfiguration> musicXml;
-    std::shared_ptr<NoQtApplication> application;
+    std::unique_ptr<mpe::ArticulationProfilesRepository> articulationProfiles;
+    std::unique_ptr<mu::iex::musicxml::MusicXmlConfiguration> musicXml;
     std::shared_ptr<EngravingContextConfiguration> contextConfiguration;
-    std::shared_ptr<PaletteScoreProvider> palette;
-    bool registered = false;
+    EngravingServices engraving;
+    std::unique_ptr<PaletteScoreProvider> palette;
 
     void teardown() noexcept;
 };
@@ -139,22 +137,10 @@ void EngineContext::Impl::teardown() noexcept
 {
     try {
         if (palette) palette->deinit();
-        if (registered) {
-            auto* ioc = modularity::globalIoc();
-            auto* contextIoc = modularity::ioc(modularity::globalCtx());
-            contextIoc->unregister<IPaletteScoreProvider>("native");
-            contextIoc->unregister<IEngravingContextConfiguration>("native");
-            ioc->unregister<IApplication>("native");
-            ioc->unregister<mu::iex::musicxml::IMusicXmlConfiguration>("native");
-            ioc->unregister<mpe::IArticulationProfilesRepository>("native");
-            ioc->unregister<rendering::IScoreRenderer>("native");
-            ioc->unregister<IEngravingConfiguration>("native");
-            ioc->unregister<IEngravingFontsProvider>("native");
-            registered = false;
-        }
+        engraving.paletteScoreProvider = nullptr;
         palette.reset();
+        engraving = EngravingServices();
         contextConfiguration.reset();
-        application.reset();
         musicXml.reset();
         articulationProfiles.reset();
         renderer.reset();
@@ -191,18 +177,13 @@ EngineContext::EngineContext(const std::string& assets, const std::string& cache
         d.engravingFonts = std::make_shared<EngravingFontsProvider>(d.assets->fontProvider());
         d.configuration = std::make_shared<EngravingConfiguration>();
         d.renderer = std::make_shared<rendering::score::ScoreRenderer>();
-        d.articulationProfiles = std::make_shared<mpe::ArticulationProfilesRepository>(*d.fileSystem);
-        d.musicXml = std::make_shared<mu::iex::musicxml::MusicXmlConfiguration>();
-        d.application = std::make_shared<NoQtApplication>();
-
-        auto* ioc = modularity::globalIoc();
-        d.registered = true;
-        ioc->registerExport<IEngravingFontsProvider>("native", d.engravingFonts);
-        ioc->registerExport<IEngravingConfiguration>("native", d.configuration);
-        ioc->registerExport<rendering::IScoreRenderer>("native", d.renderer);
-        ioc->registerExport<mpe::IArticulationProfilesRepository>("native", d.articulationProfiles);
-        ioc->registerExport<mu::iex::musicxml::IMusicXmlConfiguration>("native", d.musicXml);
-        ioc->registerExport<IApplication>("native", d.application);
+        d.articulationProfiles = std::make_unique<mpe::ArticulationProfilesRepository>(*d.fileSystem);
+        d.musicXml = std::make_unique<mu::iex::musicxml::MusicXmlConfiguration>();
+        d.contextConfiguration = std::make_shared<EngravingContextConfiguration>();
+        d.engraving.configuration = d.configuration;
+        d.engraving.engravingFonts = d.engravingFonts;
+        d.engraving.contextConfiguration = d.contextConfiguration;
+        d.engraving.renderer = d.renderer;
 
         register_builtin_fonts(d.assets->fontsDatabase(), *d.engravingFonts);
 
@@ -223,12 +204,9 @@ EngineContext::EngineContext(const std::string& assets, const std::string& cache
 
         d.musicXml->init();
 
-        d.contextConfiguration = std::make_shared<EngravingContextConfiguration>(modularity::globalCtx());
-        auto* contextIoc = modularity::ioc(modularity::globalCtx());
-        contextIoc->registerExport<IEngravingContextConfiguration>("native", d.contextConfiguration);
-        d.palette = std::make_shared<PaletteScoreProvider>(modularity::globalCtx());
-        contextIoc->registerExport<IPaletteScoreProvider>("native", d.palette);
+        d.palette = std::make_unique<PaletteScoreProvider>(d.engraving);
         d.palette->init();
+        d.engraving.paletteScoreProvider = d.palette.get();
 
         loadInstrumentTemplates(":/engraving/instruments/instruments.xml");
     } catch (...) {
@@ -245,4 +223,10 @@ EngineContext::~EngineContext()
 io::IFileSystem& EngineContext::fileSystem() const { return *m_impl->fileSystem; }
 RuntimeAssets& EngineContext::assets() const { return *m_impl->assets; }
 IFontsDatabase& EngineContext::fontsDatabase() const { return m_impl->assets->fontsDatabase(); }
+EngravingServices& EngineContext::engraving() const { return m_impl->engraving; }
+const mpe::IArticulationProfilesRepository& EngineContext::articulationProfiles() const
+{
+    return *m_impl->articulationProfiles;
+}
+const mu::iex::musicxml::IMusicXmlConfiguration& EngineContext::musicXml() const { return *m_impl->musicXml; }
 }

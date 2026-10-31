@@ -2,7 +2,6 @@
 
 #include <unordered_map>
 
-#include "modularity/ioc.h"
 #include "engraving/iengravingconfiguration.h"
 #include "engraving/types/fraction.h"
 
@@ -20,12 +19,10 @@ class GPScore;
 class GPTrack;
 class GPDomModel;
 
-class GPConverter : public muse::Contextable
+class GPConverter
 {
-    muse::GlobalInject<mu::engraving::IEngravingConfiguration> engravingConfiguration;
-
 public:
-    GPConverter(mu::engraving::Score* score, std::unique_ptr<GPDomModel>&& gpDom, const muse::modularity::ContextPtr& iocCtx);
+    GPConverter(mu::engraving::Score* score, std::unique_ptr<GPDomModel>&& gpDom);
 
     void convertGP();
 
@@ -154,6 +151,8 @@ private:
     void addTuning();
     void addCapos();
     int capoFret(const mu::engraving::Part* part) const;
+
+    const std::shared_ptr<mu::engraving::IEngravingConfiguration>& engravingConfiguration() const;
 
     mu::engraving::Score* _score;
     std::unique_ptr<GPDomModel> _gpDom;

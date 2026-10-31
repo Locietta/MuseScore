@@ -66,8 +66,8 @@ static Color colorForPointer(const void* ptr)
 
 void DebugPaint::paintElementDebug(Painter& painter, const EngravingItem* item)
 {
-    // Elements tree
-    bool isDiagnosticSelected = item->score()->elementsProvider() ? item->score()->elementsProvider()->isSelected(item) : false;
+    // Elements tree (its diagnostic selection is a desktop tool)
+    const bool isDiagnosticSelected = false;
 
     PointF pos(item->pagePos());
     painter.translate(pos);

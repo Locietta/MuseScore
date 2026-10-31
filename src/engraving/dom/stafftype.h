@@ -30,7 +30,6 @@
 #include "../style/styledef.h"
 #include "../types/types.h"
 
-#include "modularity/ioc.h"
 
 namespace mu::engraving {
 class Chord;
@@ -131,7 +130,8 @@ enum class ParenthesizeTiedFret : unsigned char {
 
 class StaffType
 {
-    static muse::GlobalInject<class IEngravingConfiguration> configuration;
+    // The default color of a new staff type, set by initStaffTypes().
+    static Color s_defaultColor;
 
 public:
     StaffType();

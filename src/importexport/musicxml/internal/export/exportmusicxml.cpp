@@ -33,6 +33,7 @@
 // TODO LVI 2011-10-30: determine how to report export errors.
 // Currently all output (both debug and error reports) are done using LOGD.
 
+#include <cassert>
 #include "exportmusicxml.h"
 
 #include <math.h>
@@ -131,9 +132,8 @@
 #include "../shared/musicxmlsupport.h"
 #include "../shared/musicxmltypes.h"
 
-#include "modularity/ioc.h"
 #include "imusicxmlconfiguration.h"
-#include "global/iapplication.h"
+#include "global/appinfo.h"
 #include "global/realfn.h"
 #include "engraving/iengravingconfiguration.h"
 
@@ -245,6 +245,7 @@ class SlurHandler
 {
 public:
     SlurHandler();
+    void setExportLayout(bool exportLayout) { m_exportLayout = exportLayout; }
     void doSlurs(const ChordRest* chordRest, Notations& notations, XmlWriter& xml);
 
 private:
@@ -254,6 +255,7 @@ private:
 
     const Slur* m_slur[MAX_NUMBER_LEVEL];
     bool m_started[MAX_NUMBER_LEVEL];
+    bool m_exportLayout = true;
 };
 
 //---------------------------------------------------------
@@ -324,16 +326,20 @@ struct MeasurePrintContext final
 typedef std::unordered_map<const ChordRest*, const Trill*> TrillHash;
 typedef std::map<const Instrument*, int> MusicXmlInstrumentMap;
 
-class ExportMusicXml : public muse::Contextable
+// The configuration of the export in progress. ExportMusicXml binds it for its
+// lifetime because the static position helpers reach it without an exporter;
+// exports run one at a time on the engine's owner thread.
+static const IMusicXmlConfiguration* s_exportConfiguration = nullptr;
+
+class ExportMusicXml
 {
 public:
-    static inline muse::GlobalInject<mu::iex::musicxml::IMusicXmlConfiguration> configuration;
-    muse::GlobalInject<muse::IApplication> application;
-
-public:
-    ExportMusicXml(Score* s)
-        : muse::Contextable(s->iocContext())
+    ExportMusicXml(Score* s, const IMusicXmlConfiguration& configuration)
+        : m_configuration(configuration)
     {
+        assert(!s_exportConfiguration);
+        s_exportConfiguration = &configuration;
+        m_sh.setExportLayout(configuration.exportLayout());
         m_score = s;
         m_tick = { 0, 1 };
         m_div = 1;
@@ -341,6 +347,11 @@ public:
         m_millimeters = m_score->style().spatium() * m_tenths / (10 * DPMM);
     }
 
+    ~ExportMusicXml() { s_exportConfiguration = nullptr; }
+    ExportMusicXml(const ExportMusicXml&) = delete;
+    ExportMusicXml& operator=(const ExportMusicXml&) = delete;
+
+    static const IMusicXmlConfiguration* configuration() { return s_exportConfiguration; }
     void write(muse::io::IODevice* dev);
     void credits(XmlWriter& xml);
     void moveToTick(const Fraction& t, const Fraction& stretch = { 1, 1 });
@@ -419,6 +430,7 @@ private:
 
     Score* m_score = nullptr;
     XmlWriter m_xml;
+    const IMusicXmlConfiguration& m_configuration;
     SlurHandler m_sh;
     GlissandoHandler m_gh;
     Fraction m_tick;
@@ -631,10 +643,6 @@ void Notations::closeContainer(XmlWriter& xml)
     m_currentContainer = "";
 }
 
-static std::shared_ptr<mu::engraving::IEngravingConfiguration> engravingConfiguration()
-{
-    return muse::modularity::globalIoc()->resolve<mu::engraving::IEngravingConfiguration>("iex_musicxml");
-}
 
 //---------------------------------------------------------
 //   color2xml
@@ -642,9 +650,9 @@ static std::shared_ptr<mu::engraving::IEngravingConfiguration> engravingConfigur
 
 static String color2xml(const EngravingItem* el)
 {
-    if (el->color() != engravingConfiguration()->defaultColor()) {
+    if (el->color() != el->configuration()->defaultColor()) {
         return String(u" color=\"%1\"").arg(String::fromStdString(el->color().toString()));
-    } else if (el->isSLine() && ((SLine*)el)->lineColor() != engravingConfiguration()->defaultColor()) {
+    } else if (el->isSLine() && ((SLine*)el)->lineColor() != el->configuration()->defaultColor()) {
         return String(u" color=\"%1\"").arg(String::fromStdString(((SLine*)el)->lineColor().toString()));
     } else {
         return String();
@@ -653,7 +661,7 @@ static String color2xml(const EngravingItem* el)
 
 static void addColorAttr(const EngravingItem* el, XmlWriter::Attributes& attrs)
 {
-    if (el->color() != engravingConfiguration()->defaultColor()) {
+    if (el->color() != el->configuration()->defaultColor()) {
         attrs.emplace_back(std::make_pair("color", String::fromStdString(el->color().toString())));
     }
 }
@@ -745,9 +753,9 @@ static String slurTieLineStyle(const SlurTie* s)
     return rest;
 }
 
-static String slurTieBezier(const SlurTie* st, const bool start)
+static String slurTieBezier(const SlurTie* st, const bool start, bool exportLayout)
 {
-    if (!ExportMusicXml::configuration()->exportLayout()) {
+    if (!exportLayout) {
         return String();
     }
 
@@ -900,7 +908,7 @@ void SlurHandler::doSlurStart(const Slur* s, Notations& notations, String tagNam
     // compose tag
     tagName += u" type=\"start\"";
     tagName += style ? slurTieLineStyle(s) : color2xml(s);
-    tagName += slurTieBezier(s, true);
+    tagName += slurTieBezier(s, true, m_exportLayout);
 
     if (i >= 0) {
         // remove from list and print start
@@ -946,7 +954,7 @@ void SlurHandler::doSlurStop(const Slur* s, Notations& notations, String tagName
             m_started[i] = false;
             notations.tag(xml, s);
             tagName += String(u" type=\"stop\" number=\"%1\"").arg(i + 1);
-            tagName += slurTieBezier(s, false);
+            tagName += slurTieBezier(s, false, m_exportLayout);
             xml.tagRaw(tagName);
         } else {
             LOGD("no free slur slot");
@@ -957,7 +965,7 @@ void SlurHandler::doSlurStop(const Slur* s, Notations& notations, String tagName
         m_started[i] = false;
         notations.tag(xml, s);
         tagName += String(u" type=\"stop\" number=\"%1\"").arg(i + 1);
-        tagName += slurTieBezier(s, false);
+        tagName += slurTieBezier(s, false, m_exportLayout);
         xml.tagRaw(tagName);
     }
 }
@@ -3395,7 +3403,7 @@ static void writeChordLines(const Chord* const chord, XmlWriter& xml, Notations&
 //   writeBreathMark
 //---------------------------------------------------------
 
-static void writeBreathMark(const Breath* const breath, XmlWriter& xml, Notations& notations)
+static void writeBreathMark(const Breath* const breath, XmlWriter& xml, Notations& notations, bool mu3Compat)
 {
     if (breath) {
         String tagName;
@@ -3443,12 +3451,12 @@ static void writeBreathMark(const Breath* const breath, XmlWriter& xml, Notation
         tagName += ExportMusicXml::positioningAttributes(breath);
         if (breath->placement() == PlacementV::BELOW) {
             tagName += u" placement=\"below\"";
-        } else if (ExportMusicXml::configuration()->exportMu3Compat()) {
+        } else if (mu3Compat) {
             // MuseScore versions prior to 4.3 otherwise default to below on import
             tagName += u" placement=\"above\"";
         }
 
-        if (breath->isCaesura() && (type.isEmpty() || ExportMusicXml::configuration()->exportMu3Compat())) {
+        if (breath->isCaesura() && (type.isEmpty() || mu3Compat)) {
             // for backwards compatibility, as 3.6.2 and earlier can't import those special caesuras,
             // but reports corruption on all subsequent measures and imports them entirely empty.
             xml.tagRaw(tagName);
@@ -3502,7 +3510,7 @@ void ExportMusicXml::chordAttributes(Chord* chord, Notations& notations, TrillHa
         }
     }
 
-    writeBreathMark(chord->hasBreathMark(), m_xml, notations);
+    writeBreathMark(chord->hasBreathMark(), m_xml, notations, configuration()->exportMu3Compat());
     writeChordLines(chord, m_xml, notations);
 
     notations.closeContainer(m_xml); // end articulations tag
@@ -4316,7 +4324,7 @@ String ExportMusicXml::elementPosition(const ExportMusicXml* const expMxml, cons
 {
     String res;
 
-    if (configuration()->exportLayout()) {
+    if (expMxml->configuration()->exportLayout()) {
         const double pageHeight  = expMxml->getTenthsFromInches(expMxml->score()->style().styleD(Sid::pageHeight));
 
         const Measure* meas = elm->findMeasure();
@@ -4687,7 +4695,7 @@ void ExportMusicXml::rest(Rest* rest, staff_idx_t staff, const std::vector<Lyric
     }
     fermatas(fl, m_xml, notations);
 
-    writeBreathMark(rest->hasBreathMark(), m_xml, notations);
+    writeBreathMark(rest->hasBreathMark(), m_xml, notations, configuration()->exportMu3Compat());
 
     wavyLineStartStop(rest, notations, m_trillStart, m_trillStop);
 
@@ -4707,13 +4715,14 @@ void ExportMusicXml::rest(Rest* rest, staff_idx_t staff, const std::vector<Lyric
 //   directionTag
 //---------------------------------------------------------
 
-static void directionTag(XmlWriter& xml, Attributes& attr, EngravingItem const* const el = 0)
+static void directionTag(const IMusicXmlConfiguration& configuration, XmlWriter& xml, Attributes& attr,
+                         EngravingItem const* const el = 0)
 {
     attr.doAttr(xml, false);
     String tagName = u"direction";
     if (el) {
         tagName += placement2xml(el);
-        if (el->systemFlag() && !ExportMusicXml::configuration()->exportMu3Compat()) {
+        if (el->systemFlag() && !configuration.exportMu3Compat()) {
             tagName += u" system=\"only-top\"";
         }
     }
@@ -4989,7 +4998,7 @@ void ExportMusicXml::tempoText(TempoText const* const text, staff_idx_t staff)
 
     XmlWriter::Attributes tempoAttrs;
     tempoAttrs = { { "placement", TConv::toXml(text->placement()) } };
-    if (text->systemFlag() && !ExportMusicXml::configuration()->exportMu3Compat()) {
+    if (text->systemFlag() && !configuration()->exportMu3Compat()) {
         tempoAttrs.emplace_back(std::make_pair("system", text->isLinked() ? "also-top" : "only-top"));
     }
 
@@ -5053,7 +5062,7 @@ void ExportMusicXml::playText(PlayTechAnnotation const* const annot, staff_idx_t
         return;
     }
 
-    directionTag(m_xml, m_attr, annot);
+    directionTag(m_configuration, m_xml, m_attr, annot);
     wordsMetronome(m_xml, m_score->style(), annot, offset);
 
     const PlayingTechniqueType type = annot->techniqueType();
@@ -5102,7 +5111,7 @@ void ExportMusicXml::words(TextBase const* const text, staff_idx_t staff)
         return;
     }
 
-    directionTag(m_xml, m_attr, text);
+    directionTag(m_configuration, m_xml, m_attr, text);
     wordsMetronome(m_xml, m_score->style(), text, offset);
 
     directionETag(m_xml, staff);
@@ -5185,7 +5194,7 @@ void ExportMusicXml::image(const Image* const img, staff_idx_t staff)
         return;
     }
 
-    directionTag(m_xml, m_attr, img);
+    directionTag(m_configuration, m_xml, m_attr, img);
     m_xml.startElement("direction-type");
 
     String source;
@@ -5235,7 +5244,7 @@ void ExportMusicXml::systemText(StaffTextBase const* const text, staff_idx_t sta
         return;
     }
 
-    directionTag(m_xml, m_attr, text);
+    directionTag(m_configuration, m_xml, m_attr, text);
     wordsMetronome(m_xml, m_score->style(), text, offset);
 
     if (text->swing()) {
@@ -5300,7 +5309,7 @@ void ExportMusicXml::rehearsal(RehearsalMark const* const rmk, staff_idx_t staff
         return;
     }
 
-    directionTag(m_xml, m_attr, rmk);
+    directionTag(m_configuration, m_xml, m_attr, rmk);
     m_xml.startElement("direction-type");
     String attr;
     if (rmk->circle()) {
@@ -5348,7 +5357,7 @@ void ExportMusicXml::rehearsal(RehearsalMark const* const rmk, staff_idx_t staff
 
 void ExportMusicXml::harpPedals(HarpPedalDiagram const* const hpd, staff_idx_t staff)
 {
-    directionTag(m_xml, m_attr, hpd);
+    directionTag(m_configuration, m_xml, m_attr, hpd);
     m_xml.startElement("direction-type");
     XmlWriter::Attributes harpPedalAttrs;
     addColorAttr(hpd, harpPedalAttrs);
@@ -5503,7 +5512,7 @@ void ExportMusicXml::hairpin(Hairpin const* const hp, staff_idx_t staff, const F
             if ((isStart && hp->beginText().isEmpty()) || (!isStart && hp->endText().isEmpty())) {
                 return;
             }
-            directionTag(m_xml, m_attr, hp);
+            directionTag(m_configuration, m_xml, m_attr, hp);
             writeHairpinText(m_xml, hp, isStart);
             directionETag(m_xml, staff, calculateTimeDeltaInDivisions(tick, m_tick, m_div));
             return;
@@ -5535,7 +5544,7 @@ void ExportMusicXml::hairpin(Hairpin const* const hp, staff_idx_t staff, const F
         }
     }
 
-    directionTag(m_xml, m_attr, hp);
+    directionTag(m_configuration, m_xml, m_attr, hp);
     if (isStart) {
         writeHairpinText(m_xml, hp, isStart);
     }
@@ -5698,7 +5707,7 @@ void ExportMusicXml::ottava(Ottava const* const ot, staff_idx_t staff, const Fra
         const Fraction tickToWrite = isStart ? ot->tick() : ot->tick2();
         moveToTickIfNeed(tickToWrite, ot->track(), measureStart);
 
-        directionTag(m_xml, m_attr, nullptr);
+        directionTag(m_configuration, m_xml, m_attr, nullptr);
         m_xml.startElement("direction-type");
         octaveShiftXml += color2xml(ot);
         octaveShiftXml += positioningAttributes(ot, ot->tick() == tick);
@@ -5720,7 +5729,7 @@ void ExportMusicXml::pedal(Pedal const* const pd, staff_idx_t staff, const Fract
     }
     bool isStart = pd->tick() == tick;
 
-    directionTag(m_xml, m_attr, pd);
+    directionTag(m_configuration, m_xml, m_attr, pd);
     m_xml.startElement("direction-type");
     String pedalType;
     String pedalXml;
@@ -5791,7 +5800,7 @@ void ExportMusicXml::textLine(TextLineBase const* const tl, staff_idx_t staff, c
         if ((isStart && tl->beginText().isEmpty()) || (!isStart && tl->endText().isEmpty())) {
             return;
         }
-        directionTag(m_xml, m_attr, tl);
+        directionTag(m_configuration, m_xml, m_attr, tl);
         writeHairpinText(m_xml, tl, isStart);
         directionETag(m_xml, staff, calculateTimeDeltaInDivisions(tick, m_tick, m_div));
         return;
@@ -5892,7 +5901,7 @@ void ExportMusicXml::textLine(TextLineBase const* const tl, staff_idx_t staff, c
     rest += color2xml(tl);
     rest += positioningAttributes(tl, tl->tick() == tick);
 
-    directionTag(m_xml, m_attr, tl);
+    directionTag(m_configuration, m_xml, m_attr, tl);
 
     if (!tl->beginText().isEmpty() && tl->tick() == tick) {
         m_xml.startElement("direction-type");
@@ -5991,7 +6000,7 @@ void ExportMusicXml::dynamic(Dynamic const* const dyn, staff_idx_t staff)
         u"n", u"pf", u"sfzp"
     };
 
-    directionTag(m_xml, m_attr, dyn);
+    directionTag(m_configuration, m_xml, m_attr, dyn);
 
     m_xml.startElement("direction-type");
 
@@ -7259,7 +7268,7 @@ void ExportMusicXml::identification(XmlWriter& xml, Score const* const score)
         xml.tag("software", String(u"MuseScore 0.7.0"));
         xml.tag("encoding-date", String(u"2007-09-10"));
     } else {
-        xml.tag("software", String(u"MuseScore Studio ") + application()->version().toString());
+        xml.tag("software", String(u"MuseScore Studio ") + muse::appinfo::version().toString());
         xml.tag("encoding-date", muse::Date::currentDate().toString(muse::DateFormat::ISODate));
     }
 
@@ -7874,7 +7883,7 @@ static void partList(XmlWriter& xml, Score* score, MusicXmlInstrumentMap& instrM
             longInstrumentAttributes.push_back({ "print-object", "no" });
             shortInstrumentAttributes.push_back({ "print-object", "no" });
         }
-        if (longInstrumentColor != engravingConfiguration()->defaultColor()) {
+        if (longInstrumentColor != score->configuration()->defaultColor()) {
             longInstrumentAttributes.push_back({ "color", String::fromStdString(longInstrumentColor.toString()) });
         }
         xml.tag("part-name", longInstrumentAttributes,
@@ -7885,7 +7894,7 @@ static void partList(XmlWriter& xml, Score* score, MusicXmlInstrumentMap& instrM
             xml.endElement();
         }
         if (!part->shortName().isEmpty()) {
-            if (shortInstrumentColor != engravingConfiguration()->defaultColor()) {
+            if (shortInstrumentColor != score->configuration()->defaultColor()) {
                 shortInstrumentAttributes.push_back({ "color", String::fromStdString(shortInstrumentColor.toString()) });
             }
             xml.tag("part-abbreviation", shortInstrumentAttributes,
@@ -8073,7 +8082,7 @@ static void writeStaffDetails(XmlWriter& xml, const Part* part, const std::vecto
         }
         const Color lineColor = st->color(Fraction(0, 1));
         const bool invis = st->isLinesInvisible(Fraction(0, 1));
-        const bool needsLineDetails = invis || lineColor != engravingConfiguration()->defaultColor();
+        const bool needsLineDetails = invis || lineColor != part->score()->configuration()->defaultColor();
         if (st->lines(Fraction(0, 1)) != 5 || st->isTabStaff(Fraction(0, 1)) || !muse::RealIsEqual(mag, 1.0)
             || hidden || needsLineDetails) {
             XmlWriter::Attributes attributes;
@@ -8100,7 +8109,7 @@ static void writeStaffDetails(XmlWriter& xml, const Part* part, const std::vecto
             if (needsLineDetails) {
                 for (int lineIdx = 0; lineIdx < st->lines(Fraction(0, 1)); ++lineIdx) {
                     String ld = String(u"line-detail line=\"%1\"").arg(lineIdx + 1);
-                    if (lineColor != engravingConfiguration()->defaultColor()) {
+                    if (lineColor != part->score()->configuration()->defaultColor()) {
                         ld += String(u" color=\"%1\"").arg(String::fromStdString(lineColor.toString()));
                     }
                     if (invis) {
@@ -8961,18 +8970,18 @@ void ExportMusicXml::write(muse::io::IODevice* dev)
  Return false on error.
  */
 
-bool saveXml(Score* score, IODevice* device)
+bool saveXml(Score* score, IODevice* device, const IMusicXmlConfiguration& configuration)
 {
-    ExportMusicXml em(score);
+    ExportMusicXml em(score, configuration);
     em.write(device);
     return true;
 }
 
-bool saveXml(Score* score, const String& name)
+bool saveXml(Score* score, const String& name, const IMusicXmlConfiguration& configuration)
 {
     auto buf = Buffer::opened(IODevice::WriteOnly);
 
-    bool res = saveXml(score, &buf) && !buf.hasError();
+    bool res = saveXml(score, &buf, configuration) && !buf.hasError();
     if (!res) {
         return res;
     }
@@ -9000,7 +9009,8 @@ bool saveXml(Score* score, const String& name)
 //     </rootfiles>
 // </container>
 
-static void writeMxlArchive(Score* score, muse::ZipWriter& zip, const String& filename)
+static void writeMxlArchive(Score* score, muse::ZipWriter& zip, const String& filename,
+                            const IMusicXmlConfiguration& configuration)
 {
     auto cbuf = Buffer::opened(IODevice::ReadWrite);
 
@@ -9018,7 +9028,7 @@ static void writeMxlArchive(Score* score, muse::ZipWriter& zip, const String& fi
     zip.addFile("META-INF/container.xml", cbuf.data());
 
     auto dbuf = Buffer::opened(IODevice::ReadWrite);
-    ExportMusicXml em(score);
+    ExportMusicXml em(score, configuration);
     em.setMxl(true);
     em.write(&dbuf);
     dbuf.seek(0);
@@ -9034,26 +9044,26 @@ static void writeMxlArchive(Score* score, muse::ZipWriter& zip, const String& fi
     }
 }
 
-bool saveMxl(Score* score, IODevice* device)
+bool saveMxl(Score* score, IODevice* device, const IMusicXmlConfiguration& configuration)
 {
     muse::ZipWriter zip(device);
 
     //anonymized filename since we don't know the actual one here
     String fn = u"score.xml";
-    writeMxlArchive(score, zip, fn);
+    writeMxlArchive(score, zip, fn, configuration);
     zip.close();
 
     return true;
 }
 
-bool saveMxl(Score* score, const String& name)
+bool saveMxl(Score* score, const String& name, const IMusicXmlConfiguration& configuration)
 {
     auto outBuf = Buffer::opened(IODevice::WriteOnly);
     muse::ZipWriter zip(&outBuf);
 
     FileInfo fi(name);
     String fn = fi.completeBaseName() + u".xml";
-    writeMxlArchive(score, zip, fn);
+    writeMxlArchive(score, zip, fn, configuration);
     zip.close();
 
     return File::writeFile(name, outBuf.data());

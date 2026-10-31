@@ -26,7 +26,6 @@
 #include <vector>
 
 #include "io/iodevice.h"
-#include "modularity/ioc.h"
 #include "types/bytearray.h"
 #include "types/string.h"
 
@@ -129,10 +128,10 @@ struct GpBar {
 //   GuitarPro
 //---------------------------------------------------------
 
-class GuitarPro : public muse::Contextable
+class GuitarPro
 {
 public:
-    muse::GlobalInject<mu::engraving::IEngravingConfiguration> engravingConfiguration;
+    const std::shared_ptr<mu::engraving::IEngravingConfiguration>& engravingConfiguration() const;
 
 protected:
 
@@ -335,7 +334,7 @@ public:
         GP_EOF, GP_BAD_NUMBER_OF_STRINGS
     };
 
-    GuitarPro(mu::engraving::MasterScore*, int v, const muse::modularity::ContextPtr& iocCtx);
+    GuitarPro(mu::engraving::MasterScore*, int v);
     virtual ~GuitarPro() {}
     virtual bool read(muse::io::IODevice*) = 0;
     muse::String error(GuitarProError n) const { return muse::String::fromUtf8(errmsg[int(n)]); }
@@ -352,8 +351,8 @@ protected:
     int readBeatEffects(int track, mu::engraving::Segment*) override;
 
 public:
-    GuitarPro1(mu::engraving::MasterScore* s, int v, const muse::modularity::ContextPtr& iocCtx)
-        : GuitarPro(s, v, iocCtx) {}
+    GuitarPro1(mu::engraving::MasterScore* s, int v)
+        : GuitarPro(s, v) {}
     bool read(muse::io::IODevice*) override;
 };
 
@@ -364,8 +363,8 @@ public:
 class GuitarPro2 : public GuitarPro1
 {
 public:
-    GuitarPro2(mu::engraving::MasterScore* s, int v, const muse::modularity::ContextPtr& iocCtx)
-        : GuitarPro1(s, v, iocCtx) {}
+    GuitarPro2(mu::engraving::MasterScore* s, int v)
+        : GuitarPro1(s, v) {}
     bool read(muse::io::IODevice*) override;
 };
 
@@ -378,8 +377,8 @@ class GuitarPro3 : public GuitarPro1
     int readBeatEffects(int track, mu::engraving::Segment* segment) override;
 
 public:
-    GuitarPro3(mu::engraving::MasterScore* s, int v, const muse::modularity::ContextPtr& iocCtx)
-        : GuitarPro1(s, v, iocCtx) {}
+    GuitarPro3(mu::engraving::MasterScore* s, int v)
+        : GuitarPro1(s, v) {}
     bool read(muse::io::IODevice*) override;
 };
 
@@ -398,8 +397,8 @@ class GuitarPro4 : public GuitarPro
     int convertGP4SlideNum(int slide);
 
 public:
-    GuitarPro4(mu::engraving::MasterScore* s, int v, const muse::modularity::ContextPtr& iocCtx)
-        : GuitarPro(s, v, iocCtx) {}
+    GuitarPro4(mu::engraving::MasterScore* s, int v)
+        : GuitarPro(s, v) {}
     bool read(muse::io::IODevice*) override;
 };
 
@@ -431,8 +430,8 @@ class GuitarPro5 : public GuitarPro
     void addGlissandos();
 
 public:
-    GuitarPro5(mu::engraving::MasterScore* s, int v, const muse::modularity::ContextPtr& iocCtx)
-        : GuitarPro(s, v, iocCtx) {}
+    GuitarPro5(mu::engraving::MasterScore* s, int v)
+        : GuitarPro(s, v) {}
     bool read(muse::io::IODevice*) override;
 };
 
@@ -487,10 +486,10 @@ protected:
     virtual std::unique_ptr<IGPDomBuilder> createGPDomBuilder() const override;
 
 public:
-    GuitarPro6(mu::engraving::MasterScore* s, const muse::modularity::ContextPtr& iocCtx)
-        : GuitarPro(s, 6, iocCtx) {}
-    GuitarPro6(mu::engraving::MasterScore* s, int v, const muse::modularity::ContextPtr& iocCtx)
-        : GuitarPro(s, v, iocCtx) {}
+    GuitarPro6(mu::engraving::MasterScore* s)
+        : GuitarPro(s, 6) {}
+    GuitarPro6(mu::engraving::MasterScore* s, int v)
+        : GuitarPro(s, v) {}
     bool read(muse::io::IODevice*) override;
 };
 
@@ -499,8 +498,8 @@ class GuitarPro7 : public GuitarPro6
     virtual std::unique_ptr<IGPDomBuilder> createGPDomBuilder() const override;
 
 public:
-    GuitarPro7(mu::engraving::MasterScore* s, const muse::modularity::ContextPtr& iocCtx)
-        : GuitarPro6(s, 7, iocCtx) {}
+    GuitarPro7(mu::engraving::MasterScore* s)
+        : GuitarPro6(s, 7) {}
     bool read(muse::io::IODevice*) override;
     GPProperties readProperties(muse::ByteArray* data);
 };

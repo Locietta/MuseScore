@@ -26,9 +26,9 @@
 #include "types/string.h"
 #include "../types/types.h"
 
-#include "modularity/ioc.h"
 
 namespace mu::engraving {
+struct EngravingServices;
 class MasterScore;
 class TDuration;
 class TimeSig;
@@ -43,7 +43,7 @@ class MCursor
 {
 public:
     MCursor(MasterScore* s = 0);
-    void createScore(const muse::modularity::ContextPtr& iocCtx, const String& s);
+    void createScore(const EngravingServices& services, const String& s);
 
     void addPart(const String& instrument);
     Chord* addChord(int pitch, const TDuration& duration);

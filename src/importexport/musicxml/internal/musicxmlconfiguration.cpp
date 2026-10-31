@@ -43,14 +43,8 @@ static const Settings::Key MUSICXML_IMPORT_INFER_TEXT_TYPE(module_name, "import/
 void MusicXmlConfiguration::init()
 {
     settings()->setDefaultValue(MUSICXML_IMPORT_BREAKS_KEY, Val(true));
-    settings()->valueChanged(MUSICXML_IMPORT_BREAKS_KEY).onReceive(this, [this](const Val& val) {
-        m_importBreaksChanged.send(val.toBool());
-    });
 
     settings()->setDefaultValue(MUSICXML_IMPORT_LAYOUT_KEY, Val(true));
-    settings()->valueChanged(MUSICXML_IMPORT_LAYOUT_KEY).onReceive(this, [this](const Val& val) {
-        m_importLayoutChanged.send(val.toBool());
-    });
 
     settings()->setDefaultValue(MUSICXML_EXPORT_LAYOUT_KEY, Val(true));
     settings()->setDefaultValue(MUSICXML_EXPORT_MU3_COMPAT_KEY, Val(false));
@@ -66,19 +60,10 @@ void MusicXmlConfiguration::init()
     settings()->setCanBeManuallyEdited(MUSICXML_EXPORT_INVISIBLE_ELEMENTS_KEY, true);
 
     settings()->setDefaultValue(MIGRATION_APPLY_EDWIN_FOR_XML, Val(false));
-    settings()->valueChanged(MIGRATION_APPLY_EDWIN_FOR_XML).onReceive(this, [this](const Val& val) {
-        m_needUseDefaultFontChanged.send(val.toBool());
-    });
 
     settings()->setDefaultValue(MIGRATION_NOT_ASK_AGAIN_KEY, Val(false));
-    settings()->valueChanged(MIGRATION_NOT_ASK_AGAIN_KEY).onReceive(this, [this](const Val& val) {
-        m_needAskAboutApplyingNewStyleChanged.send(val.toBool());
-    });
 
     settings()->setDefaultValue(MUSICXML_IMPORT_INFER_TEXT_TYPE, Val(false));
-    settings()->valueChanged(MUSICXML_IMPORT_INFER_TEXT_TYPE).onReceive(this, [this](const Val& val) {
-        m_inferTextTypeChanged.send(val.toBool());
-    });
 }
 
 bool MusicXmlConfiguration::importBreaks() const
@@ -91,11 +76,6 @@ void MusicXmlConfiguration::setImportBreaks(bool value)
     settings()->setSharedValue(MUSICXML_IMPORT_BREAKS_KEY, Val(value));
 }
 
-async::Channel<bool> MusicXmlConfiguration::importBreaksChanged() const
-{
-    return m_importBreaksChanged;
-}
-
 bool MusicXmlConfiguration::importLayout() const
 {
     return settings()->value(MUSICXML_IMPORT_LAYOUT_KEY).toBool();
@@ -104,11 +84,6 @@ bool MusicXmlConfiguration::importLayout() const
 void MusicXmlConfiguration::setImportLayout(bool value)
 {
     settings()->setSharedValue(MUSICXML_IMPORT_LAYOUT_KEY, Val(value));
-}
-
-async::Channel<bool> MusicXmlConfiguration::importLayoutChanged() const
-{
-    return m_importLayoutChanged;
 }
 
 bool MusicXmlConfiguration::exportLayout() const
@@ -165,11 +140,6 @@ void MusicXmlConfiguration::setNeedUseDefaultFont(bool value)
     settings()->setSharedValue(MIGRATION_APPLY_EDWIN_FOR_XML, Val(value));
 }
 
-async::Channel<bool> MusicXmlConfiguration::needUseDefaultFontChanged() const
-{
-    return m_needUseDefaultFontChanged;
-}
-
 void MusicXmlConfiguration::setNeedUseDefaultFontOverride(std::optional<bool> value)
 {
     m_needUseDefaultFontOverride = value;
@@ -185,11 +155,6 @@ void MusicXmlConfiguration::setNeedAskAboutApplyingNewStyle(bool value)
     settings()->setSharedValue(MIGRATION_NOT_ASK_AGAIN_KEY, Val(!value));
 }
 
-async::Channel<bool> MusicXmlConfiguration::needAskAboutApplyingNewStyleChanged() const
-{
-    return m_needAskAboutApplyingNewStyleChanged;
-}
-
 bool MusicXmlConfiguration::inferTextType() const
 {
     if (m_inferTextTypeOverride.has_value()) {
@@ -202,11 +167,6 @@ bool MusicXmlConfiguration::inferTextType() const
 void MusicXmlConfiguration::setInferTextType(bool value)
 {
     settings()->setSharedValue(MUSICXML_IMPORT_INFER_TEXT_TYPE, Val(value));
-}
-
-async::Channel<bool> MusicXmlConfiguration::inferTextTypeChanged() const
-{
-    return m_inferTextTypeChanged;
 }
 
 void MusicXmlConfiguration::setInferTextTypeOverride(std::optional<bool> value)

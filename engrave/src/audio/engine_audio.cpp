@@ -579,7 +579,8 @@ std::string engine_soundfont_uri()
     return engine_state().soundfontUri;
 }
 
-AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderRequest& request)
+AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderRequest& request,
+                                     const muse::mpe::IArticulationProfilesRepository& profiles)
 {
     OfflineTimingReport timingReport;
     AudioRenderResult result;
@@ -637,7 +638,7 @@ AudioRenderResult export_score_audio(MasterScore* master, const AudioRenderReque
 
     // PlaybackModel stays alive until the render has consumed the playback data
     // streams; the audio tracks reference them.
-    PlaybackModel model(modularity::globalCtx());
+    PlaybackModel model(&profiles);
     model.setPlayRepeats(request.use_repeats);
     model.setPlayChordSymbols(false);
     model.setIsMetronomeEnabled(false);

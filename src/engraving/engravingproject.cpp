@@ -36,28 +36,22 @@ using namespace muse;
 using namespace mu;
 using namespace mu::engraving;
 
-std::shared_ptr<EngravingProject> EngravingProject::create(const modularity::ContextPtr& iocCtx)
+std::shared_ptr<EngravingProject> EngravingProject::create(const EngravingServices& services)
 {
-    std::shared_ptr<EngravingProject> p = std::shared_ptr<EngravingProject>(new EngravingProject(iocCtx));
-    if (p->engravingElementsProvider()) {
-        p->engravingElementsProvider()->clearStatistic();
-    }
+    std::shared_ptr<EngravingProject> p = std::shared_ptr<EngravingProject>(new EngravingProject(services));
     p->init(DefaultStyle::defaultStyle());
     return p;
 }
 
-std::shared_ptr<EngravingProject> EngravingProject::create(const MStyle& style, const modularity::ContextPtr& iocCtx)
+std::shared_ptr<EngravingProject> EngravingProject::create(const MStyle& style, const EngravingServices& services)
 {
-    std::shared_ptr<EngravingProject> p = std::shared_ptr<EngravingProject>(new EngravingProject(iocCtx));
-    if (p->engravingElementsProvider()) {
-        p->engravingElementsProvider()->clearStatistic();
-    }
+    std::shared_ptr<EngravingProject> p = std::shared_ptr<EngravingProject>(new EngravingProject(services));
     p->init(style);
     return p;
 }
 
-EngravingProject::EngravingProject(const modularity::ContextPtr& iocCtx)
-    : muse::Contextable(iocCtx)
+EngravingProject::EngravingProject(const EngravingServices& services)
+    : m_services(services)
 {
     muse::ObjectAllocator::used();
 }
@@ -75,7 +69,7 @@ EngravingProject::~EngravingProject()
 
 void EngravingProject::init(const MStyle& style)
 {
-    m_masterScore = new MasterScore(iocContext(), style, weak_from_this());
+    m_masterScore = new MasterScore(m_services, style, weak_from_this());
 }
 
 IFileInfoProviderPtr EngravingProject::fileInfoProvider() const
@@ -146,7 +140,7 @@ bool EngravingProject::writeMscz(MscWriter& writer, bool createThumbnail, const 
 {
     TRACEFUNC;
 
-    MscSaver saver(iocContext());
+    MscSaver saver(m_services);
     return saver.writeMscz(m_masterScore, writer, createThumbnail, ctx);
 }
 

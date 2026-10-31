@@ -29,8 +29,8 @@
 using namespace muse;
 using namespace mu::engraving;
 
-PaletteScoreProvider::PaletteScoreProvider(const modularity::ContextPtr& iocCtx)
-    : muse::Contextable(iocCtx)
+PaletteScoreProvider::PaletteScoreProvider(const EngravingServices& services)
+    : m_services(services)
 {
 }
 
@@ -40,17 +40,12 @@ PaletteScoreProvider::~PaletteScoreProvider()
 
 void PaletteScoreProvider::init()
 {
-    m_paletteScore = compat::ScoreAccess::createMasterScore(iocContext());
+    m_paletteScore = compat::ScoreAccess::createMasterScore(m_services);
     m_paletteScore->setFileInfoProvider(std::make_shared<LocalFileInfoProvider>(""));
-
-
-    if (m_paletteScore->elementsProvider()) {
-        m_paletteScore->elementsProvider()->unreg(m_paletteScore);
-    }
 
     m_paletteScore->setStyle(DefaultStyle::baseStyle());
     m_paletteScore->style().set(Sid::musicalTextFont, String(u"Leland Text"));
-    IEngravingFontPtr scoreFont = engravingfonts()->fontByName("Leland");
+    IEngravingFontPtr scoreFont = m_services.engravingFonts->fontByName("Leland");
     m_paletteScore->setEngravingFont(scoreFont);
     m_paletteScore->setNoteHeadWidth(scoreFont->width(SymId::noteheadBlack,
                                                       m_paletteScore->style().spatium()) / m_paletteScore->style().defaultSpatium());

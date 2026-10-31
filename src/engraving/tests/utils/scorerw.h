@@ -25,7 +25,6 @@
 
 #include <functional>
 
-#include "modularity/ioc.h"
 #include "types/bytearray.h"
 #include "types/string.h"
 
@@ -41,11 +40,15 @@ public:
     static void setRootPath(const String& path);
     static String rootPath();
 
+    // The engine services the test scores are built with; the test environment
+    // sets them for the lifetime of its engine context.
+    static void setServices(const EngravingServices* services);
+    static const EngravingServices& services();
+
     using ImportFunc = std::function<Err (MasterScore* score, const muse::io::path_t& path)>;
     using ExportFunc = std::function<Err (Score* score, const muse::io::path_t& path)>;
 
-    static MasterScore* readScore(const String& path, bool isAbsolutePath = false, ImportFunc importFunc = nullptr,
-                                  const muse::modularity::ContextPtr& iocCtx = nullptr);
+    static MasterScore* readScore(const String& path, bool isAbsolutePath = false, ImportFunc importFunc = nullptr);
     static bool saveScore(Score* score, const String& name);
     static bool saveScore(Score* score, const String& name, ExportFunc exportFunc);
     static muse::ByteArray writeElement(const EngravingItem* element);
@@ -54,6 +57,7 @@ public:
 
 private:
     static String m_rootPath;
+    static const EngravingServices* m_services;
 };
 }
 

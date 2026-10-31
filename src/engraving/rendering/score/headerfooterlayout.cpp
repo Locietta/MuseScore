@@ -20,6 +20,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "global/appinfo.h"
 #include "headerfooterlayout.h"
 
 #include "dom/factory.h"
@@ -350,7 +351,7 @@ TextBlock HeaderFooterLayout::replaceTextMacros(LayoutContext& ctx, const Page* 
                 break;
                 case 'v':
                     if (page->score()->dirty()) {
-                        newFragments.back().text += application()->version().toString();
+                        newFragments.back().text += muse::appinfo::version().toString();
                     } else {
                         newFragments.back().text += page->score()->mscoreVersion();
                     }

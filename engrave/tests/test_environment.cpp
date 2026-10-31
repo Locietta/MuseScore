@@ -15,7 +15,7 @@
 #include "engraving/dom/mscore.h"
 #include "utils/scorerw.h"
 #include "mocks/engravingconfigurationmock.h"
-#include "global/modularity/ioc.h"
+#include "engraving/engravingservices.h"
 #include <gmock/gmock.h>
 #endif
 
@@ -255,8 +255,8 @@ void setup_test_environment(const TestEnvironmentConfig& config)
     ON_CALL(*configurator, debuggingOptions()).WillByDefault(::testing::ReturnRef(s_debugOpt));
     ON_CALL(*configurator, allowReadingImagesFromOutsideMscz()).WillByDefault(::testing::Return(true));
 
-    muse::modularity::globalIoc()->unregister<mu::engraving::IEngravingConfiguration>("utests");
-    muse::modularity::globalIoc()->registerExport<mu::engraving::IEngravingConfiguration>("utests", configurator);
+    s_context->engraving().configuration = configurator;
+    mu::engraving::ScoreRW::setServices(&s_context->engraving());
 #else
     (void)config;
 #endif
@@ -265,7 +265,7 @@ void setup_test_environment(const TestEnvironmentConfig& config)
 void teardown_test_environment()
 {
 #if defined(TEST_HAS_ENGRAVING)
-    muse::modularity::globalIoc()->unregister<mu::engraving::IEngravingConfiguration>("utests");
+    mu::engraving::ScoreRW::setServices(nullptr);
     s_context.reset();
 #endif
 }

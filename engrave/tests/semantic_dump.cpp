@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
         if (!stream) throw std::runtime_error("Cannot read " + args[1]);
         const std::string bytes{std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>()};
         music::EngineContext context(args[0]);
-        auto project = music::load_native_score(bytes, format);
+        auto project = music::load_native_score(context, bytes, format);
         auto* master = project->masterScore();
         if (generate) music::generate_score_excerpts(master);
         std::cout << music::semantic_dump(master).dump(1) << '\n';

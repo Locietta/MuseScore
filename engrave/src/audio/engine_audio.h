@@ -20,6 +20,10 @@
 #include "engraving/types/types.h"
 #include "midi/miditypes.h"
 
+namespace muse::mpe {
+class IArticulationProfilesRepository;
+}
+
 namespace mu::engraving {
 class MasterScore;
 }
@@ -201,7 +205,9 @@ struct AudioRenderResult {
 // above.
 //
 // Never throws for a bad score/format/engine state; inspect AudioRenderResult.
-AudioRenderResult export_score_audio(mu::engraving::MasterScore* master, const AudioRenderRequest& request);
+// profiles supplies the default articulation profiles of the playback model.
+AudioRenderResult export_score_audio(mu::engraving::MasterScore* master, const AudioRenderRequest& request,
+                                     const muse::mpe::IArticulationProfilesRepository& profiles);
 
 // One playable track for score_audio_tracks. `id` is the raw score identity
 // (muse::ID hex string / muse::String); the public trackId is this entry's

@@ -26,7 +26,6 @@
 
 #include "draw/fontmetrics.h"
 
-#include "modularity/ioc.h"
 #include "../iengravingfontsprovider.h"
 
 #include "engravingitem.h"
@@ -224,7 +223,6 @@ private:
 class TextFragment
 {
 public:
-    muse::GlobalInject<IEngravingFontsProvider> engravingFonts;
 
 public:
     mutable CharFormat format;

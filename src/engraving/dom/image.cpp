@@ -376,7 +376,7 @@ void Image::init()
         }
     } else if (m_imageType == ImageType::RASTER && !m_rasterDoc) {
         if (m_storeItem) {
-            m_rasterDoc = imageProvider()->createPixmap(m_storeItem->buffer());
+            m_rasterDoc = score()->services().imageProvider->createPixmap(m_storeItem->buffer());
             if (!m_rasterDoc->isNull()) {
                 m_dirty = true;
             }

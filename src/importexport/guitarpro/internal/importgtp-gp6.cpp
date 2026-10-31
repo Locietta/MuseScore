@@ -442,7 +442,7 @@ void GuitarPro6::readGpif(ByteArray* data)
     }
     builder->buildGPDomModel(&domElem);
 
-    GPConverter scoreBuilder(score, builder->getGPDomModel(), iocContext());
+    GPConverter scoreBuilder(score, builder->getGPDomModel());
     scoreBuilder.convertGP();
     m_gpifRead = true;
 }

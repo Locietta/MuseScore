@@ -24,16 +24,11 @@
 
 #include "types/string.h"
 #include "io/path.h"
-#include "modularity/imoduleinterface.h"
-#include "modularity/ioc.h"
-#include "async/channel.h"
-#include "async/notification.h"
 #include "engraving/types/types.h"
 
 namespace mu::engraving {
-class IEngravingConfiguration : MODULE_GLOBAL_INTERFACE
+class IEngravingConfiguration
 {
-    INTERFACE_ID(IEngravingConfiguration)
 public:
     virtual ~IEngravingConfiguration() = default;
 
@@ -41,11 +36,9 @@ public:
 
     virtual muse::io::path_t defaultStyleFilePath() const = 0;
     virtual void setDefaultStyleFilePath(const muse::io::path_t& path) = 0;
-    virtual muse::async::Channel<muse::io::path_t> defaultStyleFilePathChanged() const = 0;
 
     virtual muse::io::path_t partStyleFilePath() const = 0;
     virtual void setPartStyleFilePath(const muse::io::path_t& path) = 0;
-    virtual muse::async::Channel<muse::io::path_t> partStyleFilePathChanged() const = 0;
 
     virtual SizeF defaultPageSize() const = 0;
 
@@ -61,7 +54,6 @@ public:
      * but it's not printed nor saved. */
     virtual Color displayedDefaultColor(bool inverted) const = 0;
     virtual void setDisplayedDefaultColor(Color color, bool inverted) = 0;
-    virtual muse::async::Channel</* inverted */ bool, Color> displayedDefaultColorChanged() const = 0;
     virtual void resetDisplayedDefaultColors() = 0;
 
     virtual Color indicatorIconInvertedSelectionColor() const = 0;
@@ -78,27 +70,20 @@ public:
 
     virtual Color selectionColor(voice_idx_t voiceIndex = 0, bool itemVisible = true, bool itemIsUnlinkedFromScore = false) const = 0;
     virtual void setSelectionColor(voice_idx_t voiceIndex, Color color) = 0;
-    virtual muse::async::Channel<voice_idx_t, Color> selectionColorChanged() const = 0;
 
     virtual bool dynamicsApplyToAllVoices() const = 0;
     virtual void setDynamicsApplyToAllVoices(bool v) = 0;
-    virtual muse::async::Channel<bool> dynamicsApplyToAllVoicesChanged() const = 0;
 
     virtual bool autoUpdateFretboardDiagrams() const = 0;
     virtual void setAutoUpdateFretboardDiagrams(bool v) = 0;
-    virtual muse::async::Channel<bool> autoUpdateFretboardDiagramsChanged() const = 0;
 
     virtual Color formattingColor() const = 0;
-    virtual muse::async::Channel<Color> formattingColorChanged() const = 0;
 
     virtual Color invisibleColor() const = 0;
-    virtual muse::async::Channel<Color> invisibleColorChanged() const = 0;
 
     virtual Color unlinkedColor() const = 0;
-    virtual muse::async::Channel<Color> unlinkedColorChanged() const = 0;
 
     virtual Color frameColor() const = 0;
-    virtual muse::async::Channel<Color> frameColorChanged() const = 0;
 
     virtual Color scoreGreyColor() const = 0;
 
@@ -138,7 +123,6 @@ public:
 
     virtual const DebuggingOptions& debuggingOptions() const = 0;
     virtual void setDebuggingOptions(const DebuggingOptions& options) = 0;
-    virtual muse::async::Notification debuggingOptionsChanged() const = 0;
 
     virtual bool allowReadingImagesFromOutsideMscz() const = 0;
 

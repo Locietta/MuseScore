@@ -24,13 +24,12 @@
 #define MUSE_MPE_ARTICULATIONPROFILESREPOSITORY_H
 
 #include "io/ifilesystem.h"
-#include "async/asyncable.h"
 #include "serialization/json.h"
 
 #include "mpe/iarticulationprofilesrepository.h"
 
 namespace muse::mpe {
-class ArticulationProfilesRepository : public IArticulationProfilesRepository, public async::Asyncable
+class ArticulationProfilesRepository : public IArticulationProfilesRepository
 {
 public:
     explicit ArticulationProfilesRepository(io::IFileSystem& fileSystem)
@@ -40,7 +39,6 @@ public:
     ArticulationsProfilePtr defaultProfile(const ArticulationFamily family) const override;
     ArticulationsProfilePtr loadProfile(const io::path_t& path) const override;
     void saveProfile(const io::path_t& path, const ArticulationsProfilePtr profilePtr) override;
-    async::Channel<io::path_t> profileChanged() const override;
 
 private:
     io::IFileSystem* fileSystem() const { return &m_fileSystem; }
@@ -63,7 +61,6 @@ private:
     mutable std::unordered_map<ArticulationFamily, ArticulationsProfilePtr> m_defaultProfiles;
 
     io::IFileSystem& m_fileSystem;
-    async::Channel<io::path_t> m_profileChanged;
 };
 }
 

@@ -22,7 +22,6 @@
 
 #include "style.h"
 
-#include "global/modularity/ioc.h"
 
 #include "iengravingfontsprovider.h"
 

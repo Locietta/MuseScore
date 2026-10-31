@@ -21,7 +21,6 @@
  */
 #pragma once
 
-#include "modularity/imoduleinterface.h"
 
 #include "draw/painter.h"
 
@@ -33,10 +32,8 @@ class EngravingItem;
 }
 
 namespace mu::engraving::rendering {
-class IEditModeRenderer : MODULE_GLOBAL_INTERFACE
+class IEditModeRenderer
 {
-    INTERFACE_ID(IEditModeRenderer)
-
 public:
     virtual ~IEditModeRenderer() = default;
 

@@ -284,7 +284,7 @@ int main(int argc, char** argv)
     try {
         if (argc != 2) throw std::invalid_argument("Usage: score_edit_test ASSETS");
         music::EngineContext context(argv[1]);
-        const auto project = music::load_native_score(kTwoPartScore, "musicxml");
+        const auto project = music::load_native_score(context, kTwoPartScore, "musicxml");
         auto* score = project->masterScore();
         expect(score->parts().size() == 2, "Fixture did not import two parts");
 
@@ -504,7 +504,7 @@ int main(int argc, char** argv)
         // sounding pitches and ties must match the live DOM semantics.
         const std::string exported = music::export_native_score(context, project, "musicxml", 0, "");
         expect(exported.find("<score-partwise") != std::string::npos, "MusicXML export was empty");
-        const auto reimported = music::load_native_score(exported, "musicxml");
+        const auto reimported = music::load_native_score(context, exported, "musicxml");
         auto* reimported_score = reimported->masterScore();
         const ScoreRegionView piano_export = music::query_score_region(
             reimported_score, make_region(0, 0, total_measures));
@@ -543,7 +543,7 @@ int main(int argc, char** argv)
         mu::engraving::MScore::setError(mu::engraving::MsError::MS_NO_ERROR);
         score->undoRedo(false, nullptr);
 
-        const auto poison_project = music::load_native_score(kTwoPartScore, "musicxml");
+        const auto poison_project = music::load_native_score(context, kTwoPartScore, "musicxml");
         auto* poison_score = poison_project->masterScore();
         const auto poison_view = music::query_score_region(poison_score, make_region(0, 0, 1));
         music::set_native_edit_test_fault(music::NativeEditTestFault::exception_after_first);
@@ -566,7 +566,7 @@ int main(int argc, char** argv)
         // An unopened headless excerpt must follow linked master edits and be
         // fully updated by endCmd. Exercise its exported written transposition,
         // rather than only checking the master note's in-memory pitch.
-        const auto excerpt_project = music::load_native_score(kTwoPartScore, "musicxml");
+        const auto excerpt_project = music::load_native_score(context, kTwoPartScore, "musicxml");
         auto* excerpt_master = excerpt_project->masterScore();
         expect(music::generate_score_excerpts(excerpt_master), "Excerpt fixture generation failed");
         expect(music::list_score_excerpts(excerpt_master).size() == 2,
@@ -584,7 +584,7 @@ int main(int argc, char** argv)
         excerpt_options.excerpt_id = 1;
         const auto excerpt_xml = music::export_native_score(context,
             excerpt_project, "musicxml", excerpt_options, "");
-        const auto excerpt_reopened = music::load_native_score(excerpt_xml, "musicxml");
+        const auto excerpt_reopened = music::load_native_score(context, excerpt_xml, "musicxml");
         expect(excerpt_reopened->masterScore()->parts().size() == 1,
                "Excerpt export contained other parts");
         const auto excerpt_export_region = music::query_score_region(
@@ -595,7 +595,7 @@ int main(int argc, char** argv)
         // A whole-score projection must not inherit the public 4096-note
         // per-region cap: 4224 notes in one 128-measure block are inside the
         // documented 16384-note projection bound.
-        const auto dense_project = music::load_native_score(dense_projection_score(), "musicxml");
+        const auto dense_project = music::load_native_score(context, dense_projection_score(), "musicxml");
         auto* dense_score = dense_project->masterScore();
         const auto dense_projection = music::snapshot_score_projection(dense_score);
         expect(dense_projection.complete, "Dense score projection was unavailable");
@@ -619,7 +619,7 @@ int main(int argc, char** argv)
 
         // A spanner anchored only to another voice is outside the requested
         // voice window and must not set has_cross_region_spanners.
-        const auto voice_project = music::load_native_score(kVoiceSpannerScore, "musicxml");
+        const auto voice_project = music::load_native_score(context, kVoiceSpannerScore, "musicxml");
         auto* voice_score = voice_project->masterScore();
         const ScoreRegionView other_voice = music::query_score_region(
             voice_score, make_region(0, 0, 4, 0));
@@ -641,7 +641,7 @@ int main(int argc, char** argv)
         // A contained slur in another voice is outside a voice-0 window, while
         // a voice-1 window that cuts the voice-1 slur across the barline must
         // report it. Both live and projected region queries share this filter.
-        const auto filter_project = music::load_native_score(kVoiceFilterScore, "musicxml");
+        const auto filter_project = music::load_native_score(context, kVoiceFilterScore, "musicxml");
         auto* filter_score = filter_project->masterScore();
         expect(!music::query_score_region(filter_score, make_region(0, 0, 1, 0))
                     .has_cross_region_spanners,
@@ -668,7 +668,7 @@ int main(int argc, char** argv)
 
         // A slur with one anchor in the queried voice and the other in another
         // voice is a voice-window crossing, not an ignorable other-voice span.
-        const auto cross_project = music::load_native_score(kCrossVoiceSpanScore, "musicxml");
+        const auto cross_project = music::load_native_score(context, kCrossVoiceSpanScore, "musicxml");
         auto* cross_score = cross_project->masterScore();
         expect(music::query_score_region(cross_score, make_region(0, 0, 1, 0))
                    .has_cross_region_spanners,
