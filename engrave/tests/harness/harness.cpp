@@ -149,7 +149,13 @@ void on_push(UndoableCommand* command, bool appended) {
     switch (g_pushes.mode) {
     case Inject::before:
         if (appended) return;
-        command->cleanup(false);
+        // The command never entered the transaction, so nothing here will undo it,
+        // and its element is not necessarily free-standing: the engine may already
+        // have wired it into the score (Score::setNoteRest puts the tie of a note
+        // that runs past a barline on the note before the tie is pushed, for one),
+        // and the rollback of the commands that were pushed still reads it. A push
+        // that fails in the engine leaks its command, element and all; free the
+        // command only and leave the element to whatever still owns it.
         delete command;
         throw Fault("fault injected before a push");
     case Inject::after:
