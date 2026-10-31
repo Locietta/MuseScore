@@ -38,9 +38,6 @@
 #include "types/symnames.h"
 #include "types/typesconv.h"
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-#include "accessibility/accessibleitem.h"
-#endif
 
 #include "anchors.h"
 #include "box.h"
@@ -2908,52 +2905,23 @@ String TextBase::getHtmlEndTag(FontStyle style, VerticalAlignment vAlign)
     return s;
 }
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-AccessibleItemPtr TextBase::createAccessible()
-{
-    return std::make_shared<AccessibleItem>(this, AccessibleItem::EditableText);
-}
-
-#endif
 
 void TextBase::notifyAboutTextCursorChanged()
 {
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-    using namespace muse::accessibility;
-    if (accessible()) {
-        accessible()->accessiblePropertyChanged().send(IAccessible::Property::TextCursor, muse::Val());
-    }
-#endif
 }
 
 void TextBase::notifyAboutTextInserted(int startPosition, int endPosition, const String& text)
 {
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-    using namespace muse::accessibility;
-    if (accessible()) {
-        auto range = IAccessible::TextRange(startPosition, endPosition, text);
-        accessible()->accessiblePropertyChanged().send(IAccessible::Property::TextInsert, muse::Val::fromQVariant(range.toMap()));
-    }
-#else
     UNUSED(startPosition);
     UNUSED(endPosition);
     UNUSED(text);
-#endif
 }
 
 void TextBase::notifyAboutTextRemoved(int startPosition, int endPosition, const String& text)
 {
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-    using namespace muse::accessibility;
-    if (accessible()) {
-        auto range = IAccessible::TextRange(startPosition, endPosition, text);
-        accessible()->accessiblePropertyChanged().send(IAccessible::Property::TextRemove, muse::Val::fromQVariant(range.toMap()));
-    }
-#else
     UNUSED(startPosition);
     UNUSED(endPosition);
     UNUSED(text);
-#endif
 }
 
 //---------------------------------------------------------

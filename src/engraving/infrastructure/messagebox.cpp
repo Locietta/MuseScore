@@ -27,28 +27,7 @@ using namespace mu::engraving;
 
 MessageBox::Button MessageBox::warning(const std::string& title, const std::string& text, const std::set<Button>& buttons)
 {
-#ifndef ENGRAVING_NO_INTERACTIVE
-
-    using namespace muse;
-
-    std::vector<IInteractive::Button> realButtons;
-    if (buttons.find(Cancel) != buttons.cend()) {
-        realButtons.push_back(IInteractive::Button::Cancel);
-    }
-    if (buttons.find(Ok) != buttons.cend() || realButtons.empty()) {
-        realButtons.push_back(IInteractive::Button::Ok);
-    }
-
-    IInteractive::Result res = interactive()->warningSync(title, text, realButtons);
-    if (res.standardButton() == IInteractive::Button::Ok) {
-        return MessageBox::Button::Ok;
-    }
-
-    return MessageBox::Button::Cancel;
-
-#else
     UNUSED(buttons);
     LOGW() << "interactive disabled, will be return Ok, message: " << title << " " << text;
     return MessageBox::Button::Ok;
-#endif
 }

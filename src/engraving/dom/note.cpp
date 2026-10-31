@@ -825,9 +825,6 @@ void Note::setPitch(int val, bool notifyAboutChanged)
         m_pitch = val;
 
         if (notifyAboutChanged) {
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-            notifyAboutNameChanged();
-#endif
         }
     }
 }

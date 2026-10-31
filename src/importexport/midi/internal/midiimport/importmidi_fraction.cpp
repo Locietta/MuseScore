@@ -24,16 +24,12 @@
 
 #include <limits>
 
-#ifdef NO_QT_SUPPORT
 #include <cassert>
 #ifndef Q_ASSERT
 #define Q_ASSERT(condition) assert(condition)
 #endif
 #ifndef Q_ASSERT_X
 #define Q_ASSERT_X(condition, where, what) assert(condition)
-#endif
-#else
-#include <QtGlobal>
 #endif
 
 namespace mu::iex::midi {

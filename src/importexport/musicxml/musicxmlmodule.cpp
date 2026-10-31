@@ -23,15 +23,6 @@
 
 #include "modularity/ioc.h"
 
-#ifndef MUSICXML_NO_INTERNAL
-#include "project/inotationreadersregister.h"
-#include "internal/musicxmlreader.h"
-#include "project/inotationwritersregister.h"
-#include "internal/musicxmlwriter.h"
-#include "internal/musicxmlwriter.h"
-#include "internal/mxlwriter.h"
-#include "internal/musicxmlconfiguration.h"
-#endif
 
 using namespace muse;
 using namespace mu::iex::musicxml;
@@ -43,33 +34,12 @@ std::string MusicXmlModule::moduleName() const
 
 void MusicXmlModule::registerExports()
 {
-#ifndef MUSICXML_NO_INTERNAL
-    m_configuration = std::make_shared<MusicXmlConfiguration>();
-    globalIoc()->registerExport<IMusicXmlConfiguration>(moduleName(), m_configuration);
-#endif
 }
 
 void MusicXmlModule::resolveImports()
 {
-#ifndef MUSICXML_NO_INTERNAL
-    using namespace mu::project;
-
-    auto readers = globalIoc()->resolve<INotationReadersRegister>(moduleName());
-    if (readers) {
-        readers->reg({ "xml", "musicxml", "mxl" }, std::make_shared<MusicXmlReader>());
-    }
-
-    auto writers = globalIoc()->resolve<INotationWritersRegister>(moduleName());
-    if (writers) {
-        writers->reg({ "musicxml", "xml" }, std::make_shared<MusicXmlWriter>());
-        writers->reg({ "mxl" }, std::make_shared<MxlWriter>());
-    }
-#endif
 }
 
 void MusicXmlModule::onInit(const IApplication::RunMode&)
 {
-#ifndef MUSICXML_NO_INTERNAL
-    m_configuration->init();
-#endif
 }

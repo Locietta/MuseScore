@@ -114,10 +114,6 @@
 #include "utils.h"
 #include "volta.h"
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-#include "accessibility/accessibleitem.h"
-#include "accessibility/accessibleroot.h"
-#endif
 
 #include "log.h"
 
@@ -2672,56 +2668,7 @@ void Score::cmdConcertPitchChanged(bool flag)
 
 static void onFocusedItemChanged(EngravingItem* item)
 {
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-    if (!item || !item->selected()) {
-        return;
-    }
-
-    if (item->isSpannerSegment()) {
-        item = toSpannerSegment(item)->spanner();
-        if (!item) {
-            return;
-        }
-    }
-
-    item->initAccessibleIfNeed();
-
-    AccessibleItemPtr accessible = item->accessible();
-    if (!accessible) {
-        return;
-    }
-
-    const Score* score = item->score();
-    if (!score) {
-        return;
-    }
-
-    AccessibleRoot* currAccRoot = accessible->accessibleRoot();
-    AccessibleRoot* accRoot = score->rootItem()->accessible()->accessibleRoot();
-    AccessibleRoot* dummyAccRoot = score->dummy()->rootItem()->accessible()->accessibleRoot();
-
-    if (accRoot && currAccRoot == accRoot && accRoot->registered() && accRoot->enabled()) {
-        accRoot->setFocusedElement(accessible);
-
-        if (AccessibleItemPtr focusedElement = dummyAccRoot->focusedElement().lock()) {
-            accRoot->updateStaffInfo(accessible, focusedElement);
-        }
-
-        dummyAccRoot->setFocusedElement(nullptr);
-    }
-
-    if (dummyAccRoot && currAccRoot == dummyAccRoot && dummyAccRoot->registered() && dummyAccRoot->enabled()) {
-        dummyAccRoot->setFocusedElement(accessible);
-
-        if (AccessibleItemPtr focusedElement = accRoot->focusedElement().lock()) {
-            dummyAccRoot->updateStaffInfo(accessible, focusedElement);
-        }
-
-        accRoot->setFocusedElement(nullptr);
-    }
-#else
     UNUSED(item);
-#endif
 }
 
 //---------------------------------------------------------

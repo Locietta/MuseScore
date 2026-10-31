@@ -73,10 +73,6 @@ inline void dump(const ld_field<T>& f, std::stringstream& ss)
 class Factory;
 class XmlReader;
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-class AccessibleItem;
-typedef std::shared_ptr<AccessibleItem> AccessibleItemPtr;
-#endif
 
 enum class Pid : short;
 class StaffType;
@@ -465,11 +461,6 @@ public:
     virtual EngravingItem* nextSegmentElement();    //< Used for navigation
     virtual EngravingItem* prevSegmentElement();    //< next-element and prev-element command
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-    virtual void setupAccessible();
-    AccessibleItemPtr accessible() const;
-    void initAccessibleIfNeed();
-#endif
 
     bool accessibleEnabled() const;
     void setAccessibleEnabled(bool enabled);
@@ -710,10 +701,6 @@ protected:
     EngravingItem(const ElementType& type, EngravingObject* parent = nullptr, ElementFlags = ElementFlag::NOTHING);
     EngravingItem(const EngravingItem&, bool link = false);
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-    virtual AccessibleItemPtr createAccessible();
-    void notifyAboutNameChanged();
-#endif
 
     virtual LayoutData* createLayoutData() const;
     virtual const LayoutData* ldataInternal() const;
@@ -731,10 +718,6 @@ private:
 
     friend class Factory;
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-    void doInitAccessible();
-    AccessibleItemPtr m_accessible;
-#endif
 
     bool m_accessibleEnabled = false;
 
@@ -770,8 +753,3 @@ public:
 
 extern bool elementLessThan(const EngravingItem* const, const EngravingItem* const);
 } // mu::engraving
-
-#ifndef NO_QT_SUPPORT
-Q_DECLARE_METATYPE(mu::engraving::ElementPtr)
-Q_DECLARE_METATYPE(mu::engraving::ElementType)
-#endif

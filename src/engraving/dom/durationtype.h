@@ -107,8 +107,5 @@ void splitCompoundBeatsForList(std::vector<TDuration>* dList, const Fraction& l,
                                const TimeSigFrac& nominal, int maxDots);
 } // namespace mu::engraving
 
-#ifndef NO_QT_SUPPORT
-Q_DECLARE_METATYPE(mu::engraving::TDuration)
-#endif
 
 #endif

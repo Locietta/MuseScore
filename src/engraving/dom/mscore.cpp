@@ -67,21 +67,6 @@ bool MScore::_errorIsWarning = false;
 
 void MScore::registerUiTypes()
 {
-#ifndef ENGRAVING_NO_API
-    qRegisterMetaType<Spanner::Anchor>("Anchor");
-    qRegisterMetaType<SegmentType>("SegmentType");
-    qRegisterMetaType<FiguredBassItem::Modifier>("Modifier");
-    qRegisterMetaType<FiguredBassItem::Parenthesis>("Parenthesis");
-    qRegisterMetaType<FiguredBassItem::ContLine>("ContLine");
-    qRegisterMetaType<Volta::Type>("VoltaType");
-    qRegisterMetaType<OttavaType>("OttavaType");
-    qRegisterMetaType<TrillType>("TrillType");
-    qRegisterMetaType<JumpType>("JumpType");
-    qRegisterMetaType<MarkerType>("MarkerType");
-    qRegisterMetaType<HairpinType>("HairpinType");
-    qRegisterMetaType<LyricsSyllabic>("Syllabic");
-
-#endif
 }
 
 std::string MScore::errorToString(MsError err)

@@ -37,10 +37,6 @@ namespace mu::engraving {
 //   Keep in sync with styleTypes[] in styledef.cpp
 //---------------------------------------------------------
 
-#ifndef ENGRAVING_NO_API
-namespace _Sid {
-Q_NAMESPACE;
-#endif
 
 /** APIDOC
  * Enumerates the list of score style settings
@@ -2280,11 +2276,6 @@ enum class Sid : short {
     STYLES
 };
 
-#ifndef ENGRAVING_NO_API
-Q_ENUM_NS(Sid)
-}
-using _Sid::Sid;
-#endif
 
 using StyleId = Sid;
 using StyleIdSet = std::unordered_set<Sid>;

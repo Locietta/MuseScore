@@ -29,12 +29,10 @@
 
 #include "infrastructure/smufl.h"
 
-#ifndef ENGRAVING_NO_INTERNAL
 #include "internal/engravingconfiguration.h"
 #include "internal/engravingcontextconfiguration.h"
 #include "internal/engravingfontsprovider.h"
 #include "internal/palettescoreprovider.h"
-#endif
 
 #include "engraving/style/defaultstyle.h"
 
@@ -48,11 +46,6 @@
 #include "rendering/single/singlerenderer.h"
 #include "rendering/editmode/editmoderenderer.h"
 
-#ifndef ENGRAVING_NO_API
-#include "global/api/iapiregister.h"
-#include "api/v1/qmlpluginapi.h"
-#include "api/v1/engravingapiv1.h"
-#endif
 
 #ifdef MUE_BUILD_ENGRAVING_DEVTOOLS
 #include "interactive/iinteractiveuriregister.h"
@@ -73,24 +66,6 @@ static const std::string mname("engraving");
 
 static void engraving_init_qrc()
 {
-#ifndef NO_QT_SUPPORT
-    Q_INIT_RESOURCE(engraving);
-
-    Q_INIT_RESOURCE(fonts_Leland);
-    Q_INIT_RESOURCE(fonts_Bravura);
-    Q_INIT_RESOURCE(fonts_Campania);
-    Q_INIT_RESOURCE(fonts_Edwin);
-    Q_INIT_RESOURCE(fonts_FreeSans);
-    Q_INIT_RESOURCE(fonts_FreeSerif);
-    Q_INIT_RESOURCE(fonts_Gootville);
-    Q_INIT_RESOURCE(fonts_MScore);
-    Q_INIT_RESOURCE(fonts_MuseJazz);
-    Q_INIT_RESOURCE(fonts_Smufl);
-    Q_INIT_RESOURCE(fonts_Petaluma);
-    Q_INIT_RESOURCE(fonts_FinaleMaestro);
-    Q_INIT_RESOURCE(fonts_FinaleBroadway);
-    Q_INIT_RESOURCE(fonts_Tabulature);
-#endif
 }
 
 std::string EngravingModule::moduleName() const
@@ -100,14 +75,12 @@ std::string EngravingModule::moduleName() const
 
 void EngravingModule::registerExports()
 {
-#ifndef ENGRAVING_NO_INTERNAL
 
     m_configuration = std::make_shared<EngravingConfiguration>();
     m_engravingfonts = std::make_shared<EngravingFontsProvider>();
 
     globalIoc()->registerExport<IEngravingConfiguration>(mname, m_configuration);
     globalIoc()->registerExport<IEngravingFontsProvider>(mname, m_engravingfonts);
-#endif
 
     // internal
     globalIoc()->registerExport<rendering::IScoreRenderer>(mname, new rendering::score::ScoreRenderer());
@@ -133,19 +106,6 @@ void EngravingModule::resolveImports()
 
 void EngravingModule::registerApi()
 {
-#ifndef ENGRAVING_NO_API
-    apiv1::PluginAPI::registerQmlTypes();
-
-    auto api = globalIoc()->resolve<muse::api::IApiRegister>(mname);
-    if (api) {
-        api->regApiCreator(mname, "MuseApi.Engraving", new muse::api::ApiCreator<apiv1::EngravingApiV1>());
-
-        //! TODO remove me
-        const char* uri = "MuseApi.Engraving";
-        api->regEnum<apiv1::enums::ElementType>(uri, muse::api::EnumType::String, "Element");
-        api->regEnum<apiv1::enums::TextStyleType>(uri);
-    }
-#endif
 }
 
 void EngravingModule::registerResources()
@@ -160,7 +120,6 @@ void EngravingModule::registerUiTypes()
 
 void EngravingModule::onInit(const IApplication::RunMode&)
 {
-#ifndef ENGRAVING_NO_INTERNAL
     // Init fonts
     {
         using namespace muse::draw;
@@ -256,7 +215,6 @@ void EngravingModule::onInit(const IApplication::RunMode&)
                                    m_configuration->defaultPageSize());
 
     StaffType::initStaffTypes(m_configuration->defaultColor());
-#endif // ENGRAVING_NO_INTERNAL
 
     // initialize dom
 
@@ -276,9 +234,7 @@ void EngravingModule::onInit(const IApplication::RunMode&)
 
 void EngravingModule::onDeinit()
 {
-#ifndef ENGRAVING_NO_INTERNAL
     m_engravingfonts->deinit();
-#endif
 }
 
 IContextSetup* EngravingModule::newContext(const muse::modularity::ContextPtr& ctx) const
@@ -288,26 +244,20 @@ IContextSetup* EngravingModule::newContext(const muse::modularity::ContextPtr& c
 
 void EngravingContext::registerExports()
 {
-#ifndef ENGRAVING_NO_INTERNAL
     m_paletteScoreProvider = std::make_shared<PaletteScoreProvider>(iocContext());
     ioc()->registerExport<IPaletteScoreProvider>(mname, m_paletteScoreProvider);
 #ifdef MUE_BUILD_ENGRAVING_DEVTOOLS
     ioc()->registerExport<IEngravingElementsProvider>(mname, new EngravingElementsProvider());
 #endif
     ioc()->registerExport<IEngravingContextConfiguration>(mname, new EngravingContextConfiguration(iocContext()));
-#endif
 }
 
 void EngravingContext::onInit(const muse::IApplication::RunMode&)
 {
-#ifndef ENGRAVING_NO_INTERNAL
     m_paletteScoreProvider->init();
-#endif
 }
 
 void EngravingContext::onDestroy()
 {
-#ifndef ENGRAVING_NO_INTERNAL
     m_paletteScoreProvider->deinit();
-#endif
 }

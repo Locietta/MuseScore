@@ -22,9 +22,6 @@
 
 #include "page.h"
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-#include "accessibility/accessibleitem.h"
-#endif
 
 #include "factory.h"
 #include "measurebase.h"
@@ -131,13 +128,6 @@ EngravingItemList Page::accessibleChildren() const
     return children;
 }
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-AccessibleItemPtr Page::createAccessible()
-{
-    return std::make_shared<AccessibleItem>(this, AccessibleItem::Group);
-}
-
-#endif
 
 //---------------------------------------------------------
 //   scanElements

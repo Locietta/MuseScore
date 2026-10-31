@@ -75,11 +75,11 @@ MasterScore::MasterScore(const muse::modularity::ContextPtr& iocCtx, std::weak_p
     m_nonExpandedRepeatList = new RepeatList(this);
     setMasterScore(this);
 
-#if defined(Q_OS_WIN)
+#if defined(_WIN32)
     metaTags().insert({ u"platform", u"Microsoft Windows" });
-#elif defined(Q_OS_MAC)
+#elif defined(__APPLE__)
     metaTags().insert({ u"platform", u"Apple Macintosh" });
-#elif defined(Q_OS_LINUX)
+#elif defined(__linux__)
     metaTags().insert({ u"platform", u"Linux" });
 #else
     metaTags().insert({ u"platform", u"Unknown" });

@@ -249,9 +249,6 @@ public:
 
     String accessibleExtraInfo() const override;
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-    AccessibleItemPtr createAccessible() override;
-#endif
 
     EngravingItem* firstInNextSegments(staff_idx_t activeStaff) const;   //<
     EngravingItem* lastInPrevSegments(staff_idx_t activeStaff) const;     //<
@@ -378,7 +375,3 @@ private:
     double m_spacing = 0;
 };
 } // namespace mu::engraving
-
-#ifndef NO_QT_SUPPORT
-Q_DECLARE_METATYPE(mu::engraving::SegmentType)
-#endif

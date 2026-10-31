@@ -23,11 +23,7 @@
 #ifndef EXPORTMIDI_H
 #define EXPORTMIDI_H
 
-#ifdef NO_QT_SUPPORT
 #include "io/path.h"
-#else
-#include <QFile>
-#endif
 
 #include "../midishared/midifile.h"
 #include "engraving/compat/midi/pausemap.h"
@@ -39,11 +35,7 @@ class SynthesizerState;
 }
 
 namespace mu::iex::midi {
-#ifdef NO_QT_SUPPORT
 using MidiPath = muse::io::path_t;
-#else
-using MidiPath = QString;
-#endif
 
 //---------------------------------------------------------
 //   ExportMidi
@@ -61,9 +53,6 @@ public:
 private:
     void writeHeader(const engraving::CompatMidiRendererInternal::Context& context);
 
-#ifndef NO_QT_SUPPORT
-    QFile m_file;
-#endif
     MidiFile m_midiFile;
     engraving::Score* m_score = nullptr;
 };

@@ -206,7 +206,3 @@ private:
     bool m_snapToItemAfter = true;
 };
 } // namespace mu::engraving
-
-#ifndef NO_QT_SUPPORT
-Q_DECLARE_METATYPE(mu::engraving::HairpinType)
-#endif

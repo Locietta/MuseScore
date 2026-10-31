@@ -261,11 +261,6 @@ public:
     std::vector<std::string> allMidiFiles() const;
     void setOperationsFile(const std::string& fileName);
 
-#ifndef NO_QT_SUPPORT
-    // Compatibility for the Qt MIDI configuration module, which keeps passing
-    // a QString.  The Qt-free path only sees the std::string overload.
-    void setOperationsFile(const QString& fileName) { setOperationsFile(fileName.toStdString()); }
-#endif
 
 private:
     friend class CurrentTrackSetter;

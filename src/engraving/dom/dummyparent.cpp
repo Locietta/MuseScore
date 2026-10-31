@@ -40,7 +40,4 @@ void DummyParent::init()
 {
     m_root = new RootItem(score(), RootItem::Kind::Dummy);
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-    m_root->setupAccessible();
-#endif
 }

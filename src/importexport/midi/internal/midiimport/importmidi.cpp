@@ -27,19 +27,12 @@
 #include <string>
 #include <vector>
 
-#ifndef NO_QT_SUPPORT
-#include <QFile>
-#include <QFileInfo>
-#endif
 
 #include "translation.h"
 
 #include "engraving/engravingerrors.h"
 #include "engraving/rw/xmlwriter.h"
 
-#ifndef NO_QT_SUPPORT
-#include "engraving/infrastructure/messagebox.h"
-#endif
 
 #include "engraving/dom/articulation.h"
 #include "engraving/dom/barline.h"
@@ -91,9 +84,7 @@
 #include "importmidi_voice.h"
 #include "importmidi.h"
 
-#ifdef NO_QT_SUPPORT
 #include "io/buffer.h"
-#endif
 
 #include "log.h"
 
@@ -1251,7 +1242,6 @@ void loadMidiData(MidiFile& mf)
 }
 
 namespace {
-#ifdef NO_QT_SUPPORT
 // Erase the one-shot cache entry on every exit path, including exceptions from
 // the notation algorithms.  MidiImportOperations is process-global, so leaving
 // the entry (or the current-file pointer) behind would leak state into the next
@@ -1262,63 +1252,8 @@ struct MidiImportFileGuard {
 
     ~MidiImportFileGuard() { opers.excludeMidiFile(key); }
 };
-#endif
 }
 
-#ifndef NO_QT_SUPPORT
-Err importMidi(MasterScore* score, const QString& name)
-{
-    if (name.isEmpty()) {
-        return Err::FileNotFound;
-    }
-
-    const std::string fileName = name.toStdString();
-    auto& opers = midiImportOperations;
-
-    MidiOperations::CurrentMidiFileSetter setCurrentMidiFile(opers, fileName);
-    if (!opers.hasMidiFile(fileName)) {
-        opers.addNewMidiFile(fileName);
-    }
-
-    // Check if file has been modified on disk since last import
-    QFileInfo fileInfo(name);
-    int64_t currentModTime = fileInfo.lastModified().toSecsSinceEpoch();
-    bool needsReload = (opers.data()->processingsOfOpenedFile == 0)
-                       || (opers.data()->fileModificationTime != currentModTime);
-
-    if (needsReload) {
-        QFile fp(name);
-        if (!fp.open(QIODevice::ReadOnly)) {
-            LOGD("importMidi: file open error <%s>", qPrintable(name));
-            return Err::FileOpenError;
-        }
-        MidiFile mf;
-        try {
-            mf.read(&fp);
-        }
-        catch (QString errorText) {
-            if (!MScore::noGui) {
-                MessageBox(score->iocContext()).warning(muse::trc("iex_midi", "Import MIDI"),
-                                                        muse::qtrc("iex_midi", "Import failed: %1").arg(errorText).toStdString(),
-                                                        { MessageBox::Ok });
-            }
-            fp.close();
-            LOGD("importMidi: bad file format");
-            return Err::FileBadFormat;
-        }
-        fp.close();
-
-        loadMidiData(mf);
-        opers.setMidiFileData(fileName, mf);
-        opers.data()->fileModificationTime = currentModTime;
-    }
-
-    opers.data()->tracks = convertMidi(score, opers.midiFile(fileName));
-    ++opers.data()->processingsOfOpenedFile;
-
-    return Err::NoError;
-}
-#else
 Err importMidiFromBuffer(MasterScore* score, const std::string& bytes)
 {
     if (!score || bytes.empty()) {
@@ -1369,5 +1304,4 @@ Err importMidiFromBuffer(MasterScore* score, const std::string& bytes)
     ++importData->processingsOfOpenedFile;
     return Err::NoError;
 }
-#endif
 }

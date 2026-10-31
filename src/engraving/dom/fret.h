@@ -308,7 +308,3 @@ private:
     std::vector<int> m_fingering = std::vector<int>(m_strings, 0);
 };
 } // namespace mu::engraving
-
-#ifndef NO_QT_SUPPORT
-Q_DECLARE_METATYPE(mu::engraving::FretDiagram*)
-#endif

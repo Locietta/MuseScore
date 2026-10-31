@@ -326,7 +326,3 @@ private:
 
 extern AccidentalVal sym2accidentalVal(SymId id);
 }
-
-#ifndef NO_QT_SUPPORT
-Q_DECLARE_METATYPE(mu::engraving::AccidentalType)
-#endif

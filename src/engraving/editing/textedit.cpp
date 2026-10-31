@@ -410,7 +410,7 @@ bool TextBase::isEditAllowed(EditData& ed) const
             return true;
         }
 
-#if defined(Q_OS_WIN)
+#if defined(_WIN32)
         // Allow special characters to be typed with AltGr / Ctrl+Alt (they are the same in Windows)
         if (!ed.s.empty() && (ed.key < Key_A || ed.key > Key_Z) && (ed.key < Key_0 || ed.key > Key_9)) {
             return true;
@@ -592,7 +592,7 @@ bool TextBase::edit(EditData& ed)
             break;
 
         case Key_Up:
-#if defined(Q_OS_MAC)
+#if defined(__APPLE__)
             if (!cursor->movePosition(TextCursor::MoveOperation::Up, mm)) {
                 cursor->movePosition(TextCursor::MoveOperation::StartOfLine, mm);
             }
@@ -606,7 +606,7 @@ bool TextBase::edit(EditData& ed)
             break;
 
         case Key_Down:
-#if defined(Q_OS_MAC)
+#if defined(__APPLE__)
             if (!cursor->movePosition(TextCursor::MoveOperation::Down, mm)) {
                 cursor->movePosition(TextCursor::MoveOperation::EndOfLine, mm);
             }

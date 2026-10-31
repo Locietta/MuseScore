@@ -209,9 +209,6 @@ public:
     std::vector<staff_idx_t> visibleStavesOfPart(const Part* part) const;
     std::vector<Part*> visiblePartsOfGroup(staff_idx_t start, staff_idx_t end) const;
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-    AccessibleItemPtr createAccessible() override;
-#endif
 
     size_t getBracketsColumnsCount() const;
 

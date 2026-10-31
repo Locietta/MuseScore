@@ -54,9 +54,6 @@
 #include "systemdivider.h"
 #include "systemlockindicator.h"
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-#include "accessibility/accessibleitem.h"
-#endif
 
 #include "log.h"
 
@@ -183,13 +180,6 @@ System::~System()
     }
 }
 
-#ifndef ENGRAVING_NO_ACCESSIBILITY
-AccessibleItemPtr System::createAccessible()
-{
-    return std::make_shared<AccessibleItem>(this, AccessibleItem::Group);
-}
-
-#endif
 
 //---------------------------------------------------------
 ///   clear

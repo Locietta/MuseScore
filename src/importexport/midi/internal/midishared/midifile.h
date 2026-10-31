@@ -25,25 +25,17 @@
 #include <map>
 #include <vector>
 
-#ifdef NO_QT_SUPPORT
 #include "io/iodevice.h"
 
 //! NOTE: midievent.h still uses the Qt typedef `uchar`; provide the same
 //! type without pulling Qt into the MIDI core. Redefining it is harmless if
 //! the typedef is already visible.
 using uchar = unsigned char;
-#else
-#include <QIODevice>
-#endif
 
 #include "../midishared/midievent.h"
 
 namespace mu::iex::midi {
-#ifdef NO_QT_SUPPORT
 using MidiIODevice = muse::io::IODevice;
-#else
-using MidiIODevice = QIODevice;
-#endif
 
 class MidiTrack
 {
