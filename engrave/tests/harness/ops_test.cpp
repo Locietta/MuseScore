@@ -116,6 +116,9 @@ TEST(Edit, AFailingOperationRollsTheBatchBack) {
         {SetProperty{note, "color", std::int64_t{3}}, ErrorCode::InvalidArgument},
         {SetProperty{note, "pitch", std::int64_t{60}}, ErrorCode::InvalidArgument},    // structural only
         {SetProperty{note, "beamMode", engrave::Enum{"auto"}}, ErrorCode::InvalidArgument}, // not a Note property
+        // An integer that does not fit the engine's int is not narrowed silently.
+        {SetProperty{note, "fret", std::int64_t{4294967297LL}}, ErrorCode::InvalidArgument},
+        {SetStyle{{}, "measureNumberInterval", std::int64_t{4294967297LL}}, ErrorCode::InvalidArgument},
         {SetProperty{ElementId{1, 2}, "color", Color{}}, ErrorCode::NotFound},
         {SetProperty{engrave::OpRef{1, 0}, "color", Color{}}, ErrorCode::InvalidArgument},
         {ResetProperty{note, "noSuchProperty"}, ErrorCode::InvalidArgument},

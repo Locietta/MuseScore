@@ -258,6 +258,32 @@ TEST(ValueCodec, RejectsWhatDoesNotFitTheType) {
     ASSERT_FALSE(wrong_size);
     EXPECT_EQ(wrong_size.error().code, ErrorCode::InvalidArgument);
 
+    // A caller's integer has to fit what the engine stores; the probe of finding 3 of
+    // the A4 validation set an int style to 4294967297 and got 1 back.
+    for (const std::int64_t too_big : {std::int64_t{4294967297LL}, std::int64_t{1} << 32,
+                                       std::int64_t{-4294967295LL}}) {
+        const auto overflow = engrave::api::from_value(P_TYPE::INT, too_big);
+        ASSERT_FALSE(overflow) << too_big;
+        EXPECT_EQ(overflow.error().code, ErrorCode::InvalidArgument) << too_big;
+        const auto fraction = engrave::api::from_value(P_TYPE::FRACTION, engrave::Fraction{too_big, 1});
+        ASSERT_FALSE(fraction) << too_big;
+        EXPECT_EQ(fraction.error().code, ErrorCode::InvalidArgument) << too_big;
+    }
+    for (const std::int64_t negative : {std::int64_t{-1}, std::int64_t{-4294967295LL}}) {
+        const auto size = engrave::api::from_value(P_TYPE::SIZE_T, negative);
+        ASSERT_FALSE(size) << negative;
+        EXPECT_EQ(size.error().code, ErrorCode::InvalidArgument) << negative;
+    }
+    const auto negative_size = engrave::api::from_value(P_TYPE::SIZE_T, std::int64_t{-1});
+    ASSERT_FALSE(negative_size);
+    EXPECT_EQ(negative_size.error().code, ErrorCode::InvalidArgument);
+    const auto list = engrave::api::from_value(P_TYPE::INT_VEC, std::vector<std::int64_t>{1, 4294967297LL, 3});
+    ASSERT_FALSE(list);
+    EXPECT_EQ(list.error().code, ErrorCode::InvalidArgument);
+    const auto fraction = engrave::api::from_value(P_TYPE::FRACTION, engrave::Fraction{1, 4294967297LL});
+    ASSERT_FALSE(fraction);
+    EXPECT_EQ(fraction.error().code, ErrorCode::InvalidArgument);
+
     for (const P_TYPE type :
          {P_TYPE::DRAW_PATH, P_TYPE::GROUPS, P_TYPE::PITCH_VALUES, P_TYPE::DURATION_TYPE_WITH_DOTS}) {
         const auto read_only = engrave::api::from_value(type, Opaque{"draw_path"});

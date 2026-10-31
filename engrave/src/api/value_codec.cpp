@@ -1,6 +1,7 @@
 #include "engrave/src/api/value_codec.h"
 
 #include <format>
+#include <limits>
 #include <string>
 
 #include "engraving/types/bps.h"
@@ -53,6 +54,16 @@ std::string_view kind_name(ValueKind kind) {
 
 Result<PropertyValue> fail(ValueKind expected) {
     return std::unexpected(Error{ErrorCode::InvalidArgument, std::format("expected a {} value", kind_name(expected))});
+}
+
+// A caller's integer has to fit what the engine stores: a narrowing conversion that
+// wraps or truncates is a value the caller did not ask for.
+bool fits_int(std::int64_t value) {
+    return value >= std::numeric_limits<int>::min() && value <= std::numeric_limits<int>::max();
+}
+
+Result<PropertyValue> out_of_range(std::string_view what) {
+    return std::unexpected(Error{ErrorCode::InvalidArgument, std::format("{} is out of range", what)});
 }
 
 // A stored value of the type the pid declares, including the engine's own
@@ -506,14 +517,29 @@ Result<PropertyValue> from_value(P_TYPE type, const Value& value) {
         if (const auto* v = std::get_if<bool>(&value)) return PropertyValue(*v);
         return fail(ValueKind::Bool);
     case P_TYPE::INT:
-        if (const auto* v = std::get_if<std::int64_t>(&value)) return PropertyValue(int(*v));
+        if (const auto* v = std::get_if<std::int64_t>(&value)) {
+            if (!fits_int(*v)) return out_of_range(std::format("the int {}", *v));
+            return PropertyValue(int(*v));
+        }
         return fail(ValueKind::Int);
     case P_TYPE::SIZE_T:
-        if (const auto* v = std::get_if<std::int64_t>(&value)) return PropertyValue(size_t(*v));
+        if (const auto* v = std::get_if<std::int64_t>(&value)) {
+            if (*v < 0 || static_cast<std::uint64_t>(*v) > std::numeric_limits<std::size_t>::max()) {
+                return out_of_range(std::format("the size {}", *v));
+            }
+            return PropertyValue(size_t(*v));
+        }
         return fail(ValueKind::Int);
     case P_TYPE::INT_VEC:
-        if (const auto* v = std::get_if<std::vector<std::int64_t>>(&value))
-            return PropertyValue(std::vector<int>(v->begin(), v->end()));
+        if (const auto* v = std::get_if<std::vector<std::int64_t>>(&value)) {
+            std::vector<int> ints;
+            ints.reserve(v->size());
+            for (const std::int64_t entry : *v) {
+                if (!fits_int(entry)) return out_of_range(std::format("the int {} in the list", entry));
+                ints.push_back(int(entry));
+            }
+            return PropertyValue(std::move(ints));
+        }
         return fail(ValueKind::IntList);
     case P_TYPE::REAL:
         if (const auto* v = std::get_if<double>(&value)) return PropertyValue(*v);
@@ -547,8 +573,10 @@ Result<PropertyValue> from_value(P_TYPE type, const Value& value) {
             return PropertyValue(mu::engraving::Color(v->r, v->g, v->b, v->a));
         return fail(ValueKind::Color);
     case P_TYPE::FRACTION:
-        if (const auto* v = std::get_if<engrave::Fraction>(&value))
+        if (const auto* v = std::get_if<engrave::Fraction>(&value)) {
+            if (!fits_int(v->num) || !fits_int(v->den)) return out_of_range("a fraction term");
             return PropertyValue(mu::engraving::Fraction(int(v->num), int(v->den)));
+        }
         return fail(ValueKind::Fraction);
     case P_TYPE::ALIGN_H:
         if (const auto* token = std::get_if<Enum>(&value)) return enum_value<AlignH>(token->token, AlignH::HCENTER);
