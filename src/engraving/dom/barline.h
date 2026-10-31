@@ -58,19 +58,6 @@ struct BarLineTableItem {
 };
 
 //---------------------------------------------------------
-//   BarLineEditData
-//---------------------------------------------------------
-
-class BarLineEditData : public ElementEditData
-{
-    OBJECT_ALLOCATOR(engraving, BarLineEditData)
-public:
-    double yoff1 = 0.0;
-    double yoff2 = 0.0;
-    virtual EditDataType type() override { return EditDataType::BarLineEditData; }
-};
-
-//---------------------------------------------------------
 //   @@ BarLine
 //
 //   @P barLineType  enum  (BarLineType.NORMAL, .DOUBLE, .START_REPEAT, .END_REPEAT, .BROKEN, .END, .END_START_REPEAT, .DOTTED)
@@ -98,7 +85,6 @@ public:
     void remove(EngravingItem*) override;
     bool acceptDrop(EditData&) const override;
     EngravingItem* drop(Transaction& tx, EditData&) override;
-    bool isEditable() const override { return true; }
 
     Segment* segment() const { return toSegment(ownershipParent()); }
     Measure* measure() const { return ownershipParent() ? toMeasure(ownershipParent()->ownershipParent()) : nullptr; }
@@ -111,12 +97,6 @@ public:
     int spanFrom() const { return m_spanFrom; }
     int spanTo() const { return m_spanTo; }
     bool showTips() const;
-
-    void startEdit(EditData& ed) override;
-    bool isEditAllowed(EditData&) const override;
-    bool edit(EditData& ed) override;
-    void dragGrip(EditData&) override;
-    void endDragGrip(EditData&) override;
 
     const ElementList* el() const { return &m_el; }
 
@@ -146,15 +126,7 @@ public:
     EngravingItem* nextSegmentElement() override;
     EngravingItem* prevSegmentElement() override;
 
-
-
-
     void setSelected(bool f) override;
-    bool needStartEditingAfterSelecting() const override { return true; }
-    int gripsCount() const override { return 1; }
-    Grip initialEditModeGrip() const override { return Grip::START; }
-    Grip defaultGrip() const override { return Grip::START; }
-    std::vector<PointF> gripsPositions(const EditData&) const override;
 
     void styleChanged() override;
 

@@ -65,9 +65,6 @@ public:
     void resetNumberProperty();
     static void resetNumberProperty(Text* number);
 
-    bool isEditable() const override;
-    void startDragGrip(EditData&) override;
-    void dragGrip(EditData&) override;
 
     void setSelected(bool f) override;
 
@@ -136,11 +133,6 @@ public:
     bool setProperty(Pid propertyId, const PropertyValue& v) override;
     PropertyValue propertyDefault(Pid id) const override;
 
-    bool needStartEditingAfterSelecting() const override { return true; }
-    int gripsCount() const override;
-    Grip initialEditModeGrip() const override { return Grip::MIDDLE; }
-    Grip defaultGrip() const override { return Grip::MIDDLE; }
-    std::vector<PointF> gripsPositions(const EditData&) const override;
 
     void sanitizeTuplet();
     void addMissingElements();

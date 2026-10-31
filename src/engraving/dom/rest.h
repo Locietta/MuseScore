@@ -122,8 +122,6 @@ public:
     EngravingItem* nextElement() override;
     EngravingItem* prevElement() override;
 
-
-
     bool shouldNotBeDrawn() const;
     bool debugDrawGap() const;
 
@@ -152,7 +150,6 @@ private:
     Rest(DummyParentOr<Segment> parent);
     Rest(DummyParentOr<Segment> parent, const TDuration&);
 
-    RectF drag(EditData&) override;
     double upPos() const override;
     double downPos() const override;
     void setOffset(const PointF& o) override;

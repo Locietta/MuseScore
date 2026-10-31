@@ -58,7 +58,6 @@ public:
     void symbolLine(SymId start, SymId fill, SymId end);
 
 protected:
-    void rebaseAnchors(EditData& ed, Grip grip) override;
 
 private:
     SymIdList m_symbols;
@@ -109,8 +108,6 @@ public:
     PropertyValue getProperty(Pid propertyId) const override;
     bool setProperty(Pid propertyId, const PropertyValue&) override;
     PropertyValue propertyDefault(Pid) const override;
-
-
 
     Ornament* ornament() const { return m_ornament; }
     void setOrnament(Ornament* o) { m_ornament = o; }

@@ -97,11 +97,6 @@ public:
     muse::draw::SvgRenderer* svgRenderer() const { return m_svgDoc; }
     const std::shared_ptr<muse::draw::Pixmap>& rasterImage() const { return m_rasterDoc; }
 
-    bool needStartEditingAfterSelecting() const override { return true; }
-    int gripsCount() const override { return 2; }
-    Grip initialEditModeGrip() const override { return Grip(1); }
-    Grip defaultGrip() const override { return Grip(1); }
-    std::vector<PointF> gripsPositions(const EditData&) const override;
 
     SizeF pixel2size(const SizeF& s) const;
     SizeF size2pixel(const SizeF& s) const;
@@ -113,10 +108,6 @@ public:
 
 private:
 
-    bool isEditable() const override { return true; }
-    void startDragGrip(EditData&) override;
-    void dragGrip(EditData& ed) override;
-    std::vector<LineF> gripAnchorLines(Grip) const override { return std::vector<LineF>(); }
 
     ImageStoreItem* m_storeItem = nullptr;
     std::string m_storePath; // the path of the img in the ImageStore

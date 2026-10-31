@@ -39,7 +39,6 @@ class AccidentalState;
 class Chord;
 class Factory;
 class NoteDot;
-class NoteEditData;
 class Score;
 class Spanner;
 class StaffType;
@@ -391,10 +390,6 @@ public:
     EngravingItem* nextSegmentElement() override;
     EngravingItem* prevSegmentElement() override;
 
-
-
-
-
     std::vector<Note*> tiedNotes() const;
 
     void setOffTimeType(int v) { m_offTimeType = v; }
@@ -469,22 +464,12 @@ private:
     Note(DummyParentOr<Chord> ch);
     Note(const Note&, bool link = false);
 
-    void startDrag(EditData&) override;
-    RectF drag(EditData& ed) override;
-    void endDrag(EditData&) override;
-
-    void dragInEditMode(EditData& ed);
-    void verticalDrag(EditData& ed);
-    void horizontalDrag(EditData& ed);
-
     void addSpanner(Spanner*);
     void removeSpanner(Spanner*);
     int concertPitchIdx() const;
     void updateRelLine(int absLine, bool undoable);
 
     static std::vector<Note*> findTiedNotes(Note* startNote, bool followPartialTies = true);
-
-    void normalizeLeftDragDelta(Segment* seg, EditData& ed, NoteEditData* ned);
 
     void getNoteListForDots(std::vector<Note*>& topDownNotes, std::vector<Note*>& bottomUpNotes, std::vector<int>& anchoredDots);
 

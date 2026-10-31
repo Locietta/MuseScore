@@ -36,7 +36,6 @@ public:
     explicit SoundFlag(DummyParentOr<EngravingItem> parent);
 
     SoundFlag* clone() const override;
-    bool isEditable() const override;
 
     void setSelected(bool f) override;
 

@@ -92,7 +92,6 @@
 #include "editspanner.h"
 #include "editstaff.h"
 #include "editsystemlocks.h"
-#include "mscoreview.h"
 #include "navigation.h"
 #include "transaction/transaction.h"
 #include "transaction/undostack.h"
@@ -357,7 +356,6 @@ void MasterScore::update(bool resetCmdState, bool layoutAllParts)
 
     deletePostponed(m_cmdState);
 
-    bool updateAll = false;
     if (m_cmdState.layoutRange()) {
         for (Score* s : scoreList()) {
             if (s != this && !s->isOpen() && scoreList().size() > 1 && !layoutAllParts) {
@@ -365,35 +363,14 @@ void MasterScore::update(bool resetCmdState, bool layoutAllParts)
             }
             s->doLayoutRange(m_cmdState.startTick(), m_cmdState.endTick());
         }
-        updateAll = true;
     }
 
     if (needUpdateTicksAndTimeSigMap()) {
         updateTicksAndTimeSigMap();
     }
 
-    if (updateAll || m_cmdState.updateAll()) {
-        for (Score* s : scoreList()) {
-            for (MuseScoreView* v : s->getViewer()) {
-                v->updateAll();
-            }
-        }
-    } else if (m_cmdState.updateRange()) {
-        // Any score that accumulated a refresh rect via addRefresh() calls dataChanged() on its viewers.
-        for (Score* s : scoreList()) {
-            if (s->refreshRect().isNull()) {
-                continue;
-            }
-            const std::list<MuseScoreView*>& viewers = s->getViewer();
-            if (!viewers.empty()) {
-                double d = s->style().spatium() * .5;
-                RectF rect = s->refreshRect().adjusted(-d, -d, 2 * d, 2 * d);
-                for (MuseScoreView* v : viewers) {
-                    v->dataChanged(rect);
-                }
-            }
-            s->clearRefreshRect();
-        }
+    for (Score* s : scoreList()) {
+        s->clearRefreshRect();
     }
 
     if (resetCmdState) {
@@ -1479,7 +1456,6 @@ void Score::changeCRlen(ChordRest* cr, const Fraction& dstF, bool fillWithRest)
         return;
     }
 
-
     track_idx_t track = cr->track();
     Tuplet* tuplet = cr->tuplet();
 
@@ -1538,7 +1514,6 @@ void Score::changeCRlen(ChordRest* cr, const Fraction& dstF, bool fillWithRest)
         return;
     }
 
-
     Fraction tick  = cr->tick();
     Fraction f     = dstF;
     ChordRest* cr1 = cr;
@@ -1557,7 +1532,6 @@ void Score::changeCRlen(ChordRest* cr, const Fraction& dstF, bool fillWithRest)
 
         if (cr->isRest()) {
             Fraction timeStretch = cr1->staff()->timeStretch(cr1->tick());
-            Rest* r = toRest(cr);
             if (first) {
                 std::vector<TDuration> dList = toDurationList(f2, true);
                 undoChangeChordRestLen(cr, dList[0]);
@@ -1568,7 +1542,7 @@ void Score::changeCRlen(ChordRest* cr, const Fraction& dstF, bool fillWithRest)
                     setRest(tick2, track, d.fraction(), (d.dots() > 0), tuplet);
                 }
             } else {
-                r = setRest(tick, track, f2, false, tuplet);
+                setRest(tick, track, f2, false, tuplet);
             }
             if (first) {
                 first = false;

@@ -46,8 +46,6 @@
 #include "../dom/tapping.h"
 #include "../style/style.h"
 
-#include "mscoreview.h"
-
 using namespace mu;
 
 namespace mu::engraving {
@@ -1615,9 +1613,7 @@ EngravingItem* Navigation::move(Score* score, const String& cmd)
             } else {
                 score->setPlayNote(false);
             }
-            for (MuseScoreView* view : score->getViewer()) {
-                view->moveCursor();
-            }
+
         } else {
             score->select(el, SelectType::SINGLE, 0);
         }

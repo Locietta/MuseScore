@@ -49,10 +49,6 @@ public:
 
     bool isEdited() const;
     bool isEndPointsEdited() const;
-    bool isEditAllowed(EditData&) const override;
-    bool edit(EditData&) override;
-
-    void dragGrip(EditData& ed) override;
 
     Slur* slur() const { return toSlur(spanner()); }
 
@@ -63,7 +59,6 @@ public:
     Color curColor(const rendering::PaintOptions& opt) const override;
 
 protected:
-    void changeAnchor(EditData&, EngravingItem*) override;
 };
 
 //---------------------------------------------------------

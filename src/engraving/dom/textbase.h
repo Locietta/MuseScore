@@ -351,18 +351,7 @@ public:
 
     bool hasParentSegment() const { return ownershipParent() && parent()->isSegment(); }
     virtual bool allowTimeAnchor() const override { return hasParentSegment(); }
-    virtual void startEdit(EditData&) override;
-    virtual bool isEditAllowed(EditData&) const override;
-    virtual bool edit(EditData&) override;
-    virtual void editCut(EditData&) override;
-    virtual void editCopy(EditData&) override;
-    virtual void endEdit(EditData&) override;
-    virtual RectF drag(EditData&) override;
-    virtual void endDrag(EditData&) override;
     void movePosition(TextCursor::MoveOperation);
-
-    bool mousePress(EditData& ed);
-    void dragTo(EditData& ed);
 
     bool deleteSelectedText();
 
@@ -377,8 +366,6 @@ public:
 
     const Shape& highResShape() const { return ldata()->highResShape.value(); }
 
-    std::vector<LineF> dragAnchorLines() const override;
-
     virtual bool acceptDrop(EditData&) const override;
     virtual EngravingItem* drop(Transaction& tx, EditData&) override;
 
@@ -387,9 +374,6 @@ public:
 
     static String unEscape(String s);
     static String escape(String s);
-
-
-
 
     int subtype() const override;
     TranslatableString subtypeUserName() const override;
@@ -527,15 +511,11 @@ protected:
     TextBase(const ElementType& type, EngravingObject* parent, ElementFlags);
     TextBase(const TextBase&);
 
-    bool nudge(const EditData& ed);
-
     void insertSym(SymId id);
     void prepareFormat(const String& token, TextCursor& cursor);
     bool prepareFormat(const String& token, CharFormat& format);
 
     virtual void commitText();
-
-    bool textWasEdited(EditData& ed) const;
 
     bool m_layoutToParentWidth = false;
 
@@ -552,7 +532,6 @@ private:
     static void swap(size_t& r1, size_t& c1, size_t& r2, size_t& c2);
 
     Sid defaultPosSid() const override;
-
 
     void notifyAboutTextCursorChanged();
     void notifyAboutTextInserted(int startPosition, int endPosition, const String& text);
@@ -594,9 +573,4 @@ private:
     double m_textAngle = 0.0;
 };
 
-inline bool isTextNavigationKey(int key, KeyboardModifiers modifiers)
-{
-    // space + TextEditingControlModifier = insert nonbreaking space, so that's *not* a navigation key
-    return (key == Key_Space && modifiers != TextEditingControlModifier) || key == Key_Tab;
-}
 } // namespace mu::engraving

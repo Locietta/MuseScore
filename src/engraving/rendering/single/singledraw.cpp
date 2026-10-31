@@ -146,8 +146,6 @@
 
 #include "dom/whammybar.h"
 
-#include "editing/mscoreview.h"
-
 #include "rendering/score/stemlayout.h"
 
 #include "infrastructure/rtti.h"
@@ -540,15 +538,7 @@ void SingleDraw::draw(const Note* item, Painter* painter, const PaintOptions& op
                              tab->fretMaskY() * item->magS(),
                              ldata->bbox().width() + 2 * d,
                              tab->fretMaskH() * item->magS());
-            // we do not know which viewer did this draw() call
-            // so update all:
-            if (!item->score()->getViewer().empty()) {
-                for (MuseScoreView* view : item->score()->getViewer()) {
-                    view->drawBackground(painter, bb);
-                }
-            } else {
-                painter->fillRect(bb, config->noteBackgroundColor());
-            }
+            painter->fillRect(bb, config->noteBackgroundColor());
 
             if (item->fretConflict() && !opt.isPrinting && item->score()->showUnprintable()) {                //on fret conflict, draw on red background
                 painter->save();

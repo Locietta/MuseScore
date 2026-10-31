@@ -63,24 +63,14 @@ public:
 
     EngravingObject* propertyDelegate(Pid) const override;
 
-    int gripsCount() const override;
-    std::vector<PointF> gripsPositions(const EditData& = EditData()) const override;
-
-    std::unique_ptr<ElementGroup> getDragGroup(std::function<bool(const EngravingItem*)> isDragged) override;
-
     bool hasVoiceAssignmentProperties() const override { return spanner()->hasVoiceAssignmentProperties(); }
 
     EngravingItem* findElementToSnapBefore(bool ignoreInvisible = true) const;
     EngravingItem* findElementToSnapAfter(bool ignoreInvisible = true, bool requirePlayable = false) const;
 
-    void endDragGrip(EditData& ed) override;
-
 private:
     TextBase* findStartDynamicOrExpression(bool ignoreInvisible = true) const;
     TextBase* findEndDynamicOrExpression(bool ignoreInvisible = true, bool requirePlayable = false) const;
-
-    void startDragGrip(EditData&) override;
-    void dragGrip(EditData&) override;
 
     Sid getPropertyStyle(Pid) const override;
 
@@ -154,7 +144,6 @@ public:
     PropertyValue getProperty(Pid id) const override;
     bool setProperty(Pid propertyId, const PropertyValue&) override;
     PropertyValue propertyDefault(Pid id) const override;
-
 
     bool isLineType() const
     {

@@ -157,35 +157,6 @@ void EditTimeTickAnchors::updateLayout(Measure* measure)
     MeasureLayout::layoutTimeTickAnchors(measure, ctx);
 }
 
-void MoveElementAnchors::moveElementAnchors(EngravingItem* element, KeyboardKey key, KeyboardModifier mod)
-{
-    EngravingObject* owner = element->ownershipParent();
-    Segment* segment = owner && owner->isSegment() ? toSegment(owner) : nullptr;
-    if (!segment) {
-        return;
-    }
-
-    bool altMod = mod & AltModifier;
-
-    bool anchorToEndOfPrevious = element->getProperty(Pid::ANCHOR_TO_END_OF_PREVIOUS).toBool();
-    bool changeAnchorType = altMod && canAnchorToEndOfPrevious(element);
-    bool resetAnchorType = !altMod && anchorToEndOfPrevious;
-    if (changeAnchorType || resetAnchorType) {
-        element->undoChangeProperty(Pid::ANCHOR_TO_END_OF_PREVIOUS, !anchorToEndOfPrevious,
-                                    element->propertyFlags(Pid::ANCHOR_TO_END_OF_PREVIOUS));
-
-        bool needMoveSeg = (key == Key_Left && anchorToEndOfPrevious) || (key == Key_Right && !anchorToEndOfPrevious);
-        if (!needMoveSeg) {
-            checkMeasureBoundariesAndMoveIfNeed(element);
-            return;
-        }
-    }
-
-    moveSegment(element, /*forward*/ key == Key_Right);
-    EditTimeTickAnchors::updateAnchors(element);
-    checkMeasureBoundariesAndMoveIfNeed(element);
-}
-
 bool MoveElementAnchors::canAnchorToEndOfPrevious(const EngravingItem* element)
 {
     switch (element->type()) {
@@ -230,30 +201,6 @@ void MoveElementAnchors::checkMeasureBoundariesAndMoveIfNeed(EngravingItem* elem
     }
 }
 
-void MoveElementAnchors::moveElementAnchorsOnDrag(EngravingItem* element, EditData& ed)
-{
-    EngravingObject* owner = element->ownershipParent();
-    Segment* segment = owner && owner->isSegment() ? toSegment(owner) : nullptr;
-    if (!segment) {
-        return;
-    }
-
-    KeyboardModifiers km = ed.modifiers;
-    if (km & (ShiftModifier | ControlModifier)) {
-        return;
-    }
-
-    EditTimeTickAnchors::updateAnchors(element);
-
-    Segment* newSeg = findNewAnchorableSegmentFromDrag(element, segment);
-
-    if (newSeg && (newSeg != segment && !newSeg->measure()->isMMRest())) {
-        PointF curOffset = element->offset();
-        moveSegment(element, newSeg, newSeg->tick() - segment->tick());
-        rebaseOffsetOnMoveSegment(element, curOffset, newSeg, segment);
-    }
-}
-
 Segment* MoveElementAnchors::findNewAnchorableSegmentFromDrag(EngravingItem* element, Segment* curSeg)
 {
     const System* system = curSeg->system();
@@ -280,72 +227,6 @@ Segment* MoveElementAnchors::findNewAnchorableSegmentFromDrag(EngravingItem* ele
     dragPositionToSegment(element->canvasPos(), newMeasure, element->staffIdx(), &newSeg, 0.5, true);
 
     return newSeg;
-}
-
-Segment* MoveElementAnchors::findNewAnchorSegmentForLine(LineSegment* lineSegment, const EditData& ed, const Segment* curSeg)
-{
-    SLine* line = lineSegment->line();
-    Score* score = lineSegment->score();
-    if (!line->allowTimeAnchor()) {
-        if (ed.key == Key_Left) {
-            return curSeg->prev1WithElemsOnStaff(lineSegment->staffIdx());
-        }
-        if (ed.key == Key_Right) {
-            Segment* lastCRSegInScore = score->lastSegment();
-            while (lastCRSegInScore && !lastCRSegInScore->isChordRestType()) {
-                lastCRSegInScore = lastCRSegInScore->prev1(SegmentType::ChordRest);
-            }
-            if (curSeg == lastCRSegInScore && curSeg == line->endSegment()) {
-                // If we reach this point, it means that the line in question does not accept time anchors
-                // and that the line's end segment is the last CR segment in the score. Trying to use
-                // next1WithElemsOnStaff won't do anything from here, but the last segment in the score is
-                // still a valid new anchor segment for this line (see also LineSegment::edit)...
-                return score->lastSegment();
-            }
-            return curSeg->next1WithElemsOnStaff(lineSegment->staffIdx());
-        }
-    }
-
-    switch (ed.key) {
-    case Key_Left: {
-        if (ed.modifiers & ControlModifier) {
-            Measure* m = curSeg->rtick().isZero() ? curSeg->measure()->prevMeasure() : curSeg->measure();
-            return m ? m->findFirstR(SegmentType::ChordRest, Fraction(0, 1)) : nullptr;
-        }
-        return findNewAnchorableSegment(curSeg, /*forward*/ false);
-    }
-    case Key_Right: {
-        if (ed.modifiers & ControlModifier) {
-            if (Measure* measure = curSeg->measure()->nextMeasure()) {
-                return measure->findFirstR(SegmentType::ChordRest, Fraction(0, 1));
-            } else {
-                Measure* m = score->lastMeasure();
-                EditTimeTickAnchors::updateAnchors(m, lineSegment->staffIdx());
-                return m->getChordRestOrTimeTickSegment(m->endTick());
-            }
-        }
-        return findNewAnchorableSegment(curSeg, /*forward*/ true);
-    }
-    case Key_Home: {
-        Measure* m = curSeg->measure()->system()->firstMeasure();
-        if (curSeg->rtick() == Fraction(0, 1) && m == curSeg->measure() && m->prevMeasure()) {
-            m = m->prevMeasure()->system()->firstMeasure();
-        }
-        return m->findFirstR(SegmentType::ChordRest, Fraction(0, 1));
-    }
-    case Key_End: {
-        Measure* measure = curSeg->measure()->system()->lastMeasure()->nextMeasure();
-        if (measure) {
-            return measure->findFirstR(SegmentType::ChordRest, Fraction(0, 1));
-        } else {
-            Measure* m = score->lastMeasure();
-            EditTimeTickAnchors::updateAnchors(m, lineSegment->staffIdx());
-            return m->getChordRestOrTimeTickSegment(m->endTick());
-        }
-    }
-    }
-
-    return nullptr;
 }
 
 void MoveElementAnchors::moveSegment(EngravingItem* element, bool forward)

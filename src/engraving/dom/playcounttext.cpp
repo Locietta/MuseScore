@@ -42,17 +42,6 @@ PlayCountText::PlayCountText(DummyParentOr<Segment> parent, TextStyleType tid)
     initElementStyle(&playCountStyle);
 }
 
-void PlayCountText::endEdit(EditData& ed)
-{
-    if (textWasEdited(ed)) {
-        score()->startCmd(TranslatableString("undoableAction", "Update play count text"));
-        barline()->undoChangeProperty(Pid::PLAY_COUNT_TEXT, xmlText());
-        barline()->undoChangeProperty(Pid::PLAY_COUNT_TEXT_SETTING, AutoCustomHide::CUSTOM);
-        score()->endCmd();
-    }
-    TextBase::endEdit(ed);
-}
-
 PropertyValue PlayCountText::getProperty(Pid id) const
 {
     switch (id) {
@@ -105,12 +94,6 @@ PropertyValue PlayCountText::propertyDefault(Pid propertyId) const
     default:
         return TextBase::propertyDefault(propertyId);
     }
-}
-
-RectF PlayCountText::drag(EditData& ed)
-{
-    // Not TextBase::drag because we don't allow reanchoring on drag
-    return EngravingItem::drag(ed);
 }
 
 mu::engraving::BarLine* mu::engraving::PlayCountText::barline() const

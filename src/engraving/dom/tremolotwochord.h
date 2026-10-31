@@ -61,7 +61,6 @@ public:
     PointF chordBeamAnchor(const ChordRest* chord, ChordBeamAnchorType anchorType) const;
 
     double chordMag() const;
-    RectF drag(EditData&) override;
 
     Chord* chord1() const { return m_chord1; }
     void setChord1(Chord* ch) { m_chord1 = ch; }
@@ -83,7 +82,6 @@ public:
 
     bool crossStaffBeamBetween() const;
 
-
     void triggerLayout() const override;
 
     TremoloStyle tremoloStyle() const { return m_style; }
@@ -102,14 +100,7 @@ public:
     bool setProperty(Pid propertyId, const PropertyValue&) override;
     PropertyValue propertyDefault(Pid propertyId) const override;
 
-    bool needStartEditingAfterSelecting() const override;
-    int gripsCount() const override;
-    Grip initialEditModeGrip() const override;
-    Grip defaultGrip() const override;
-    std::vector<PointF> gripsPositions(const EditData&) const override;
     bool isMovable() const override { return true; }
-    bool isEditable() const override { return true; }
-    void dragGrip(EditData&) override;
 
     void clearBeamSegments() override;
 

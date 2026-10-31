@@ -114,33 +114,6 @@ PointF TremoloTwoChord::chordBeamAnchor(const ChordRest* chord, ChordBeamAnchorT
 }
 
 //---------------------------------------------------------
-//   drag
-//---------------------------------------------------------
-
-RectF TremoloTwoChord::drag(EditData& ed)
-{
-    int idx = directionIdx();
-    double dy = ed.pos.y() - ed.lastPos.y();
-
-    double y1 = m_beamFragment.py1[idx];
-    double y2 = m_beamFragment.py2[idx];
-
-    y1 += dy;
-    y2 += dy;
-
-    double _spatium = spatium();
-    // Because of the logic in TremoloTwoChord::setProperty(),
-    // changing Pid::BEAM_POS only has an effect if Pid::USER_MODIFIED is true.
-    undoChangeProperty(Pid::USER_MODIFIED, true);
-    undoChangeProperty(Pid::BEAM_POS, PairF(y1 / _spatium, y2 / _spatium));
-    undoChangeProperty(Pid::GENERATED, false);
-
-    triggerLayout();
-
-    return canvasBoundingRect();
-}
-
-//---------------------------------------------------------
 //   setTremoloType
 //---------------------------------------------------------
 
@@ -307,79 +280,6 @@ void TremoloTwoChord::triggerLayout() const
     }
 }
 
-bool TremoloTwoChord::needStartEditingAfterSelecting() const
-{
-    return true;
-}
-
-int TremoloTwoChord::gripsCount() const
-{
-    return 3;
-}
-
-Grip TremoloTwoChord::initialEditModeGrip() const
-{
-    return Grip::END;
-}
-
-Grip TremoloTwoChord::defaultGrip() const
-{
-    return Grip::MIDDLE;
-}
-
-//---------------------------------------------------------
-//   gripsPositions
-//---------------------------------------------------------
-
-std::vector<PointF> TremoloTwoChord::gripsPositions(const EditData&) const
-{
-    int idx = directionIdx();
-
-    int y = pagePos().y();
-    double beamStartX = m_startAnchor.x() + m_chord1->pageX();
-    double beamEndX = m_endAnchor.x() + m_chord1->pageX(); // intentional--chord1 is start x
-    double middleX = (beamStartX + beamEndX) / 2;
-    double middleY = (m_beamFragment.py1[idx] + y + m_beamFragment.py2[idx] + y) / 2;
-
-    return {
-        PointF(beamStartX, m_beamFragment.py1[idx] + y),
-        PointF(beamEndX, m_beamFragment.py2[idx] + y),
-        PointF(middleX, middleY)
-    };
-}
-
-//---------------------------------------------------------
-//   dragGrip
-//---------------------------------------------------------
-
-void TremoloTwoChord::dragGrip(EditData& ed)
-{
-    int idx = directionIdx();
-    double dy = ed.delta.y();
-    double y1 = m_beamFragment.py1[idx];
-    double y2 = m_beamFragment.py2[idx];
-
-    if (ed.curGrip == Grip::MIDDLE) {
-        y1 += dy;
-        y2 += dy;
-    } else if (ed.curGrip == Grip::START) {
-        y1 += dy;
-    } else if (ed.curGrip == Grip::END) {
-        y2 += dy;
-    } else {
-        UNREACHABLE;
-        return;
-    }
-
-    double _spatium = spatium();
-    // Because of the logic in Beam::setProperty(),
-    // changing Pid::BEAM_POS only has an effect if Pid::USER_MODIFIED is true.
-    undoChangeProperty(Pid::USER_MODIFIED, true);
-    undoChangeProperty(Pid::BEAM_POS, PairF(y1 / _spatium, y2 / _spatium));
-    undoChangeProperty(Pid::GENERATED, false);
-
-    triggerLayout();
-}
 
 //---------------------------------------------------------
 //   subtypeName
@@ -389,12 +289,6 @@ TranslatableString TremoloTwoChord::subtypeUserName() const
 {
     return TConv::userName(tremoloType());
 }
-
-//---------------------------------------------------------
-//   accessibleInfo
-//---------------------------------------------------------
-
-
 
 //---------------------------------------------------------
 //   customStyleApplicable

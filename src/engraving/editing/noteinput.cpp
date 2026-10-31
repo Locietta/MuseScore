@@ -31,7 +31,6 @@
 #include "editmeasures.h"
 #include "editnote.h"
 #include "inserttime.h"
-#include "mscoreview.h"
 #include "regroup.h"
 #include "transaction/transaction.h"
 #include "transpose.h"
@@ -1236,9 +1235,7 @@ void NoteInput::nextInputPos(Transaction&, Score* score, const ChordRest* cr, bo
         if (doSelect) {
             score->select(ncr, SelectType::SINGLE, 0);
         }
-        for (MuseScoreView* v : score->getViewer()) {
-            v->moveCursor();
-        }
+
     }
 }
 

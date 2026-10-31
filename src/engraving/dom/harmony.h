@@ -239,11 +239,6 @@ public:
     RealizedHarmony& realizedHarmony();
     const RealizedHarmony& getRealizedHarmony() const;
 
-    bool isEditable() const override { return !isInFretBox(); }
-    void startEdit(EditData&) override;
-    bool isEditAllowed(EditData&) const override;
-    bool edit(EditData&) override;
-    void endEdit(EditData&) override;
 
     bool isPlayable() const override;
 
@@ -281,7 +276,6 @@ public:
     TranslatableString typeUserName() const override;
 
     String generateScreenReaderInfo() const;
-
 
     bool acceptDrop(EditData&) const override;
     EngravingItem* drop(Transaction& tx, EditData&) override;

@@ -32,8 +32,6 @@ class StaveSharingLabel final : public StaffTextBase
 public:
     StaveSharingLabel(DummyParentOr<Segment> parent, TextStyleType tid = TextStyleType::STAVE_SHARING);
 
-    bool isEditAllowed(EditData&) const override { return false; }
-
     StaveSharingLabel* clone() const override { return new StaveSharingLabel(*this); }
 };
 } // namespace mu::engraving

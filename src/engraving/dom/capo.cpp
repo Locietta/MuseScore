@@ -128,10 +128,6 @@ void Capo::setXmlText(const String& text)
     StaffTextBase::setXmlText(text);
 }
 
-bool Capo::isEditable() const
-{
-    return false;
-}
 
 const CapoParams& Capo::params() const
 {

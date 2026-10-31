@@ -116,7 +116,6 @@ class Lyrics;
 class MasterScore;
 class Measure;
 class MeasureBase;
-class MuseScoreView;
 class Note;
 class Page;
 class Part;
@@ -301,7 +300,6 @@ public:
     Score& operator=(const Score&) = delete;
     virtual ~Score();
     Score* clone();
-
 
     virtual bool isMaster() const { return false; }
     virtual bool readOnly() const;
@@ -748,10 +746,6 @@ public:
     void setMscoreVersion(const String& val) { m_mscoreVersion = val; }
     void setMscoreRevision(int val) { m_mscoreRevision = val; }
 
-    void addViewer(MuseScoreView* v) { m_viewer.push_back(v); }
-    void removeViewer(MuseScoreView* v) { m_viewer.remove(v); }
-    const std::list<MuseScoreView*>& getViewer() const { return m_viewer; }
-
     //! NOTE Layout
     const LayoutOptions& layoutOptions() const { return m_layoutOptions; }
     void setLayoutMode(LayoutMode lm) { m_layoutOptions.mode = lm; }
@@ -948,7 +942,6 @@ private:
 
     const EngravingServices& m_services;
     MasterScore* m_masterScore = nullptr;
-    std::list<MuseScoreView*> m_viewer;
     Excerpt* m_excerpt = nullptr;
 
     String m_mscoreVersion;

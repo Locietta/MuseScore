@@ -162,7 +162,6 @@
 
 #include "dom/whammybar.h"
 
-#include "editing/mscoreview.h"
 #include "editing/navigation.h"
 
 #include "infrastructure/rtti.h"

@@ -21,7 +21,6 @@
  */
 #include "tie.h"
 
-#include "../editing/mscoreview.h"
 #include "../rendering/iscorerenderer.h"
 
 #include "accidental.h"
@@ -68,105 +67,6 @@ TieSegment::TieSegment(const ElementType& type, Tie* sp)
 TieSegment::TieSegment(const TieSegment& s)
     : SlurTieSegment(s)
 {
-}
-
-void TieSegment::changeAnchor(EditData& ed, EngravingItem* element)
-{
-    if (ed.curGrip == Grip::START) {
-        spanner()->setStartElement(element);
-        Note* note = toNote(element);
-        if (note->chord()->tick() <= tie()->endNote()->chord()->tick()) {
-            tie()->startNote()->setTieFor(0);
-            tie()->setStartNote(note);
-            note->setTieFor(tie());
-        }
-    } else {
-        spanner()->setEndElement(element);
-        Note* note = toNote(element);
-        // do not allow backward ties
-        if (note->chord()->tick() >= tie()->startNote()->chord()->tick()) {
-            tie()->endNote()->setTieBack(0);
-            tie()->setEndNote(note);
-            note->setTieBack(tie());
-        }
-    }
-
-    const size_t segments  = spanner()->spannerSegments().size();
-    ups(ed.curGrip).off = PointF();
-    renderer()->layoutItem(spanner());
-    if (spanner()->spannerSegments().size() != segments) {
-        const std::vector<SpannerSegment*>& ss = spanner()->spannerSegments();
-
-        TieSegment* newSegment = toTieSegment(ed.curGrip == Grip::END ? ss.back() : ss.front());
-        ed.view()->changeEditElement(newSegment);
-        triggerLayout();
-    }
-}
-
-RectF TieSegment::drag(EditData& ed)
-{
-    consolidateAdjustmentOffsetIntoUserOffset();
-    return SlurTieSegment::drag(ed);
-}
-
-void TieSegment::dragGrip(EditData& ed)
-{
-    consolidateAdjustmentOffsetIntoUserOffset();
-    Grip g = ed.curGrip;
-
-    switch (g) {
-    case Grip::START:
-    case Grip::END:
-        ups(g).off += ed.delta;
-        if (!isPartialTieSegment()) {
-            //
-            // move anchor for slurs/ties
-            //
-            if ((g == Grip::START && isSingleBeginType())
-                || (g == Grip::END && isSingleEndType())) {
-                Spanner* spanner = tie();
-                EngravingItem* e = ed.view()->elementNear(ed.pos);
-                Note* note = (e && e->isNote()) ? toNote(e) : nullptr;
-                if (note && ((g == Grip::END && note->tick() > tie()->tick())
-                             || (g == Grip::START && note->tick() < tie()->tick2()))) {
-                    if (g == Grip::END) {
-                        Tie* tie = toTie(spanner);
-                        if (tie->startNote()->pitch() == note->pitch()
-                            && tie->startNote()->chord()->tick() < note->chord()->tick()) {
-                            ed.view()->setDropTarget(note);
-                            if (note != tie->endNote()) {
-                                changeAnchor(ed, note);
-                            }
-                        }
-                    }
-                } else {
-                    ed.view()->setDropTarget(0);
-                }
-            }
-        }
-        renderer()->computeBezier(this);
-        break;
-    case Grip::BEZIER1:
-    case Grip::BEZIER2:
-        ups(g).off += ed.delta;
-        renderer()->computeBezier(this);
-        break;
-    case Grip::SHOULDER:
-        ups(g).off = PointF();
-        ups(Grip::BEZIER1).off += ed.delta;
-        ups(Grip::BEZIER2).off += ed.delta;
-        renderer()->computeBezier(this);
-        break;
-    case Grip::DRAG:
-        ups(Grip::DRAG).off = PointF();
-        roffset() += ed.delta;
-        break;
-    default:
-        UNREACHABLE;
-        return;
-    }
-
-    triggerLayout();
 }
 
 void TieSegment::consolidateAdjustmentOffsetIntoUserOffset()

@@ -55,8 +55,6 @@ public:
     double lw() const { return m_lw; }
     void setLw(double w) { m_lw = w; }
 
-    RectF hitBBox() const override;
-    Shape hitShape() const override;
 
     bool collectForDrawing() const override;
 

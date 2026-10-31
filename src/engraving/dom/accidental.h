@@ -262,8 +262,6 @@ public:
     bool acceptDrop(EditData&) const override;
     EngravingItem* drop(Transaction& tx, EditData&) override;
 
-    bool isEditable() const override { return true; }
-    void startEdit(EditData&) override { setGenerated(false); }
 
     PropertyValue getProperty(Pid propertyId) const override;
     bool setProperty(Pid propertyId, const PropertyValue&) override;
@@ -282,8 +280,6 @@ public:
     int stackingOrder() const { return ldata()->stackingNumber + m_stackingOrderOffset; }
 
     int line() const;
-
-
 
     void computeMag();
 

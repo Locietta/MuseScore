@@ -62,28 +62,6 @@ RehearsalMark::RehearsalMark(DummyParentOr<Segment> parent)
 }
 
 //---------------------------------------------------------
-//   isEditAllowed
-//---------------------------------------------------------
-
-bool RehearsalMark::isEditAllowed(EditData& ed) const
-{
-    bool ctrlPressed  = ed.modifiers & ControlModifier;
-    bool shiftPressed = ed.modifiers & ShiftModifier;
-    bool altPressed = ed.modifiers & AltModifier;
-    if (altPressed && !ctrlPressed && !shiftPressed && (ed.key == Key_Left || ed.key == Key_Right)) {
-        return false;
-    }
-
-    return TextBase::isEditAllowed(ed);
-}
-
-RectF RehearsalMark::drag(EditData& ed)
-{
-    // Not TextBase::drag because we don't allow reanchoring on drag
-    return EngravingItem::drag(ed);
-}
-
-//---------------------------------------------------------
 //   setType
 //---------------------------------------------------------
 

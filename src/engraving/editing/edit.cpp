@@ -117,7 +117,6 @@
 #include "edittimesig.h"
 #include "edittremolo.h"
 #include "inserttime.h"
-#include "mscoreview.h"
 #include "navigation.h"
 #include "splitjoinmeasure.h"
 #include "transaction/transaction.h"
@@ -1743,9 +1742,6 @@ void Score::deleteMeasures(MeasureBase* mbStart, MeasureBase* mbEnd, bool preser
 
         // adjust views
         Measure* focusOn = startMeasure->prevMeasure() ? startMeasure->prevMeasure() : score->firstMeasure();
-        for (MuseScoreView* v : score->m_viewer) {
-            v->adjustCanvasPosition(focusOn);
-        }
 
         // insert correct timesig after deletion
         Measure* mBeforeSel = startMeasure->prevMeasure();

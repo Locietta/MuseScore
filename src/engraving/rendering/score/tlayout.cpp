@@ -196,7 +196,6 @@ using namespace mu::engraving::rendering::score;
 
 void TLayout::layoutItem(EngravingItem* item, LayoutContext& ctx)
 {
-    //DO_ASSERT(!ctx.conf().isPaletteMode());
 
     EngravingItem::LayoutData* ldata = item->mutldata();
 
@@ -6685,9 +6684,6 @@ void TLayout::layoutVibrato(Vibrato* item, LayoutContext& ctx)
     LAYOUT_CALL_ITEM(item);
     layoutLine(static_cast<SLine*>(item), ctx);
 
-    if (ctx.conf().isPaletteMode()) {
-        return;
-    }
     if (item->spannerSegments().empty()) {
         LOGD("Vibrato: no segments");
         return;

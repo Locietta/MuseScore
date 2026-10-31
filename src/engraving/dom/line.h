@@ -43,12 +43,6 @@ class LineSegment : public SpannerSegment
 {
     OBJECT_ALLOCATOR(engraving, LineSegment)
 protected:
-    virtual bool isEditAllowed(EditData&) const override;
-    virtual bool edit(EditData&) override;
-    virtual std::vector<LineF> gripAnchorLines(Grip) const override;
-    virtual void startDragGrip(EditData&) override;
-    virtual void dragGrip(EditData&) override;
-    void startDrag(EditData&) override;
 
     LineSegment(const ElementType& type, SLine* sp, ElementFlags f = ElementFlag::NOTHING);
 
@@ -63,14 +57,6 @@ public:
 
     virtual EngravingObject* propertyDelegate(Pid) const override;
 
-    bool needStartEditingAfterSelecting() const override { return true; }
-    int gripsCount() const override { return 3; }
-    Grip initialEditModeGrip() const override { return Grip::END; }
-    Grip defaultGrip() const override { return Grip::MIDDLE; }
-    std::vector<PointF> gripsPositions(const EditData& = EditData()) const override;
-
-    std::vector<LineF> dragAnchorLines() const override;
-    RectF drag(EditData& ed) override;
 
     Spatium lineWidth() const;
 
@@ -78,10 +64,8 @@ public:
 
 protected:
     virtual void rebaseOffsetsOnAnchorChanged(Grip grip, const PointF& oldPos, System* sys);
-    virtual void rebaseAnchors(EditData&, Grip);
 
 private:
-    void undoMoveStartEndAndSnappedItems(EditData& ed, bool moveStart, bool moveEnd, Segment* s1, Segment* s2);
     PointF leftAnchorPosition(const double& systemPositionY) const;
     PointF rightAnchorPosition(const double& systemPositionY) const;
 

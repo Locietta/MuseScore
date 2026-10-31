@@ -26,7 +26,6 @@
 #include "../editing/transaction/transaction.h"
 #include "../types/typesconv.h"
 
-#include "dynamichairpingroup.h"
 #include "expression.h"
 #include "hairpin.h"
 #include "measure.h"
@@ -341,24 +340,6 @@ int Dynamic::dynamicVelocity(DynamicType t)
     return DYN_LIST[int(t)].velocity;
 }
 
-void Dynamic::startEdit(EditData& ed)
-{
-    if (ed.curGrip != Grip::NO_GRIP) {
-        EngravingItem::startEdit(ed);
-    } else {
-        TextBase::startEdit(ed);
-    }
-}
-
-void Dynamic::endEdit(EditData& ed)
-{
-    if (cursor() && cursor()->editing()) {
-        TextBase::endEdit(ed);
-    } else {
-        EngravingItem::endEdit(ed);
-    }
-}
-
 TranslatableString Dynamic::subtypeUserName() const
 {
     if (dynamicType() == DynamicType::OTHER) {
@@ -371,39 +352,6 @@ TranslatableString Dynamic::subtypeUserName() const
     } else {
         return TConv::userName(dynamicType());
     }
-}
-
-void Dynamic::dragGrip(EditData& ed)
-{
-    const bool hasLeftGrip = this->hasLeftGrip();
-    const bool hasRightGrip = this->hasRightGrip();
-
-    // Right grip (when two grips/when single grip)
-    if ((int(ed.curGrip) == 1 && hasLeftGrip && hasRightGrip) || (int(ed.curGrip) == 0 && !hasLeftGrip && hasRightGrip)) {
-        m_rightDragOffset += ed.evtDelta.x();
-        if (m_rightDragOffset < 0) {
-            m_rightDragOffset = 0;
-        }
-        return;
-    }
-
-    // Left grip (when two grips or single grip)
-    if (int(ed.curGrip) == 0 && hasLeftGrip) {
-        m_leftDragOffset += ed.evtDelta.x();
-        if (m_leftDragOffset > 0) {
-            m_leftDragOffset = 0;
-        }
-        return;
-    }
-
-    UNREACHABLE;
-}
-
-void Dynamic::endDragGrip(EditData& ed)
-{
-    m_leftDragOffset = m_rightDragOffset = 0.0;
-
-    TextBase::endDragGrip(ed);
 }
 
 //---------------------------------------------------------
@@ -419,24 +367,6 @@ void Dynamic::reset()
     if (snappedExp && !snappedExp->offset().isNull()) {
         snappedExp->reset();
     }
-}
-
-//---------------------------------------------------------
-//   getDragGroup
-//---------------------------------------------------------
-
-std::unique_ptr<ElementGroup> Dynamic::getDragGroup(std::function<bool(const EngravingItem*)> isDragged)
-{
-    if (auto g = HairpinWithDynamicsDragGroup::detectFor(this, isDragged)) {
-        return g;
-    }
-    if (auto g = DynamicNearHairpinsDragGroup::detectFor(this, isDragged)) {
-        return g;
-    }
-    if (auto g = DynamicExpressionDragGroup::detectFor(this, isDragged)) {
-        return g;
-    }
-    return TextBase::getDragGroup(isDragged);
 }
 
 //---------------------------------------------------------
@@ -557,25 +487,9 @@ Sid Dynamic::getPropertyStyle(Pid pid) const
 }
 
 //---------------------------------------------------------
-//   accessibleInfo
-//---------------------------------------------------------
-
-
-
-//---------------------------------------------------------
 //   screenReaderInfo
 //---------------------------------------------------------
 
-
-}
-
-bool Dynamic::isEditAllowed(EditData& ed) const
-{
-    if (!dynamic_cast<TextEditData*>(ed.getData(this).get())) {
-        return EngravingItem::isEditAllowed(ed);
-    }
-
-    return TextBase::isEditAllowed(ed);
 }
 
 //---------------------------------------------------------
@@ -640,68 +554,4 @@ Shape Dynamic::symShapeWithCutouts(SymId id) const
 Dyn Dynamic::dynInfo(DynamicType type)
 {
     return DYN_LIST[static_cast<int>(type)];
-}
-
-//---------------------------------------------------------
-//   gripsCount
-//---------------------------------------------------------
-
-int Dynamic::gripsCount() const
-{
-    if (empty()) {
-        return 0;
-    }
-
-    const bool hasLeftGrip = this->hasLeftGrip();
-    const bool hasRightGrip = this->hasRightGrip();
-
-    if (hasLeftGrip && hasRightGrip) {
-        return 2;
-    } else if (hasLeftGrip || hasRightGrip) {
-        return 1;
-    } else {
-        return 0;
-    }
-}
-
-//---------------------------------------------------------
-//   gripsPositions
-//---------------------------------------------------------
-
-std::vector<PointF> Dynamic::gripsPositions(const EditData&) const
-{
-    const RectF bbox = ldata()->bbox();
-    const PointF pagePos = this->pagePos();
-    const double horizontalPadding = absoluteFromSpatium(score()->style().styleS(Sid::hairpinMinDistance));
-
-    // Based on rendering::score::AlignmentLayout::yOpticalCenter
-    const double yOpticalCenter = [&] {
-        switch (align().vertical) {
-        case AlignV::TOP:
-            return 0.5 * bbox.height();
-        case AlignV::VCENTER:
-            return 0.0;
-        case AlignV::BOTTOM:
-            return -0.5 * bbox.height();
-        case AlignV::BASELINE:
-            return -0.46 * spatium() * symbolScale(); // approximated half x-height of dynamic
-        }
-        return 0.0;
-    }();
-
-    PointF leftOffset(bbox.left() - horizontalPadding + m_leftDragOffset, yOpticalCenter);
-    PointF rightOffset(bbox.right() + horizontalPadding + m_rightDragOffset, yOpticalCenter);
-
-    const bool hasLeftGrip = this->hasLeftGrip();
-    const bool hasRightGrip = this->hasRightGrip();
-
-    if (hasLeftGrip && hasRightGrip) {
-        return { pagePos + leftOffset, pagePos + rightOffset };
-    } else if (hasLeftGrip) {
-        return { pagePos + leftOffset };
-    } else if (hasRightGrip) {
-        return { pagePos + rightOffset };
-    } else {
-        return {};
-    }
 }

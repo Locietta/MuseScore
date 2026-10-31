@@ -257,45 +257,6 @@ EngravingItem* Lyrics::drop(Transaction& tx, EditData& data)
     return e;
 }
 
-bool Lyrics::isEditAllowed(EditData& ed) const
-{
-    if (isTextNavigationKey(ed.key, ed.modifiers)) {
-        return false;
-    }
-
-    static const std::set<KeyboardModifiers> navigationModifiers {
-        NoModifier,
-        KeypadModifier,
-        ShiftModifier
-    };
-
-    if (navigationModifiers.find(ed.modifiers) != navigationModifiers.end()) {
-        static const std::set<int> navigationKeys {
-            Key_Underscore,
-            Key_Minus,
-            Key_Enter,
-            Key_Return,
-            Key_Up,
-            Key_Down
-        };
-
-        if (navigationKeys.find(ed.key) != navigationKeys.end()) {
-            return false;
-        }
-    }
-
-    if (ed.key == Key_Left || ed.key == Key_Backspace) {
-        return cursor()->column() != 0 || cursor()->hasSelection();
-    }
-
-    if (ed.key == Key_Right) {
-        bool cursorInLastColumn = cursor()->column() == cursor()->curLine().columns();
-        return !cursorInLastColumn || cursor()->hasSelection();
-    }
-
-    return TextBase::isEditAllowed(ed);
-}
-
 void Lyrics::adjustPrevious()
 {
     Lyrics* prev = Navigation::prevLyrics(toLyrics(this));
@@ -333,20 +294,6 @@ void Lyrics::setNeedRemoveInvalidSegments()
         return;
     }
     m_needRemoveInvalidSegments = true;
-}
-
-//---------------------------------------------------------
-//   endEdit
-//---------------------------------------------------------
-
-void Lyrics::endEdit(EditData& ed)
-{
-    TextBase::endEdit(ed);
-
-    triggerLayout();
-    if (m_separator) {
-        m_separator->triggerLayout();
-    }
 }
 
 //---------------------------------------------------------

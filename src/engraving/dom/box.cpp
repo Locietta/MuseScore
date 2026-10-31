@@ -73,73 +73,6 @@ void HBox::computeMinWidth()
     setWidth(absoluteFromSpatium(boxWidth() + topGap() + bottomGap()));    // top/bottom is really left/right
 }
 
-bool Box::isEditAllowed(EditData&) const
-{
-    return false;
-}
-
-//---------------------------------------------------------
-//   edit
-//---------------------------------------------------------
-
-bool Box::edit(EditData&)
-{
-    return false;
-}
-
-//---------------------------------------------------------
-//   startDragGrip
-//---------------------------------------------------------
-
-void Box::startDragGrip(EditData& ed)
-{
-    ElementEditDataPtr eed = ed.getData(this);
-    if (isHBox()) {
-        eed->pushProperty(Pid::BOX_WIDTH);
-    } else {
-        eed->pushProperty(Pid::BOX_HEIGHT);
-    }
-}
-
-void Box::dragGrip(EditData& ed)
-{
-    const double sp = sizeIsSpatiumDependent() ? spatium() : style().defaultSpatium();
-    if (isVBox()) {
-        m_boxHeight += Spatium(ed.delta.y() / sp);
-        if (ed.vRaster) {
-            double vRaster = 1.0 / MScore::vRaster();
-            int n = lrint(m_boxHeight.val() / vRaster);
-            m_boxHeight = Spatium(vRaster * n);
-        }
-        mutldata()->setBbox(0.0, 0.0, system()->width(), absoluteFromSpatium(boxHeight()));
-        system()->setHeight(height());
-    } else {
-        m_boxWidth += Spatium(ed.delta.x() / sp);
-        if (ed.hRaster) {
-            double hRaster = 1.0 / MScore::hRaster();
-            int n = lrint(m_boxWidth.val() / hRaster);
-            m_boxWidth = Spatium(hRaster * n);
-        }
-    }
-    triggerLayout();
-}
-
-//---------------------------------------------------------
-//   gripsPositions
-//---------------------------------------------------------
-
-std::vector<PointF> HBox::gripsPositions(const EditData&) const
-{
-    RectF r(pageBoundingRect());
-    return { PointF(r.right(), r.top() + r.height() * .5) };
-}
-
-std::vector<PointF> VBox::gripsPositions(const EditData&) const
-{
-    RectF r(pageBoundingRect());
-    return { PointF(r.x() + r.width() * .5, r.bottom()) };
-}
-
 //---------------------------------------------------------
 //   add
 ///   Add new EngravingItem \a el to Box
@@ -491,33 +424,6 @@ void Box::manageExclusionFromParts(bool exclude)
 }
 
 //---------------------------------------------------------
-//   drag
-//---------------------------------------------------------
-
-RectF HBox::drag(EditData& data)
-{
-    if (!isMovable()) {
-        return RectF();
-    }
-    RectF r(canvasBoundingRect());
-    double diff = data.evtDelta.x();
-    double x1   = offset().x() + diff;
-    EngravingItem* parent = layoutParent();
-    if (parent && parent->isVBox()) {
-        VBox* vb = toVBox(parent);
-        double x2 = parent->width() - width() - (vb->leftMargin() + vb->rightMargin()) * DPMM;
-        if (x1 < 0.0) {
-            x1 = 0.0;
-        } else if (x1 > x2) {
-            x1 = x2;
-        }
-    }
-    setOffset(PointF(x1, 0.0));
-//      setStartDragPosition(data.delta);
-    return canvasBoundingRect().united(r);
-}
-
-//---------------------------------------------------------
 //   isMovable
 //---------------------------------------------------------
 
@@ -672,16 +578,6 @@ bool VBox::setProperty(Pid propertyId, const PropertyValue& v)
 //---------------------------------------------------------
 //   startDragGrip
 //---------------------------------------------------------
-
-void VBox::startDragGrip(EditData& ed)
-{
-    const double sp = sizeIsSpatiumDependent() ? spatium() : style().defaultSpatium();
-    if (isAutoSizeEnabled()) {
-        setAutoSizeEnabled(false);
-        setBoxHeight(Spatium(height() / sp));
-    }
-    Box::startDragGrip(ed);
-}
 
 bool VBox::acceptDrop(EditData& data) const
 {
@@ -922,26 +818,6 @@ PropertyValue FBox::propertyDefault(Pid propertyId) const
     }
 }
 
-int FBox::gripsCount() const
-{
-    return 0;
-}
-
-Grip FBox::initialEditModeGrip() const
-{
-    return Grip::NO_GRIP;
-}
-
-Grip FBox::defaultGrip() const
-{
-    return Grip::NO_GRIP;
-}
-
-std::vector<PointF> FBox::gripsPositions(const EditData&) const
-{
-    return {};
-}
-
 void FBox::undoReorderElements(const StringList& newOrder)
 {
     undoChangeProperty(Pid::FRET_FRAME_DIAGRAMS_ORDER, newOrder.join(FRET_BOX_DIAGRAMS_SEPARATOR));
@@ -1075,26 +951,4 @@ PropertyValue TBox::propertyDefault(Pid id) const
 //   accessibleExtraInfo
 //---------------------------------------------------------
 
-
-
-//---------------------------------------------------------
-//   accessibleExtraInfo
-//---------------------------------------------------------
-
-
-
-int TBox::gripsCount() const
-{
-    return 0;
-}
-
-Grip TBox::initialEditModeGrip() const
-{
-    return Grip::NO_GRIP;
-}
-
-Grip TBox::defaultGrip() const
-{
-    return Grip::NO_GRIP;
-}
 }

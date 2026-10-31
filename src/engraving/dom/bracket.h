@@ -77,14 +77,6 @@ public:
 
     const BracketItem* bi() const { return m_bi; }
 
-    bool isEditable() const override;
-    bool needStartEditingAfterSelecting() const override;
-    void startEdit(EditData&) override;
-    bool isEditAllowed(EditData&) const override;
-    bool edit(EditData&) override;
-    void endEdit(EditData&) override;
-    void dragGrip(EditData&) override;
-    void endDragGrip(EditData&) override;
 
     Color color() const override { return m_bi->color(); }
 
@@ -99,11 +91,6 @@ public:
     using EngravingObject::undoChangeProperty;
 
     Fraction tick() const override;
-
-    int gripsCount() const override { return 1; }
-    Grip initialEditModeGrip() const override { return Grip::START; }
-    Grip defaultGrip() const override { return Grip::START; }
-    std::vector<PointF> gripsPositions(const EditData&) const override;
 
     void setSelected(bool f) override;
 

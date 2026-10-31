@@ -37,7 +37,6 @@ public:
     StringTunings(const StringTunings& s);
 
     StringTunings* clone() const override;
-    bool isEditable() const override;
 
     PropertyValue getProperty(Pid id) const override;
     PropertyValue propertyDefault(Pid id) const override;

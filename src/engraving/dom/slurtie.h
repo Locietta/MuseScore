@@ -96,12 +96,6 @@ public:
     virtual void spatiumChanged(double, double) override;
     SlurTie* slurTie() const { return (SlurTie*)spanner(); }
 
-    bool isEditAllowed(EditData&) const override;
-    bool edit(EditData&) override;
-
-    void startDragGrip(EditData& ed) override;
-    void endDragGrip(EditData& ed) override;
-
     PropertyValue getProperty(Pid propertyId) const override;
     bool setProperty(Pid propertyId, const PropertyValue&) override;
     PropertyValue propertyDefault(Pid id) const override;
@@ -109,7 +103,6 @@ public:
     virtual void reset() override;
     void undoChangeProperty(Pid id, const PropertyValue&, PropertyFlags ps) override;
     void move(const PointF& s) override;
-    bool isEditable() const override { return true; }
 
     int subtype() const override;
     TranslatableString subtypeUserName() const override;
@@ -118,11 +111,6 @@ public:
     const UP& ups(Grip i) const { return m_ups[int(i)]; }
     UP& ups(Grip i) { return m_ups[int(i)]; }
 
-    bool needStartEditingAfterSelecting() const override { return true; }
-    int gripsCount() const override { return int(Grip::GRIPS); }
-    Grip initialEditModeGrip() const override { return Grip::END; }
-    Grip defaultGrip() const override { return Grip::DRAG; }
-    std::vector<PointF> gripsPositions(const EditData& = EditData()) const override;
 
     virtual bool isUserModified() const override;
 
@@ -140,9 +128,6 @@ public:
 protected:
     SlurTieSegment(const ElementType& type, SlurTie* sp);
     SlurTieSegment(const SlurTieSegment&);
-
-    virtual void changeAnchor(EditData&, EngravingItem*) = 0;
-    std::vector<LineF> gripAnchorLines(Grip grip) const override;
 
     struct UP m_ups[int(Grip::GRIPS)];
 };

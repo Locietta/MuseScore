@@ -56,7 +56,6 @@ public:
     double minHeight() const;
 
     double chordMag() const;
-    RectF drag(EditData&) override;
 
     TDuration durationType() const;
     void setDurationType(TDuration d);
@@ -70,7 +69,6 @@ public:
     void localSpatiumChanged(double oldValue, double newValue) override;
     void styleChanged() override;
     staff_idx_t vStaffIdx() const override;
-
 
     bool playTremolo() const { return m_playTremolo; }
     void setPlayTremolo(bool v) { m_playTremolo = v; }

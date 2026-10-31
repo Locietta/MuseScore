@@ -288,69 +288,6 @@ bool Image::loadFromData(const std::string& name, const muse::ByteArray& ba)
 }
 
 //---------------------------------------------------------
-//   startDrag
-//---------------------------------------------------------
-
-void Image::startDragGrip(EditData& data)
-{
-    BSymbol::startDragGrip(data);
-    ElementEditDataPtr eed = data.getData(this);
-
-    eed->pushProperty(Pid::SIZE);
-}
-
-//---------------------------------------------------------
-//   dragGrip
-//---------------------------------------------------------
-
-void Image::dragGrip(EditData& ed)
-{
-    if (ed.curGrip == Grip::MIDDLE) {
-        setOffset(offset() + ed.evtDelta);
-        triggerLayout();
-        return;
-    }
-
-    double ratio = m_size.width() / m_size.height();
-    double dx = ed.delta.x();
-    double dy = ed.delta.y();
-    if (m_sizeIsSpatium) {
-        double _spatium = spatium();
-        dx /= _spatium;
-        dy /= _spatium;
-    } else {
-        dx /= DPMM;
-        dy /= DPMM;
-    }
-    if (ed.curGrip == Grip::START) {
-        m_size.setWidth(m_size.width() + dx);
-        if (m_lockAspectRatio) {
-            m_size.setHeight(m_size.width() / ratio);
-        }
-    } else if (ed.curGrip == Grip::END) {
-        m_size.setHeight(m_size.height() + dy);
-        if (m_lockAspectRatio) {
-            m_size.setWidth(m_size.height() * ratio);
-        }
-    }
-
-    triggerLayout();
-}
-
-//---------------------------------------------------------
-//   gripsPositions
-//---------------------------------------------------------
-
-std::vector<PointF> Image::gripsPositions(const EditData&) const
-{
-    RectF r(pageBoundingRect());
-    return {
-        PointF(r.x() + r.width(), r.y() + r.height() * .5),
-        PointF(r.x() + r.width() * .5, r.y() + r.height())
-    };
-}
-
-//---------------------------------------------------------
 //   pixel2Size
 //---------------------------------------------------------
 

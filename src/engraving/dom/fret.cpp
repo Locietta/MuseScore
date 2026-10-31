@@ -279,15 +279,6 @@ double FretDiagram::mainWidth() const
 }
 
 //---------------------------------------------------------
-//   dragAnchorLines
-//---------------------------------------------------------
-
-std::vector<LineF> FretDiagram::dragAnchorLines() const
-{
-    return genericDragAnchorLines();
-}
-
-//---------------------------------------------------------
 //   setStrings
 //---------------------------------------------------------
 
@@ -1024,15 +1015,6 @@ void FretDiagram::remove(EngravingItem* e)
     }
 }
 
-RectF FretDiagram::drag(EditData& ed)
-{
-    RectF result = EngravingItem::drag(ed);
-
-    MoveElementAnchors::moveElementAnchorsOnDrag(this, ed);
-
-    return result;
-}
-
 //---------------------------------------------------------
 //   acceptDrop
 //---------------------------------------------------------
@@ -1210,16 +1192,8 @@ void FretDiagram::setTrack(track_idx_t val)
 }
 
 //---------------------------------------------------------
-//   accessibleInfo
-//---------------------------------------------------------
-
-
-
-//---------------------------------------------------------
 //   screenReaderInfo
 //---------------------------------------------------------
-
-
 
 void FretDiagram::setFingering(std::vector<int> v)
 {

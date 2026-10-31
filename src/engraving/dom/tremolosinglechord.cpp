@@ -78,15 +78,6 @@ double TremoloSingleChord::minHeight() const
 }
 
 //---------------------------------------------------------
-//   drag
-//---------------------------------------------------------
-
-RectF TremoloSingleChord::drag(EditData& ed)
-{
-    return EngravingItem::drag(ed);
-}
-
-//---------------------------------------------------------
 //   setTremoloType
 //---------------------------------------------------------
 
@@ -251,12 +242,6 @@ TranslatableString TremoloSingleChord::subtypeUserName() const
 {
     return TConv::userName(tremoloType());
 }
-
-//---------------------------------------------------------
-//   accessibleInfo
-//---------------------------------------------------------
-
-
 
 //---------------------------------------------------------
 //   getProperty

@@ -203,7 +203,6 @@ EngineContext::EngineContext(const std::string& assets, const std::string& cache
 
         d.musicXml->init();
 
-
         loadInstrumentTemplates(":/engraving/instruments/instruments.xml");
     } catch (...) {
         d.teardown();

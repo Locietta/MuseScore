@@ -47,8 +47,6 @@ public:
     SystemDividerType dividerType() const { return m_dividerType; }
     void setDividerType(SystemDividerType v);
 
-    RectF drag(EditData&) override;
-
     Segment* segment() const override { return nullptr; }
     System* system() const { return (System*)ownershipParent(); }
 
@@ -56,8 +54,6 @@ public:
 
     void styleChanged() override;
     Sid getPropertyStyle(Pid id) const override;
-
-    std::vector<LineF> dragAnchorLines() const override;
 
     void reset() override;
 

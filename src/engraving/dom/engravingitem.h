@@ -36,7 +36,6 @@
 #include "../types/types.h"
 
 #include "engravingobject.h"
-#include "elementgroup.h"
 
 #include "../editing/editdata.h"
 
@@ -71,7 +70,6 @@ inline void dump(const ld_field<T>& f, std::stringstream& ss)
 
 class Factory;
 class XmlReader;
-
 
 enum class Pid : short;
 class StaffType;
@@ -259,63 +257,8 @@ public:
     bool contains(const PointF& p) const;
     bool intersects(const RectF& r) const;
 
-    virtual RectF hitBBox() const { return ldata()->bbox(); }
-    virtual Shape hitShape() const { return shape(); }
-    Shape canvasHitShape() const { return hitShape().translate(canvasPos()); }
-    bool hitShapeContains(const PointF& p) const;
-    bool hitShapeIntersects(const RectF& rr) const;
 
     virtual int subtype() const { return -1; }                    // for select gui
-
-//       virtual ElementGroup getElementGroup() { return SingleElementGroup(this); }
-    virtual std::unique_ptr<ElementGroup> getDragGroup(std::function<bool(const EngravingItem*)> /*isDragged*/)
-    {
-        return std::unique_ptr<ElementGroup>(new SingleElementGroup(this));
-    }
-
-    virtual void startDrag(EditData&);
-    virtual RectF drag(EditData&);
-    virtual void endDrag(EditData&);
-    /** muse::Returns anchor lines displayed while dragging element in canvas coordinates. */
-    virtual std::vector<LineF> dragAnchorLines() const { return std::vector<LineF>(); }
-    /**
-     * A generic \ref dragAnchorLines() implementation which can be used in
-     * dragAnchorLines() overrides in descendants. It is not made its default
-     * implementation in EngravingItem class since showing anchor lines is not
-     * desirable for most element types.
-     * TODO: maybe Annotation class could be extracted which would be a base
-     * class of various annotation types and which would have this
-     * dragAnchorLines() implementation by default.
-     */
-    std::vector<LineF> genericDragAnchorLines() const;
-
-    virtual bool isEditable() const { return !flag(ElementFlag::GENERATED); }
-    virtual bool needStartEditingAfterSelecting() const { return false; }
-
-    virtual void startEdit(EditData&);
-    virtual bool isEditAllowed(EditData&) const;
-    virtual bool edit(EditData&);
-    virtual void startDragGrip(EditData&);
-    virtual void dragGrip(EditData&);
-    virtual void endDragGrip(EditData&);
-    virtual void endEdit(EditData&);
-
-    virtual void editCut(EditData&) {}
-    virtual void editCopy(EditData&) {}
-
-    void updateGrips(EditData&) const;
-    virtual bool nextGrip(EditData&) const;
-    virtual bool prevGrip(EditData&) const;
-    /** muse::Returns anchor lines displayed while dragging element's grip in canvas coordinates. */
-    virtual std::vector<LineF> gripAnchorLines(Grip) const { return std::vector<LineF>(); }
-
-    virtual int gripsCount() const { return 0; }
-    virtual Grip initialEditModeGrip() const { return Grip::NO_GRIP; }
-    virtual Grip defaultGrip() const { return Grip::NO_GRIP; }
-    /** muse::Returns grips positions in page coordinates. */
-    virtual std::vector<PointF> gripsPositions(const EditData& = EditData()) const { return std::vector<PointF>(); }
-
-    bool hasGrips() const;
 
     track_idx_t track() const;
     virtual void setTrack(track_idx_t val);
@@ -459,7 +402,6 @@ public:
     virtual EngravingItem* nextSegmentElement();    //< Used for navigation
     virtual EngravingItem* prevSegmentElement();    //< next-element and prev-element command
 
-
     bool accessibleEnabled() const;
     void setAccessibleEnabled(bool enabled);
 
@@ -471,8 +413,6 @@ public:
     //! accessibleParentItem(). Those are the children it owns, unless ownership and
     //! placement diverge, in which case the item that places them lists them instead.
     virtual EngravingItemList accessibleChildren() const;
-
-
 
     //  if the screen-reader needs a special string (see note for example)
     // used to return info that will be appended to accessibleInfo
@@ -699,7 +639,6 @@ protected:
     EngravingItem(const ElementType& type, EngravingObject* parent = nullptr, ElementFlags = ElementFlag::NOTHING);
     EngravingItem(const EngravingItem&, bool link = false);
 
-
     virtual LayoutData* createLayoutData() const;
     virtual const LayoutData* ldataInternal() const;
     virtual LayoutData* mutldataInternal();
@@ -715,7 +654,6 @@ protected:
 private:
 
     friend class Factory;
-
 
     bool m_accessibleEnabled = false;
 

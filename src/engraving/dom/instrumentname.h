@@ -63,7 +63,6 @@ public:
 
     double largestStaffSpatium() const;
 
-    bool isEditable() const override { return false; }
 
     bool setProperty(Pid propertyId, const PropertyValue&) override;
 

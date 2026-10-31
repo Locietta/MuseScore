@@ -23,7 +23,6 @@
 
 #include "chord.h"
 #include "dynamic.h"
-#include "dynamichairpingroup.h"
 #include "note.h"
 #include "segment.h"
 #include "score.h"
@@ -48,18 +47,6 @@ Expression::Expression(const Expression& expression)
     _snapToDynamics = expression._snapToDynamics;
 }
 
-bool Expression::isEditAllowed(EditData& ed) const
-{
-    bool ctrlPressed  = ed.modifiers & ControlModifier;
-    bool shiftPressed = ed.modifiers & ShiftModifier;
-    bool altPressed = ed.modifiers & AltModifier;
-    if (altPressed && !ctrlPressed && !shiftPressed && (ed.key == Key_Left || ed.key == Key_Right)) {
-        return false;
-    }
-
-    return TextBase::isEditAllowed(ed);
-}
-
 PropertyValue Expression::propertyDefault(Pid id) const
 {
     switch (id) {
@@ -82,14 +69,6 @@ double Expression::computeDynamicExpressionDistance(const Dynamic* snappedDyn) c
     double distance = (dynamicTextString.endsWith(f) ? 0.2 : 0.5) * spatium();
     distance *= 0.5 * (snappedDyn->symbolScale() + (size() / 10));
     return distance;
-}
-
-std::unique_ptr<ElementGroup> Expression::getDragGroup(std::function<bool(const EngravingItem*)> isDragged)
-{
-    if (auto g = DynamicExpressionDragGroup::detectFor(this, isDragged)) {
-        return g;
-    }
-    return TextBase::getDragGroup(isDragged);
 }
 
 bool Expression::acceptDrop(EditData& ed) const

@@ -269,7 +269,6 @@ TEST_F(Engraving_PartsTests, styleScoreReload)
     delete partScore;
 }
 
-
 //---------------------------------------------------------
 //   test part creation
 //---------------------------------------------------------
@@ -339,7 +338,7 @@ MasterScore* Engraving_PartsTests::doAddBreath()
     Segment* s   = m->tick2segment(Fraction(1, 4));
     Chord* chord = toChord(s->element(0));
     Note* note   = chord->upNote();
-    EditData dd(0);
+    EditData dd;
     Breath* b = Factory::createBreath(score->dummy());
     b->setSymId(SymId::breathMarkComma);
     dd.dropElement = b;
@@ -483,7 +482,7 @@ MasterScore* Engraving_PartsTests::doAddFingering()
     Segment* s   = m->tick2segment(Fraction(1, 4));
     Chord* chord = toChord(s->element(0));
     Note* note   = chord->upNote();
-    EditData dd(0);
+    EditData dd;
     Fingering* b = Factory::createFingering(note);
     b->setXmlText("3");
     dd.dropElement = b;
@@ -629,7 +628,7 @@ MasterScore* Engraving_PartsTests::doAddSymbol()
     Segment* s   = m->tick2segment(Fraction(1, 4));
     Chord* chord = toChord(s->element(0));
     Note* note   = chord->upNote();
-    EditData dd(0);
+    EditData dd;
     Symbol* b  = new Symbol(note);
     b->setSym(SymId::gClef);
     dd.dropElement = b;
@@ -775,7 +774,7 @@ MasterScore* Engraving_PartsTests::doAddChordline()
     Segment* s   = m->tick2segment(Fraction(1, 4));
     Chord* chord = toChord(s->element(0));
     Note* note   = chord->upNote();
-    EditData dd(0);
+    EditData dd;
     ChordLine* b  = Factory::createChordLine(chord);
     b->setChordLineType(ChordLineType::FALL);
     dd.dropElement = b;
@@ -1032,11 +1031,6 @@ TEST_F(Engraving_PartsTests, undoRedoRemoveMeasureRepeat)
     EXPECT_TRUE(ScoreComp::saveCompareScore(score, u"part-measure-repeat-urdel.mscx", PARTS_DATA_DIR + u"part-measure-repeat-urdel.mscx"));
     delete score;
 }
-
-//---------------------------------------------------------
-//   Image
-//---------------------------------------------------------
-
 
 //---------------------------------------------------------
 //   Stemless
@@ -1385,7 +1379,6 @@ TEST_F(Engraving_PartsTests, noteVisibilityBeamsVoiceParts)
 //---------------------------------------------------------
 //   staffStyles
 //---------------------------------------------------------
-
 
 TEST_F(Engraving_PartsTests, deleteLinkedRestsRemovesEmptySegments)
 {

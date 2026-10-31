@@ -281,24 +281,6 @@ HammerOnPullOffText::HammerOnPullOffText(const HammerOnPullOffText& h)
 {
 }
 
-std::vector<LineF> HammerOnPullOffText::dragAnchorLines() const
-{
-    std::vector<LineF> result;
-
-    PointF p1 = canvasPos();
-
-    HammerOnPullOffSegment* hopoSeg = hopoSegment();
-    const Shape& hopoSegShape = hopoSeg->ldata()->shape();
-    double x = ldata()->pos().x();// + hopoSegShape.bbox().x();
-    double y = hopoSeg->hammerOnPullOff()->up() ? hopoSegShape.topAtX(x) : hopoSegShape.bottomAtX(x);
-
-    PointF p2 = PointF(x, y) + hopoSeg->canvasPos();
-
-    result.push_back(LineF(p1, p2));
-
-    return result;
-}
-
 bool HammerOnPullOffText::isUserModified() const
 {
     for (const TextStyleProperty& p : *textStyle(textStyleType())) {

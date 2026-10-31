@@ -273,9 +273,6 @@ public:
 
     void setSelected(bool f) override;
     void setVisible(bool f) override;
-    void startEdit(EditData& ed) override;
-    bool isEditAllowed(EditData&) const override;
-    void endEdit(EditData&) override;
     void regenerateText();
 
     bool onNote() const { return m_onNote; }
@@ -333,6 +330,5 @@ private:
                                                  // under the same note)
 };
 } // namespace mu::engraving
-
 
 #endif

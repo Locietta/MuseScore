@@ -60,10 +60,6 @@ public:
     bool acceptDrop(EditData&) const override;
     EngravingItem* drop(Transaction& tx, EditData&) override;
 
-    bool isEditable() const override { return true; }
-    bool isEditAllowed(EditData&) const override;
-    bool edit(EditData&) override;
-    void dragGrip(EditData&) override;
 
     void reset() override;
 
@@ -93,11 +89,6 @@ public:
     bool setProperty(Pid propertyId, const PropertyValue&) override;
     PropertyValue propertyDefault(Pid propertyId) const override;
 
-    bool needStartEditingAfterSelecting() const override { return true; }
-    int gripsCount() const override { return 3; }
-    Grip initialEditModeGrip() const override { return Grip::END; }
-    Grip defaultGrip() const override { return Grip::MIDDLE; }
-    std::vector<PointF> gripsPositions(const EditData& = EditData()) const override;
 
     struct LayoutData : public EngravingItem::LayoutData {
         // cache
@@ -121,10 +112,6 @@ protected:
 
 private:
     void spatiumChanged(double /*oldValue*/, double /*newValue*/) override;
-    std::vector<LineF> dragAnchorLines() const override;
-    std::vector<LineF> gripAnchorLines(Grip) const override;
-    void startEdit(EditData&) override;
-    void startDragGrip(EditData&) override;
 
     ArpeggioType m_arpeggioType = ArpeggioType::NORMAL;
     double m_userLen1 = 0.0;

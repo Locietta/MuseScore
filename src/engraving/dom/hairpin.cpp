@@ -30,7 +30,6 @@
 #include "types/typesconv.h"
 
 #include "dynamic.h"
-#include "dynamichairpingroup.h"
 #include "measure.h"
 #include "score.h"
 #include "segment.h"
@@ -146,102 +145,6 @@ void HairpinSegment::setPropertyFlags(Pid id, PropertyFlags f)
 }
 
 //---------------------------------------------------------
-//   gripsPositions
-//---------------------------------------------------------
-
-int HairpinSegment::gripsCount() const
-{
-    return hairpin()->isLineType() ? 3 : 4;
-}
-
-std::vector<PointF> HairpinSegment::gripsPositions(const EditData&) const
-{
-    double _spatium = spatium();
-    double x = pos2().x();
-    if (x < _spatium) {             // minimum size of hairpin
-        x = _spatium;
-    }
-    double y = pos2().y();
-    PointF p(x, y);
-
-    std::vector<PointF> grips(gripsCount());
-    PointF pp(pagePos());
-    grips[int(Grip::START)] = pp;
-    grips[int(Grip::END)] = p + pp;
-    grips[int(Grip::MIDDLE)] = p * .5 + pp;
-
-    if (!hairpin()->isLineType()) {
-        // Calc PointF for Grip Aperture
-        Transform doRotation;
-        PointF gripLineAperturePoint;
-        double h1 = hairpin()->hairpinHeight().val() * spatium() * .5;
-        double len = sqrt(x * x + y * y);
-        doRotation.rotateRadians(asin(y / len));
-        double lineApertureX;
-        double offsetX = 10;                                 // Horizontal offset for x Grip
-        if (len < offsetX * 3) {                            // For small hairpin, offset = 30% of len
-            offsetX = len / 3;                              // else offset is fixed to 10
-        }
-        if (hairpin()->hairpinType() == HairpinType::CRESC_HAIRPIN) {
-            lineApertureX = len - offsetX;                  // End of CRESCENDO - Offset
-        } else {
-            lineApertureX = offsetX;                        // Begin of DIMINUENDO + Offset
-        }
-        double lineApertureH = (len - offsetX) * h1 / len;   // Vertical position for y grip
-        gripLineAperturePoint.setX(lineApertureX);
-        gripLineAperturePoint.setY(lineApertureH);
-        gripLineAperturePoint = doRotation.map(gripLineAperturePoint);
-
-        // End calc position grip aperture
-        grips[int(Grip::APERTURE)] = gripLineAperturePoint + pp;
-    }
-
-    return grips;
-}
-
-//---------------------------------------------------------
-//   getDragGroup
-//---------------------------------------------------------
-
-std::unique_ptr<ElementGroup> HairpinSegment::getDragGroup(std::function<bool(const EngravingItem*)> isDragged)
-{
-    if (auto g = HairpinWithDynamicsDragGroup::detectFor(this, isDragged)) {
-        return g;
-    }
-    return TextLineBaseSegment::getDragGroup(isDragged);
-}
-
-//---------------------------------------------------------
-//   startDragGrip
-//---------------------------------------------------------
-
-void HairpinSegment::startDragGrip(EditData& ed)
-{
-    TextLineBaseSegment::startDragGrip(ed);
-    ElementEditDataPtr eed = ed.getData(this);
-
-    eed->pushProperty(Pid::HAIRPIN_HEIGHT);
-    eed->pushProperty(Pid::HAIRPIN_CONT_HEIGHT);
-}
-
-//---------------------------------------------------------
-//   dragGrip
-//---------------------------------------------------------
-
-void HairpinSegment::dragGrip(EditData& ed)
-{
-    if (ed.curGrip == Grip::APERTURE) {
-        double newHeight = hairpin()->hairpinHeight().val() + ed.delta.y() / spatium() / .5;
-        if (newHeight < 0.5) {
-            newHeight = 0.5;
-        }
-        hairpin()->setHairpinHeight(Spatium(newHeight));
-        triggerLayout();
-    }
-    TextLineBaseSegment::dragGrip(ed);
-}
-
-//---------------------------------------------------------
 //   propertyDelegate
 //---------------------------------------------------------
 
@@ -339,16 +242,6 @@ EngravingItem* HairpinSegment::findElementToSnapAfter(bool ignoreInvisible, bool
     // Note: we don't need to look for a hairpin after.
     // It is the next hairpin which looks for a hairpin before.
     return findEndDynamicOrExpression(ignoreInvisible, requirePlayable);
-}
-
-void HairpinSegment::endDragGrip(EditData& ed)
-{
-    if (ed.isHairpinDragCreatedFromDynamic) {
-        undoResetProperty(Pid::OFFSET);
-        undoResetProperty(Pid::OFFSET2);
-    }
-
-    LineSegment::endDragGrip(ed);
 }
 
 TextBase* HairpinSegment::findStartDynamicOrExpression(bool ignoreInvisible) const
@@ -780,8 +673,6 @@ PropertyValue Hairpin::propertyDefault(Pid id) const
 //---------------------------------------------------------
 //   accessibleInfo
 //---------------------------------------------------------
-
-
 
 PointF Hairpin::linePos(Grip grip, System** system) const
 {
