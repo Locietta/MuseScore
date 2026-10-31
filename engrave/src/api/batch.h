@@ -123,8 +123,10 @@ private:
     // RevisionConflict, EditRejected (the undo stack is busy) or Poisoned, before
     // anything is touched.
     Result<void> admit(std::optional<std::uint64_t> expected_revision) const;
-    Result<EditResult> execute(std::vector<Step> steps, Policy policy);
-    void roll_back(const Snapshot* snapshot, std::size_t history);
+    Result<EditResult> execute(std::vector<Step> steps, Policy policy, std::vector<bool> snapshot_step);
+    void roll_back(const Snapshot* snapshot, std::size_t history, bool unwind_unsafe);
+    // Whether the undo left the document where the batch found it.
+    bool same_score(const Snapshot& snapshot);
     void restore(const Snapshot& snapshot);
 
     Document& m_document;

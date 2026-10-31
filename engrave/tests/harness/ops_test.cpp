@@ -175,8 +175,11 @@ std::string changed_fields(const engrave::harness::Fingerprint& before, const en
 // the harness's to judge per operation (C3/C4): a score the engine did not write
 // itself is laid out differently once it is read back as a current one.
 TEST(Snapshot, S1RestoreIsIdempotent) {
+    // A throw, not a returned error: the guard unwinds a clean failure and only
+    // restores the snapshot when the engine threw (see BatchGuard::roll_back), and
+    // this test is about the restore.
     const engrave::api::Step fail = [](engrave::api::EditContext&) -> engrave::Result<void> {
-        return std::unexpected(engrave::Error{ErrorCode::EditRejected, "restore"});
+        throw std::runtime_error("restore");
     };
     for (const auto& path : g_corpus) {
         auto document = g_engine->open(path);
@@ -196,6 +199,62 @@ TEST(Snapshot, S1RestoreIsIdempotent) {
     }
 }
 
+// A batch whose rollback policy is Snapshot can fail with an error the operations
+// themselves return (a stale handle, an engine refusal), not only with a throw. The
+// score then has to come back as it was, layout included: reloading the snapshot is
+// what moves it (S1 above), so the unwind is what the guard keeps. The validation's
+// rollback probe found this batch; its 39 changed note boxes are the regression.
+TEST(Edit, AFailedMixedBatchKeepsTheLayout) {
+    auto document = open("layout_elements.mscx");
+    ASSERT_TRUE(document);
+    engrave::Query query;
+    query.types = {"Note"};
+    query.layout_boxes = true;
+    const auto boxes = [&query](engrave::Document& doc) {
+        std::map<engrave::ElementId, engrave::LayoutBox> found;
+        const auto result = doc.query(query);
+        EXPECT_TRUE(result) << result.error().message;
+        if (!result) return found;
+        for (const auto& item : result->elements) {
+            if (item.box) found.emplace(item.id, *item.box);
+        }
+        return found;
+    };
+    const auto before = boxes(*document);
+    ASSERT_GE(before.size(), 40u);
+    const auto svg_before = document->render({.format = engrave::RenderFormat::Svg, .first_page = 0, .last_page = 0});
+    ASSERT_TRUE(svg_before) << svg_before.error().message;
+    ASSERT_FALSE(svg_before->pages.empty());
+
+    const engrave::ElementId note = engrave::harness::find_id(*document, "Note");
+    const auto outline = document->outline();
+    ASSERT_TRUE(outline);
+    const engrave::ElementId measure = outline->measures.front().id;
+    const engrave::Batch batch{{engrave::Remove{note}, engrave::Remove{note},
+                                engrave::SetLayoutBreak{measure, "line", false}}};
+    const auto result = document->edit(batch);
+    ASSERT_FALSE(result);
+    EXPECT_EQ(result.error().code, ErrorCode::StaleHandle);
+    EXPECT_EQ(result.error().op_index, 1u);
+    EXPECT_EQ(document->revision(), 1u);
+
+    const auto after = boxes(*document);
+    ASSERT_EQ(after.size(), before.size());
+    for (const auto& [id, box] : before) {
+        const auto found = after.find(id);
+        ASSERT_NE(found, after.end()) << engrave::to_string(id) << " is gone after the rollback";
+        EXPECT_EQ(found->second.page, box.page) << engrave::to_string(id);
+        EXPECT_EQ(found->second.x, box.x) << engrave::to_string(id);
+        EXPECT_EQ(found->second.y, box.y) << engrave::to_string(id);
+        EXPECT_EQ(found->second.width, box.width) << engrave::to_string(id);
+        EXPECT_EQ(found->second.height, box.height) << engrave::to_string(id);
+    }
+    const auto svg_after = document->render({.format = engrave::RenderFormat::Svg, .first_page = 0, .last_page = 0});
+    ASSERT_TRUE(svg_after) << svg_after.error().message;
+    ASSERT_FALSE(svg_after->pages.empty());
+    EXPECT_TRUE(svg_before->pages[0] == svg_after->pages[0]) << "the rollback changed the first page";
+}
+
 // --- the evidence ---------------------------------------------------------------
 
 std::string read_text(const std::filesystem::path& path) {
@@ -208,6 +267,7 @@ TEST(Evidence, EveryCaseMatchesTheCheckedInRow) {
     for (const auto& op_case : engrave::harness::registered_cases()) {
         const std::filesystem::path path = fixture(op_case.fixture);
         ASSERT_FALSE(path.empty()) << op_case.name << ": " << op_case.fixture << " is not in the corpus";
+
         rows.push_back(engrave::harness::run_case(*g_engine, op_case, path));
     }
     const std::string current = engrave::harness::to_json(rows).dump(2) + "\n";

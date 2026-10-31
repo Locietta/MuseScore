@@ -20,6 +20,7 @@
 #include "engrave/src/api/handles.h"
 #include "engrave/src/api/state.h"
 #include "engrave/src/runtime/noqt_runtime.h"
+#include "engrave/src/score/score_semantic.h"
 
 namespace engrave {
 
@@ -54,6 +55,19 @@ bool structural(const UndoableCommand* command) {
     default:
         return true;
     }
+}
+
+// The ids of the document, as the harness's fingerprint writes them: the writer's
+// order (the spanner map, the excerpt list) is not the order an undo puts them back
+// in, so a rollback compares them sorted.
+std::vector<std::string> id_list(MasterScore& master) {
+    std::vector<std::string> ids;
+    for (const LiveId& entry : live_ids(master)) {
+        ids.push_back(std::format("{} {} {}/{}/{}", to_string(entry.id), entry.object->typeName(), entry.placement.score,
+                                  entry.placement.tick, entry.placement.track));
+    }
+    std::ranges::sort(ids);
+    return ids;
 }
 
 bool engine_failed() {
@@ -138,7 +152,8 @@ void EditContext::created(EngravingObject* object) {
 // --- BatchGuard -------------------------------------------------------------
 
 // The score as an in-memory MSCZ, with the version stamps the writer replaces, per
-// score: the master first, then the excerpts.
+// score: the master first, then the excerpts. The semantic dump and the ids are what
+// a rollback compares against, since the writer's order is not the undo's.
 struct BatchGuard::Snapshot {
     struct Versions {
         muse::String version;
@@ -147,6 +162,8 @@ struct BatchGuard::Snapshot {
         bool laid_out = false;
     };
     std::string mscz;
+    std::string semantic;
+    std::vector<std::string> ids;
     std::vector<Versions> versions;
 };
 
@@ -172,13 +189,16 @@ Result<EditResult> BatchGuard::edit(const Batch& batch, std::optional<std::uint6
     m_context.m_created.assign(batch.ops.size(), {});
     Policy policy = Policy::Transaction;
     std::vector<Step> steps;
+    std::vector<bool> snapshot_step;
     steps.reserve(batch.ops.size());
+    snapshot_step.reserve(batch.ops.size());
     for (std::size_t i = 0; i < batch.ops.size(); ++i) {
         const Op& op = batch.ops[i];
         m_context.m_op = i;
         const Policy own = policy_of(op);
         if (own == Policy::Unexposed) return fail(ErrorCode::Unsupported, std::format("{} is not available", op_name(op)), i);
         if (own == Policy::Snapshot) policy = Policy::Snapshot;
+        snapshot_step.push_back(own == Policy::Snapshot);
         auto step = std::visit([this](const auto& value) { return prepare(m_context, value); }, op);
         if (!step) {
             Error error = std::move(step.error());
@@ -187,27 +207,36 @@ Result<EditResult> BatchGuard::edit(const Batch& batch, std::optional<std::uint6
         }
         steps.push_back(std::move(*step));
     }
-    return execute(std::move(steps), policy);
+    return execute(std::move(steps), policy, std::move(snapshot_step));
 }
 
 Result<EditResult> BatchGuard::run(std::vector<Step> steps, Policy policy, std::optional<std::uint64_t> expected_revision) {
     if (const auto admitted = admit(expected_revision); !admitted) return std::unexpected(admitted.error());
     m_context.m_created.assign(steps.size(), {});
-    return execute(std::move(steps), policy);
+    return execute(std::move(steps), policy, {});
 }
 
-Result<EditResult> BatchGuard::execute(std::vector<Step> steps, Policy policy) {
+Result<EditResult> BatchGuard::execute(std::vector<Step> steps, Policy policy, std::vector<bool> snapshot_step) {
     Document::Impl& document = *m_document.impl_;
     EditResult result{.revision = document.revision};
     if (steps.empty()) return result;
     const EditHooks& hooks = document.edit_hooks;
-    if (hooks.policy) policy = *hooks.policy;
+    if (hooks.policy) {
+        policy = *hooks.policy;
+        // A forced policy applies to every step, and the guard cannot tell which of
+        // them the unwind is safe for.
+        std::ranges::fill(snapshot_step, policy == Policy::Snapshot);
+    }
+    // Without per-step policies (run(), whose caller brings its own steps), a snapshot
+    // policy says nothing about which step is safe to unwind.
+    bool snapshot_ran = snapshot_step.empty() && policy == Policy::Snapshot;
 
     MasterScore& master = m_context.master();
     UndoStack* stack = master.undoStack();
     std::optional<Snapshot> snapshot;
     if (policy == Policy::Snapshot) {
-        snapshot = Snapshot{music::export_native_score(document.project, "mscz", music::ExportOptions{}, {}), {}};
+        snapshot = Snapshot{music::export_native_score(document.project, "mscz", music::ExportOptions{}, {}),
+                            music::semantic_dump(&master).dump(1), id_list(master), {}};
         for (const mu::engraving::Score* score : master.scoreList())
             snapshot->versions.push_back({score->mscoreVersion(), score->mscoreRevision(), score->mscVersion(), score->npages() > 0});
     }
@@ -216,6 +245,7 @@ Result<EditResult> BatchGuard::execute(std::vector<Step> steps, Policy policy) {
 
     // An engine error that a hook or a step leaves behind rejects the batch at that point.
     std::optional<Error> failure;
+    bool engine_threw = false;
     const auto check_engine = [&failure, &result, &steps](std::size_t step) {
         if (engine_failed()) {
             failure = Error{ErrorCode::EditRejected, std::format("the engine refused it: {}", MScore::errorToString(MScore::_error)),
@@ -234,6 +264,7 @@ Result<EditResult> BatchGuard::execute(std::vector<Step> steps, Policy policy) {
             m_context.m_op = i;
             if (hooks.before_step) hooks.before_step(i);
             if (!check_engine(i) || i == steps.size()) break;
+            if (i < snapshot_step.size() && snapshot_step[i]) snapshot_ran = true;
             const std::size_t mark = stack->activeTransaction()->commands().size();
             if (auto applied = steps[i](m_context); !applied) {
                 failure = std::move(applied.error());
@@ -246,18 +277,19 @@ Result<EditResult> BatchGuard::execute(std::vector<Step> steps, Policy policy) {
         }
         if (!failure) master.endCmd(false, true);
     } catch (const std::bad_alloc&) {
-        roll_back(snapshot ? &*snapshot : nullptr, history);
+        roll_back(snapshot ? &*snapshot : nullptr, history, true);
         throw;
     } catch (const std::exception& error) {
         const std::size_t op = m_context.m_op;
+        engine_threw = true;
         failure = Error{ErrorCode::EditRejected, std::format("the engine failed: {}", error.what()),
                         op < steps.size() ? std::optional(op) : std::nullopt};
     } catch (...) {
-        roll_back(snapshot ? &*snapshot : nullptr, history);
+        roll_back(snapshot ? &*snapshot : nullptr, history, true);
         throw;
     }
     if (failure) {
-        roll_back(snapshot ? &*snapshot : nullptr, history);
+        roll_back(snapshot ? &*snapshot : nullptr, history, engine_threw || snapshot_ran);
         return std::unexpected(std::move(*failure));
     }
 
@@ -292,17 +324,34 @@ Result<EditResult> BatchGuard::execute(std::vector<Step> steps, Policy policy) {
 
 // Brings the score back to where it was before the batch. A failure here leaves the
 // document poisoned and is thrown.
-void BatchGuard::roll_back(const Snapshot* snapshot, std::size_t history) {
+void BatchGuard::roll_back(const Snapshot* snapshot, std::size_t history, bool unwind_unsafe) {
     Document::Impl& document = *m_document.impl_;
     MasterScore& master = m_context.master();
     UndoStack* stack = master.undoStack();
     try {
         if (snapshot) {
-            // The project is replaced, so its transaction is dropped as it is rather
-            // than unwound: after a failure in the middle of a command its undo is
-            // not to be trusted.
-            if (stack->hasActiveTransaction()) stack->endTransaction(true);
-            restore(*snapshot);
+            // The transaction's unwind keeps the layout the score had; a reload of the
+            // snapshot does not. A score written from a 3.x file reads back with the
+            // current reader and lays out a few units differently (S1 of the harness
+            // records that, and Edit.AFailedMixedBatchKeepsTheLayout pins it), so the
+            // unwind is taken whenever it can be trusted to bring the score back
+            // exactly: the engine did not throw, and no operation whose rollback policy
+            // is Snapshot has run. When it cannot, the snapshot is the way back.
+            const bool active = stack->hasActiveTransaction();
+            if (active && !unwind_unsafe) {
+                // The undo's own layout is the one the score had, so it is kept: a
+                // relayout would read the score back through the layout code that the
+                // snapshot's reload uses and move the elements the same way.
+                master.endCmd(true, true);
+                if (!same_score(*snapshot)) restore(*snapshot);
+            } else {
+                // The project is replaced rather than unwound: an operation whose rollback
+                // policy is Snapshot cannot be undone (the excerpt build frees its links
+                // twice), and after a failure in the middle of a command the undo is not
+                // to be trusted either.
+                if (active) stack->endTransaction(true);
+                restore(*snapshot);
+            }
         } else if (stack->hasActiveTransaction()) {
             master.endCmd(true, true);
         } else if (stack->size() > history) {
@@ -341,6 +390,15 @@ void BatchGuard::restore(const Snapshot& snapshot) {
     }
     assign_missing_ids(*project->masterScore());
     document.project = std::move(project);
+}
+
+// Whether the undo left the document where the batch found it: the same musical
+// content and the same ids. A serialized comparison would be stricter than the undo
+// can promise (the writer orders spanners and excerpts its own way), and a restore is
+// what a difference costs, so the harness's own notion of the score's content is used.
+bool BatchGuard::same_score(const Snapshot& snapshot) {
+    MasterScore& master = m_context.master();
+    return music::semantic_dump(&master).dump(1) == snapshot.semantic && id_list(master) == snapshot.ids;
 }
 
 } // namespace api
