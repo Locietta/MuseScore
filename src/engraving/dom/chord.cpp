@@ -2592,47 +2592,7 @@ EngravingItem* Chord::prevSegmentElement()
 //   accessibleExtraInfo
 //---------------------------------------------------------
 
-String Chord::accessibleExtraInfo() const
-{
-    String rez;
 
-    for (const Chord* c : graceNotes()) {
-        if (!score()->selectionFilter().canSelect(c)) {
-            continue;
-        }
-        for (const Note* n : c->notes()) {
-            rez = String(u"%1 %2").arg(rez, n->screenReaderInfo());
-        }
-    }
-
-    for (Articulation* a : articulations()) {
-        if (!score()->selectionFilter().canSelect(a)) {
-            continue;
-        }
-        rez = String(u"%1 %2").arg(rez, a->screenReaderInfo());
-    }
-
-    if (arpeggio() && score()->selectionFilter().canSelect(arpeggio())) {
-        rez = String(u"%1 %2").arg(rez, arpeggio()->screenReaderInfo());
-    }
-
-    if (tremoloTwoChord() && score()->selectionFilter().canSelect(tremoloTwoChord())) {
-        rez = String(u"%1 %2").arg(rez, tremoloTwoChord()->screenReaderInfo());
-    }
-
-    if (tremoloSingleChord() && score()->selectionFilter().canSelect(tremoloSingleChord())) {
-        rez = String(u"%1 %2").arg(rez, tremoloSingleChord()->screenReaderInfo());
-    }
-
-    for (EngravingItem* e : el()) {
-        if (!score()->selectionFilter().canSelect(e)) {
-            continue;
-        }
-        rez = String(u"%1 %2").arg(rez, e->screenReaderInfo());
-    }
-
-    return String(u"%1 %2").arg(rez, ChordRest::accessibleExtraInfo());
-}
 
 void Chord::undoChangeProperty(Pid id, const PropertyValue& newValue)
 {

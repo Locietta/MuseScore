@@ -391,9 +391,9 @@ public:
     EngravingItem* nextSegmentElement() override;
     EngravingItem* prevSegmentElement() override;
 
-    String accessibleInfo() const override;
-    String screenReaderInfo() const override;
-    String accessibleExtraInfo() const override;
+
+
+
 
     std::vector<Note*> tiedNotes() const;
 

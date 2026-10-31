@@ -234,10 +234,7 @@ muse::TranslatableString LayoutBreak::subtypeUserName() const
 //   accessibleInfo
 //---------------------------------------------------------
 
-String LayoutBreak::accessibleInfo() const
-{
-    return translatedSubtypeUserName();
-}
+
 
 Font LayoutBreak::font() const
 {

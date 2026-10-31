@@ -20,6 +20,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "log.h"
 #include "editpart.h"
 #include "editscoreproperties.h"
 #include "editstaff.h"

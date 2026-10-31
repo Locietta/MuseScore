@@ -205,10 +205,7 @@ EngravingItem* Jump::prevSegmentElement()
 //   accessibleInfo
 //---------------------------------------------------------
 
-String Jump::accessibleInfo() const
-{
-    return String(u"%1: %2").arg(EngravingItem::accessibleInfo(), this->jumpTypeUserName());
-}
+
 
 //---------------------------------------------------------
 //   subtypeUserName

@@ -128,7 +128,7 @@ public:
 
     EngravingItem* nextSegmentElement() override;
     EngravingItem* prevSegmentElement() override;
-    String accessibleInfo() const override;
+
     void triggerLayout() const override;
 
     std::list<EngravingObject*> linkListForPropertyPropagation() const override;

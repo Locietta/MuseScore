@@ -27,7 +27,7 @@
 #include <cassert> // IWYU pragma: export
 
 #include "profiler.h" // IWYU pragma: export
-#include "logger.h" // IWYU pragma: export
+#include "thirdparty/kors_logger/src/log_base.h" // IWYU pragma: export
 
 #undef FALLTHROUGH
 

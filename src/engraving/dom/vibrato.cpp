@@ -224,8 +224,5 @@ PropertyValue Vibrato::propertyDefault(Pid propertyId) const
 //   accessibleInfo
 //---------------------------------------------------------
 
-String Vibrato::accessibleInfo() const
-{
-    return String(u"%1: %2").arg(EngravingItem::accessibleInfo(), vibratoTypeUserName());
-}
+
 }

@@ -29,7 +29,6 @@
 #include "event.h"
 #include "compatmidirenderinternal.h"
 
-#include "log.h"
 
 namespace mu::engraving {
 class Chord;

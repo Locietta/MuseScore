@@ -24,7 +24,9 @@
 
 #include <optional>
 
+#ifdef MUE_ENABLE_ENGRAVING_LD_ACCESS
 #include "log.h"
+#endif
 
 namespace mu::engraving {
 //! NOTE Enum for detect layoutdata bad access errors
@@ -70,7 +72,7 @@ public:
                 LOGE_T("LD_ACCESS")() << "BAD ACCESS to: " << m_name;
             }
 #else
-            UNUSED(mode);
+            (void)mode;
 #endif
             return m_def;
         }

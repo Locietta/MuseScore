@@ -21,111 +21,50 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef KORS_LOGSTREAM_H
-#define KORS_LOGSTREAM_H
-
-#include <sstream>
-#include <thread>
+#pragma once
+#include <string>
+#include <string_view>
 #include <vector>
-
-#ifdef KORS_LOGGER_QT_SUPPORT
-#include <QDebug>
-#include <QVariant>
-#endif
-
-//! NOTE Example add operator for custom types
-/*
-1) Recommended add own log stream type in your project
-file: app/src/global/logstream.h
-
-#ifndef APP_LOGSTREAM_H
-#define APP_LOGSTREAM_H
-
-#include "thirdparty/kors_logger/src/logstream.h"
-namespace app::logger {
-using Stream = kors::logger::Stream;
-}
-
-#endif // APP_LOGSTREAM_H
-
-2) Add stream operator for your type
-file: app/src/.../sometype.h
-
-inline app::logger::Stream& operator<<(app::logger::Stream& s, const SomeType& v)
-{
-    s << v.toStdString();
-    return s;
-}
-*/
-
 namespace kors::logger {
-class Stream
-{
+class Stream {
 public:
-    Stream() = default;
-
-    inline Stream& operator<<(bool t) { m_ss << t; return *this; }
-    inline Stream& operator<<(char t) { m_ss << t; return *this; }
-    inline Stream& operator<<(signed short t) { m_ss << t; return *this; }
-    inline Stream& operator<<(unsigned short t) { m_ss << t; return *this; }
-    inline Stream& operator<<(char16_t t) { m_ss << static_cast<uint16_t>(t); return *this; }
-    inline Stream& operator<<(char32_t t) { m_ss << static_cast<uint32_t>(t); return *this; }
-    inline Stream& operator<<(signed int t) { m_ss << t; return *this; }
-    inline Stream& operator<<(unsigned int t) { m_ss << t; return *this; }
-    inline Stream& operator<<(signed long t) { m_ss << t; return *this; }
-    inline Stream& operator<<(unsigned long t) { m_ss << t; return *this; }
-    inline Stream& operator<<(signed long long t) { m_ss << t; return *this; }
-    inline Stream& operator<<(unsigned long long t) { m_ss << t; return *this; }
-    inline Stream& operator<<(float t) { m_ss << t; return *this; }
-    inline Stream& operator<<(double t) { m_ss << t; return *this; }
-    inline Stream& operator<<(const void* t) { m_ss << t; return *this; }
-    inline Stream& operator<<(const char* t) { m_ss << t; return *this; }
-
-    inline Stream& operator<<(const std::string& t) { m_ss << t; return *this; }
-    inline Stream& operator<<(const std::string_view& t) { m_ss << t; return *this; }
-    inline Stream& operator<<(const std::thread::id& t) { m_ss << t; return *this; }
-
-    template<typename T>
-    inline Stream& operator<<(const std::vector<T>& t)
+    Stream();
+    ~Stream();
+    Stream(const Stream&) = delete;
+    Stream& operator=(const Stream&) = delete;
+    Stream& operator<<(bool);
+    Stream& operator<<(char);
+    Stream& operator<<(short);
+    Stream& operator<<(unsigned short);
+    Stream& operator<<(char16_t);
+    Stream& operator<<(char32_t);
+    Stream& operator<<(int);
+    Stream& operator<<(unsigned int);
+    Stream& operator<<(long);
+    Stream& operator<<(unsigned long);
+    Stream& operator<<(long long);
+    Stream& operator<<(unsigned long long);
+    Stream& operator<<(float);
+    Stream& operator<<(double);
+    Stream& operator<<(const void*);
+    Stream& operator<<(const char*);
+    Stream& operator<<(const std::string&);
+    Stream& operator<<(const std::string_view&);
+    template <class T>
+    Stream& operator<<(const std::vector<T>& values)
     {
-        m_ss << '[';
-        for (size_t i = 0; i < t.size(); ++i) {
-            *this << t.at(i);
-            if (i < t.size() - 1) {
-                m_ss << ',';
-            }
+        *this << '[';
+        for (size_t i = 0; i < values.size(); ++i) {
+            if (i)
+                *this << ',';
+            *this << values[i];
         }
-        m_ss << ']';
-        return *this;
+        return *this << ']';
     }
-
-#ifdef KORS_LOGGER_QT_SUPPORT
-    inline Stream& operator<<(QChar t) { qt_to_ss(t); return *this; }
-    inline Stream& operator<<(const QString& t) { qt_to_ss(t); return *this; }
-    inline Stream& operator<<(QStringView t) { qt_to_ss(t); return *this; }
-    inline Stream& operator<<(QLatin1String t) { qt_to_ss(t); return *this; }
-    inline Stream& operator<<(const QByteArray& t) { qt_to_ss(t); return *this; }
-    inline Stream& operator<<(const QVariant& t) { qt_to_ss(t); return *this; }
-#endif
-
-    inline std::string str() const { return m_ss.str(); }
+    std::string str() const;
 
 private:
-
-#ifdef KORS_LOGGER_QT_SUPPORT
-    template<typename T>
-    inline void qt_to_ss(const T& t)
-    {
-        QString str;
-        QDebug q(&str);
-        q << t;
-        m_ss << str.toStdString();
-    }
-
-#endif
-
-    std::stringstream m_ss;
+    struct Impl;
+    Impl* m_impl;
 };
 }
-
-#endif //KORS_LOGSTREAM_H

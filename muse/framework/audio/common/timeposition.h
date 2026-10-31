@@ -21,6 +21,7 @@
  */
 
  #pragma once
+#include "global/asserts.h"
 
  #include "audiotypes.h"
 

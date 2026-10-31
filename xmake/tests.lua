@@ -41,7 +41,6 @@ target("engraving_playback_tests")
     add_deps("muse_generated", "engrave")
     add_packages("gtest")
     add_defines(table.unpack(ENGRAVE_DEFINES))
-    add_defines("KORS_PROFILER_ENABLED")
     add_defines("TEST_HAS_ENGRAVING=1")
     add_defines('ENGRAVING_TESTS_DATA_ROOT="' .. engraving_tests_dir:gsub("\\", "/") .. '"')
     add_includedirs(
@@ -89,7 +88,6 @@ target("mpe_tests")
     add_deps("muse_generated", "muse_mpe")
     add_packages("gtest")
     add_defines(table.unpack(ENGRAVE_DEFINES))
-    add_defines("KORS_PROFILER_ENABLED")
     add_includedirs(
         path.join(source_root, "muse", "framework", "mpe"),
         path.join(source_root, "src"),
@@ -393,5 +391,18 @@ target("c0_gate")
         "engrave_gp_import_test", "engrave_output_test", "engrave_output_probe",
         "example_embedder", "engraving_playback_tests", "mpe_tests",
         "score_edit_test", "score_audio_test", "score_positions_test",
-        "excerpts_test", "archive_test", "assets_test", "semantic_dump", "engine_audio_probe")
+        "excerpts_test", "archive_test", "assets_test", "semantic_dump", "engine_audio_probe", "diagnostics_test")
+target_end()
+
+-- Diagnostic control flow is independent of score initialization.
+target("diagnostics_test")
+    set_kind("binary")
+    set_default(false)
+    add_deps("muse_generated", "muse_global")
+    add_packages("gtest")
+    add_includedirs(ENGRAVE_INTERNAL_INCLUDES)
+    add_includedirs(path.join(source_root, "muse", "framework"),
+        path.join(source_root, "muse", "framework", "global"))
+    add_includedirs("$(builddir)/xmake-generated")
+    add_files(path.join(tests_dir, "diagnostics_test.cpp"))
 target_end()

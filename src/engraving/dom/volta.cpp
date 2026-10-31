@@ -308,10 +308,7 @@ void Volta::setChannel() const
 //   accessibleInfo
 //---------------------------------------------------------
 
-String Volta::accessibleInfo() const
-{
-    return String(u"%1: %2").arg(EngravingItem::accessibleInfo(), text());
-}
+
 
 PointF Volta::linePos(Grip grip, System** system) const
 {

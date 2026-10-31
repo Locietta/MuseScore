@@ -1318,19 +1318,13 @@ TranslatableString Harmony::typeUserName() const
 //   accessibleInfo
 //---------------------------------------------------------
 
-String Harmony::accessibleInfo() const
-{
-    return String(u"%1: %2").arg(translatedTypeUserName(), harmonyName());
-}
+
 
 //---------------------------------------------------------
 //   screenReaderInfo
 //---------------------------------------------------------
 
-String Harmony::screenReaderInfo() const
-{
-    return String(u"%1 %2").arg(translatedTypeUserName(), generateScreenReaderInfo());
-}
+
 
 //---------------------------------------------------------
 //   generateScreenReaderInfo

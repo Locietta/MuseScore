@@ -91,7 +91,7 @@ public:
     PropertyValue getProperty(Pid propertyId) const override;
     bool setProperty(Pid propertyId, const PropertyValue&) override;
     PropertyValue propertyDefault(Pid id) const override;
-    String accessibleInfo() const override;
+
 
     bool positionRelativeToNoteheadRest() const override { return true; }
 

@@ -71,10 +71,7 @@ PropertyValue Parenthesis::propertyDefault(Pid pid) const
     }
 }
 
-String Parenthesis::accessibleInfo() const
-{
-    return String(u"%1: %2").arg(EngravingItem::accessibleInfo(), TConv::translatedUserName(direction()));
-}
+
 
 bool Parenthesis::followParentCurColor() const
 {

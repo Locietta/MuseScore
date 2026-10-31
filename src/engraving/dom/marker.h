@@ -75,7 +75,7 @@ public:
 
     EngravingItem* nextSegmentElement() override;
     EngravingItem* prevSegmentElement() override;
-    String accessibleInfo() const override;
+
 
     bool positionRelativeToNoteheadRest() const override { return false; }
 

@@ -283,7 +283,7 @@ public:
 
     int line() const;
 
-    String accessibleInfo() const override;
+
 
     void computeMag();
 

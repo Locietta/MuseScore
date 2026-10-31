@@ -68,7 +68,7 @@ public:
     void startDragGrip(EditData&) override;
     void dragGrip(EditData&) override;
 
-    String accessibleInfo() const override;
+
 
     int subtype() const override;
     TranslatableString subtypeUserName() const override;

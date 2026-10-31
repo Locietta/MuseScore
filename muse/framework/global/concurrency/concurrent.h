@@ -28,7 +28,7 @@
 
 #include <QtConcurrent>
 
-#include "log.h"
+#include "global/asserts.h"
 
 namespace muse {
 class Concurrent

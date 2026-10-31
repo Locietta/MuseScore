@@ -435,14 +435,7 @@ EngravingItem* Clef::prevSegmentElement()
 //   accessibleInfo
 //---------------------------------------------------------
 
-String Clef::accessibleInfo() const
-{
-    ClefType type = clefType();
-    if (type == ClefType::INVALID) {
-        return String();
-    }
-    return muse::mtrc("engraving", TConv::translatedUserName(clefType()));
-}
+
 
 //---------------------------------------------------------
 //   subtypeUserName

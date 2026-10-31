@@ -24,6 +24,7 @@
  MusicXML support.
  */
 
+#include "log.h"
 #include "musicxmlsupport.h"
 #include "global/serialization/xmlstreamreader.h"
 

@@ -474,11 +474,11 @@ public:
     //! placement diverge, in which case the item that places them lists them instead.
     virtual EngravingItemList accessibleChildren() const;
 
-    virtual String accessibleInfo() const;
-    virtual String screenReaderInfo() const { return accessibleInfo(); }
+
+
     //  if the screen-reader needs a special string (see note for example)
     // used to return info that will be appended to accessibleInfo
-    virtual String accessibleExtraInfo() const { return String(); }
+
     virtual String formatBarsAndBeats() const;
 
     virtual void triggerLayout() const;

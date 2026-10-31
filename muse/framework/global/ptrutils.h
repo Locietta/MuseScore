@@ -23,7 +23,8 @@
 #define MUSE_GLOBAL_PTRUTILS_H
 
 #include "stringutils.h"
-#include "log.h"
+#include <cassert>
+#include <sstream>
 
 namespace muse::ptr {
 template<typename T, typename E> T* checked_cast(E* source)

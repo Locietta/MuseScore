@@ -88,7 +88,7 @@ public:
 
     EngravingItem* nextSegmentElement() override;
     EngravingItem* prevSegmentElement() override;
-    String accessibleInfo() const override;
+
 
     int subtype() const override { return int(key()) + 7; }
     muse::TranslatableString subtypeUserName() const override;

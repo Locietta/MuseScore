@@ -20,6 +20,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "log.h"
 #include "stringtunings.h"
 
 #include "types/typesconv.h"
@@ -155,41 +156,9 @@ bool StringTunings::setProperty(Pid id, const PropertyValue& val)
     return true;
 }
 
-String StringTunings::accessibleInfo() const
-{
-    const StringData* stringData = this->stringData();
-    if (stringData->isNull()) {
-        return String();
-    }
 
-    String elementName = score() ? score()->getTextStyleUserName(TextStyleType::STRING_TUNINGS).translated()
-                         : TConv::translatedUserName(TextStyleType::STRING_TUNINGS);
-    String info;
 
-    const std::vector<instrString>& stringList = stringData->stringList();
-    int numOfStrings = static_cast<int>(stringList.size());
-    for (int i = 0; i < numOfStrings; ++i) {
-        string_idx_t index = numOfStrings - i - 1;
-        if (muse::contains(m_visibleStrings, index)) {
-            const instrString str = stringList[index];
-            String pitchStr = pitch2string(str.pitch, str.useFlat);
-            if (pitchStr.empty()) {
-                LOGE() << "Invalid get pitch name for " << str.pitch;
-                continue;
-            }
 
-            info += muse::mtrc("engraving", "String %1").arg(String::number(i + 1)) + u", "
-                    + muse::mtrc("engraving", "Value %1").arg(pitchStr) + u"; ";
-        }
-    }
-
-    return String(u"%1: %2").arg(elementName, info);
-}
-
-String StringTunings::screenReaderInfo() const
-{
-    return accessibleInfo();
-}
 
 const StringData* StringTunings::stringData() const
 {

@@ -61,7 +61,7 @@ public:
     bool setProperty(Pid, const PropertyValue&) override;
     PropertyValue getProperty(Pid) const override;
 
-    String accessibleInfo() const override;
+
 
     int subtype() const override { return m_numMeasures; }
     muse::TranslatableString subtypeUserName() const override;

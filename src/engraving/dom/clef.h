@@ -137,7 +137,7 @@ public:
 
     EngravingItem* nextSegmentElement() override;
     EngravingItem* prevSegmentElement() override;
-    String accessibleInfo() const override;
+
     void clear();
 
     void changeClefToBarlinePos(ClefToBarlinePosition newPos);

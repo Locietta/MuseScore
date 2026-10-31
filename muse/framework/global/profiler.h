@@ -1,31 +1,20 @@
-/*
- * SPDX-License-Identifier: GPL-3.0-only
- * MuseScore-CLA-applies
- *
- * MuseScore Studio
- * Music Composition & Notation
- *
- * Copyright (C) 2021 MuseScore Limited and others
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 3 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-#ifndef MU_PROFILER_H
-#define MU_PROFILER_H
-
-#include "thirdparty/kors_profiler/profiler/profiler.h" // IWYU pragma: export
-
+// SPDX-License-Identifier: GPL-3.0-only
+#pragma once
+#ifdef ENGRAVE_PROFILE
 namespace muse::profiler {
-using Profiler = kors::profiler::Profiler;
-}
+class Scope {
+public:
+    explicit Scope(const char*);
+    ~Scope();
 
-#endif // MU_PROFILER_H
+private:
+    const char* m_name;
+    long long m_start;
+};
+}
+#define TRACEFUNC muse::profiler::Scope __engrave_scope(__func__);
+#define TRACEFUNC_C(info) muse::profiler::Scope __engrave_scope(info);
+#else
+#define TRACEFUNC
+#define TRACEFUNC_C(info)
+#endif

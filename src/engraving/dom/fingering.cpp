@@ -120,14 +120,7 @@ bool Fingering::isEditAllowed(EditData& ed) const
 //   accessibleInfo
 //---------------------------------------------------------
 
-String Fingering::accessibleInfo() const
-{
-    String rez = EngravingItem::accessibleInfo();
-    if (textStyleType() == TextStyleType::STRING_NUMBER) {
-        rez += u' ' + muse::mtrc("engraving", "String number");
-    }
-    return String(u"%1: %2").arg(rez, plainText());
-}
+
 
 bool Fingering::isOnCrossBeamSide() const
 {

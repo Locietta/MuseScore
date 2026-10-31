@@ -372,7 +372,7 @@ public:
     double firstNoteRestSegmentX(bool leading = false) const;
     double endingXForOpenEndedLines() const;
 
-    String accessibleInfo() const override;
+
 
     void styleChanged() override;
 

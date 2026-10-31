@@ -366,10 +366,7 @@ muse::TranslatableString TimeSig::subtypeUserName() const
 //   accessibleInfo
 //---------------------------------------------------------
 
-String TimeSig::accessibleInfo() const
-{
-    return String(u"%1: %2").arg(EngravingItem::accessibleInfo(), translatedSubtypeUserName());
-}
+
 
 void TimeSig::initElementStyle(const ElementStyle* elementStype)
 {

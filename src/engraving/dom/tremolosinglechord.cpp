@@ -256,10 +256,7 @@ TranslatableString TremoloSingleChord::subtypeUserName() const
 //   accessibleInfo
 //---------------------------------------------------------
 
-String TremoloSingleChord::accessibleInfo() const
-{
-    return String(u"%1: %2").arg(EngravingItem::accessibleInfo(), translatedSubtypeUserName());
-}
+
 
 //---------------------------------------------------------
 //   getProperty

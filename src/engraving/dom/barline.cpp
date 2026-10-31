@@ -949,86 +949,8 @@ muse::TranslatableString BarLine::subtypeUserName() const
 //   accessibleInfo
 //---------------------------------------------------------
 
-String BarLine::accessibleInfo() const
-{
-    return String(u"%1: %2").arg(EngravingItem::accessibleInfo(), BarLine::translatedUserTypeName(barLineType()));
-}
+
 
 //---------------------------------------------------------
 //   accessibleExtraInfo
 //---------------------------------------------------------
-
-String BarLine::accessibleExtraInfo() const
-{
-    Segment* seg = segment();
-    String rez;
-
-    for (const EngravingItem* e : *el()) {
-        if (!score()->selectionFilter().canSelect(e)) {
-            continue;
-        }
-        rez = String(u"%1 %2").arg(rez, e->screenReaderInfo());
-    }
-
-    for (const EngravingItem* e : seg->annotations()) {
-        if (!score()->selectionFilter().canSelect(e)) {
-            continue;
-        }
-        if (e->track() == track()) {
-            rez = String(u"%1 %2").arg(rez, e->screenReaderInfo());
-        }
-    }
-    Measure* m = seg->measure();
-
-    if (m) {      // always true?
-        //jumps
-        for (const EngravingItem* e : m->el()) {
-            if (!score()->selectionFilter().canSelect(e)) {
-                continue;
-            }
-            if (e->isJump()) {
-                rez= String(u"%1 %2").arg(rez, e->screenReaderInfo());
-            }
-            if (e->isMarker()) {
-                const Marker* m1 = toMarker(e);
-                if (m1->markerType() == MarkerType::FINE) {
-                    rez = String(u"%1 %2").arg(rez, e->screenReaderInfo());
-                }
-            }
-        }
-        //markers
-        Measure* nextM = m->nextMeasureMM();
-        if (nextM) {
-            for (const EngravingItem* e : nextM->el()) {
-                if (!score()->selectionFilter().canSelect(e)) {
-                    continue;
-                }
-                if (e->isMarker()) {
-                    if (toMarker(e)->markerType() == MarkerType::FINE) {
-                        continue;             //added above^
-                    }
-                    rez = String(u"%1 %2").arg(rez, e->screenReaderInfo());
-                }
-            }
-        }
-    }
-
-    Fraction tick = seg->tick();
-
-    auto spanners = score()->spannerMap().findOverlapping(tick.ticks(), tick.ticks());
-    for (auto interval : spanners) {
-        Spanner* s = interval.value;
-        if (!score()->selectionFilter().canSelect(s)) {
-            continue;
-        }
-        if (s->isVolta()) {
-            if (s->tick() == tick) {
-                rez += u"; " + muse::mtrc("engraving", "Start of %1").arg(s->screenReaderInfo());
-            }
-            if (s->tick2() == tick) {
-                rez += u"; " + muse::mtrc("engraving", "End of %1").arg(s->screenReaderInfo());
-            }
-        }
-    }
-    return rez;
-}

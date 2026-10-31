@@ -92,8 +92,8 @@ public:
 
     std::unique_ptr<ElementGroup> getDragGroup(std::function<bool(const EngravingItem*)> isDragged) override;
 
-    String accessibleInfo() const override;
-    String screenReaderInfo() const override;
+
+
 
     static String dynamicText(DynamicType t);
     bool hasCustomText() const { return dynamicText(m_dynamicType) != xmlText(); }

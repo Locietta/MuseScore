@@ -146,8 +146,8 @@ public:
     EngravingItem* nextSegmentElement() override;
     EngravingItem* prevSegmentElement() override;
 
-    String accessibleInfo() const override;
-    String accessibleExtraInfo() const override;
+
+
 
     void setSelected(bool f) override;
     bool needStartEditingAfterSelecting() const override { return true; }

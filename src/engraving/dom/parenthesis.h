@@ -42,7 +42,7 @@ public:
     bool setProperty(Pid, const PropertyValue&) override;
     PropertyValue propertyDefault(Pid) const override;
 
-    String accessibleInfo() const override;
+
 
     bool followParentCurColor() const;
     void setFollowParentColor(bool val);
