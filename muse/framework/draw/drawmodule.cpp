@@ -23,17 +23,10 @@
 
 #include "global/modularity/ioc.h"
 
-#ifndef DRAW_NO_INTERNAL
-#ifndef NO_QT_SUPPORT
-#include "internal/qfontprovider.h"
-#include "internal/qimageprovider.h"
-#else
 #include "internal/fontprovider.h"
 #include "internal/fontsengine.h"
-#endif
 
 #include "internal/fontsdatabase.h"
-#endif
 
 #include "muse_framework_config.h"
 
@@ -47,24 +40,15 @@ std::string DrawModule::moduleName() const
 
 void DrawModule::registerExports()
 {
-#ifndef DRAW_NO_INTERNAL
 
-#ifndef NO_QT_SUPPORT
-    globalIoc()->registerExport<draw::IImageProvider>(moduleName(), std::make_shared<QImageProvider>());
-    globalIoc()->registerExport<draw::IFontProvider>(moduleName(), std::make_shared<QFontProvider>());
-#else
     m_fontsEngine = std::make_shared<FontsEngine>(globalCtx());
     globalIoc()->registerExport<draw::IFontProvider>(moduleName(), std::make_shared<FontProvider>(globalCtx()));
     globalIoc()->registerExport<draw::IFontsEngine>(moduleName(), m_fontsEngine);
-#endif
     globalIoc()->registerExport<draw::IFontsDatabase>(moduleName(), std::make_shared<FontsDatabase>());
 
-#endif // DRAW_NO_INTERNAL
 }
 
 void DrawModule::onInit(const IApplication::RunMode&)
 {
-#if !defined(DRAW_NO_INTERNAL) && defined(NO_QT_SUPPORT)
     m_fontsEngine->init();
-#endif // DRAW_NO_INTERNAL
 }

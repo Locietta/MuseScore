@@ -66,7 +66,7 @@ RetVal<io::paths_t> Dir::scanFiles(const io::path_t& rootDir, const std::vector<
 
 path_t Dir::fromNativeSeparators(const path_t& pathName)
 {
-#if defined(Q_OS_WIN)
+#if defined(_WIN32)
     String path = pathName.toString();
     size_t i = path.indexOf(u'\\');
     if (i != muse::nidx) {

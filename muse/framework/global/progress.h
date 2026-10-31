@@ -133,8 +133,5 @@ private:
 using ProgressPtr = std::shared_ptr<Progress>;
 }
 
-#ifndef NO_QT_SUPPORT
-Q_DECLARE_METATYPE(muse::Progress)
-#endif
 
 #endif // MUSE_GLOBAL_PROGRESS_H

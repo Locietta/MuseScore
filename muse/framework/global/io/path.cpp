@@ -21,9 +21,6 @@
  */
 #include "path.h"
 
-#ifndef NO_QT_SUPPORT
-#include <QDir>
-#endif
 
 #include "global/stringutils.h"
 #include "fileinfo.h"
@@ -100,33 +97,6 @@ const char* path_t::c_str() const
     return m_path.c_str();
 }
 
-#ifndef NO_QT_SUPPORT
-path_t::path_t(const QString& s)
-    : m_path(s.toStdString())
-{
-}
-
-path_t::path_t(const QUrl& u)
-    : m_path(u.toLocalFile().toStdString())
-{
-}
-
-QString path_t::toQString() const
-{
-    return QString::fromStdString(m_path);
-}
-
-QUrl path_t::toQUrl() const
-{
-    return QUrl::fromLocalFile(QString::fromStdString(m_path));
-}
-
-std::wstring path_t::toStdWString() const
-{
-    return QString::fromStdString(m_path).toStdWString();
-}
-
-#endif
 
 std::string muse::io::suffix(const io::path_t& path)
 {
@@ -300,9 +270,5 @@ std::string muse::io::pathsToString(const paths_t& ps, const std::string& delim)
 
 path_t muse::io::toNativeSeparators(const path_t& path)
 {
-#ifndef NO_QT_SUPPORT
-    return QDir::toNativeSeparators(path.toQString());
-#else
     return path;
-#endif
 }

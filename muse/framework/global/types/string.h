@@ -33,10 +33,6 @@
 #include "bytearray.h"
 #include "global/logstream.h"
 
-#ifndef NO_QT_SUPPORT
-#include <QString>
-#include <QStringList>
-#endif
 
 namespace muse {
 enum CaseSensitivity {
@@ -102,13 +98,6 @@ public:
     Char(AsciiChar c)
         : m_ch(c.unicode()) {}
 
-#ifndef NO_QT_SUPPORT
-    constexpr Char(QChar c)
-        : m_ch(c.unicode()) {}
-    constexpr operator QChar() const {
-        return QChar(m_ch);
-    }
-#endif
 
     constexpr bool operator ==(Char c) const { return m_ch == c.m_ch; }
     constexpr bool operator !=(Char c) const { return !operator ==(c); }
@@ -208,19 +197,6 @@ public:
     String(const Char& ch);
     String(const Char* unicode, size_t size = muse::nidx);
 
-#ifndef NO_QT_SUPPORT
-    String(const QString& str) { *this = fromQString(str); }
-    operator QString() const {
-        return this->toQString();
-    }
-
-    String& operator=(const QString& str) { *this = fromQString(str); return *this; }
-    static String fromQString(const QString& str);
-    QString toQString() const;
-
-    inline bool operator ==(const QString& s) const { return toQString() == s; }
-    inline bool operator !=(const QString& s) const { return !operator ==(s); }
-#endif
 
     String& operator=(const char16_t* str);
     void reserve(size_t i);
@@ -412,10 +388,6 @@ public:
 
     std::vector<std::string> toStdStringList() const;
 
-#ifndef NO_QT_SUPPORT
-    StringList(const QStringList& l);
-    QStringList toQStringList() const;
-#endif
 };
 
 // ============================
@@ -435,10 +407,6 @@ public:
     AsciiStringView(const std::string& str)
         : m_size(str.size()), m_data(str.c_str()) {}
 
-#ifndef NO_QT_SUPPORT
-    static AsciiStringView fromQLatin1String(const QLatin1String& str) { return AsciiStringView(str.latin1(), str.size()); }
-    QLatin1String toQLatin1String() const { return QLatin1String(m_data, static_cast<int>(m_size)); }
-#endif
 
     operator std::string_view() const {
         if (!m_data) {

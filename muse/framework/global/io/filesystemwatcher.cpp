@@ -22,51 +22,8 @@
 
 #include "filesystemwatcher.h"
 
-#ifndef NO_QT_SUPPORT
-#include <QFileSystemWatcher>
-#endif
 
 namespace muse::io {
-#ifndef NO_QT_SUPPORT
-
-FileSystemWatcher::FileSystemWatcher()
-    : m_watcher(std::make_unique<QFileSystemWatcher>())
-{
-    QObject::connect(m_watcher.get(), &QFileSystemWatcher::fileChanged,
-                     [this](const QString& path) {
-        m_fileChannel.send(path.toStdString());
-    });
-
-    QObject::connect(m_watcher.get(), &QFileSystemWatcher::directoryChanged,
-                     [this](const QString& path) {
-        m_directoryChannel.send(path.toStdString());
-    });
-}
-
-FileSystemWatcher::~FileSystemWatcher() = default;
-
-void FileSystemWatcher::startWatching(const std::string& path)
-{
-    m_watcher->addPath(QString::fromStdString(path));
-}
-
-void FileSystemWatcher::stopWatching(const std::string& path)
-{
-    if (path.empty()) {
-        const auto watchedPaths = m_watcher->files();
-        if (!watchedPaths.isEmpty()) {
-            m_watcher->removePaths(watchedPaths);
-        }
-        const auto watchedDirs = m_watcher->directories();
-        if (!watchedDirs.isEmpty()) {
-            m_watcher->removePaths(watchedDirs);
-        }
-        return;
-    }
-    m_watcher->removePath(QString::fromStdString(path));
-}
-
-#else
 
 FileSystemWatcher::FileSystemWatcher() = default;
 FileSystemWatcher::~FileSystemWatcher() = default;
@@ -74,7 +31,6 @@ FileSystemWatcher::~FileSystemWatcher() = default;
 void FileSystemWatcher::startWatching(const std::string&) {}
 void FileSystemWatcher::stopWatching(const std::string&) {}
 
-#endif
 
 muse::async::Channel<std::string> FileSystemWatcher::fileChanged() const
 {

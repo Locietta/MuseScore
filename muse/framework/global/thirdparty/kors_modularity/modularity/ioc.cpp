@@ -27,10 +27,6 @@ SOFTWARE.
 #include <utility>
 
 // Context
-#ifndef NO_QT_SUPPORT
-const kors::modularity::ContextPtr globalCtx
-    = std::make_shared<kors::modularity::Context>(kors::modularity::globalId);
-#endif
 
 #ifdef IOC_CHECK_INTERFACE_TYPE   
 // IoC
@@ -44,16 +40,9 @@ kors::modularity::ModulesGlobalIoC* kors::modularity::globalIoc()
 
 kors::modularity::ModulesContextIoC* kors::modularity::ioc(const ContextPtr& ctx)
 {
-#ifndef NO_QT_SUPPORT
-    assert(ctx && ctx->id > 0);
-    if (!(ctx && ctx->id > 0)) {
-        return nullptr;
-    }
-#else
     if (!ctx) {
         return nullptr;
     }
-#endif
 
     auto it = s_contexts.find(ctx->id);
     if (it != s_contexts.end()) {

@@ -35,11 +35,7 @@
 // (actually, the only basic support of this version is implemented but it is enough for now)
 #define ZIP_VERSION 20
 
-#if 0
-#define ZDEBUG LOGD
-#else
 #define ZDEBUG if (0) LOGD
-#endif
 
 using namespace muse::io;
 

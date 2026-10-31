@@ -38,9 +38,6 @@ static double angleForArc(double angle);
 void PainterPath::moveTo(const PointF& p)
 {
     if (!hasValidCoords(p)) {
-#ifdef MUSE_MODULE_DRAW_TRACE
-        LOGW() << "PainterPath::moveTo: Adding point with invalid coordinates, ignoring call";
-#endif
         return;
     }
     ensureData();
@@ -59,9 +56,6 @@ void PainterPath::moveTo(const PointF& p)
 void PainterPath::lineTo(const PointF& p)
 {
     if (!hasValidCoords(p)) {
-#ifdef MUSE_MODULE_DRAW_TRACE
-        LOGW() << "PainterPath::lineTo: Adding point with invalid coordinates, ignoring call";
-#endif
         return;
     }
     ensureData();
@@ -80,13 +74,6 @@ void PainterPath::lineTo(const PointF& p)
 void PainterPath::cubicTo(const PointF& ctrlPt1, const PointF& ctrlPt2, const PointF& endPt)
 {
     if (!hasValidCoords(ctrlPt1) || !hasValidCoords(ctrlPt2) || !hasValidCoords(endPt)) {
-   #ifdef MUSE_MODULE_DRAW_TRACE
-        static int count = 0;
-        LOGW() << "[" << ++count << "] Points with invalid coordinates, ignoring it,"
-               << " point1: " << ctrlPt1
-               << " point2: " << ctrlPt2
-               << " point3: " << endPt;
-   #endif
         return;
     }
     ensureData();
@@ -158,9 +145,6 @@ PainterPath::Element PainterPath::elementAt(size_t i) const
 void PainterPath::addRect(const RectF& r)
 {
     if (!hasValidCoords(r)) {
-#ifdef MUSE_MODULE_DRAW_TRACE
-        LOGW() << "PainterPath::addRect: Adding point with invalid coordinates, ignoring call";
-#endif
         return;
     }
     if (r.isNull()) {
@@ -183,9 +167,6 @@ void PainterPath::addRect(const RectF& r)
 void PainterPath::addEllipse(const RectF& boundingRect)
 {
     if (!hasValidCoords(boundingRect)) {
-#ifdef MUSE_MODULE_DRAW_TRACE
-        LOGW() << "PainterPath::addEllipse: Adding point with invalid coordinates, ignoring call";
-#endif
         return;
     }
     if (boundingRect.isNull()) {
@@ -266,9 +247,6 @@ void PainterPath::arcMoveTo(const RectF& rect, double angle)
 void PainterPath::arcTo(const RectF& rect, double startAngle, double sweepLength)
 {
     if (!hasValidCoords(rect) || !isValidCoord(startAngle) || !isValidCoord(sweepLength)) {
-#ifdef MUSE_MODULE_DRAW_TRACE
-        LOGW() << "PainterPath::arcTo: Adding point with invalid coordinates, ignoring call";
-#endif
         return;
     }
     if (rect.isNull()) {
@@ -288,62 +266,6 @@ void PainterPath::arcTo(const RectF& rect, double startAngle, double sweepLength
     }
 }
 
-#ifndef NO_QT_SUPPORT
-QPainterPath PainterPath::toQPainterPath(const PainterPath& path)
-{
-    QPainterPath qpath;
-    std::vector<QPainterPath::Element> curveEls;
-
-    qpath.setFillRule(static_cast<Qt::FillRule>(path.fillRule()));
-
-    for (size_t i = 0; i < path.elementCount(); i++) {
-        auto elem = path.elementAt(i);
-
-        QPainterPath::ElementType type = static_cast<QPainterPath::ElementType>(elem.type);
-        double x = elem.x;
-        double y = elem.y;
-
-        switch (type) {
-        case QPainterPath::MoveToElement: {
-            qpath.moveTo(x, y);
-        } break;
-        case QPainterPath::LineToElement: {
-            qpath.lineTo(x, y);
-        } break;
-        case QPainterPath::CurveToElement: {
-            IF_ASSERT_FAILED(curveEls.empty()) {
-                continue;
-            }
-            QPainterPath::Element e;
-            e.type = type;
-            e.x = x;
-            e.y = y;
-            curveEls.push_back(std::move(e));
-        } break;
-        case QPainterPath::CurveToDataElement: {
-            if (curveEls.size() == 1) { // only CurveToElement
-                QPainterPath::Element e;
-                e.type = type;
-                e.x = x;
-                e.y = y;
-                curveEls.push_back(std::move(e));
-                continue;
-            }
-
-            IF_ASSERT_FAILED(curveEls.size() == 2) { // must be CurveToElement and one CurveToDataElement
-                curveEls.clear();
-                continue;
-            }
-
-            qpath.cubicTo(curveEls.at(0).x, curveEls.at(0).y, curveEls.at(1).x, curveEls.at(1).y, x, y);
-            curveEls.clear();
-        } break;
-        }
-    }
-    return qpath;
-}
-
-#endif
 
 void PainterPath::closeSubpath()
 {

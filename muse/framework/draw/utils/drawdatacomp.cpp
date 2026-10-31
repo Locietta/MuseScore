@@ -157,99 +157,6 @@ static bool isEqual(const Brush& b1, const Brush& b2)
     return true;
 }
 
-#if 0 // currently unused, disabled due to an MSVC compiler warning C4505
-static bool isEqual(const Font& f1, const Font& f2)
-{
-    if (f1.family() != f2.family()) {
-        return false;
-    }
-
-    if (!RealIsEqual(f1.pointSizeF(), f2.pointSizeF())) {
-        return false;
-    }
-
-    if (f1.weight() != f2.weight()) {
-        return false;
-    }
-
-    if (f1.italic() != f2.italic()) {
-        return false;
-    }
-
-    return true;
-}
-
-static bool isEqual(const Transform& t1, const Transform& t2, double tolerance)
-{
-    if (!isEqual(t1.m11(), t2.m11(), tolerance)) {
-        return false;
-    }
-
-    if (!isEqual(t1.m12(), t2.m12(), tolerance)) {
-        return false;
-    }
-
-    if (!isEqual(t1.m13(), t2.m13(), tolerance)) {
-        return false;
-    }
-
-    if (!isEqual(t1.m21(), t2.m21(), tolerance)) {
-        return false;
-    }
-
-    if (!isEqual(t1.m22(), t2.m22(), tolerance)) {
-        return false;
-    }
-
-    if (!isEqual(t1.m23(), t2.m23(), tolerance)) {
-        return false;
-    }
-
-    if (!isEqual(t1.m31(), t2.m31(), tolerance)) {
-        return false;
-    }
-
-    if (!isEqual(t1.m32(), t2.m32(), tolerance)) {
-        return false;
-    }
-
-    if (!isEqual(t1.m33(), t2.m33(), tolerance)) {
-        return false;
-    }
-
-    return true;
-}
-
-static bool isEqual(const DrawData::State& s1, const DrawData::State& s2, DrawDataComp::Tolerance tolerance)
-{
-    if (s1.isAntialiasing != s2.isAntialiasing) {
-        return false;
-    }
-
-    if (s1.compositionMode != s2.compositionMode) {
-        return false;
-    }
-
-    if (!isEqual(s1.pen, s2.pen)) {
-        return false;
-    }
-
-    if (!isEqual(s1.brush, s2.brush)) {
-        return false;
-    }
-
-    if (!isEqual(s1.font, s2.font)) {
-        return false;
-    }
-
-    if (!isEqual(s1.transform, s2.transform, tolerance.base)) {
-        return false;
-    }
-
-    return true;
-}
-
-#endif
 
 static bool isEqual(const PainterPath& v1, const PainterPath& v2, double tolerance)
 {
@@ -375,33 +282,6 @@ static bool isEqual(const DrawPixmap& v1, const DrawPixmap& v2, DrawDataComp::To
     return true;
 }
 
-#if 0 // currently unused, disabled due to an MSVC compiler warning C4505
-static bool isEqual(const DrawData::Data& d1, const DrawData::Data& d2, DrawDataComp::Tolerance tolerance)
-{
-    if (!isEqual(d1.state, d2.state, tolerance)) {
-        return false;
-    }
-
-    if (!isEqual(d1.paths, d2.paths, tolerance)) {
-        return false;
-    }
-
-    if (!isEqual(d1.polygons, d2.polygons, tolerance)) {
-        return false;
-    }
-
-    if (!isEqual(d1.texts, d2.texts, tolerance)) {
-        return false;
-    }
-
-    if (!isEqual(d1.pixmaps, d2.pixmaps, tolerance)) {
-        return false;
-    }
-
-    return true;
-}
-
-#endif
 
 template<class T>
 static bool isEqual(const std::vector<T>& v1, const std::vector<T>& v2, DrawDataComp::Tolerance tolerance)
@@ -435,25 +315,6 @@ static bool isEqual(const std::vector<T>& v1, const std::vector<T>& v2, DrawData
     return true;
 }
 
-#if 0 // currently unused, disabled due to an MSVC compiler warning C4505
-static bool isEqual(const DrawData::Object& o1, const DrawData::Object& o2, DrawDataComp::Tolerance tolerance)
-{
-    if (o1.name != o2.name) {
-        return false;
-    }
-
-    if (!isEqual(o1.pagePos, o2.pagePos, tolerance.base)) {
-        return false;
-    }
-
-    if (!isEqual(o1.datas, o2.datas, tolerance)) {
-        return false;
-    }
-
-    return true;
-}
-
-#endif
 
 static bool isEqual(const Path& p1, const Path& p2, DrawDataComp::Tolerance tolerance)
 {

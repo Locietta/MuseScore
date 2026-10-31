@@ -22,9 +22,6 @@
 #ifndef MUSE_GLOBAL_MNEMONICSTRING_H
 #define MUSE_GLOBAL_MNEMONICSTRING_H
 
-#ifndef NO_QT_SUPPORT
-#include <QString>
-#endif
 
 #include "translatablestring.h"
 
@@ -49,18 +46,6 @@ public:
         return m_raw;
     }
 
-#ifndef NO_QT_SUPPORT
-    inline QString qTranslatedWithMnemonicAmpersand() const
-    {
-        return m_raw.qTranslated();
-    }
-
-    QString qTranslatedWithMnemonicUnderline() const;
-
-    QString qTranslatedWithoutMnemonic() const;
-
-    QString qTranslatedPlain() const;
-#endif
 
     inline bool operator ==(const MnemonicString& other) const
     {

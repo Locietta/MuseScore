@@ -33,7 +33,7 @@ String FileInfo::path() const
 {
     size_t lastSep = m_filePath.lastIndexOf(u'/');
     if (lastSep == muse::nidx) {
-#if defined(Q_OS_WIN)
+#if defined(_WIN32)
         if (m_filePath.size() >= 2 && m_filePath.at(1) == u':') {
             return m_filePath.left(2);
         }
@@ -43,7 +43,7 @@ String FileInfo::path() const
     if (lastSep == 0) {
         return String(u'/');
     }
-#if defined(Q_OS_WIN)
+#if defined(_WIN32)
     if (lastSep == 2 && m_filePath.at(1) == u':') {
         return m_filePath.left(lastSep + 1);
     }
@@ -74,7 +74,7 @@ String FileInfo::absoluteFilePath() const
 String FileInfo::fileName() const
 {
     size_t lastSep = m_filePath.lastIndexOf(u'/');
-#if defined(Q_OS_WIN)
+#if defined(_WIN32)
     if (lastSep == muse::nidx && m_filePath.size() >= 2 && m_filePath.at(1) == u':') {
         return m_filePath.mid(2);
     }
@@ -90,7 +90,7 @@ String FileInfo::baseName() const
     size_t to = firstDot > 0 ? firstDot : m_filePath.size();
     size_t length = to - from;
 
-#if defined(Q_OS_WIN)
+#if defined(_WIN32)
     if (lastSep == muse::nidx && m_filePath.size() >= 2 && m_filePath.at(1) == u':') {
         return m_filePath.mid(2, length - 2);
     }
@@ -106,7 +106,7 @@ String FileInfo::completeBaseName() const
     size_t to = lastDot > 0 ? lastDot : m_filePath.size();
     size_t length = to - from;
 
-#if defined(Q_OS_WIN)
+#if defined(_WIN32)
     if (lastSep == muse::nidx && m_filePath.size() >= 2 && m_filePath.at(1) == u':') {
         return m_filePath.mid(2, length - 2);
     }
@@ -165,7 +165,7 @@ bool FileInfo::isRelative() const
 
 bool FileInfo::isAbsolute() const
 {
-#ifdef Q_OS_WIN
+#ifdef _WIN32
     return (m_filePath.size() >= 3
             && m_filePath.at(0).isLetter()
             && m_filePath.at(1) == u':'

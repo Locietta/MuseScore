@@ -25,9 +25,6 @@
 #include "global/types/string.h"
 #include "global/types/flags.h"
 
-#ifndef NO_QT_SUPPORT
-#include <QFont>
-#endif
 
 namespace muse::draw {
 class Font
@@ -127,10 +124,6 @@ public:
     bool operator ==(const Font& other) const;
     bool operator !=(const Font& other) const { return !this->operator ==(other); }
 
-#ifndef NO_QT_SUPPORT
-    QFont toQFont() const;
-    static Font fromQFont(const QFont& qf, Type type);
-#endif
 
     static bool g_disableFontMerging;
 

@@ -28,7 +28,7 @@
 
 #include <thread>
 
-#ifdef Q_OS_WIN
+#ifdef _WIN32
 #include <windows.h>
 #else
 #include <pthread.h>
@@ -43,7 +43,7 @@ enum class ThreadPriority {
 
 static bool setThreadPriority(std::thread& thread, ThreadPriority priority)
 {
-#ifdef Q_OS_WIN
+#ifdef _WIN32
     int winPriority = 0;
     switch (priority) {
     case ThreadPriority::Low:

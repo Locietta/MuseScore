@@ -28,16 +28,16 @@
 
 namespace muse::midi {
 class MidiConfiguration;
-#if defined(Q_OS_LINUX)
+#if defined(__linux__)
 class AlsaMidiOutPort;
 class AlsaMidiInPort;
-#elif defined(Q_OS_FREEBSD)
+#elif defined(__FreeBSD__)
 class AlsaMidiOutPort;
 class AlsaMidiInPort;
-#elif defined(Q_OS_WIN)
+#elif defined(_WIN32)
 class WinMidiOutPort;
 class WinMidiInPort;
-#elif defined(Q_OS_MACOS)
+#elif defined(__APPLE__)
 class CoreMidiOutPort;
 class CoreMidiInPort;
 #else
@@ -56,15 +56,15 @@ public:
 private:
     std::shared_ptr<MidiConfiguration> m_configuration;
 
-    #if defined(Q_OS_LINUX) || defined(Q_OS_FREEBSD)
+    #if defined(__linux__) || defined(__FreeBSD__)
     std::shared_ptr<AlsaMidiOutPort> m_midiOutPort;
     std::shared_ptr<AlsaMidiInPort> m_midiInPort;
 
-    #elif defined(Q_OS_WIN)
+    #elif defined(_WIN32)
     std::shared_ptr<WinMidiOutPort> m_midiOutPort;
     std::shared_ptr<WinMidiInPort> m_midiInPort;
 
-    #elif defined(Q_OS_MACOS)
+    #elif defined(__APPLE__)
     std::shared_ptr<CoreMidiOutPort> m_midiOutPort;
     std::shared_ptr<CoreMidiInPort> m_midiInPort;
 

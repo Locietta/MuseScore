@@ -42,9 +42,6 @@ public:
     muse::async::Channel<std::string> directoryChanged() const;
 
 private:
-#ifndef NO_QT_SUPPORT
-    std::unique_ptr<QFileSystemWatcher> m_watcher;
-#endif
     muse::async::Channel<std::string> m_fileChannel;
     muse::async::Channel<std::string> m_directoryChannel;
 };

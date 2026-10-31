@@ -33,11 +33,6 @@
 #include "number.h"
 #include "io/path.h"
 
-#ifndef NO_QT_SUPPORT
-#include <QString>
-#include <QColor>
-#include <QVariant>
-#endif
 
 namespace muse {
 class Val;
@@ -199,16 +194,6 @@ public:
     bool operator ==(const Val& v) const;
     bool operator <(const Val& v) const;
 
-#ifndef NO_QT_SUPPORT
-    explicit Val(const QString& str);
-    explicit Val(const QColor& color);
-
-    QString toQString() const;
-    QColor toQColor() const;
-
-    QVariant toQVariant() const;
-    static Val fromQVariant(const QVariant& var);
-#endif
 
 private:
 

@@ -61,9 +61,6 @@ public:
     size_t write(const uint8_t* data, size_t len);
     size_t write(const ByteArray& ba);
 
-#ifndef NO_QT_SUPPORT
-    size_t write(const QByteArray& ba);
-#endif
 
     const std::string& meta(const std::string& key) const;
     void setMeta(const std::string& key, const std::string& val);

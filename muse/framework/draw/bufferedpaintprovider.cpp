@@ -86,9 +86,6 @@ void BufferedPaintProvider::beginObject(const std::string& name)
 
     ensureItemInit(ch);
 
-#ifdef MUSE_MODULE_DRAW_TRACE
-    //m_drawObjectsLogger->beginObject(name);
-#endif
 }
 
 void BufferedPaintProvider::endObject()
@@ -107,9 +104,6 @@ void BufferedPaintProvider::endObject()
 
     --m_itemLevel;
 
-#ifdef MUSE_MODULE_DRAW_TRACE
-    //m_drawObjectsLogger->endObject();
-#endif
 }
 
 void BufferedPaintProvider::ensureItemInit(DrawData::Item& item) const
@@ -320,18 +314,6 @@ void BufferedPaintProvider::drawTiledPixmap(const RectF& rect, const Pixmap& pm,
     editableData().pixmaps.push_back(DrawPixmap { DrawPixmap::Tiled, rect, pm, offset });
 }
 
-#ifndef NO_QT_SUPPORT
-void BufferedPaintProvider::drawPixmap(const PointF& p, const QPixmap& pm)
-{
-    editableData().pixmaps.push_back(DrawPixmap { DrawPixmap::Single, RectF(p, SizeF()), Pixmap::fromQPixmap(pm), PointF() });
-}
-
-void BufferedPaintProvider::drawTiledPixmap(const RectF& rect, const QPixmap& pm, const PointF& offset)
-{
-    editableData().pixmaps.push_back(DrawPixmap { DrawPixmap::Tiled, rect, Pixmap::fromQPixmap(pm), offset });
-}
-
-#endif
 
 bool BufferedPaintProvider::hasClipping() const
 {

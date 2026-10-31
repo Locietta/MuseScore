@@ -26,9 +26,6 @@
 
 #include "types/string.h"
 
-#ifndef NO_QT_SUPPORT
-#include <QString>
-#endif
 
 namespace muse {
 //! Note: in order to make the string visible for `lupdate`,
@@ -87,28 +84,6 @@ public:
         return res;
     }
 
-#ifndef NO_QT_SUPPORT
-    inline QString qTranslated() const
-    {
-        return qTranslated(defaultN);
-    }
-
-    inline QString qTranslated(int n) const
-    {
-        if (isEmpty()) {
-            return {};
-        }
-
-        QString res = isTranslatable() ? qtrc(context, str, disambiguation, n) : str.toQString();
-
-        for (const auto& arg : args) {
-            arg->apply(res);
-        }
-
-        return res;
-    }
-
-#endif
 
     template<typename ... Args>
     inline TranslatableString arg(const Args& ...) const;
@@ -133,9 +108,6 @@ private:
         virtual ~IArg() = default;
 
         virtual void apply(String& res) const = 0;
-#ifndef NO_QT_SUPPORT
-        virtual void apply(QString& res) const = 0;
-#endif
     };
 
     template<typename ... Args>
@@ -167,27 +139,6 @@ struct TranslatableString::Arg : public TranslatableString::IArg
         }
     }
 
-#ifndef NO_QT_SUPPORT
-    void apply(QString& res) const override
-    {
-        res = std::apply([&](const Args&... args) { return res.arg(makeQArg(args)...); }, args);
-    }
-
-    template<typename T>
-    static inline auto makeQArg(const T& t)
-    {
-        if constexpr (std::is_same_v<T, TranslatableString>) {
-            return t.qTranslated();
-// *INDENT-OFF* // Uncrustify doesn't understand `else if constexpr`
-        } else if constexpr (std::is_same_v<T, String>) {
-// *INDENT-ON*
-            return t.toQString();
-        } else {
-            return t;
-        }
-    }
-
-#endif
 };
 
 template<typename Int>
@@ -203,13 +154,6 @@ struct TranslatableString::Arg<Int> : public TranslatableString::IArg
         res = res.arg(arg);
     }
 
-#ifndef NO_QT_SUPPORT
-    void apply(QString& res) const override
-    {
-        res = res.arg(arg);
-    }
-
-#endif
 };
 
 template<>
@@ -226,13 +170,6 @@ struct TranslatableString::Arg<String> : public TranslatableString::IArg
         res = res.arg(arg);
     }
 
-#ifndef NO_QT_SUPPORT
-    void apply(QString& res) const override
-    {
-        res = res.arg(arg.toQString());
-    }
-
-#endif
 };
 
 template<>
@@ -248,13 +185,6 @@ struct TranslatableString::Arg<TranslatableString> : public TranslatableString::
         res = res.arg(arg.translated());
     }
 
-#ifndef NO_QT_SUPPORT
-    void apply(QString& res) const override
-    {
-        res = res.arg(arg.qTranslated());
-    }
-
-#endif
 };
 
 template<typename ... Args>

@@ -25,9 +25,6 @@
 #include <string_view>
 #include <vector>
 
-#ifndef NO_QT_SUPPORT
-#include <QString>
-#endif
 
 namespace muse {
 class ByteArray;
@@ -59,9 +56,6 @@ public:
     TextStream& operator<<(const ByteArray& b);
     TextStream& operator<<(const String& s);
 
-#ifndef NO_QT_SUPPORT
-    TextStream& operator<<(const QString& s);
-#endif
 
 private:
     void write(const char* ch, size_t len);

@@ -26,9 +26,6 @@
 #include <vector>
 #include <algorithm>
 
-#ifndef NO_QT_SUPPORT
-#include <QVariant>
-#endif
 
 #include "global/logstream.h"
 
@@ -59,12 +56,6 @@ public:
     uint64_t toUint64() const;
     std::string toStdString() const;
 
-#ifndef NO_QT_SUPPORT
-    ID(const QString& id);
-    ID(const QVariant& id);
-
-    QString toQString() const;
-#endif
 
 private:
     uint64_t m_id = 0;

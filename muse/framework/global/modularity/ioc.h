@@ -22,10 +22,6 @@
 
 #pragma once
 
-#ifndef NO_QT_SUPPORT
-#include <QObject>
-class QQmlContext;
-#endif
 
 #include "../thirdparty/kors_modularity/modularity/ioc.h" // IWYU pragma: export
 
@@ -80,19 +76,4 @@ using kors::modularity::ThreadSafeInject;
 using kors::modularity::Injectable;
 //! ----
 
-#ifndef NO_QT_SUPPORT
-struct QmlIoCContext : public QObject
-{
-    Q_OBJECT
-public:
-    QmlIoCContext(QObject* p)
-        : QObject(p) {}
-
-    modularity::ContextPtr ctx;
-};
-
-Contextable::GetContext iocCtxForQmlObject(const QObject* o);
-modularity::ContextPtr iocCtxForQmlContext(const QQmlContext* c);
-muse::Contextable::GetContext iocCtxForQWidget(const QWidget* o);
-#endif
 }

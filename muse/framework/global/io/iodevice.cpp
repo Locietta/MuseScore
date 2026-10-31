@@ -23,9 +23,6 @@
 
 #include <cstring>
 
-#ifndef NO_QT_SUPPORT
-#include <QByteArray>
-#endif
 
 #include "log.h"
 
@@ -231,13 +228,6 @@ size_t IODevice::write(const ByteArray& ba)
     return write(ba.constData(), ba.size());
 }
 
-#ifndef NO_QT_SUPPORT
-size_t IODevice::write(const QByteArray& ba)
-{
-    return write(reinterpret_cast<const uint8_t*>(ba.constData()), ba.size());
-}
-
-#endif
 
 const std::string& IODevice::meta(const std::string& key) const
 {

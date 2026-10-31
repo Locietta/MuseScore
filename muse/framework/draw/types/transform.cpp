@@ -462,12 +462,6 @@ Transform& Transform::rotate(double a)
     if (RealIsNull(a)) {
         return *this;
     }
-#ifdef MUSE_MODULE_DRAW_TRACE
-    if (std::isnan(a)) {
-        nanWarning("rotate");
-        return *this;
-    }
-#endif
 
     double sina = 0.0;
     double cosa = 0.0;
@@ -530,12 +524,6 @@ Transform& Transform::rotate(double a)
 
 Transform& Transform::rotateRadians(double a)
 {
-#ifdef MUSE_MODULE_DRAW_TRACE
-    if (std::isnan(a)) {
-        nanWarning("rotateRadians");
-        return *this;
-    }
-#endif
     double sina = std::sin(a);
     double cosa = std::cos(a);
     switch (inline_type()) {
@@ -589,12 +577,6 @@ Transform& Transform::translate(double dx, double dy)
     if (RealIsNull(dx) && RealIsNull(dy)) {
         return *this;
     }
-#ifdef MUSE_MODULE_DRAW_TRACE
-    if (std::isnan(dx) || std::isnan(dy)) {
-        nanWarning("translate");
-        return *this;
-    }
-#endif
     switch (inline_type()) {
     case TransformationType::None:
         m_affine.m_dx = dx;
@@ -628,12 +610,6 @@ Transform& Transform::scale(double sx, double sy)
     if (RealIsEqual(sx, 1) && RealIsEqual(sy, 1)) {
         return *this;
     }
-#ifdef MUSE_MODULE_DRAW_TRACE
-    if (std::isnan(sx) || std::isnan(sy)) {
-        nanWarning("scale");
-        return *this;
-    }
-#endif
     switch (inline_type()) {
     case TransformationType::None:
     case TransformationType::Translate:
@@ -665,12 +641,6 @@ Transform& Transform::shear(double sh, double sv)
     if (RealIsNull(sh) && RealIsNull(sv)) {
         return *this;
     }
-#ifdef MUSE_MODULE_DRAW_TRACE
-    if (std::isnan(sh) || std::isnan(sv)) {
-        nanWarning("shear");
-        return *this;
-    }
-#endif
     switch (inline_type()) {
     case TransformationType::None:
     case TransformationType::Translate:
@@ -783,26 +753,3 @@ void Transform::mapElement(double& nx, double& ny, TransformationType t) const
         }
     }
 }
-
-#ifndef NO_QT_SUPPORT
-QTransform Transform::toQTransform(const Transform& transform)
-{
-    return QTransform(transform.m_affine.m_11, transform.m_affine.m_12, transform.m_13, transform.m_affine.m_21, transform.m_affine.m_22,
-                      transform.m_23, transform.m_affine.m_dx, transform.m_affine.m_dy, transform.m_33);
-}
-
-Transform Transform::fromQTransform(const QTransform& transform)
-{
-    return Transform(transform.m11(), transform.m12(), transform.m13(), transform.m21(), transform.m22(), transform.m23(),
-                     transform.m31(), transform.m32(), transform.m33());
-}
-
-#endif
-
-#ifdef MUSE_MODULE_DRAW_TRACE
-void Transform::nanWarning(const std::string& func)
-{
-    LOGW() << "Transform:: " << func << " with NaN called";
-}
-
-#endif

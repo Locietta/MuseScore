@@ -28,11 +28,6 @@
 #include "types/version.h"
 #include "modularity/ioc.h"
 
-#ifndef NO_QT_SUPPORT
-class QObject;
-class QEvent;
-class QWindow;
-#endif
 
 namespace muse {
 class IApplication : MODULE_GLOBAL_INTERFACE
@@ -76,12 +71,6 @@ public:
 
     virtual void processEvents() = 0;
 
-#ifndef NO_QT_SUPPORT
-    virtual QWindow* focusWindow() const = 0;
-    virtual bool notify(QObject* object, QEvent* event) = 0;
-
-    virtual Qt::KeyboardModifiers keyboardModifiers() const = 0;
-#endif
 };
 }
 
