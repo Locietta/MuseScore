@@ -1,16 +1,16 @@
 {
- "note": "The A2 render goldens for three corpus scores, copied from musescore-mcp tests/golden/<platform>/<fixture> at superproject commit 8acd1d0. svg is the sha256 of the stored page-N.svg text; png is describe_png's width/height/mode and the sha256 of the RGBA bytes PIL decodes; pdf is describe_pdf's page count. scripts/golden.py normalizes SVG to LF and leaves it otherwise unchanged, and decodes the PNG to RGBA (8 bits per channel, no alpha premultiplication), which is what the test reproduces. Windows hashes were refreshed for the one-time pre-4.6 fixture upgrade on 2026-10-31; the old/new hashes and reason are pinned in the superproject tests/golden/allow.json. Linux runtime recapture is pending (this change requested a Linux build-only check).",
+ "note": "The A2 render goldens for three corpus scores, copied from musescore-mcp tests/golden/<platform>/<fixture> at superproject commit 8acd1d0. svg is the sha256 of the stored page-N.svg text; png is describe_png's width/height/mode and the sha256 of the RGBA bytes PIL decodes; pdf is describe_pdf's page count. scripts/golden.py normalizes SVG to LF and leaves it otherwise unchanged, and decodes the PNG to RGBA (8 bits per channel, no alpha premultiplication), which is what the test reproduces. Windows hashes were refreshed for the one-time pre-4.6 fixture upgrade on 2026-10-31; the old/new hashes and reason are pinned in the superproject tests/golden/allow.json. Linux runtime recapture is pending (this change requested a Linux build-only check). C0: Linux recapture executed at engrave-5; public and old-host captures agree. Linux conversion hashes are now pinned in the superproject allow-list.",
  "fixtures": {
   "ghost_note.mscx": {
    "linux": {
     "pdf": 1,
     "png": {
+     "width": 1191,
      "height": 1684,
-     "sha256": "657b06cc0e55554228c58177b122885d156b93d5254f68567496c7b054cdc246",
-     "width": 1191
+     "sha256": "657b06cc0e55554228c58177b122885d156b93d5254f68567496c7b054cdc246"
     },
     "svg": [
-     "8ae400e71efb4240231de41d8c7e61544606b56f96cade56f24a6c785f8f3b80"
+     "94b943efc87bf09984662f3b25aafc3e4774ed8f505367ec7446709d1711fe70"
     ]
    },
    "windows": {
@@ -29,9 +29,9 @@
    "linux": {
     "pdf": 1,
     "png": {
+     "width": 1191,
      "height": 1684,
-     "sha256": "863054633b37b1f05c557f9db6359631892746d53cb0875198b229d38c1ae1f4",
-     "width": 1191
+     "sha256": "863054633b37b1f05c557f9db6359631892746d53cb0875198b229d38c1ae1f4"
     },
     "svg": [
      "ee96b6099a3f8e87e787db2a76255820c57127fb6626b2c062621d41fbbda241"
@@ -53,9 +53,9 @@
    "linux": {
     "pdf": 2,
     "png": {
+     "width": 1191,
      "height": 171,
-     "sha256": "efaf04c96e76ff0ae32adfe90951b25f8c02df616d7a47a65a184ad5edc941df",
-     "width": 1191
+     "sha256": "efaf04c96e76ff0ae32adfe90951b25f8c02df616d7a47a65a184ad5edc941df"
     },
     "svg": [
      "f3e5187aed677c7e29cdae79da02201fb3eab0ea9e4e0c88865c5ce26fd10dc1",

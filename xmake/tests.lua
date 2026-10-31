@@ -372,3 +372,15 @@ target("audio_engine_link_check")
         add_links("m")
     end
 target_end()
+
+-- The complete engine gate closure; no MCP host dependency.
+target("c0_gate")
+    set_kind("phony")
+    set_default(false)
+    add_deps("engrave_api_test", "engrave_handles_test", "engrave_describe_test",
+        "engrave_read_test", "engrave_ops_test", "engrave_op_policy_test",
+        "engrave_gp_import_test", "engrave_output_test", "engrave_output_probe",
+        "example_embedder", "engraving_playback_tests", "mpe_tests",
+        "score_edit_test", "score_audio_test", "score_positions_test",
+        "excerpts_test", "archive_test", "assets_test", "semantic_dump", "engine_audio_probe")
+target_end()

@@ -14,6 +14,8 @@
 
 #include <engrave/engrave.h>
 
+#include <algorithm>
+#include <sstream>
 #include <cstdio>
 #include <cstdlib>
 #include <filesystem>
@@ -45,6 +47,30 @@ void write_audio(const std::filesystem::path& path, const std::vector<std::byte>
     write(path, data);
 }
 
+std::vector<std::string> notes(engrave::Document& doc) {
+    auto outline = doc.outline();
+    if (!outline) throw std::runtime_error("outline failed");
+    std::vector<std::string> result;
+    for (int first = 0; first < outline->measure_count; first += 128) {
+        engrave::Query q;
+        q.types = {"Note"}; q.props = {"pitch"};
+        q.first_measure = first;
+        q.measure_count = std::min(128, outline->measure_count - first);
+        auto found = doc.query(q);
+        if (!found || found->next_cursor) throw std::runtime_error("note query incomplete");
+        for (const auto& n : found->elements) {
+            std::ostringstream row;
+            row << n.staff << ':' << n.voice << ':' << n.tick.num << '/' << n.tick.den;
+            for (const auto& p : n.props) {
+                if (auto v = std::get_if<std::int64_t>(&p.value)) row << ':' << *v;
+            }
+            result.push_back(row.str());
+        }
+    }
+    std::sort(result.begin(), result.end());
+    return result;
+}
+
 int usage() {
     std::fprintf(stderr, "usage: --assets=DIR [--soundfont=FILE]... --render=SCORE --out=DIR\n"
                          "       --assets=DIR [--soundfont=FILE]... --audio=SCORE --format=NAME --out=FILE\n");
@@ -66,6 +92,7 @@ int main(int argc, char** argv) {
         else if (argument.starts_with("--soundfont=")) soundfonts.push_back(std::filesystem::u8path(value(12)));
         else if (argument.starts_with("--out=")) out = std::filesystem::u8path(value(6));
         else if (argument.starts_with("--render=")) { mode = "render"; score = std::filesystem::u8path(value(9)); }
+        else if (argument.starts_with("--export=")) { mode = "export"; score = std::filesystem::u8path(value(9)); }
         else if (argument.starts_with("--audio=")) { mode = "audio"; score = std::filesystem::u8path(value(8)); }
         else if (argument.starts_with("--format=")) format = value(9);
         else if (argument.starts_with("--sample-rate=")) sample_rate = std::atoi(value(14).c_str());
@@ -90,6 +117,30 @@ int main(int argc, char** argv) {
             std::fprintf(stderr, "error: %s: %s\n", std::string(engrave::to_string(document.error().code)).c_str(),
                          document.error().message.c_str());
             return 2;
+        }
+
+        if (mode == "export") {
+            std::filesystem::create_directories(out);
+            const auto before = notes(**document);
+            const std::pair<engrave::Format, const char*> formats[] = {
+                {engrave::Format::MusicXml, "score.musicxml"},
+                {engrave::Format::Mscz, "score.mscz"},
+                {engrave::Format::Mxl, "score.mxl"},
+                {engrave::Format::Midi, "score.mid"}};
+            for (auto [kind, name] : formats) {
+                engrave::ExportOptions ex; ex.format = kind;
+                auto bytes = (*document)->export_score(ex);
+                if (!bytes) throw std::runtime_error(bytes.error().message);
+                write(out / name, *bytes);
+                auto reopened = (*engine)->open(out / name);
+                if (!reopened) throw std::runtime_error(reopened.error().message);
+                // Native serialization must preserve note placement and pitch exactly.
+                // Interchange import normalizes voices/staves; the captured oracle owns it.
+                if ((kind == engrave::Format::Mscz || kind == engrave::Format::Mscx)
+                    && notes(**reopened) != before)
+                    throw std::runtime_error("native semantic reopen changed notes");
+            }
+            return 0;
         }
 
         if (mode == "render") {
