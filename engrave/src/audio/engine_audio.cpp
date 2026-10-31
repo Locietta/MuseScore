@@ -1,3 +1,4 @@
+#include "global/io/streamfile.h"
 // SPDX-License-Identifier: GPL-3.0-only
 //
 // Offline audio driver. See engine_audio.h for the lifetime/threading contract.
@@ -100,94 +101,7 @@ public:
     std::uint64_t renderedFrames = 0;
 };
 
-// Encoder destination. 5.0's encoders write through muse::io::IODevice
-// (export/wavencoder.cpp:172,198 writes four bytes per sample), but the fork's
-// io::File keeps the whole file in a ByteArray and rewrites it on every write
-// (global/io/file.cpp:136-146): quadratic in the file size and with the whole
-// render resident in memory. 4.7.6's encoders streamed to std::ofstream/FILE*
-// instead (4.7.6 export/wavencoder.cpp:223, mp3encoder.cpp:110). This device
-// restores that behaviour behind the 5.0 device API: sequential writes are
-// buffered by the stream, and only the WAV header patch seeks backwards
-// (export/wavencoder.cpp:134-154). Write failures make encode() return 0,
-// which SoundTrackWriter reports as Err::ErrorEncode
-// (export/soundtrackwriter.cpp:155,177,194).
-class StreamingFileDevice final : public io::IODevice
-{
-public:
-    explicit StreamingFileDevice(io::path_t path)
-        : m_path(std::move(path)) {}
 
-    ~StreamingFileDevice() override { close(); }
-
-protected:
-    bool doOpen(OpenMode mode) override
-    {
-        if (mode != WriteOnly && mode != ReadWrite && mode != Append) {
-            setError(static_cast<int>(io::Err::FSWriteError), "audio output is write-only");
-            return false;
-        }
-
-        // The path is UTF-8; std::filesystem::path keeps it away from the
-        // process ANSI code page on Windows.
-        m_stream.open(std::filesystem::u8path(m_path.toStdString()), std::ios::binary | std::ios::trunc);
-        if (!m_stream.is_open()) {
-            setError(static_cast<int>(io::Err::FSWriteError), "cannot open audio output for writing");
-            return false;
-        }
-
-        m_size = 0;
-        m_streamPos = 0;
-        return true;
-    }
-
-    void doClose() override
-    {
-        if (m_stream.is_open()) {
-            m_stream.flush();
-            m_stream.close();
-        }
-    }
-
-    size_t dataSize() const override { return m_size; }
-    const uint8_t* rawData() const override { return nullptr; }
-
-    bool resizeData(size_t size) override
-    {
-        m_size = std::max(m_size, size);
-        return true;
-    }
-
-    size_t writeData(const uint8_t* data, size_t len) override
-    {
-        if (!m_stream.is_open()) {
-            return 0;
-        }
-
-        // Only seek for the non-sequential writes (the WAV header patch);
-        // std::ofstream::seekp flushes the put buffer, so doing it per write
-        // would turn a buffered stream into one syscall per sample.
-        if (m_streamPos != pos()) {
-            m_stream.seekp(static_cast<std::streamoff>(pos()));
-            if (!m_stream) {
-                return 0;
-            }
-        }
-
-        m_stream.write(reinterpret_cast<const char*>(data), static_cast<std::streamsize>(len));
-        if (!m_stream) {
-            return 0;
-        }
-
-        m_streamPos = pos() + len;
-        return len;
-    }
-
-private:
-    io::path_t m_path;
-    std::ofstream m_stream;
-    size_t m_size = 0;
-    size_t m_streamPos = 0;
-};
 
 } // namespace
 
@@ -808,7 +722,7 @@ AudioRenderResult export_score_audio(EngineAudio& audio, MasterScore* master, co
     // The writer reports completed frames after each successfully encoded block.
     state.midiOutPort.renderedFrames = 0;
 
-    StreamingFileDevice device(io::path_t(request.output_path));
+    io::StreamingFileDevice device(std::filesystem::u8path(request.output_path));
     if (!device.open(io::IODevice::WriteOnly)) {
         return fail(AudioRenderResult::Failure::EngineFailure,
                     std::string("cannot write ") + audio_format_name(request.format) + " output: '"
@@ -829,12 +743,12 @@ AudioRenderResult export_score_audio(EngineAudio& audio, MasterScore* master, co
     // (audiocontext.cpp:934-940).
     masterChain->setMode(ProcessMode::Idle);
 
-    if (!writeRet) {
+    if (!writeRet || device.hasError()) {
         // SoundTrackWriter returns Err::ErrorEncode when an encoder could not
         // be created or stopped accepting data, e.g. the destination is not
         // writable, and the bare Ret has no context. Name the format and path
         // instead of reporting the raw code.
-        const std::string detail = writeRet.toString();
+        const std::string detail = device.hasError() ? device.errorString() : writeRet.toString();
         return fail(AudioRenderResult::Failure::EngineFailure,
                     std::string(audio_format_name(request.format)) + " encoder failed (" + detail
                     + "): '" + request.output_path + "'");

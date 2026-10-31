@@ -19,7 +19,7 @@
 #include <utility>
 #include <vector>
 
-#include "global/io/buffer.h"
+#include "global/io/byteview.h"
 #include "global/serialization/json.h"
 #include "global/serialization/zipreader.h"
 
@@ -183,8 +183,8 @@ ScoreAudioMixDefaults score_audio_mix_defaults(const std::string& mscz_bytes)
     ScoreAudioMixDefaults result;
     if (mscz_bytes.size() < 4) return result;
     try {
-        muse::ByteArray archive(mscz_bytes.data(), mscz_bytes.size());
-        muse::io::Buffer buffer(&archive);
+        muse::io::ByteView buffer(std::span<const uint8_t>(
+            reinterpret_cast<const uint8_t*>(mscz_bytes.data()), mscz_bytes.size()));
         if (!buffer.open(muse::io::IODevice::ReadOnly)) return result;
         muse::ZipReader zip(&buffer);
         if (zip.hasError()) return result;
