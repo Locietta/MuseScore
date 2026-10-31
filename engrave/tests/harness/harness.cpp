@@ -446,10 +446,10 @@ const std::vector<OpCase>& registered_cases() {
 // back from the snapshot (its policy is Snapshot, and the guard takes the weakest policy of
 // a batch), which replaces the commands instead of undoing them. Probing the unwind would
 // describe a path no document takes, and for an operation that builds a whole score subtree
-// the probe does not report a failed check but corrupts the heap: the unwind frees the link
-// lists and the elements twice, and leaves the excerpt in the master without the elements
-// the build removed from it. An operation listed here can therefore never be Transaction,
-// whatever its snapshot rows say.
+// the probe does not report a failed check but corrupts the heap: unwinding frees the link
+// lists, and the elements the build's commands own, twice over, because the commands and the
+// built score own the same objects. An operation listed here can therefore never be
+// Transaction, whatever its snapshot rows say.
 const std::map<std::string, std::string>& unwind_not_probed() {
     static const std::map<std::string, std::string> ops = {
         // Excerpt::createExcerpt builds the excerpt's score (its staves, its title frame and
