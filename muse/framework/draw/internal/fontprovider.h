@@ -23,19 +23,18 @@
 
 #include "../ifontprovider.h"
 
-#include "global/modularity/ioc.h"
 #include "ifontsdatabase.h"
 #include "ifontsengine.h"
 
 namespace muse::draw {
-class FontProvider : public IFontProvider, public Contextable
+class FontProvider : public IFontProvider
 {
-    GlobalInject<IFontsDatabase> fontsDatabase;
-    GlobalInject<IFontsEngine> fontsEngine;
+    IFontsDatabase& m_database;
+    IFontsEngine& m_engine;
 
 public:
-    FontProvider(const modularity::ContextPtr& iocCtx)
-        : Contextable(iocCtx) {}
+    FontProvider(IFontsDatabase& database, IFontsEngine& engine)
+        : m_database(database), m_engine(engine) {}
 
     int addSymbolFont(const String& family, const io::path_t& path) override;
     int addSymbolFont(const String& family, std::shared_ptr<io::IODevice> device) override;

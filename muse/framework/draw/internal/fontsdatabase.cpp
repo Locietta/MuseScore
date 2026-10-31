@@ -36,7 +36,7 @@ static int s_fontID = -1;
 void FontsDatabase::setDefaultFont(Font::Type type, const FontDataKey& key)
 {
     m_defaults[type] = key;
-    m_changed.notify();
+    ++m_revision;
 }
 
 void FontsDatabase::insertSubstitution(const String& familyName, const String& substituteName)
@@ -46,7 +46,7 @@ void FontsDatabase::insertSubstitution(const String& familyName, const String& s
     m_familySubstitutions[familyKey].push_back(substituteKey);
 
 
-    m_changed.notify();
+    ++m_revision;
 }
 
 void FontsDatabase::removeSubstitutions(const String& familyName, const std::vector<String>& substituteNames)
@@ -71,7 +71,7 @@ void FontsDatabase::removeSubstitutions(const String& familyName, const std::vec
         m_familySubstitutions.erase(it);
     }
 
-    m_changed.notify();
+    ++m_revision;
 }
 
 const FontDataKey& FontsDatabase::defaultFont(Font::Type type) const
@@ -125,7 +125,7 @@ int FontsDatabase::addFont(const FontDataKey& key, std::shared_ptr<io::IODevice>
     }
 
     m_fonts.insert({ key, FontInfo { id, key, std::move(device) } });
-    m_changed.notify();
+    ++m_revision;
 
     return id;
 }
@@ -139,7 +139,7 @@ void FontsDatabase::removeFont(const FontDataKey& key)
 
     release(it->second);
     m_fonts.erase(it);
-    m_changed.notify();
+    ++m_revision;
 }
 
 void FontsDatabase::release(const FontInfo& fi)
@@ -192,9 +192,9 @@ FontData FontsDatabase::fontData(const FontDataKey& requireKey, Font::Type type)
     return FontData { key, data };
 }
 
-async::Notification FontsDatabase::changed() const
+uint64_t FontsDatabase::revision() const
 {
-    return m_changed;
+    return m_revision;
 }
 
 const FontsDatabase::FontInfo& FontsDatabase::fontInfo(const FontDataKey& key) const

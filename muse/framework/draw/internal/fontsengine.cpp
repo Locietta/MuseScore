@@ -126,9 +126,6 @@ void FontsEngine::init()
 {
     m_renderCache.init();
 
-    fontsDatabase()->changed().onNotify(this, [this]() {
-        clearLoadedFaces();
-    });
 }
 
 void FontsEngine::setRenderCacheDirPath(const io::path_t& path, const std::string& revision)
@@ -496,7 +493,7 @@ IFontFace* FontsEngine::fontFaceByActualDataKey(const FontDataKey& actualDataKey
         }
     }
 
-    FontData fontData = fontsDatabase()->fontData(actualDataKey, type);
+    FontData fontData = m_database.fontData(actualDataKey, type);
     if (!fontData.valid()) {
         LOGE() << "font data is empty: " << actualDataKey.family().id();
         return nullptr;
@@ -534,6 +531,11 @@ IFontFace* FontsEngine::sdfFontFaceFor(const IFontFace* layoutFace) const
 
 FontsEngine::RequireFace* FontsEngine::fontFace(const Font& f, bool isSymbolMode) const
 {
+    if (m_databaseRevision != m_database.revision()) {
+        const_cast<FontsEngine*>(this)->clearLoadedFaces();
+        m_databaseRevision = m_database.revision();
+    }
+
     //! NOTE This font is required
     FaceKey requireKey = faceKeyForMetricsFont(f);
 
@@ -558,9 +560,9 @@ FontsEngine::RequireFace* FontsEngine::fontFace(const Font& f, bool isSymbolMode
 
     //! Let's find out which real font will be used
     //! (for example, if there is no required one)
-    FontDataKey actualDataKey = fontsDatabase()->actualFont(requireKey.dataKey, requireKey.type);
+    FontDataKey actualDataKey = m_database.actualFont(requireKey.dataKey, requireKey.type);
 
-    const int loadedPixelSize = isFtx(fontsDatabase()->fontData(actualDataKey, requireKey.type).data)
+    const int loadedPixelSize = isFtx(m_database.fontData(actualDataKey, requireKey.type).data)
                                 ? static_cast<int>(LOADED_PIXEL_SIZE)
                                 : requireKey.pixelSize;
     IFontFace* face = fontFaceByActualDataKey(actualDataKey, requireKey.type, loadedPixelSize, isSymbolMode);
@@ -574,10 +576,10 @@ FontsEngine::RequireFace* FontsEngine::fontFace(const Font& f, bool isSymbolMode
     newFont->actualDataKey = actualDataKey;
     newFont->face = face;
 
-    auto subtitutionFontDataKeys = fontsDatabase()->substitutionFonts(requireKey.dataKey);
+    auto subtitutionFontDataKeys = m_database.substitutionFonts(requireKey.dataKey);
     for (const FontDataKey& dataKey : subtitutionFontDataKeys) {
-        const FontDataKey actualSubtitutionDataKey = fontsDatabase()->actualFont(dataKey, requireKey.type);
-        const int subtitutionLoadedPixelSize = isFtx(fontsDatabase()->fontData(actualSubtitutionDataKey, requireKey.type).data)
+        const FontDataKey actualSubtitutionDataKey = m_database.actualFont(dataKey, requireKey.type);
+        const int subtitutionLoadedPixelSize = isFtx(m_database.fontData(actualSubtitutionDataKey, requireKey.type).data)
                                                ? static_cast<int>(LOADED_PIXEL_SIZE) : requireKey.pixelSize;
         IFontFace* subtitutionFace = fontFaceByActualDataKey(actualSubtitutionDataKey, requireKey.type, subtitutionLoadedPixelSize,
                                                              isSymbolMode);

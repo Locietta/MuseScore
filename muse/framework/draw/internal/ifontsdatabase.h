@@ -26,7 +26,7 @@
 #include "global/modularity/imoduleinterface.h"
 #include "global/io/iodevice.h"
 #include "global/io/path.h"
-#include "global/async/notification.h"
+#include <cstdint>
 
 #include "../types/fontstypes.h"
 
@@ -50,6 +50,6 @@ public:
     virtual std::vector<FontDataKey> substitutionFonts(const FontDataKey& requireKey) const = 0;
     virtual FontData fontData(const FontDataKey& requireKey, Font::Type type) const = 0;
 
-    virtual async::Notification changed() const = 0;
+    virtual uint64_t revision() const = 0;
 };
 }

@@ -171,7 +171,6 @@ void initialize_native_runtime(const std::string& assets) {
     // IApplication before any module's exports.
     modularity::globalIoc()->registerExport<io::IFileSystem>("native", new NativeFileSystem(root));
     install_runtime_font_services();
-    modularity::globalIoc()->registerExport<draw::IFontProvider>("native", std::make_shared<draw::FontProvider>(modularity::globalCtx()));
     // Writer, MusicXML export, and the $v header macro resolve IApplication
     // through the project IoC; without it application() is null and export crashes.
     auto application = std::make_shared<NoQtApplication>();

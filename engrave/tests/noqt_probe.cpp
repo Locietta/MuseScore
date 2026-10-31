@@ -23,7 +23,7 @@ class EngravingFontProvider final : public muse::draw::FontProvider {
         return font;
     }
 public:
-    EngravingFontProvider() : FontProvider(nullptr) {}
+    using FontProvider::FontProvider;
     double lineSpacing(const muse::draw::Font& f) const override { return FontProvider::lineSpacing(scaled(f)); }
     double xHeight(const muse::draw::Font& f) const override { return FontProvider::xHeight(scaled(f)); }
     double height(const muse::draw::Font& f) const override { return FontProvider::height(scaled(f)); }
@@ -44,10 +44,11 @@ int main(int argc, char** argv) {
         using namespace mu;
         auto fs = std::make_shared<music::NativeFileSystem>(std::filesystem::u8path(argv[1]));
         modularity::globalIoc()->registerExport<io::IFileSystem>("native", fs);
-        modularity::globalIoc()->registerExport<draw::IFontsDatabase>("native", new draw::FontsDatabase());
-        auto fonts = std::make_shared<draw::FontsEngine>(modularity::globalCtx());
+        auto database = std::make_shared<draw::FontsDatabase>();
+        modularity::globalIoc()->registerExport<draw::IFontsDatabase>("native", database);
+        auto fonts = std::make_shared<draw::FontsEngine>(*database);
         modularity::globalIoc()->registerExport<draw::IFontsEngine>("native", fonts);
-        modularity::globalIoc()->registerExport<draw::IFontProvider>("native", new EngravingFontProvider());
+        modularity::globalIoc()->registerExport<draw::IFontProvider>("native", new EngravingFontProvider(*database, *fonts));
         modularity::globalIoc()->registerExport<IApplication>("native", std::make_shared<music::NoQtApplication>());
         fonts->init();
         engraving::EngravingModule engraving;

@@ -45,7 +45,7 @@ public:
     std::vector<FontDataKey> substitutionFonts(const FontDataKey& requireKey) const override;
     FontData fontData(const FontDataKey& requireKey, Font::Type type) const override;
 
-    async::Notification changed() const override;
+    uint64_t revision() const override;
 
 private:
 
@@ -64,6 +64,6 @@ private:
     std::map<Font::Type, FontDataKey> m_defaults;
     std::map<FontDataKey, std::vector<FontDataKey> > m_familySubstitutions;
     std::map<FontDataKey, FontInfo> m_fonts;
-    async::Notification m_changed;
+    uint64_t m_revision = 0;
 };
 }

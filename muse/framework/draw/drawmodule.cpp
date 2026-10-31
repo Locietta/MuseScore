@@ -41,10 +41,11 @@ std::string DrawModule::moduleName() const
 void DrawModule::registerExports()
 {
 
-    m_fontsEngine = std::make_shared<FontsEngine>(globalCtx());
-    globalIoc()->registerExport<draw::IFontProvider>(moduleName(), std::make_shared<FontProvider>(globalCtx()));
+    auto database = std::make_shared<FontsDatabase>();
+    m_fontsEngine = std::make_shared<FontsEngine>(*database);
+    globalIoc()->registerExport<draw::IFontProvider>(moduleName(), std::make_shared<FontProvider>(*database, *m_fontsEngine));
     globalIoc()->registerExport<draw::IFontsEngine>(moduleName(), m_fontsEngine);
-    globalIoc()->registerExport<draw::IFontsDatabase>(moduleName(), std::make_shared<FontsDatabase>());
+    globalIoc()->registerExport<draw::IFontsDatabase>(moduleName(), database);
 
 }
 

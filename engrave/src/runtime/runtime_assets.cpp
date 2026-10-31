@@ -3,6 +3,7 @@
 //   src/framework/draw/internal/ifontsdatabase.h
 //   src/framework/draw/internal/ifontsengine.h
 #include "runtime_assets.h"
+#include "draw/internal/fontprovider.h"
 
 #include <algorithm>
 #include <atomic>
@@ -400,9 +401,9 @@ void checkOwnerThread()
     }
 }
 
-std::unique_ptr<draw::FontsEngine> createEngine()
+std::unique_ptr<draw::FontsEngine> createEngine(draw::IFontsDatabase& database)
 {
-    auto engine = std::make_unique<draw::FontsEngine>(muse::modularity::globalCtx());
+    auto engine = std::make_unique<draw::FontsEngine>(database);
     engine->init();
     return engine;
 }
@@ -654,7 +655,7 @@ RuntimeFontInfo reactivateRetained(const FontRecord& retained)
         next->push_back(retained);
     }
 
-    auto newEngine = createEngine();
+    auto newEngine = createEngine(*s_database);
 
     std::shared_ptr<const ActiveTable> published = std::move(next);
     s_database->publish(published);
@@ -683,10 +684,10 @@ void install_runtime_font_services()
         auto* ioc = muse::modularity::globalIoc();
         ioc->registerExport<muse::draw::IFontsDatabase>("native", database);
 
-        // FontsEngine::init() subscribes to IFontsDatabase::changed() in 5.0, so the
-        // database must be resolvable before the engine is constructed.
-        auto proxy = std::make_shared<FontsEngineProxy>(cacheStore, createEngine());
+        auto proxy = std::make_shared<FontsEngineProxy>(cacheStore, createEngine(*database));
         ioc->registerExport<muse::draw::IFontsEngine>("native", proxy);
+        ioc->registerExport<draw::IFontProvider>("native",
+            std::make_shared<draw::FontProvider>(*database, *proxy));
 
         s_database = std::move(database);
         s_proxyEngine = std::move(proxy);
@@ -820,7 +821,7 @@ RuntimeFontInfo add_runtime_font(const std::string& source_path)
     nextRetained.push_back(record);
 
     RuntimeFontInfo result = record.info;
-    auto newEngine = createEngine();
+    auto newEngine = createEngine(*s_database);
 
     std::shared_ptr<const ActiveTable> published = std::move(nextActive);
     s_database->publish(published);
