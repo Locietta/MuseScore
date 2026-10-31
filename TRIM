@@ -481,3 +481,41 @@ src/engraving/thirdparty/intervaltree/interval_tree_test.cpp
 muse/framework/audio/thirdparty/fluidsynth/fluidsynth-2.3.3/src/fluid_wasapi_device_enumerate.c
 muse/framework/audio/thirdparty/fluidsynth/fluidsynth-2.3.3/src/fluidsynth.c
 muse/framework/midi/midimodule.cpp
+
+# Batch 9: pre-MuseScore-4 native score formats are unsupported (2026-10-31).
+src/engraving/rw/read114/read114.cpp
+src/engraving/rw/read114/read114.h
+src/engraving/rw/read206/read206.cpp
+src/engraving/rw/read206/read206.h
+src/engraving/rw/read302/read302.cpp
+src/engraving/rw/read302/read302.h
+
+# Batch 10: pre-MuseScore-4.6 readers and their unused compatibility types.
+src/engraving/rw/read400/connectorinforeader.cpp
+src/engraving/rw/read400/connectorinforeader.h
+src/engraving/rw/read400/measurerw.cpp
+src/engraving/rw/read400/measurerw.h
+src/engraving/rw/read400/read400.cpp
+src/engraving/rw/read400/read400.h
+src/engraving/rw/read400/readcontext.cpp
+src/engraving/rw/read400/readcontext.h
+src/engraving/rw/read400/staffrw.cpp
+src/engraving/rw/read400/staffrw.h
+src/engraving/rw/read400/tread.cpp
+src/engraving/rw/read400/tread.h
+src/engraving/rw/read410/connectorinforeader.cpp
+src/engraving/rw/read410/connectorinforeader.h
+src/engraving/rw/read410/measureread.cpp
+src/engraving/rw/read410/measureread.h
+src/engraving/rw/read410/read410.cpp
+src/engraving/rw/read410/read410.h
+src/engraving/rw/read410/readcontext.cpp
+src/engraving/rw/read410/readcontext.h
+src/engraving/rw/read410/staffread.cpp
+src/engraving/rw/read410/staffread.h
+src/engraving/rw/read410/tread.cpp
+src/engraving/rw/read410/tread.h
+src/engraving/rw/compat/compattypes.h
+
+# Current MSCZ replaces the pre-4.6 MSCX to preserve its inline excerpt.
+src/engraving/tests/parts_data/part-visible-tracks.mscx

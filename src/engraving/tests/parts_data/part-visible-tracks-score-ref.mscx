@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <museScore version="5.00">
   <Score>
-    <eid>B_B</eid>
+    <eid>mVVze66smaO_TVdf6QDKW5I</eid>
     <Division>480</Division>
     <Style>
+      <pageWidth>8.26772</pageWidth>
+      <pageHeight>11.6929</pageHeight>
+      <pagePrintableWidth>7.08661</pagePrintableWidth>
+      <pageEvenLeftMargin>0.590551</pageEvenLeftMargin>
+      <pageOddLeftMargin>0.590551</pageOddLeftMargin>
+      <pageEvenTopMargin>0.590551</pageEvenTopMargin>
+      <pageEvenBottomMargin>0.590551</pageEvenBottomMargin>
+      <pageOddTopMargin>0.590551</pageOddTopMargin>
+      <pageOddBottomMargin>0.590551</pageOddBottomMargin>
       <spatium>1.75</spatium>
       </Style>
     <showInvisible>1</showInvisible>
@@ -71,9 +80,9 @@
       <unsorted/>
       </Order>
     <Part id="1">
-      <eid>C_C</eid>
+      <eid>4bR9mQp0GOH_3yBlEAVg+gI</eid>
       <Staff>
-        <eid>D_D</eid>
+        <eid>sYHN29ImIAN_wrayKpreJtH</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
@@ -90,8 +99,8 @@
         <barLineSpan>1</barLineSpan>
         </Staff>
       <Staff>
-        <eid>E_E</eid>
-        <linkedTo>D_D</linkedTo>
+        <eid>j0tQ6TTE2RD_Rh20ImhrakG</eid>
+        <linkedTo>sYHN29ImIAN_wrayKpreJtH</linkedTo>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
@@ -117,23 +126,23 @@
       </Part>
     <Staff id="1">
       <Measure>
-        <eid>F_F</eid>
+        <eid>Jq57bDWUQlJ_FOvaQt0LeAC</eid>
         <voice>
           <KeySig>
-            <eid>G_G</eid>
+            <eid>SGsH2DQ3WpH_0/lm/HdT6DH</eid>
             <concertKey>0</concertKey>
             <actualKey>2</actualKey>
             </KeySig>
           <TimeSig>
-            <eid>H_H</eid>
+            <eid>yv1W2wEg7PC_3CB84tCA4rJ</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Chord>
-            <eid>I_I</eid>
+            <eid>P3UIkgxU65G_s4PIevCVJgP</eid>
             <durationType>whole</durationType>
             <Note>
-              <eid>J_J</eid>
+              <eid>536aZHa9erK_GwU8fDBTta</eid>
               <pitch>83</pitch>
               <tpc>19</tpc>
               <tpc2>21</tpc2>
@@ -142,10 +151,10 @@
           </voice>
         <voice>
           <Chord>
-            <eid>K_K</eid>
+            <eid>5l/bBWrbQkP_5l/bBWrbQkP</eid>
             <durationType>whole</durationType>
             <Note>
-              <eid>L_L</eid>
+              <eid>6l/bBWrbQkP_6l/bBWrbQkP</eid>
               <pitch>71</pitch>
               <tpc>19</tpc>
               <tpc2>21</tpc2>
@@ -158,23 +167,23 @@
       <Measure>
         <voice>
           <KeySig>
-            <eid>M_M</eid>
-            <linkedTo>G_G</linkedTo>
+            <eid>Nw2l0lep/aF_xaNzM1RkwBJ</eid>
+            <linkedTo>SGsH2DQ3WpH_0/lm/HdT6DH</linkedTo>
             <concertKey>0</concertKey>
             <actualKey>2</actualKey>
             </KeySig>
           <TimeSig>
-            <eid>N_N</eid>
+            <eid>5QSBZ994TjF_I3ocMKJ0obP</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Chord>
-            <eid>O_O</eid>
-            <linkedTo>I_I</linkedTo>
+            <eid>Pf/lc/I9/zM_zCFEv559f/G</eid>
+            <linkedTo>P3UIkgxU65G_s4PIevCVJgP</linkedTo>
             <durationType>whole</durationType>
             <Note>
-              <eid>P_P</eid>
-              <linkedTo>J_J</linkedTo>
+              <eid>sdvyNYZ2UtE_3OlLE0RhmKK</eid>
+              <linkedTo>536aZHa9erK_GwU8fDBTta</linkedTo>
               <pitch>83</pitch>
               <tpc>19</tpc>
               <tpc2>21</tpc2>
@@ -183,12 +192,12 @@
           </voice>
         <voice>
           <Chord>
-            <eid>Q_Q</eid>
-            <linkedTo>K_K</linkedTo>
+            <eid>7l/bBWrbQkP_7l/bBWrbQkP</eid>
+            <linkedTo>5l/bBWrbQkP_5l/bBWrbQkP</linkedTo>
             <durationType>whole</durationType>
             <Note>
-              <eid>R_R</eid>
-              <linkedTo>L_L</linkedTo>
+              <eid>8l/bBWrbQkP_8l/bBWrbQkP</eid>
+              <linkedTo>6l/bBWrbQkP_6l/bBWrbQkP</linkedTo>
               <pitch>71</pitch>
               <tpc>19</tpc>
               <tpc2>21</tpc2>
@@ -198,7 +207,7 @@
         </Measure>
       </Staff>
     <Score>
-      <eid>S_S</eid>
+      <eid>o66Vz+mZyQN_7ToTSW03l6C</eid>
       <name>Klarinet in B♭</name>
       <Tracklist sTrack="0" dstTrack="0"/>
       <Tracklist sTrack="2" dstTrack="1"/>
@@ -268,17 +277,17 @@
       <open>1</open>
       <metaTag name="partName">Klarinet in B♭</metaTag>
       <Part id="1">
-        <eid>T_T</eid>
+        <eid>u5Ht9tHgcnJ_NWHFEz+llRD</eid>
         <Staff>
-          <eid>U_U</eid>
-          <linkedTo>D_D</linkedTo>
+          <eid>VPVg6YbQSuG_gqON3xUtax</eid>
+          <linkedTo>sYHN29ImIAN_wrayKpreJtH</linkedTo>
           <StaffType group="pitched">
             <name>stdNormal</name>
             </StaffType>
           </Staff>
         <Staff>
-          <eid>V_V</eid>
-          <linkedTo>D_D</linkedTo>
+          <eid>YjPFPTZLHFI_/lgYtWO3uLJ</eid>
+          <linkedTo>sYHN29ImIAN_wrayKpreJtH</linkedTo>
           <StaffType group="pitched">
             <name>stdNormal</name>
             </StaffType>
@@ -303,27 +312,27 @@
         </Part>
       <Staff id="1">
         <Measure>
-          <eid>W_W</eid>
+          <eid>yGE/1ExrqzD_xw/omqS/ttB</eid>
           <voice>
             <KeySig>
-              <eid>X_X</eid>
-              <linkedTo>G_G</linkedTo>
+              <eid>Md0b94aQZJN_5YbjAd8rUzD</eid>
+              <linkedTo>SGsH2DQ3WpH_0/lm/HdT6DH</linkedTo>
               <concertKey>0</concertKey>
               <actualKey>2</actualKey>
               </KeySig>
             <TimeSig>
-              <eid>Y_Y</eid>
-              <linkedTo>H_H</linkedTo>
+              <eid>L0nfSCLf4qH_ifgkAmO8/LO</eid>
+              <linkedTo>yv1W2wEg7PC_3CB84tCA4rJ</linkedTo>
               <sigN>4</sigN>
               <sigD>4</sigD>
               </TimeSig>
             <Chord>
-              <eid>Z_Z</eid>
-              <linkedTo>I_I</linkedTo>
+              <eid>EorMhQdUjdI_N9es5F9h7XC</eid>
+              <linkedTo>P3UIkgxU65G_s4PIevCVJgP</linkedTo>
               <durationType>whole</durationType>
               <Note>
-                <eid>a_a</eid>
-                <linkedTo>J_J</linkedTo>
+                <eid>V04EUE7/nRL_Xxp5pP5dFVB</eid>
+                <linkedTo>536aZHa9erK_GwU8fDBTta</linkedTo>
                 <pitch>83</pitch>
                 <tpc>19</tpc>
                 <tpc2>21</tpc2>
@@ -336,24 +345,24 @@
         <Measure>
           <voice>
             <KeySig>
-              <eid>b_b</eid>
-              <linkedTo>G_G</linkedTo>
+              <eid>mS769cu42mG_4l/bBWrbQkP</eid>
+              <linkedTo>SGsH2DQ3WpH_0/lm/HdT6DH</linkedTo>
               <concertKey>0</concertKey>
               <actualKey>2</actualKey>
               </KeySig>
             <TimeSig>
-              <eid>c_c</eid>
-              <linkedTo>N_N</linkedTo>
+              <eid>cq46M50HlbE_ipUbbPJyTLK</eid>
+              <linkedTo>5QSBZ994TjF_I3ocMKJ0obP</linkedTo>
               <sigN>4</sigN>
               <sigD>4</sigD>
               </TimeSig>
             <Chord>
-              <eid>d_d</eid>
-              <linkedTo>K_K</linkedTo>
+              <eid>9l/bBWrbQkP_9l/bBWrbQkP</eid>
+              <linkedTo>5l/bBWrbQkP_5l/bBWrbQkP</linkedTo>
               <durationType>whole</durationType>
               <Note>
-                <eid>e_e</eid>
-                <linkedTo>L_L</linkedTo>
+                <eid>+l/bBWrbQkP_+l/bBWrbQkP</eid>
+                <linkedTo>6l/bBWrbQkP_6l/bBWrbQkP</linkedTo>
                 <pitch>71</pitch>
                 <tpc>19</tpc>
                 <tpc2>21</tpc2>

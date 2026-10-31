@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <museScore version="5.00">
   <Score>
-    <eid>S_S</eid>
+    <eid>o66Vz+mZyQN_7ToTSW03l6C</eid>
     <name>Klarinet in B♭</name>
     <Tracklist sTrack="0" dstTrack="0"/>
     <Tracklist sTrack="2" dstTrack="1"/>
@@ -71,17 +71,17 @@
     <open>1</open>
     <metaTag name="partName">Klarinet in B♭</metaTag>
     <Part id="1">
-      <eid>T_T</eid>
+      <eid>u5Ht9tHgcnJ_NWHFEz+llRD</eid>
       <Staff>
-        <eid>U_U</eid>
-        <linkedTo>D_D</linkedTo>
+        <eid>VPVg6YbQSuG_gqON3xUtax</eid>
+        <linkedTo>sYHN29ImIAN_wrayKpreJtH</linkedTo>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
       <Staff>
-        <eid>V_V</eid>
-        <linkedTo>D_D</linkedTo>
+        <eid>YjPFPTZLHFI_/lgYtWO3uLJ</eid>
+        <linkedTo>sYHN29ImIAN_wrayKpreJtH</linkedTo>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
@@ -106,27 +106,27 @@
       </Part>
     <Staff id="1">
       <Measure>
-        <eid>W_W</eid>
+        <eid>yGE/1ExrqzD_xw/omqS/ttB</eid>
         <voice>
           <KeySig>
-            <eid>X_X</eid>
-            <linkedTo>G_G</linkedTo>
+            <eid>Md0b94aQZJN_5YbjAd8rUzD</eid>
+            <linkedTo>SGsH2DQ3WpH_0/lm/HdT6DH</linkedTo>
             <concertKey>0</concertKey>
             <actualKey>2</actualKey>
             </KeySig>
           <TimeSig>
-            <eid>Y_Y</eid>
-            <linkedTo>H_H</linkedTo>
+            <eid>L0nfSCLf4qH_ifgkAmO8/LO</eid>
+            <linkedTo>yv1W2wEg7PC_3CB84tCA4rJ</linkedTo>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Chord>
-            <eid>Z_Z</eid>
-            <linkedTo>I_I</linkedTo>
+            <eid>EorMhQdUjdI_N9es5F9h7XC</eid>
+            <linkedTo>P3UIkgxU65G_s4PIevCVJgP</linkedTo>
             <durationType>whole</durationType>
             <Note>
-              <eid>a_a</eid>
-              <linkedTo>J_J</linkedTo>
+              <eid>V04EUE7/nRL_Xxp5pP5dFVB</eid>
+              <linkedTo>536aZHa9erK_GwU8fDBTta</linkedTo>
               <pitch>83</pitch>
               <tpc>19</tpc>
               <tpc2>21</tpc2>
@@ -139,24 +139,24 @@
       <Measure>
         <voice>
           <KeySig>
-            <eid>b_b</eid>
-            <linkedTo>G_G</linkedTo>
+            <eid>mS769cu42mG_4l/bBWrbQkP</eid>
+            <linkedTo>SGsH2DQ3WpH_0/lm/HdT6DH</linkedTo>
             <concertKey>0</concertKey>
             <actualKey>2</actualKey>
             </KeySig>
           <TimeSig>
-            <eid>c_c</eid>
-            <linkedTo>N_N</linkedTo>
+            <eid>cq46M50HlbE_ipUbbPJyTLK</eid>
+            <linkedTo>5QSBZ994TjF_I3ocMKJ0obP</linkedTo>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Chord>
-            <eid>d_d</eid>
-            <linkedTo>K_K</linkedTo>
+            <eid>9l/bBWrbQkP_9l/bBWrbQkP</eid>
+            <linkedTo>5l/bBWrbQkP_5l/bBWrbQkP</linkedTo>
             <durationType>whole</durationType>
             <Note>
-              <eid>e_e</eid>
-              <linkedTo>L_L</linkedTo>
+              <eid>+l/bBWrbQkP_+l/bBWrbQkP</eid>
+              <linkedTo>6l/bBWrbQkP_6l/bBWrbQkP</linkedTo>
               <pitch>71</pitch>
               <tpc>19</tpc>
               <tpc2>21</tpc2>

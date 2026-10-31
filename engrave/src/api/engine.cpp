@@ -186,6 +186,8 @@ Result<std::unique_ptr<Document>> Engine::open(std::span<const std::byte> data, 
     music::ScoreProject project;
     try {
         project = music::load_native_score(bytes, backend_name(*format));
+    } catch (const music::UnsupportedScoreVersion& error) {
+        return fail(ErrorCode::Unsupported, error.what());
     } catch (const std::bad_alloc&) {
         throw;
     } catch (const std::exception& error) {
@@ -244,6 +246,8 @@ Result<std::unique_ptr<Document>> Engine::create_document(const CreateOptions& o
     music::ScoreProject project;
     try {
         project = music::load_native_score_dir(utf8(std::filesystem::absolute(mscx)));
+    } catch (const music::UnsupportedScoreVersion& error) {
+        return fail(ErrorCode::Unsupported, error.what());
     } catch (const std::bad_alloc&) {
         throw;
     } catch (const std::exception& error) {

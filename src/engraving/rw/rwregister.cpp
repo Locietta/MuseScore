@@ -23,11 +23,6 @@
 
 #include "types/constants.h"
 
-#include "read114/read114.h"
-#include "read206/read206.h"
-#include "read302/read302.h"
-#include "read400/read400.h"
-#include "read410/read410.h"
 #include "read460/read460.h"
 #include "read500/read500.h"
 
@@ -42,16 +37,8 @@ IReaderPtr RWRegister::reader(int version)
         version = Constants::MSC_VERSION;
     }
 
-    if (version <= 114) {
-        return std::make_shared<read114::Read114>();
-    } else if (version <= 207) {
-        return std::make_shared<read206::Read206>();
-    } else if (version < 400) {
-        return std::make_shared<read302::Read302>();
-    } else if (version < 410) {
-        return std::make_shared<read400::Read400>();
-    } else if (version < 460) {
-        return std::make_shared<read410::Read410>();
+    if (version < 460) {
+        return nullptr;
     } else if (version < 500) {
         return std::make_shared<read460::Read460>();
     }

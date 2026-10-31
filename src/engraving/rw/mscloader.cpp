@@ -54,6 +54,9 @@ using namespace mu::engraving::rw;
 
 static RetVal<IReaderPtr> makeReader(int version, bool ignoreVersionError)
 {
+    if (version < 460) {
+        return RetVal<IReaderPtr>(make_ret(Err::FileTooOld));
+    }
     if (!ignoreVersionError) {
         if (version > Constants::MSC_VERSION) {
             return RetVal<IReaderPtr>(make_ret(Err::FileTooNew));
@@ -228,7 +231,13 @@ Ret MscLoader::readMasterScore(MasterScore* score, XmlReader& e, bool ignoreVers
         if (e.name() == "museScore") {
             const String version = e.attribute("version");
             const StringList sl = version.split(u'.');
+            if (sl.size() < 2) return make_ret(Err::FileBadFormat);
             score->setMscVersion(sl[0].toInt() * 100 + sl[1].toInt());
+            if (score->mscVersion() < 460) {
+                return Ret(static_cast<int>(Err::FileTooOld),
+                           "written by MuseScore " + version.toStdString()
+                           + "; scores from before MuseScore 4.6 are not supported");
+            }
 
             RetVal<IReaderPtr> reader = makeReader(score->mscVersion(), ignoreVersionError);
             if (!reader.ret) {

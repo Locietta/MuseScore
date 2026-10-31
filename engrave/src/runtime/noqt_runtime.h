@@ -2,9 +2,11 @@
 #include "engrave/src/score/export_options.h"
 #include <memory>
 #include <string>
+#include <stdexcept>
 
 namespace mu::engraving { class EngravingProject; class MasterScore; }
 namespace music {
+struct UnsupportedScoreVersion : std::runtime_error { using std::runtime_error::runtime_error; };
 using ScoreProject = std::shared_ptr<mu::engraving::EngravingProject>;
 void initialize_native_runtime(const std::string& assets);
 ScoreProject load_native_score(const std::string& bytes, const std::string& format);
