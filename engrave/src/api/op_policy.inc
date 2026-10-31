@@ -20,5 +20,5 @@ ENGRAVE_OP(SetStyle, Transaction)
 // spanners (ops/spanners.cpp)
 
 // text (ops/text.cpp)
-ENGRAVE_OP(AddText, Snapshot)
-ENGRAVE_OP(Add, Snapshot)
+ENGRAVE_OP(AddText, Transaction)
+ENGRAVE_OP(Add, Transaction)
