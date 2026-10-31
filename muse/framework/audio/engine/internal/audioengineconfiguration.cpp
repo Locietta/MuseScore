@@ -23,14 +23,12 @@
 
 #include "audio/common/audiosanitizer.h"
 #include "audio/common/soundfonttypes.h"
-#include "audio/common/rpc/rpcpacker.h"
 
 #include "log.h"
 
 using namespace muse;
 using namespace muse::audio;
 using namespace muse::audio::engine;
-using namespace muse::audio::rpc;
 
 static const AudioResourceId DEFAULT_SOUND_FONT_NAME = "MS Basic";
 static const AudioResourceAttributes DEFAULT_AUDIO_RESOURCE_ATTRIBUTES = {

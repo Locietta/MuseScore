@@ -453,7 +453,6 @@ target("muse_audio_engine")
     add_includedirs(ENGRAVE_AUDIO_ENGINE.includes)
     add_files(
         engine("muse/framework/audio/common/*.cpp"),
-        engine("muse/framework/audio/common/rpc/platform/general/*.cpp"),
         engine("muse/framework/audio/engine/*.cpp"),
         engine("muse/framework/audio/engine/internal/**.cpp")
     )

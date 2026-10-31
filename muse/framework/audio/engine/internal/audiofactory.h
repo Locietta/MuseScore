@@ -25,18 +25,18 @@
 #include "iaudiofactory.h"
 
 #include "global/modularity/ioc.h"
-#include "iaudioengine.h"
 #include "../isynthresolver.h"
 #include "../ifxresolver.h"
 
 namespace muse::audio::engine {
 class AudioFactory : public IAudioFactory
 {
-    GlobalInject<IAudioEngine> audioEngine;
+    OutputSpec m_spec;
     GlobalInject<synth::ISynthResolver> synthResolver;
     GlobalInject<fx::IFxResolver> fxResolver;
 
 public:
+    void setOutputSpec(const OutputSpec& spec) { m_spec = spec; }
 
     // Available resources
     AudioResourceMetaList availableInputResources() const override;

@@ -21,6 +21,7 @@
  */
 
 #include "soundtrackwriter.h"
+#include "../offlinetiming.h"
 
 #include <algorithm>
 #include <cstdint>
@@ -57,8 +58,8 @@ static encode::AbstractAudioEncoderPtr createEncoder(const SoundTrackFormat& for
 }
 
 SoundTrackWriter::SoundTrackWriter(io::IODevice& dstDevice, const SoundTrackFormat& format,
-                                   const secs_t totalDuration, IAudioNodePtr source)
-    : m_source(std::move(source))
+                                   const secs_t totalDuration, IAudioNodePtr source, std::function<void(uint64_t)> blockCompleted)
+    : m_source(std::move(source)), m_blockCompleted(std::move(blockCompleted))
 {
     if (!m_source) {
         return;
@@ -83,6 +84,7 @@ SoundTrackWriter::SoundTrackWriter(io::IODevice& dstDevice, const SoundTrackForm
     m_intermBuffer.resize(intermediateSamplesNumber);
     m_renderStep = outputSpec.samplesPerChannel;
 
+    OfflineTimer timer(OfflineTiming::current().encode);
     m_encoderPtr = createEncoder(format, dstDevice);
     if (!m_encoderPtr) {
         return;
@@ -106,6 +108,7 @@ Ret SoundTrackWriter::write()
 
     DEFER {
         if (!m_isAborted) {
+            OfflineTimer timer(OfflineTiming::current().encode);
             m_encoderPtr->end();
         }
 
@@ -150,14 +153,17 @@ Ret SoundTrackWriter::writeStreaming()
 
         std::fill(m_intermBuffer.begin(), m_intermBuffer.end(), 0.f);
 
-        const size_t encoded = m_encoderPtr->encode(chunk, m_intermBuffer.data());
+        const size_t encoded = [&] {
+            OfflineTimer timer(OfflineTiming::current().encode);
+            return m_encoderPtr->encode(chunk, m_intermBuffer.data());
+        }();
         if (encoded == 0) {
             return make_ret(Err::ErrorEncode);
         }
 
         framesWritten += chunk;
         sendProgress(framesWritten, m_totalSamples);
-        rpcChannel()->process();
+        if (m_blockCompleted) m_blockCompleted(framesWritten);
     }
 
     // Phase 2: actual audio data
@@ -170,16 +176,22 @@ Ret SoundTrackWriter::writeStreaming()
         //! (real time does this via AudioEngine::fillSilent), so clear it before each block.
         std::fill(m_intermBuffer.begin(), m_intermBuffer.end(), 0.f);
 
-        m_source->process(m_intermBuffer.data(), chunk);
+        {
+            OfflineTimer timer(OfflineTiming::current().render);
+            m_source->process(m_intermBuffer.data(), chunk);
+        }
 
-        const size_t encoded = m_encoderPtr->encode(chunk, m_intermBuffer.data());
+        const size_t encoded = [&] {
+            OfflineTimer timer(OfflineTiming::current().encode);
+            return m_encoderPtr->encode(chunk, m_intermBuffer.data());
+        }();
         if (encoded == 0) {
             return make_ret(Err::ErrorEncode);
         }
 
         framesWritten += chunk;
         sendProgress(framesWritten, m_totalSamples);
-        rpcChannel()->process();
+        if (m_blockCompleted) m_blockCompleted(framesWritten);
     }
 
     // Phase 3: trailing silence
@@ -189,14 +201,17 @@ Ret SoundTrackWriter::writeStreaming()
 
         std::fill(m_intermBuffer.begin(), m_intermBuffer.end(), 0.f);
 
-        const size_t encoded = m_encoderPtr->encode(chunk, m_intermBuffer.data());
+        const size_t encoded = [&] {
+            OfflineTimer timer(OfflineTiming::current().encode);
+            return m_encoderPtr->encode(chunk, m_intermBuffer.data());
+        }();
         if (encoded == 0) {
             return make_ret(Err::ErrorEncode);
         }
 
         framesWritten += chunk;
         sendProgress(framesWritten, m_totalSamples);
-        rpcChannel()->process();
+        if (m_blockCompleted) m_blockCompleted(framesWritten);
     }
 
     if (m_isAborted) {

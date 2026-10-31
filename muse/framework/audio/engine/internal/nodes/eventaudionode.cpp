@@ -21,6 +21,7 @@
  */
 
 #include "eventaudionode.h"
+#include "../offlinetiming.h"
 
 #include "audio/common/audiosanitizer.h"
 
@@ -80,6 +81,7 @@ void EventAudioNode::doSelfProcess(float* buffer, samples_t samplesPerChannel)
         return;
     }
 
+    OfflineTimer timer(OfflineTiming::current().synth);
     m_synth->process(buffer, samplesPerChannel);
 }
 

@@ -1,53 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-only
 //
-// Headless driver for MuseScore 5.0's audio engine (roadmap-engrave A2).
+// Offline driver for the retained audio graph, synthesizers and encoders.
+// Services are initialized directly; no RPC channel or controller is installed.
 //
-// 4.7.6 drove `audio::engine::IEnginePlayback` with one TrackSequence per job.
-// 5.0 removed that interface and the sequence concept: the engine is a node
-// graph owned by an `engine::AudioContext` (one per context id), fed by
-// `engine::AudioEngine`, and rendered by `soundtrack::SoundTrackWriter`. This
-// driver builds that graph in-process, in one thread, and follows the 5.0 call
-// sequence (paths relative to the 5.0 tree):
-//   - muse/framework/audio/engine/enginesetup.cpp:46-74
-//       (EngineGlobalSetup::registerExports/resolveImports: the 5.0 replacement
-//        for 4.7.6 EngineController::registerExports)
-//   - muse/framework/audio/engine/internal/enginecontroller.cpp:84-98
-//       (EngineController::init: config, synth resolver, audio engine,
-//        transport event dispatcher)
-//   - muse/framework/audio/engine/internal/audiocontext.cpp:44-79
-//       (the context's own master chain: TrackChain + AutomationControlNode +
-//        SignalNode over the context mixer)
-//   - muse/framework/audio/engine/internal/audiocontext.cpp:147-240, 241-281
-//       (AudioContext::addTrack/addAuxTrack: one TrackChain per track)
-//   - muse/framework/audio/engine/internal/audiocontext.cpp:777-812, 909-953
-//       (AudioContext::saveSoundTrack/doSaveSoundTrack: the offline render)
-//   - muse/framework/audio/engine/internal/export/soundtrackwriter.cpp:59-121,
-//     133-207 (SoundTrackWriter: the render loop and the encoders)
-//   - src/playback/internal/playbackcontroller.cpp:63-73, 1188-1360,
-//     1717-1719, 1811-1824 (desktop mix setup: reverb aux, per-track params,
-//     solo folded into mute; only used as a reference - the desktop side is an
-//     RPC client)
-//
-// The engine keeps process-wide state (global IoC exports, the global FluidSynth
-// Vorbis decoder, the lock-free SoundFont cache, static track ids) and we run it
-// single-threaded: MUSE_THREADS_SUPPORT stays undefined, so the mixer never
-// starts worker threads. Therefore:
-//   - only one engine may exist per process;
-//   - initialize_engine_audio() must be called once, before any export;
-//   - every engine call (bootstrap, export, track listing) must happen on the
-//     same OS thread. It is not safe to export from two threads or to run two
-//     exports at the same time;
-//   - a process may render any number of audio jobs: export_score_audio() drops
-//     what the previous job left in the shared context (its tracks and sources,
-//     the synthesizer instances behind them, and the fx chains, Muse Reverb
-//     included) before it builds the graph. A second render therefore starts
-//     from the same state as the first, and the caller gets the same bytes it
-//     would get from a fresh process (engrave_output_test's D4 test).
-//
-// initialize_engine_audio() needs the native runtime already set up
-// (music::initialize_native_runtime): Uri::fromLocalFile resolves through
-// IFileSystem and PlaybackModel resolves the MPE articulation profile
-// repository from the global IoC.
+// Process-wide audio services and SoundFont resources require one engine per
+// process and calls on its owner thread. Each export owns a fresh render graph
+// and releases its tracks, synth sources and effects before returning. The
+// native runtime must be initialized before initialize_engine_audio().
 
 #pragma once
 
@@ -58,7 +17,6 @@
 #include <string>
 #include <vector>
 
-#include "audio/common/rpc/irpcchannel.h"
 #include "engraving/types/types.h"
 #include "midi/miditypes.h"
 
@@ -67,42 +25,6 @@ class MasterScore;
 }
 
 namespace music {
-
-// No-op rpc::IRpcChannel for the in-process engine.
-//
-// 5.0 changed the interface: `onMethod`/`listenAll` are gone, requests and
-// notifications are registered with `onRequest`/`onNotification`, and handlers
-// return a response message that the caller sends back (irpcchannel.h:400-407).
-// The host never invokes a handler: EngineController installs two request
-// handlers in its constructor (enginecontroller.cpp:46-64) and
-// EngineRpcController installs ~50 more when the engine process starts
-// (enginerpccontroller.cpp:68 onwards), but this driver talks to the engine
-// through IAudioEngine/IAudioContext directly. Sending stays a no-op.
-//
-// SoundTrackWriter still calls process() after every rendered chunk
-// (soundtrackwriter.cpp:160,182,199); the export driver uses that to count
-// rendered output frames for the MIDI event hook.
-class NullRpcChannel final : public muse::audio::rpc::IRpcChannel
-{
-public:
-    // Called once after every rendered chunk (see above).
-    std::function<void()> onProcess;
-
-    void setupOnMain() override {}
-    void setupOnEngine() override {}
-
-    void process() override { if (onProcess) onProcess(); }
-
-    void send(const muse::audio::rpc::Msg&, const muse::audio::rpc::ResponseHandler& = nullptr) override {}
-    void onRequest(muse::audio::rpc::CtxId, muse::audio::rpc::MsgCode, muse::audio::rpc::RequestHandler) override {}
-    void onNotification(muse::audio::rpc::CtxId, muse::audio::rpc::MsgCode,
-                        muse::audio::rpc::NotificationHandler) override {}
-
-    void addStream(std::shared_ptr<muse::audio::rpc::IRpcStream>) override {}
-    void removeStream(muse::audio::rpc::StreamId) override {}
-    void sendStream(const muse::audio::rpc::StreamMsg&) override {}
-    void onStream(muse::audio::rpc::StreamId, muse::audio::rpc::StreamHandler) override {}
-};
 
 // Hook for MIDI event goldens. The engine resolves a capturing IMidiOutPort and
 // FluidSynth sends every event it actually handles to it (fluidsynth.cpp:249-262,
@@ -138,13 +60,8 @@ using EngineAudioMidiEventHook = std::function<void(const muse::midi::Event&, st
 void set_engine_audio_midi_event_hook(EngineAudioMidiEventHook hook);
 
 // Initialises the process-wide engine and loads its SoundFonts:
-//   AudioSanitizer setup, NullRpcChannel registered as rpc::IRpcChannel,
-//   capturing IMidiOutPort registered, EngineGlobalSetup::{registerExports,
-//   resolveImports} (AudioEngine, AudioFactory, AudioEngineConfiguration, SynthResolver
-//   with the Fluid resolver, FxResolver with MuseFX, SoundFontRepository,
-//   TransportEventsDispatcher), EngineController::init(<setup.sample_rate, 4096, 2>,
-//   {useSoundFontLowPassFilter=true}), addSoundFont for every font, one AudioContext
-//   (id 1) whose availableInputResources() must report each of them.
+//   AudioSanitizer setup, capturing MIDI output, service registration, explicit
+//   configuration/synth/engine initialization, then SoundFont loading.
 // The first font of the list is the default: every track plays it unless its
 // request names another index. A SoundFont's resource id is its complete basename
 // ("FluidR3Mono_GM" for ".../FluidR3Mono_GM.sf3"), matching
@@ -268,26 +185,13 @@ struct AudioRenderResult {
 // behavior too), so the decoded Ogg stream is 48 kHz while its duration follows
 // the engine render.
 //
-// Setup mirrors desktop playback/export:
-//   the context's previous tracks, sources and fx are dropped first, so every
-//   render starts from the state a fresh process has;
-//   PlaybackModel on `master` (repeats as requested, chord symbols off,
-//   metronome off) kept alive for the whole export;
-//   the context is stopped and seeked to zero (audiocontext.cpp:785-793);
-//   addTrack per playable InstrumentTrackId with resolveTrackPlaybackData() and
-//   an explicit Fluid source resource from the track's SoundFont (so a track
-//   never falls back to the nonexistent default "MS Basic" resource),
-//   TrackParams::auxSends = {{request.reverb_send,true}, {0,true}}; aux 0 is
-//   Muse Reverb (fx chain copied from playbackcontroller.cpp:63-73), aux 1 is
-//   an empty output;
-//   setDuration(total render time); SoundTrackWriter over the context.
-//
-// Master volume/balance/mute are applied by an explicit master TrackChain that
-// wraps the context (the same TrackChain/AutomationControlNode/SignalNode trio
-// AudioContext::init() builds at audiocontext.cpp:44-79), because
-// AudioContext::saveSoundTrack() renders from the context mixer, i.e. from
-// below the context's own master chain (audiocontext.cpp:915): the 5.0 export
-// path drops master control params. See engine_audio.cpp for the details.
+// A PlaybackModel supplies repeat-expanded MPE events for the duration of the
+// owned OfflineRenderSession. Tracks use explicit SoundFont resources and two
+// auxiliary returns (Muse Reverb and an empty return). The retained nested
+// master chains preserve the existing gain initialization and mix behavior.
+// The writer clears its additive mix buffer before each 4096-frame block,
+// finalizes the encoder, and returns through the existing public ByteSink
+// adapter (which uses a seekable temporary file for header finalization).
 //
 // The metronome and chord-symbol tracks are added when the PlaybackModel
 // reports them, but are always muted (the metronome/chord playback switches
