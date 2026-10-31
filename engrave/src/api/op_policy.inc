@@ -21,8 +21,9 @@ ENGRAVE_OP(Remove, Transaction)
 ENGRAVE_OP(InsertMeasures, Snapshot)
 ENGRAVE_OP(RemoveMeasures, Snapshot)
 ENGRAVE_OP(SetTimeSig, Snapshot)
+// Held back from Transaction: see op_policy_test.cpp.
 ENGRAVE_OP(SetKeySig, Snapshot)
-ENGRAVE_OP(InsertClef, Snapshot)
+ENGRAVE_OP(InsertClef, Transaction)
 ENGRAVE_OP(SetLayoutBreak, Snapshot)
 
 // parts (ops/parts.cpp)
