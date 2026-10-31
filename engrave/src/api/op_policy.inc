@@ -27,7 +27,7 @@ ENGRAVE_OP(InsertClef, Transaction)
 ENGRAVE_OP(SetLayoutBreak, Snapshot)
 
 // parts (ops/parts.cpp)
-ENGRAVE_OP(AddPart, Snapshot)
+ENGRAVE_OP(AddPart, Transaction)
 ENGRAVE_OP(RemovePart, Transaction)
 ENGRAVE_OP(AddStaff, Snapshot)
 ENGRAVE_OP(RemoveStaff, Transaction)
