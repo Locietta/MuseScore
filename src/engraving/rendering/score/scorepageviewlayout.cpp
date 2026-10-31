@@ -184,8 +184,13 @@ void ScorePageViewLayout::layoutPageView(Score* score, LayoutContext& ctx, const
             if (reusable.empty()) {
                 return;
             }
-            score->systems().insert(score->systems().end(), reusable.begin(), reusable.end());
-            reusable.clear();
+            // This runs while unwinding, where a throw would terminate the process:
+            // if growing the score's list cannot allocate, leave them leaked instead.
+            try {
+                score->systems().insert(score->systems().end(), reusable.begin(), reusable.end());
+                reusable.clear();
+            } catch (...) {
+            }
         }
     } returnsReusableSystems{ score, ctx.mutState().systemList() };
 
