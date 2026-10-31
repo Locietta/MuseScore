@@ -26,20 +26,20 @@
 local fork_root = path.directory(os.scriptdir())
 local source_root = path.absolute(ENGRAVE_SOURCE_ROOT or fork_root)
 
+local function engine(...)
+    return path.join(source_root, ...)
+end
+
 ---------------------------------------------------------------------------
 -- Third-party dependencies
 ---------------------------------------------------------------------------
 local package_dir = path.join(fork_root, "xmake", "packages")
-includes(path.join(package_dir, "freetype.lua"))
-includes(path.join(package_dir, "harfbuzz.lua"))
-includes(path.join(package_dir, "flac.lua"))
-includes(path.join(package_dir, "lame.lua"))
-includes(path.join(package_dir, "opus.lua"))
-includes(path.join(package_dir, "opusenc.lua"))
-includes(path.join(package_dir, "fdk-aac.lua"))
-includes(path.join(package_dir, "pugixml.lua"))
-includes(path.join(package_dir, "utfcpp.lua"))
-includes(path.join(package_dir, "picojson.lua"))
+for _, pkg in ipairs({
+    "freetype", "harfbuzz", "flac", "lame", "opus",
+    "opusenc", "fdk-aac", "pugixml", "utfcpp", "picojson",
+}) do
+    includes(path.join(package_dir, pkg .. ".lua"))
+end
 
 add_requires("freetype 2.14.1", {system = false, configs = {
     zlib = false, png = false, bzip2 = false, woff2 = false, harfbuzz = false}})
@@ -57,48 +57,19 @@ add_requires("muse-picojson 111c9be", {system = false})
 -- Generated framework configuration header
 ---------------------------------------------------------------------------
 local function read_version(os, io)
-    local text = io.readfile(path.join(source_root, "version.cmake")) or ""
+    local text = io.readfile(engine("version.cmake")) or ""
     local function value(name)
         return text:match("set%(" .. name .. '%s+"([^"]*)"%)')
     end
     local major = value("MUSE_APP_VERSION_MAJOR") or "0"
     local minor = value("MUSE_APP_VERSION_MINOR") or "0"
     local patch = value("MUSE_APP_VERSION_PATCH") or "0"
+    local git_args = {"-C", source_root, "rev-parse", "HEAD"}
     local revision = ""
-    local function normalized_path(value)
-        local result = path.normalize(tostring(value or "")):gsub("\\", "/")
-        if os.host() == "windows" then
-            result = result:lower()
-        end
-        return result
-    end
-    local root_args = {"-C", source_root, "rev-parse", "--show-toplevel"}
-    local root_probe = os.execv("git", root_args,
-        {try = true, stdout = os.nuldev(), stderr = os.nuldev()})
-    if root_probe ~= 0 then
-        print("warning: cannot read the engine git revision from " .. source_root
-            .. "; MUSE_APP_REVISION will be empty")
-    else
-        local top_level = tostring(os.iorunv("git", root_args) or ""):gsub("%s+", "")
-        if normalized_path(top_level) ~= normalized_path(source_root) then
-            print("warning: " .. source_root .. " is not a git checkout root (repository root '"
-                .. top_level .. "'); MUSE_APP_REVISION will be empty")
-        else
-            local head_args = {"-C", source_root, "rev-parse", "HEAD"}
-            local code = os.execv("git", head_args,
-                {try = true, stdout = os.nuldev(), stderr = os.nuldev()})
-            if code == 0 then
-                local sha = tostring(os.iorunv("git", head_args) or ""):gsub("%s+", "")
-                revision = sha:sub(1, 7)
-                if not revision:match("^%x%x%x%x%x%x%x$") then
-                    print("warning: unexpected engine git revision '" .. sha
-                        .. "'; MUSE_APP_REVISION will be empty")
-                    revision = ""
-                end
-            else
-                print("warning: cannot read the engine git revision from " .. source_root
-                    .. "; MUSE_APP_REVISION will be empty")
-            end
+    if os.execv("git", git_args, {try = true, stdout = os.nuldev(), stderr = os.nuldev()}) == 0 then
+        local sha = tostring(os.iorunv("git", git_args) or ""):gsub("%s+", "")
+        if #sha >= 7 and sha:match("^%x+$") then
+            revision = sha:sub(1, 7)
         end
     end
     local version_label = value("MUSE_APP_VERSION_LABEL")
@@ -186,8 +157,7 @@ target("muse_generated")
             raise("generated target requires a build directory")
         end
         os.mkdir(output_dir)
-        local template_path = path.join(source_root, "muse", "framework", "cmake",
-            "muse_framework_config.h.in")
+        local template_path = engine("muse/framework/cmake/muse_framework_config.h.in")
         local template = io.readfile(template_path)
         if not template then
             raise("cannot read pinned config template: %s", template_path)
@@ -227,10 +197,10 @@ ENGRAVE_GLOBAL_DEFINES = {
 }
 
 ENGRAVE_INCLUDES = {
-    path.join(source_root, "muse"),
-    path.join(source_root, "muse", "framework"),
-    path.join(source_root, "muse", "framework", "global"),
-    path.join(source_root, "src"),
+    engine("muse"),
+    engine("muse/framework"),
+    engine("muse/framework/global"),
+    engine("src"),
 }
 
 -- The adapters' internal headers, included from the checkout root as
@@ -238,7 +208,7 @@ ENGRAVE_INCLUDES = {
 -- header of the same name, whatever the include order.  Besides the library
 -- and its tests, only the musescore-mcp host includes them, as a privileged
 -- client until A5 moves it onto the public API.
-local engrave_src = path.join(source_root, "engrave", "src")
+local engrave_src = engine("engrave/src")
 ENGRAVE_INTERNAL_INCLUDES = {
     source_root,
 }
@@ -246,12 +216,11 @@ ENGRAVE_INTERNAL_INCLUDES = {
 -- The public API (<engrave/engine.h>, ...): std headers only, so an embedder
 -- needs this include root and nothing else.  engrave exports it publicly.
 ENGRAVE_PUBLIC_INCLUDES = {
-    path.join(source_root, "engrave", "include"),
+    engine("engrave/include"),
 }
 
-local fluidsynth_dir = path.join(source_root, "muse", "framework", "audio", "thirdparty", "fluidsynth", "fluidsynth-2.3.3")
+local fluidsynth_dir = engine("muse/framework/audio/thirdparty/fluidsynth/fluidsynth-2.3.3")
 local fluidsynth_src = path.join(fluidsynth_dir, "src")
-
 
 ENGRAVE_AUDIO_ENGINE = {
     defines = {
@@ -261,13 +230,13 @@ ENGRAVE_AUDIO_ENGINE = {
         "SYSTEM_LAME",
     },
     includes = {
-        path.join(source_root, "muse", "framework", "audio", "common"),
-        path.join(source_root, "src"),
-        path.join(source_root, "muse"),
-        path.join(source_root, "muse", "framework"),
-        path.join(source_root, "muse", "framework", "global"),
-        path.join(source_root, "muse", "framework", "audio"),
-        path.join(source_root, "muse", "framework", "audio", "engine"),
+        engine("muse/framework/audio/common"),
+        engine("src"),
+        engine("muse"),
+        engine("muse/framework"),
+        engine("muse/framework/global"),
+        engine("muse/framework/audio"),
+        engine("muse/framework/audio/engine"),
         path.join(fluidsynth_dir, "include"),
         fluidsynth_src,
         path.join(fluidsynth_src, "bindings"),
@@ -292,7 +261,7 @@ ENGRAVE_AUDIO_INCLUDES = {
     path.join(fluidsynth_src, "sfloader"),
     path.join(fluidsynth_src, "synth"),
     path.join(fluidsynth_src, "utils"),
-    path.join(source_root, "muse", "framework", "audio"),
+    engine("muse/framework/audio"),
 }
 
 ---------------------------------------------------------------------------
@@ -310,28 +279,28 @@ target("muse_global")
     add_engine_target_defaults()
     add_defines("GLOBAL_NO_INTERNAL", "KORS_PROFILER_ENABLED", "MUSE_MODULE_GLOBAL_LOGGER_DEBUGLEVEL")
     add_includedirs(
-        path.join(source_root, "muse", "framework", "global"),
-        path.join(source_root, "src"),
-        path.join(source_root, "muse"),
-        path.join(source_root, "muse", "framework")
+        engine("muse/framework/global"),
+        engine("src"),
+        engine("muse"),
+        engine("muse/framework")
     )
     add_files(
-        path.join(source_root, "muse", "framework", "global", "*.cpp"),
-        path.join(source_root, "muse", "framework", "global", "io", "*.cpp"),
-        path.join(source_root, "muse", "framework", "global", "io", "devtools", "*.cpp"),
-        path.join(source_root, "muse", "framework", "global", "modularity", "*.cpp"),
-        path.join(source_root, "muse", "framework", "global", "serialization", "**.cpp"),
-        path.join(source_root, "muse", "framework", "global", "types", "*.cpp"),
-        path.join(source_root, "muse", "framework", "global", "thirdparty", "kors_async", "async", "internal", "*.cpp"),
-        path.join(source_root, "muse", "framework", "global", "thirdparty", "kors_logger", "src", "*.cpp"),
-        path.join(source_root, "muse", "framework", "global", "thirdparty", "kors_modularity", "modularity", "*.cpp"),
-        path.join(source_root, "muse", "framework", "global", "thirdparty", "kors_profiler", "profiler", "*.cpp")
+        engine("muse/framework/global/*.cpp"),
+        engine("muse/framework/global/io/*.cpp"),
+        engine("muse/framework/global/io/devtools/*.cpp"),
+        engine("muse/framework/global/modularity/*.cpp"),
+        engine("muse/framework/global/serialization/**.cpp"),
+        engine("muse/framework/global/types/*.cpp"),
+        engine("muse/framework/global/thirdparty/kors_async/async/internal/*.cpp"),
+        engine("muse/framework/global/thirdparty/kors_logger/src/*.cpp"),
+        engine("muse/framework/global/thirdparty/kors_modularity/modularity/*.cpp"),
+        engine("muse/framework/global/thirdparty/kors_profiler/profiler/*.cpp")
     )
     -- engrave/src/global implements framework services that upstream builds
     -- from trimmed Qt sources (muse::Settings).  engraving and the other modules
     -- call them, so they must link with muse_global rather than with engrave,
     -- which comes first on the link line.
-    add_files(path.join(engrave_src, "global", "*.cpp"))
+    add_files(path.join(engrave_src, "global/*.cpp"))
     if is_plat("linux") then
         add_syslinks("dl", "pthread", {public = true})
     end
@@ -343,18 +312,13 @@ target("muse_draw")
     add_engine_target_defaults()
     add_defines("DRAW_NO_QSVGRENDER", "KORS_PROFILER_ENABLED", "MUSE_MODULE_DRAW_USE_FONTFACE_FT", "MUSE_MODULE_DRAW_USE_QTTEXTDRAW")
     add_includedirs(
-        path.join(source_root, "muse", "framework", "draw"),
-        path.join(source_root, "src"),
-        path.join(source_root, "muse"),
-        path.join(source_root, "muse", "framework"),
-        path.join(source_root, "muse", "framework", "global")
+        engine("muse/framework/draw"),
+        engine("src"),
+        engine("muse"),
+        engine("muse/framework"),
+        engine("muse/framework/global")
     )
-    add_files(
-        path.join(source_root, "muse", "framework", "draw", "*.cpp"),
-        path.join(source_root, "muse", "framework", "draw", "internal", "*.cpp"),
-        path.join(source_root, "muse", "framework", "draw", "types", "*.cpp"),
-        path.join(source_root, "muse", "framework", "draw", "utils", "*.cpp")
-    )
+    add_files(engine("muse/framework/draw/**.cpp"))
 
 target("muse_mpe")
     set_kind("static")
@@ -362,15 +326,15 @@ target("muse_mpe")
     add_engine_target_defaults()
     add_defines("KORS_PROFILER_ENABLED")
     add_includedirs(
-        path.join(source_root, "muse", "framework", "mpe"),
-        path.join(source_root, "src"),
-        path.join(source_root, "muse"),
-        path.join(source_root, "muse", "framework"),
-        path.join(source_root, "muse", "framework", "global")
+        engine("muse/framework/mpe"),
+        engine("src"),
+        engine("muse"),
+        engine("muse/framework"),
+        engine("muse/framework/global")
     )
     add_files(
-        path.join(source_root, "muse", "framework", "mpe", "*.cpp"),
-        path.join(source_root, "muse", "framework", "mpe", "internal", "*.cpp")
+        engine("muse/framework/mpe/*.cpp"),
+        engine("muse/framework/mpe/internal/*.cpp")
     )
 
 target("engraving")
@@ -379,27 +343,20 @@ target("engraving")
     add_engine_target_defaults()
     add_defines("ENGRAVING_NO_ACCESSIBILITY", "KORS_PROFILER_ENABLED")
     add_includedirs(
-        path.join(source_root, "src", "engraving"),
-        path.join(source_root, "src"),
-        path.join(source_root, "muse"),
-        path.join(source_root, "muse", "framework"),
-        path.join(source_root, "muse", "framework", "global"),
-        path.join(source_root, "src", "engraving", "infrastructure"),
-        path.join(source_root, "src", "engraving", "thirdparty", "dtl")
+        engine("src/engraving"),
+        engine("src"),
+        engine("muse"),
+        engine("muse/framework"),
+        engine("muse/framework/global"),
+        engine("src/engraving/infrastructure"),
+        engine("src/engraving/thirdparty/dtl")
     )
-    add_files(
-        path.join(source_root, "src", "engraving", "*.cpp"),
-        path.join(source_root, "src", "engraving", "automation", "**.cpp"),
-        path.join(source_root, "src", "engraving", "compat", "**.cpp"),
-        path.join(source_root, "src", "engraving", "dom", "**.cpp"),
-        path.join(source_root, "src", "engraving", "editing", "**.cpp"),
-        path.join(source_root, "src", "engraving", "infrastructure", "**.cpp"),
-        path.join(source_root, "src", "engraving", "internal", "**.cpp"),
-        path.join(source_root, "src", "engraving", "playback", "**.cpp"),
-        path.join(source_root, "src", "engraving", "rendering", "**.cpp"),
-        path.join(source_root, "src", "engraving", "rw", "**.cpp"),
-        path.join(source_root, "src", "engraving", "style", "**.cpp"),
-        path.join(source_root, "src", "engraving", "types", "**.cpp")
+    add_files(engine("src/engraving/**.cpp"))
+    remove_files(
+        engine("src/engraving/accessibility/**"),
+        engine("src/engraving/qml/**"),
+        engine("src/engraving/tests/**"),
+        engine("src/engraving/thirdparty/**")
     )
 
 target("iex_musicxml")
@@ -408,16 +365,16 @@ target("iex_musicxml")
     add_engine_target_defaults()
     add_defines("ENGRAVING_NO_ACCESSIBILITY", "KORS_PROFILER_ENABLED", "MUSICXML_NO_INTERACTIVE", "MUSICXML_NO_INTERNAL", "MUSICXML_NO_VALIDATION")
     add_includedirs(
-        path.join(source_root, "src", "importexport", "musicxml"),
-        path.join(source_root, "src"),
-        path.join(source_root, "muse"),
-        path.join(source_root, "muse", "framework"),
-        path.join(source_root, "muse", "framework", "global"),
-        path.join(source_root, "src", "engraving"),
-        path.join(source_root, "src", "engraving", "infrastructure"),
-        path.join(source_root, "src", "engraving", "thirdparty", "dtl")
+        engine("src/importexport/musicxml"),
+        engine("src"),
+        engine("muse"),
+        engine("muse/framework"),
+        engine("muse/framework/global"),
+        engine("src/engraving"),
+        engine("src/engraving/infrastructure"),
+        engine("src/engraving/thirdparty/dtl")
     )
-    add_files(path.join(source_root, "src", "importexport", "musicxml", "**.cpp"))
+    add_files(engine("src/importexport/musicxml/**.cpp"))
 
 target("iex_guitarpro")
     set_kind("static")
@@ -425,16 +382,16 @@ target("iex_guitarpro")
     add_engine_target_defaults()
     add_defines("ENGRAVING_NO_ACCESSIBILITY", "KORS_PROFILER_ENABLED")
     add_includedirs(
-        path.join(source_root, "src", "importexport", "guitarpro"),
-        path.join(source_root, "src"),
-        path.join(source_root, "muse"),
-        path.join(source_root, "muse", "framework"),
-        path.join(source_root, "muse", "framework", "global"),
-        path.join(source_root, "src", "engraving"),
-        path.join(source_root, "src", "engraving", "infrastructure"),
-        path.join(source_root, "src", "engraving", "thirdparty", "dtl")
+        engine("src/importexport/guitarpro"),
+        engine("src"),
+        engine("muse"),
+        engine("muse/framework"),
+        engine("muse/framework/global"),
+        engine("src/engraving"),
+        engine("src/engraving/infrastructure"),
+        engine("src/engraving/thirdparty/dtl")
     )
-    add_files(path.join(source_root, "src", "importexport", "guitarpro", "internal", "**.cpp"))
+    add_files(engine("src/importexport/guitarpro/**.cpp"))
 target_end()
 
 -- MIDI import, export and the MIDI file layer they share: upstream's iex_midi.
@@ -444,21 +401,16 @@ target("iex_midi")
     add_engine_target_defaults()
     add_defines("ENGRAVING_NO_ACCESSIBILITY", "KORS_PROFILER_ENABLED")
     add_includedirs(
-        path.join(source_root, "src", "importexport", "midi"),
-        path.join(source_root, "src"),
-        path.join(source_root, "muse"),
-        path.join(source_root, "muse", "framework"),
-        path.join(source_root, "muse", "framework", "global"),
-        path.join(source_root, "src", "engraving"),
-        path.join(source_root, "src", "engraving", "infrastructure"),
-        path.join(source_root, "src", "engraving", "thirdparty", "dtl")
+        engine("src/importexport/midi"),
+        engine("src"),
+        engine("muse"),
+        engine("muse/framework"),
+        engine("muse/framework/global"),
+        engine("src/engraving"),
+        engine("src/engraving/infrastructure"),
+        engine("src/engraving/thirdparty/dtl")
     )
-    add_files(
-        path.join(source_root, "src", "importexport", "midi", "internal", "midiexport", "*.cpp"),
-        path.join(source_root, "src", "importexport", "midi", "internal", "midiimport", "*.cpp"),
-        path.join(source_root, "src", "importexport", "midi", "internal", "midishared", "*.cpp"),
-        path.join(source_root, "src", "importexport", "midi", "thirdparty", "beatroot", "*.cpp")
-    )
+    add_files(engine("src/importexport/midi/**.cpp"))
 target_end()
 
 target("native_fluidsynth")
@@ -483,15 +435,15 @@ target("native_fluidsynth")
         path.join(fluidsynth_src, "utils")
     )
     add_files(
-        path.join(source_root, "muse", "framework", "audio", "thirdparty", "fluidsynth", "vorbis_decode.cpp"),
-        path.join(fluidsynth_src, "bindings", "*.c"),
-        path.join(fluidsynth_src, "drivers", "*.c"),
-        path.join(fluidsynth_src, "midi", "*.c"),
-        path.join(fluidsynth_src, "midi", "*.cpp"),
-        path.join(fluidsynth_src, "rvoice", "*.c"),
-        path.join(fluidsynth_src, "sfloader", "*.c"),
-        path.join(fluidsynth_src, "synth", "*.c"),
-        path.join(fluidsynth_src, "utils", "*.c")
+        engine("muse/framework/audio/thirdparty/fluidsynth/vorbis_decode.cpp"),
+        path.join(fluidsynth_src, "bindings/*.c"),
+        path.join(fluidsynth_src, "drivers/*.c"),
+        path.join(fluidsynth_src, "midi/*.c"),
+        path.join(fluidsynth_src, "midi/*.cpp"),
+        path.join(fluidsynth_src, "rvoice/*.c"),
+        path.join(fluidsynth_src, "sfloader/*.c"),
+        path.join(fluidsynth_src, "synth/*.c"),
+        path.join(fluidsynth_src, "utils/*.c")
     )
     set_warnings("none")
 
@@ -503,10 +455,10 @@ target("muse_audio_engine")
     add_defines(ENGRAVE_AUDIO_ENGINE.defines)
     add_includedirs(ENGRAVE_AUDIO_ENGINE.includes)
     add_files(
-        path.join(source_root, "muse", "framework", "audio", "common", "*.cpp"),
-        path.join(source_root, "muse", "framework", "audio", "common", "rpc", "platform", "general", "*.cpp"),
-        path.join(source_root, "muse", "framework", "audio", "engine", "*.cpp"),
-        path.join(source_root, "muse", "framework", "audio", "engine", "internal", "**.cpp")
+        engine("muse/framework/audio/common/*.cpp"),
+        engine("muse/framework/audio/common/rpc/platform/general/*.cpp"),
+        engine("muse/framework/audio/engine/*.cpp"),
+        engine("muse/framework/audio/engine/internal/**.cpp")
     )
 target_end()
 
@@ -519,13 +471,13 @@ target_end()
 -- "engrave/src/<area>/<file>.h" (source_root is on the include path).  The
 -- include path is shared with the adapter tests in xmake/tests.lua.
 ENGRAVE_ADAPTER_INCLUDES = {
-    path.join(source_root, "src", "engraving", "thirdparty", "dtl"),
+    engine("src/engraving/thirdparty/dtl"),
     source_root,
-    path.join(source_root, "src"),
-    path.join(source_root, "muse", "framework"),
-    path.join(source_root, "muse", "framework", "global"),
-    path.join(source_root, "src", "engraving"),
-    path.join(source_root, "muse", "framework", "draw"),
+    engine("src"),
+    engine("muse/framework"),
+    engine("muse/framework/global"),
+    engine("src/engraving"),
+    engine("muse/framework/draw"),
 }
 for _, list in ipairs({ENGRAVE_AUDIO_INCLUDES, ENGRAVE_INCLUDES}) do
     for _, dir in ipairs(list) do

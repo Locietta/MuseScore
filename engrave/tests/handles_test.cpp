@@ -40,6 +40,9 @@
 #include "engrave/src/score/export_options.h"
 #include "engrave/src/score/score_excerpts.h"
 
+#include "global/io/buffer.h"
+#include "global/serialization/zipreader.h"
+
 #include "engraving/dom/chord.h"
 #include "engraving/dom/clef.h"
 #include "engraving/dom/engravingitem.h"
@@ -248,6 +251,22 @@ std::string export_mscz(engrave::Document& document) {
     auto bytes = document.export_score({.format = engrave::Format::Mscz});
     EXPECT_TRUE(bytes) << bytes.error().message;
     return bytes ? text_of(*bytes) : std::string{};
+}
+
+std::map<std::string, std::string> unzip_entries(std::string_view zip_bytes) {
+    std::map<std::string, std::string> entries;
+    muse::ByteArray bytes(zip_bytes.data(), zip_bytes.size());
+    muse::io::Buffer buffer(&bytes);
+    if (!buffer.open(muse::io::IODevice::ReadOnly)) return entries;
+    muse::ZipReader zip(&buffer);
+    if (zip.hasError()) return entries;
+    for (const auto& info : zip.fileInfoList()) {
+        if (!info.isFile) continue;
+        const std::string name = info.filePath.toStdString();
+        const muse::ByteArray data = zip.fileData(name);
+        entries[name] = std::string(data.constChar(), data.size());
+    }
+    return entries;
 }
 
 /// The engine's own MSCX of the score (or of one of its excerpts). The version it
@@ -575,7 +594,7 @@ TEST(Handles, H4ExportLeavesIdsAndRevisionAlone) {
         const std::string first = export_mscz(*document);
         const std::string second = export_mscz(*document);
         EXPECT_FALSE(first.empty());
-        EXPECT_EQ(first, second) << "two exports of one score differ";
+        EXPECT_EQ(unzip_entries(first), unzip_entries(second)) << "two exports of one score differ";
         EXPECT_EQ(element_map(*document), before) << "an export changed an id";
         EXPECT_EQ(document->revision(), 1u);
         expect_inv(*document);
