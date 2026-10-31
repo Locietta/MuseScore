@@ -20,6 +20,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "log.h"
 #include "engraving/types/fraction.h"
 #include "engraving/dom/interval.h"
 #include "engraving/types/typesconv.h"

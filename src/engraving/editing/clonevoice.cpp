@@ -20,6 +20,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "log.h"
 #include "clonevoice.h"
 
 #include "../dom/beam.h"

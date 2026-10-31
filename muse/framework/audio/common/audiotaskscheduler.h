@@ -28,7 +28,7 @@
 #include "iaudiotaskscheduler.h"
 #include "audiosanitizer.h"
 #include "global/async/asyncable.h"
-#include "global/log.h"
+#include "global/asserts.h"
 #include <mutex>
 
 namespace muse::audio {

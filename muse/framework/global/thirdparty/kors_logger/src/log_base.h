@@ -28,7 +28,7 @@ SOFTWARE.
 #include <cassert> // IWYU pragma: export
 
 #include "funcinfo.h" // IWYU pragma: export
-#include "logger.h" // IWYU pragma: export
+#include "log_forward.h" // IWYU pragma: export
 
 //! Log
 
@@ -36,15 +36,15 @@ SOFTWARE.
 #define LOG_TAG CLASSFUNC
 #endif
 
-#define IF_LOGLEVEL(level)  if (kors::logger::Logger::instance()->isLevel(level))
+#define IF_LOGLEVEL(level)  if (kors::logger::enabled(level))
 
 #define LOG_STREAM(type, tag, color) kors::logger::LogInput(type, tag, color).stream
 
-#define LOGE_T(tag) IF_LOGLEVEL(kors::logger::Level::Normal) LOG_STREAM(kors::logger::Logger::ERRR, tag, kors::logger::Color::Red)
-#define LOGW_T(tag) IF_LOGLEVEL(kors::logger::Level::Normal) LOG_STREAM(kors::logger::Logger::WARN, tag, kors::logger::Color::Yellow)
-#define LOGI_T(tag) IF_LOGLEVEL(kors::logger::Level::Normal) LOG_STREAM(kors::logger::Logger::INFO, tag, kors::logger::Color::Green)
-#define LOGD_T(tag) IF_LOGLEVEL(kors::logger::Level::Debug) LOG_STREAM(kors::logger::Logger::DEBG, tag, kors::logger::Color::None)
-#define LOGDA_T(tag) IF_LOGLEVEL(kors::logger::Level::Debug) LOG_STREAM(kors::logger::Logger::DEBG, tag, kors::logger::Color::Cyan)
+#define LOGE_T(tag) IF_LOGLEVEL(kors::logger::Level::Normal) LOG_STREAM("ERROR", tag, kors::logger::Color::Red)
+#define LOGW_T(tag) IF_LOGLEVEL(kors::logger::Level::Normal) LOG_STREAM("WARN", tag, kors::logger::Color::Yellow)
+#define LOGI_T(tag) IF_LOGLEVEL(kors::logger::Level::Normal) LOG_STREAM("INFO", tag, kors::logger::Color::Green)
+#define LOGD_T(tag) IF_LOGLEVEL(kors::logger::Level::Debug) LOG_STREAM("DEBUG", tag, kors::logger::Color::None)
+#define LOGDA_T(tag) IF_LOGLEVEL(kors::logger::Level::Debug) LOG_STREAM("DEBUG", tag, kors::logger::Color::Cyan)
 
 #define LOGE LOGE_T(LOG_TAG)
 #define LOGW LOGW_T(LOG_TAG)
@@ -53,43 +53,7 @@ SOFTWARE.
 #define LOGDA LOGDA_T(LOG_TAG)      // active debug
 #define LOGN if constexpr (0)LOGD_T(LOG_TAG)  // compiling, but no output
 
-//! Useful macros
-#define DO_ASSERT_X_IMPL(cond, msg, var_name) \
-    { \
-        const bool var_name = static_cast<bool>(cond); \
-        if (!(var_name)) { \
-            LOGE() << "ASSERT FAILED:    " << msg << "    " << __FILE__ << ":" << __LINE__; \
-            assert(var_name && #cond); \
-        } \
-    }
-#define DO_ASSERT_X(cond, msg) DO_ASSERT_X_IMPL(cond, msg, UNIQUE_VAR_NAME(__do_assert_))
-
-#define DO_ASSERT(cond) DO_ASSERT_X(cond, #cond)
-#define ASSERT_X(msg) DO_ASSERT_X(false, msg)
-
-#define CONCAT_IMPL(x, y) x##y
-#define CONCAT(x, y) CONCAT_IMPL(x, y)
-#define UNIQUE_VAR_NAME(prefix) CONCAT(prefix, __LINE__)
-
-#define IF_ASSERT_FAILED_X_IMPL(cond, msg, var_name) \
-    const bool var_name = static_cast<bool>(cond); \
-    if (!(var_name)) { \
-        LOGE() << "ASSERT FAILED:    " << msg << "    " << __FILE__ << ":" << __LINE__; \
-        assert(var_name && #cond); \
-    } \
-    if (!(var_name))
-
-#define IF_ASSERT_FAILED_X(cond, msg) IF_ASSERT_FAILED_X_IMPL(cond, msg, UNIQUE_VAR_NAME(__if_assert_failed_))
-#define IF_ASSERT_FAILED(cond) IF_ASSERT_FAILED_X(cond, #cond)
-
-#define IF_FAILED_IMPL(cond, var_name) \
-    const bool var_name = static_cast<bool>(cond); \
-    if (!(var_name)) { \
-        LOGE() << "FAILED: " << #cond << " at " << __FILE__ << ":" << __LINE__; \
-    } \
-    if (!(var_name))
-
-#define IF_FAILED(cond) IF_FAILED_IMPL(cond, UNIQUE_VAR_NAME(__if_failed_))
+#include "global/asserts.h"
 
 #define UNUSED(x) (void)x;
 

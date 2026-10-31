@@ -250,8 +250,7 @@ target("muse_global")
         engine("muse/framework/global/types/*.cpp"),
         engine("muse/framework/global/thirdparty/kors_async/async/internal/*.cpp"),
         engine("muse/framework/global/thirdparty/kors_logger/src/*.cpp"),
-        engine("muse/framework/global/thirdparty/kors_modularity/modularity/*.cpp"),
-        engine("muse/framework/global/thirdparty/kors_profiler/profiler/*.cpp")
+        engine("muse/framework/global/thirdparty/kors_modularity/modularity/*.cpp")
     )
     -- engrave/src/global implements framework services that upstream builds
     -- from trimmed Qt sources (muse::Settings).  engraving and the other modules

@@ -1,3 +1,4 @@
+#include "log.h"
 #include "compatmidirender.h"
 
 #include <cmath>

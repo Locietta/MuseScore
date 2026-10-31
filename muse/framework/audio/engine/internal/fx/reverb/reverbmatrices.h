@@ -23,7 +23,7 @@
 #ifndef MUSE_AUDIO_REVERBMATRICES_H
 #define MUSE_AUDIO_REVERBMATRICES_H
 
-#include "log.h"
+#include "global/asserts.h"
 
 namespace muse::audio::fx {
 namespace reverb_matrices {

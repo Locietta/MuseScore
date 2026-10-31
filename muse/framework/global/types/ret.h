@@ -28,7 +28,7 @@
 #include <any>
 
 
-#include "global/log.h"
+#include "global/asserts.h"
 
 namespace muse {
 class Ret

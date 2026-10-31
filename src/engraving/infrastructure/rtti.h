@@ -21,7 +21,8 @@
  */
 #pragma once
 
-#include "log.h"
+#include "global/asserts.h"
+#include <string>
 
 namespace mu::engraving {
 #define DECLARE_CLASSOF(Type) \
@@ -51,7 +52,7 @@ To item_cast(From from, CastMode mode = CastMode::CHECK) noexcept
         To casted = dynamic_cast<To>(from);
         if (mode == CastMode::CHECK) {
             if (!(casted || !from)) {
-                LOGE() << "[BAD CAST] from: " << typeid(From).name() << ", to: " << typeid(To).name();
+                muse::diagnostics::assertionFailure(std::string("[BAD CAST] from: ") + typeid(From).name() + ", to: " + typeid(To).name(), __FILE__, __LINE__);
             }
             assert(casted || !from);
         }

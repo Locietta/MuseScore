@@ -36,7 +36,7 @@
 #include "../layoutoptions.h"
 
 #ifdef MUE_ENABLE_ENGRAVING_RENDER_DEBUG
-#include "log.h"
+#include "logstream.h"
 #include "logstream.h"
 #define LAYOUT_CALL_CLEAR mu::engraving::rendering::dev::LayoutDebug::instance()->callClear
 #define LAYOUT_CALL_BEGIN(name) mu::engraving::rendering::dev::LayoutDebug::CallBegin(name)

@@ -42,7 +42,6 @@
 
 #include "automatablevalue.h"
 
-#include "log.h"
 
 // Forward-declared audioplugins aliases; audio must not depend on that module.
 namespace muse::audioplugins {
