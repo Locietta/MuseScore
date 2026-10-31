@@ -2631,6 +2631,11 @@ void Score::cmdCreateTuplet(ChordRest* ocr, Tuplet* tuplet)
     if (ocr->tuplet()) {
         tuplet->setTuplet(ocr->tuplet());
     }
+    // A tuplet is not attached to a segment: it hangs off the chord rests added below, so the
+    // undo stack has to own it, as RemoveElement does for a tuplet when the last of its elements
+    // goes. The command comes first, so that an undo drops it only after the chord rests that
+    // reference it are gone.
+    doUndoAddElement(tuplet);
     removeChordRest(ocr, false);
 
     ChordRest* cr;

@@ -30,7 +30,7 @@ ENGRAVE_OP(SetLayoutBreak, Snapshot)
 // spanners (ops/spanners.cpp)
 ENGRAVE_OP(AddSpanner, Transaction)
 ENGRAVE_OP(AddTie, Transaction)
-ENGRAVE_OP(AddTuplet, Snapshot)
+ENGRAVE_OP(AddTuplet, Transaction)
 
 // text (ops/text.cpp)
 ENGRAVE_OP(AddText, Transaction)
