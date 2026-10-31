@@ -149,18 +149,19 @@ Result<Step> prepare(EditContext& context, const AddStaff& op) {
         if (!found) return std::unexpected(found.error());
         Part* part = *found;
         Score* score = part->score();
+        if (score->isMaster()) {
+            // The linked staff an excerpt gets does not survive a save and a reopen: the
+            // excerpt's part is written with one staff more than the file's part holds, and
+            // the read-back differs. The editor adds the staff to every excerpt in turn;
+            // until that round trip is fixed, a part an excerpt shows is refused.
+            for (Excerpt* excerpt : context.master().excerpts()) {
+                if (copy_of(*excerpt->excerptScore(), part->id()))
+                    return invalid("an excerpt shows this part: a staff added to it does not survive a save");
+            }
+        }
         Staff* staff = mu::engraving::EditPart::appendStaff(score, part);
         if (!staff) return invalid("the engine added no staff");
         context.created(staff);
-        if (!score->isMaster()) return {};
-        // Every excerpt that shows the part gets the linked copy of the new staff.
-        for (Excerpt* excerpt : context.master().excerpts()) {
-            Score* excerptScore = excerpt->excerptScore();
-            Part* copy = copy_of(*excerptScore, part->id());
-            if (!copy) continue;
-            if (Staff* linked = mu::engraving::EditPart::appendLinkedStaff(excerptScore, staff, copy))
-                context.created(linked);
-        }
         return {};
     };
 }

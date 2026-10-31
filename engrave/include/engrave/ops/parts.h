@@ -25,7 +25,9 @@ struct RemovePart {
     Ref part;
 };
 
-// Appends a staff to a part, and a linked staff to every excerpt that shows it.
+// Appends a staff to a part, and a linked staff to every excerpt that shows it:
+// refused for a part an excerpt shows, because the linked staff does not survive a
+// save and a reopen.
 struct AddStaff {
     Ref part;
 };
