@@ -458,3 +458,26 @@ src/importexport/musicxml/internal/musicxmlwriter.cpp
 src/importexport/musicxml/internal/musicxmlwriter.h
 src/importexport/musicxml/internal/mxlwriter.cpp
 src/importexport/musicxml/internal/mxlwriter.h
+
+# Batch 8: Uncompiled engine sources and UI modules (A4 trim3)
+src/engraving/accessibility/
+src/engraving/qml/
+muse/framework/accessibility/
+muse/framework/extensions/
+muse/framework/interactive/
+muse/framework/mpe/qml/
+muse/framework/global/api/
+muse/framework/global/io/internal/
+muse/framework/global/thirdparty/kors_async/example/
+muse/framework/global/thirdparty/kors_logger/example/
+muse/framework/global/thirdparty/kors_modularity/example/
+muse/framework/global/thirdparty/kors_msgpack/example/
+muse/framework/global/thirdparty/kors_profiler/example/
+muse/framework/audio/common/rpc/platform/web/
+muse/framework/audio/engine/platform/web/
+muse/framework/audio/thirdparty/fluidsynth/fluidsynth-2.3.3/src/gentables/
+muse/framework/midi/internal/
+src/engraving/thirdparty/intervaltree/interval_tree_test.cpp
+muse/framework/audio/thirdparty/fluidsynth/fluidsynth-2.3.3/src/fluid_wasapi_device_enumerate.c
+muse/framework/audio/thirdparty/fluidsynth/fluidsynth-2.3.3/src/fluidsynth.c
+muse/framework/midi/midimodule.cpp
