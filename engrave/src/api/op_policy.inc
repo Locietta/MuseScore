@@ -24,3 +24,5 @@ ENGRAVE_OP(Remove, Transaction)
 // spanners (ops/spanners.cpp)
 
 // text (ops/text.cpp)
+ENGRAVE_OP(AddText, Transaction)
+ENGRAVE_OP(Add, Transaction)

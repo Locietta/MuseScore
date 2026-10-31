@@ -438,6 +438,7 @@ Order order_of(const ElementInfo& element, int score) {
 
 Result<Outline> Document::outline(const ScoreSel& selection) {
     impl_->engine->check_thread();
+    if (impl_->poisoned) return fail(ErrorCode::Poisoned, "an earlier edit left the document unusable");
     MasterScore& master = *impl_->project->masterScore();
     const Result<Score*> selected = select_score(master, selection);
     if (!selected) return std::unexpected(selected.error());
@@ -470,6 +471,7 @@ Result<Outline> Document::outline(const ScoreSel& selection) {
 
 Result<QueryResult> Document::query(const Query& request) {
     impl_->engine->check_thread();
+    if (impl_->poisoned) return fail(ErrorCode::Poisoned, "an earlier edit left the document unusable");
     MasterScore& master = *impl_->project->masterScore();
     const Result<Score*> selected = select_score(master, request.score);
     if (!selected) return std::unexpected(selected.error());
@@ -572,6 +574,7 @@ Result<QueryResult> Document::query(const Query& request) {
 
 Result<std::vector<PropertyRead>> Document::get(const Ref& target, const std::vector<std::string>& props) {
     impl_->engine->check_thread();
+    if (impl_->poisoned) return fail(ErrorCode::Poisoned, "an earlier edit left the document unusable");
     MasterScore& master = *impl_->project->masterScore();
     const Result<Resolved> resolved = std::visit(
         [&master](const auto& value) -> Result<Resolved> {
