@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="4.40">
-  <programVersion>4.4.0</programVersion>
-  <programRevision></programRevision>
-  <LastEID>1278</LastEID>
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>l7xl6rZtxxB_WIEgCttRjmJ</eid>
     <Division>480</Division>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
@@ -72,17 +72,24 @@
       <unsorted/>
       </Order>
     <Part id="1">
-      <Staff id="1">
+      <eid>/yahTpnZtQK_ZvL0JEbk+2F</eid>
+      <Staff>
+        <eid>v4NyYMFvpfH_uEfi6Nsn9iN</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
-        <bracket type="1" span="2" col="2" visible="1"/>
+        <BracketItem>
+          <type>Brace</type>
+          <bracketSpan>2</bracketSpan>
+          <level>2</level>
+          </BracketItem>
         <barLineSpan>1</barLineSpan>
         </Staff>
-      <trackName>Piano</trackName>
       <Instrument id="piano">
-        <longName>Piano</longName>
-        <shortName>Pno.</shortName>
+        <InstrumentLabel>
+          <longName>Piano</longName>
+          <shortName>Pno.</shortName>
+          </InstrumentLabel>
         <trackName>Piano</trackName>
         <minPitchP>21</minPitchP>
         <maxPitchP>108</maxPitchP>
@@ -138,35 +145,37 @@
       </Part>
     <Staff id="1">
       <Measure>
+        <eid>ZywPhg30N5C_7DI5kQsi5gL</eid>
         <voice>
           <KeySig>
-            <eid>1546188226583</eid>
+            <eid>30lgkU5FAwK_0y0X7znKI7D</eid>
             <concertKey>0</concertKey>
             </KeySig>
           <TimeSig>
-            <eid>1537598291993</eid>
+            <eid>rjxkOZs1AzC_KrprQdSTcaG</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Rest>
-            <eid>3530463117338</eid>
+            <eid>ZStfIQl6ioC_XHzUvn+SBBP</eid>
             <durationType>measure</durationType>
             <duration>4/4</duration>
             </Rest>
           </voice>
         </Measure>
       <Measure>
+        <eid>z82JBwkA38M_9MTGOqciZR</eid>
         <LayoutBreak>
-          <eid>3246995275856</eid>
+          <eid>Jelil5jy6bJ_0j+5oquOQgL</eid>
           <subtype>section</subtype>
           <pause>4</pause>
           </LayoutBreak>
         <voice>
           <Chord>
-            <eid>2869038153843</eid>
+            <eid>UmDcHC6c45O_5liMHPIT7UN</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>2864743186453</eid>
+              <eid>jYmVC8rOXDF_LU1KODlpqMP</eid>
               <pitch>69</pitch>
               <tpc>17</tpc>
               </Note>
@@ -174,32 +183,32 @@
           <Breath>
             <symbol>caesura</symbol>
             <pause>2</pause>
-            <eid>3135326126109</eid>
+            <eid>9kWhA0Bp2MJ_d8WIqVJug8L</eid>
             </Breath>
           <StaffText>
-            <eid>3560527888432</eid>
-            <offset x="-2.29415" y="-2.57723"/>
+            <eid>IQUc9t9M/3I_UKxXfZZhCWN</eid>
+            <offset x="-2.29415" y="-1.57723"/>
             <text>Pause: 2s</text>
             </StaffText>
           <Chord>
-            <eid>2894807957619</eid>
+            <eid>982jod6Q+sD_L13lBSglJQP</eid>
             <durationType>half</durationType>
             <Note>
-              <eid>2890512990229</eid>
+              <eid>5gAY4SaECpE_/MotrxQaUAM</eid>
               <pitch>71</pitch>
               <tpc>19</tpc>
               </Note>
             </Chord>
           <StaffText>
-            <eid>3732326580272</eid>
-            <offset x="0.143384" y="-3.00738"/>
+            <eid>EPQ3qUatSCH_NY718aYelEP</eid>
+            <offset x="0.143384" y="-2.00738"/>
             <text>Pause: 4s</text>
             </StaffText>
           <Chord>
-            <eid>2963527434355</eid>
+            <eid>BHYThbalKEB_omHC67qHRGE</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>2959232466965</eid>
+              <eid>Q2a1caa3prH_gkMFQUi5lRP</eid>
               <pitch>74</pitch>
               <tpc>16</tpc>
               </Note>
@@ -207,38 +216,28 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>BOW8brcYDSH_FTdwvzUkvzB</eid>
         <voice>
           <Chord>
-            <eid>3006477107315</eid>
+            <eid>6ORV4bxSgWI_9iUJ1ROZ83J</eid>
             <durationType>half</durationType>
             <Note>
-              <eid>3002182139925</eid>
-              <Spanner type="Tie">
-                <Tie>
-                  <eid>4707284156447</eid>
-                  </Tie>
-                <next>
-                  <location>
-                    <fractions>1/2</fractions>
-                    </location>
-                  </next>
-                </Spanner>
+              <eid>ljdE87Yr/rM_CeGYiyEI+FM</eid>
               <pitch>76</pitch>
               <tpc>18</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>3066606649459</eid>
+            <eid>oeq5tXzwN4I_4Mf7ioupzAD</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>3062311682069</eid>
-              <Spanner type="Tie">
-                <prev>
-                  <location>
-                    <fractions>-1/2</fractions>
-                    </location>
-                  </prev>
-                </Spanner>
+              <eid>YVNDxWgO+iO_tR28WThVudB</eid>
+              <Tie>
+                <startElement>ljdE87Yr/rM_CeGYiyEI+FM</startElement>
+                <endElement>YVNDxWgO+iO_tR28WThVudB</endElement>
+                <eid>sKLV49b+gND_98ri8yA5GWJ</eid>
+                <track>0</track>
+                </Tie>
               <pitch>76</pitch>
               <tpc>18</tpc>
               </Note>
@@ -246,18 +245,18 @@
           <Breath>
             <symbol>caesura</symbol>
             <pause>3</pause>
-            <eid>3547642986525</eid>
+            <eid>ToC6ZB87WwD_aaUpblKuZRK</eid>
             </Breath>
           <StaffText>
-            <eid>3573412790320</eid>
-            <offset x="-4.44491" y="-3.91393"/>
+            <eid>QHuGc7GnFkI_EG76siAE3KP</eid>
+            <offset x="-4.44491" y="-2.91393"/>
             <text>Pause: 3s</text>
             </StaffText>
           <Chord>
-            <eid>3092376453235</eid>
+            <eid>AcRh9lrZ0RG_A7j2k1+h8AG</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>3088081485845</eid>
+              <eid>nuFmfjeIqHL_cNlSkr/G28E</eid>
               <pitch>81</pitch>
               <tpc>17</tpc>
               </Note>
@@ -265,24 +264,25 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>EaSel4BD2wE_u3gS7dmK1eM</eid>
         <startRepeat/>
         <endRepeat>2</endRepeat>
         <LayoutBreak>
-          <eid>5269924872273</eid>
+          <eid>qFfgdGEvMBL_F4cLoY8HtBM</eid>
           <subtype>section</subtype>
           <pause>5</pause>
           </LayoutBreak>
         <voice>
           <StaffText>
-            <eid>5377299054640</eid>
-            <offset x="23.607" y="-3.78592"/>
+            <eid>e7ceekYBQWL_nIbibHh8bxH</eid>
+            <offset x="23.607" y="-2.78592"/>
             <text>Pause: 5s</text>
             </StaffText>
           <Chord>
-            <eid>5184025526388</eid>
+            <eid>IMxymZcuuKB_gxL0Ah/Sx7H</eid>
             <durationType>whole</durationType>
             <Note>
-              <eid>5179730558996</eid>
+              <eid>/J+F2MYBgYC_HzHpJskv+tH</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>
@@ -290,18 +290,19 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>UkTXZ7upW8H_gix+2awIoGP</eid>
         <voice>
           <Chord>
-            <eid>5467493367924</eid>
+            <eid>3sQY7P165QM_g4SxByOzWrP</eid>
             <durationType>half</durationType>
             <Note>
-              <eid>5463198400532</eid>
+              <eid>cP/1ToriahN_zJ7pMdB4qjM</eid>
               <pitch>76</pitch>
               <tpc>18</tpc>
               </Note>
             </Chord>
           <Rest>
-            <eid>5454608465946</eid>
+            <eid>NLrdfzwcsqP_FezaIyu8rUM</eid>
             <durationType>half</durationType>
             </Rest>
           </voice>

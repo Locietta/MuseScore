@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="4.20">
-  <programVersion>4.2.0</programVersion>
-  <programRevision></programRevision>
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>e2Ow6zJJVfE_Zjx1u34bVMJ</eid>
     <Division>480</Division>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
@@ -69,17 +70,24 @@
       <unsorted/>
       </Order>
     <Part id="1">
-      <Staff id="1">
+      <eid>ylNyGdR+EzK_AN3rrmdpIK</eid>
+      <Staff>
+        <eid>cManpgWfvO_PwtT+mSllHD</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
-        <bracket type="1" span="2" col="2" visible="1"/>
+        <BracketItem>
+          <type>Brace</type>
+          <bracketSpan>2</bracketSpan>
+          <level>2</level>
+          </BracketItem>
         <barLineSpan>1</barLineSpan>
         </Staff>
-      <trackName>Piano</trackName>
       <Instrument id="piano">
-        <longName>Piano</longName>
-        <shortName>Pno.</shortName>
+        <InstrumentLabel>
+          <longName>Piano</longName>
+          <shortName>Pno.</shortName>
+          </InstrumentLabel>
         <trackName>Piano</trackName>
         <minPitchP>21</minPitchP>
         <maxPitchP>108</maxPitchP>
@@ -136,73 +144,68 @@
     <Staff id="1">
       <VBox>
         <height>10</height>
-        <excludeFromParts>0</excludeFromParts>
+        <sizeIsSpatiumDependent>1</sizeIsSpatiumDependent>
+        <eid>+HjaHEQi/HE_COTM3PxwWsE</eid>
         <Text>
           <style>title</style>
+          <eid>t3lvtuP3oxP_x6ja78E/sVE</eid>
           <text>Unbenannte Partitur</text>
           </Text>
         <Text>
           <style>subtitle</style>
+          <eid>cQKHN+/Dz8H_WJ0BN20r5OH</eid>
           <text>Untertitel</text>
           </Text>
         <Text>
           <style>composer</style>
+          <eid>hsO1RxJvHAL_PydKYI28c0B</eid>
           <text>Komponist / Arrangeur</text>
           </Text>
         </VBox>
       <Measure>
+        <eid>byEYoJs4bwI_l6CZ31YyQXD</eid>
         <voice>
           <KeySig>
+            <eid>ajdbd6JEgKI_USkPzl+dkDE</eid>
             <concertKey>0</concertKey>
             </KeySig>
           <TimeSig>
+            <eid>3dfXtLHM/vF_SNdtnUpM7GC</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Chord>
+            <eid>nKC5siNZvaO_LOLzR6wK7sC</eid>
             <durationType>quarter</durationType>
             <Note>
+              <eid>2fq6DIF5y1B_ufD2RoQn0LC</eid>
               <pitch>60</pitch>
               <tpc>14</tpc>
               </Note>
             </Chord>
-          <Spanner type="Pedal">
-            <Pedal>
-              <lineVisible>0</lineVisible>
-              <beginText>&lt;sym&gt;keyboardPedalPed&lt;/sym&gt;</beginText>
-              <continueText>(&lt;sym&gt;keyboardPedalPed&lt;/sym&gt;)</continueText>
-              <endText>&lt;sym&gt;keyboardPedalUp&lt;/sym&gt;</endText>
-              </Pedal>
-            <next>
-              <location>
-                <fractions>1/2</fractions>
-                </location>
-              </next>
-            </Spanner>
           <Chord>
+            <eid>pIgsM7KTsRJ_u6t1hnhB7gB</eid>
             <durationType>quarter</durationType>
             <Note>
+              <eid>gfTTp7lQW7C_0QJ/FG+XydO</eid>
               <pitch>64</pitch>
               <tpc>18</tpc>
               </Note>
             </Chord>
           <Chord>
+            <eid>ntZqLZLvYJE_Q9KH/TsF60P</eid>
             <durationType>quarter</durationType>
             <Note>
+              <eid>mLWQIgmt7jK_7TjTWdB4ORO</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
             </Chord>
-          <Spanner type="Pedal">
-            <prev>
-              <location>
-                <fractions>-1/2</fractions>
-                </location>
-              </prev>
-            </Spanner>
           <Chord>
+            <eid>rUtNa68KmnC_oJ9LQVeDvFN</eid>
             <durationType>quarter</durationType>
             <Note>
+              <eid>C43uNqZ7epI_Rc6lQqPTX9D</eid>
               <pitch>64</pitch>
               <tpc>18</tpc>
               </Note>
@@ -210,51 +213,40 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>LwSnRWhdTWJ_+Bn7tyMqgEN</eid>
         <voice>
           <Chord>
+            <eid>c4OsiCHOn8F_TFi73ZCFfFB</eid>
             <durationType>quarter</durationType>
             <Note>
+              <eid>OXjJpH7Dv6O_TdqGmN3Ev9D</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
             </Chord>
-          <Spanner type="Trill">
-            <Trill>
-              <subtype>trill</subtype>
-              <Ornament>
-                <subtype>ornamentTrill</subtype>
-                </Ornament>
-              </Trill>
-            <next>
-              <location>
-                <fractions>1/2</fractions>
-                </location>
-              </next>
-            </Spanner>
           <Chord>
+            <eid>F2m7R1PEnV_4fFO18AB3CB</eid>
             <durationType>quarter</durationType>
             <Note>
+              <eid>H902k0+tFoF_Dv/HxTr7UWD</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>
             </Chord>
           <Chord>
+            <eid>wOSdxdxI2rE_10jLhgZbLtM</eid>
             <durationType>quarter</durationType>
             <Note>
+              <eid>mG3NmlyIW5O_jNUj+pWr5oD</eid>
               <pitch>76</pitch>
               <tpc>18</tpc>
               </Note>
             </Chord>
-          <Spanner type="Trill">
-            <prev>
-              <location>
-                <fractions>-1/2</fractions>
-                </location>
-              </prev>
-            </Spanner>
           <Chord>
+            <eid>VAXgXSP6gwJ_VlQ/qi3oJoD</eid>
             <durationType>quarter</durationType>
             <Note>
+              <eid>hgkajmfUerH_upBowN90+V</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>
@@ -262,47 +254,40 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>usa8gK9zrrE_X+65ecnAvLL</eid>
         <voice>
           <Chord>
+            <eid>3nrwzNHzIJC_zLBzqL4ZeSI</eid>
             <durationType>quarter</durationType>
             <Note>
+              <eid>AQjQaFa9S1_Yo2xDahALjL</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
             </Chord>
           <Chord>
+            <eid>eU1UFWpIr+_qnXI3+WcUSN</eid>
             <durationType>quarter</durationType>
-            <Spanner type="Slur">
-              <Slur>
-                </Slur>
-              <next>
-                <location>
-                  <fractions>1/4</fractions>
-                  </location>
-                </next>
-              </Spanner>
             <Note>
+              <eid>dbyIWXyEK9F_ni68UdqniWJ</eid>
               <pitch>64</pitch>
               <tpc>18</tpc>
               </Note>
             </Chord>
           <Chord>
+            <eid>4nDKkGcLO7P_0uL61cyIgzF</eid>
             <durationType>quarter</durationType>
-            <Spanner type="Slur">
-              <prev>
-                <location>
-                  <fractions>-1/4</fractions>
-                  </location>
-                </prev>
-              </Spanner>
             <Note>
+              <eid>Kyk1wmij3bM_476YPHhkPJO</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
             </Chord>
           <Chord>
+            <eid>IbUf2GAtklB_+pvD1v+UK6G</eid>
             <durationType>quarter</durationType>
             <Note>
+              <eid>Q1tUAxx264C_+Zl90ZaiYxB</eid>
               <pitch>60</pitch>
               <tpc>14</tpc>
               </Note>
@@ -310,5 +295,37 @@
           </voice>
         </Measure>
       </Staff>
+    <SpannerMap>
+      <Pedal>
+        <lineVisible>0</lineVisible>
+        <continueTextPlace>auto</continueTextPlace>
+        <endTextPlace>auto</endTextPlace>
+        <track2>0</track2>
+        <startTick>1/4</startTick>
+        <ticks>2/4</ticks>
+        <eid>Sv8Sfm4GKcI_AcB0erXRewL</eid>
+        <track>0</track>
+        <continueText>(&lt;sym&gt;keyboardPedalPed&lt;/sym&gt;)</continueText>
+        </Pedal>
+      <Trill>
+        <subtype>trill</subtype>
+        <track2>0</track2>
+        <startTick>5/4</startTick>
+        <ticks>2/4</ticks>
+        <eid>599dpZKnDtK_GUjgcF7VaBH</eid>
+        <track>0</track>
+        <Ornament>
+          <subtype>ornamentTrill</subtype>
+          <eid>voJgmDB1GCI_FeEQaBUQzEL</eid>
+          <track>0</track>
+          </Ornament>
+        </Trill>
+      <Slur>
+        <startElement>eU1UFWpIr+_qnXI3+WcUSN</startElement>
+        <endElement>4nDKkGcLO7P_0uL61cyIgzF</endElement>
+        <eid>vkHbkJ6WsoP_1PUOu7fOMmJ</eid>
+        <track>0</track>
+        </Slur>
+      </SpannerMap>
     </Score>
   </museScore>

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="4.00">
-  <programVersion>4.1.0</programVersion>
-  <programRevision></programRevision>
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>/wScMQqUSQI_TP9Jr/hVHrM</eid>
     <Division>480</Division>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
@@ -71,23 +72,31 @@
       <unsorted/>
       </Order>
     <Part id="1">
-      <Staff id="1">
+      <eid>prr4psi9MiB_8h7BXLM98aL</eid>
+      <Staff>
+        <eid>mgGAu9uSKn_Jt7Z+cuM8XB</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
-        <bracket type="1" span="2" col="0" visible="1"/>
+        <BracketItem>
+          <type>Brace</type>
+          <bracketSpan>2</bracketSpan>
+          <level>0</level>
+          </BracketItem>
         <barLineSpan>1</barLineSpan>
         </Staff>
-      <Staff id="2">
+      <Staff>
+        <eid>mw7SnLoMK/E_HNH+mAvVqKM</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         <defaultClef>F</defaultClef>
         </Staff>
-      <trackName>Piano</trackName>
       <Instrument id="piano">
-        <longName>Piano</longName>
-        <shortName>Pno.</shortName>
+        <InstrumentLabel>
+          <longName>Piano</longName>
+          <shortName>Pno.</shortName>
+          </InstrumentLabel>
         <trackName>Piano</trackName>
         <minPitchP>21</minPitchP>
         <maxPitchP>108</maxPitchP>
@@ -104,56 +113,72 @@
     <Staff id="1">
       <VBox>
         <height>10</height>
+        <sizeIsSpatiumDependent>1</sizeIsSpatiumDependent>
+        <eid>Ry/9Hv+8PIL_ZDi1gmDr8LG</eid>
         <Text>
           <style>title</style>
+          <eid>m6Sr14XwePM_PjS98Y4a3rI</eid>
           <text>Untitled Score</text>
           </Text>
         <Text>
           <style>subtitle</style>
+          <eid>dWKerSZv0hG_Tb1ELawDL5C</eid>
           <text>Subtitle</text>
           </Text>
         <Text>
           <style>composer</style>
+          <eid>ZeSNnWI/YnM_7NrZsttn7iI</eid>
           <text>Composer / arranger</text>
           </Text>
         </VBox>
       <Measure>
+        <eid>GJgc0bRk1nM_5Wdx73R4tBC</eid>
         <voice>
           <TimeSig>
+            <eid>DDBiqp+yPOB_KRCZeI+OX4P</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Chord>
+            <eid>68AQWdT41sG_9W2dQk/auNE</eid>
             <durationType>eighth</durationType>
             <grace8after/>
             <Note>
+              <eid>JWIF3KZJ5mD_ORCgzwWkHSC</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
             <Note>
+              <eid>pk24cRJ2IFO_Z3LNxszuNcJ</eid>
               <pitch>71</pitch>
               <tpc>19</tpc>
               </Note>
             <Note>
+              <eid>8Y0fkzsqGGC_MHlImoKP8xK</eid>
               <pitch>74</pitch>
               <tpc>16</tpc>
               </Note>
             <Note>
+              <eid>3KmoL8HFLcL_PIfjXCumKVE</eid>
               <pitch>77</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
+            <eid>1Ebe/x4n1CE_bdqJAQv5bTJ</eid>
             <durationType>quarter</durationType>
             <Note>
+              <eid>I5awcb7XT3N_GfXJh8QWXtH</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Rest>
+            <eid>riwLZw65IKF_6IVvowgWN5H</eid>
             <durationType>quarter</durationType>
             </Rest>
           <Rest>
+            <eid>d8UrURE0dRM_XxV876QqA+B</eid>
             <durationType>half</durationType>
             </Rest>
           </voice>
@@ -163,10 +188,12 @@
       <Measure>
         <voice>
           <TimeSig>
+            <eid>+6tmtzdZV2E_1CzT1NPLYv</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Rest>
+            <eid>KX0egU2v1fO_uGOsOzgYTP</eid>
             <durationType>measure</durationType>
             <duration>4/4</duration>
             </Rest>

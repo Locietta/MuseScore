@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="4.00">
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>sNaSVx9HgJG_5mVIy9XINVG</eid>
     <Division>480</Division>
-    <Style>
-      <showMeasureNumberOne>1</showMeasureNumberOne>
-      <measureNumberInterval>1</measureNumberInterval>
-      <measureNumberSystem>0</measureNumberSystem>
-      <Spatium>1.76389</Spatium>
-      </Style>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
     <showFrames>1</showFrames>
@@ -15,24 +12,29 @@
     <metaTag name="arranger"></metaTag>
     <metaTag name="composer"></metaTag>
     <metaTag name="copyright"></metaTag>
+    <metaTag name="creationDate">2026-10-31</metaTag>
     <metaTag name="lyricist"></metaTag>
     <metaTag name="movementNumber"></metaTag>
     <metaTag name="movementTitle"></metaTag>
     <metaTag name="mscVersion">4.00</metaTag>
+    <metaTag name="platform">Microsoft Windows</metaTag>
     <metaTag name="source"></metaTag>
     <metaTag name="translator"></metaTag>
     <metaTag name="workNumber"></metaTag>
     <metaTag name="workTitle">Repeat Test</metaTag>
     <Part id="1">
-      <Staff id="1">
+      <eid>mKEZ2c5Xcf_fHZsCmxHeeK</eid>
+      <Staff>
+        <eid>u+RFrYUR9nI_zCTXlRT1vaN</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
-      <trackName>Piano</trackName>
       <Instrument id="piano">
-        <longName>Piano</longName>
-        <shortName>Pno.</shortName>
+        <InstrumentLabel>
+          <longName>Piano</longName>
+          <shortName>Pno.</shortName>
+          </InstrumentLabel>
         <trackName>Piano</trackName>
         <minPitchP>21</minPitchP>
         <maxPitchP>108</maxPitchP>
@@ -70,6 +72,7 @@
           </Articulation>
         <Channel>
           <program value="0"/>
+          <synti>Fluid</synti>
           </Channel>
         </Instrument>
       </Part>
@@ -78,68 +81,69 @@
         <height>13</height>
         <bottomGap>1</bottomGap>
         <boxAutoSize>0</boxAutoSize>
+        <sizeIsSpatiumDependent>1</sizeIsSpatiumDependent>
+        <eid>pkuyfSkfZZP_4rQqVHajSO</eid>
         <Text>
           <style>title</style>
+          <eid>8VbP1fMJitG_jRYta6JsByH</eid>
           <text>repeat68</text>
           </Text>
         <Text>
           <style>subtitle</style>
+          <eid>W3ypx/ZQr/J_DoDHMYNcmfN</eid>
           <text>Volta skipping entire score</text>
           </Text>
         </VBox>
       <TBox>
-        <height>1</height>
         <topGap>0</topGap>
         <leftMargin>1</leftMargin>
         <rightMargin>1</rightMargin>
         <topMargin>1</topMargin>
         <bottomMargin>1</bottomMargin>
+        <eid>MSO9g8UaHML_LTysDefTbcM</eid>
         <Text>
           <style>frame</style>
-          <text>no playback
-</text>
+          <eid>bPWPQYqw78K_lPves2psRTI</eid>
+          <text>no playback<br/></text>
           </Text>
         </TBox>
       <Measure>
+        <eid>Nf4vq1wZP9_YAnN4WSbG3O</eid>
         <voice>
           <TimeSig>
+            <eid>CQXKWWKlGgJ_qaMMySVOkKM</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Tempo>
             <tempo>6.66667</tempo>
             <followText>1</followText>
+            <eid>9fEMtpavJ0I_NwdJUysjprP</eid>
             <family>FreeSerif</family>
             <bold>0</bold>
-            <text><b></b><font face="ScoreText"></font><b><font face="FreeSerif"></font> = 400</b></text>
+            <text><b/><font face="ScoreText"/><b><font face="FreeSerif"/> = 400</b></text>
             </Tempo>
-          <Spanner type="Volta">
-            <Volta>
-              <beginText>2. (skip)</beginText>
-              <endings>2</endings>
-              </Volta>
-            <next>
-              <location>
-                <fractions>1/1</fractions>
-                </location>
-              </next>
-            </Spanner>
           <Chord>
+            <eid>mYGJwfF1p2G_HLjtnYBlvwE</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>lwdyn93OOxO_mHd0WgIgF0</eid>
               <pitch>64</pitch>
               <tpc>18</tpc>
               </Note>
             </Chord>
-          <Spanner type="Volta">
-            <prev>
-              <location>
-                <fractions>-1/1</fractions>
-                </location>
-              </prev>
-            </Spanner>
           </voice>
         </Measure>
       </Staff>
+    <SpannerMap>
+      <Volta>
+        <beginText>2. (skip)</beginText>
+        <startElement>Nf4vq1wZP9_YAnN4WSbG3O</startElement>
+        <endElement>Nf4vq1wZP9_YAnN4WSbG3O</endElement>
+        <eid>mr/Tl6UWSOE_SHJSBiRj//B</eid>
+        <track>0</track>
+        <endings>2</endings>
+        </Volta>
+      </SpannerMap>
     </Score>
   </museScore>

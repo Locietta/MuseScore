@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="4.40">
-  <programVersion>4.5.0</programVersion>
-  <programRevision></programRevision>
-  <LastEID>491</LastEID>
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>tJ3EU9AW/QN_+oQ89bIx6gL</eid>
     <Division>480</Division>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
@@ -74,15 +74,18 @@
         </section>
       </Order>
     <Part id="1">
-      <Staff id="1">
+      <eid>2N4SboM6nbK_zM5WDdNuJZC</eid>
+      <Staff>
+        <eid>9VqmvvFZv3E_T+45s93m6BC</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
-      <trackName>Viool</trackName>
       <Instrument id="violin">
-        <longName>Viool</longName>
-        <shortName>Vl.</shortName>
+        <InstrumentLabel>
+          <longName>Viool</longName>
+          <shortName>Vl.</shortName>
+          </InstrumentLabel>
         <trackName>Viool</trackName>
         <minPitchP>55</minPitchP>
         <maxPitchP>103</maxPitchP>
@@ -106,65 +109,45 @@
     <Staff id="1">
       <VBox>
         <height>10</height>
-        <eid>592705486970</eid>
+        <eid>d66b4ULQvQC_oyLRXLQ4aCG</eid>
         <Text>
-          <eid>597000454149</eid>
           <style>title</style>
+          <eid>8PsL+t0I1qE_x0L92mjkB3M</eid>
           <text>Naamloze partituur</text>
           </Text>
         <Text>
-          <eid>601295421445</eid>
           <style>subtitle</style>
+          <eid>G3s4DutY6qM_orR8icLIv+N</eid>
           <text>Ondertitel</text>
           </Text>
         <Text>
-          <eid>605590388741</eid>
           <style>composer</style>
+          <eid>EVAjQxStKjE_f/7BQJPRQVN</eid>
           <text>Componist / arrangeur</text>
           </Text>
         </VBox>
       <Measure>
+        <eid>kCHp8LenFJI_8LQ8FAx87LM</eid>
         <voice>
           <KeySig>
-            <eid>47244640279</eid>
+            <eid>TymQQciP21C_80DUXVybATJ</eid>
             <concertKey>0</concertKey>
             </KeySig>
           <TimeSig>
-            <eid>38654705689</eid>
+            <eid>IHmYg1KsOKP_I8LSSw9kzbI</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Dynamic>
             <subtype>f</subtype>
             <velocity>96</velocity>
-            <eid>7344394076196</eid>
+            <eid>6Ny5egInMuO_z5jiKKIRkUN</eid>
             </Dynamic>
-          <Spanner type="HairPin">
-            <HairPin>
-              <subtype>1</subtype>
-              <eid>2589865279582</eid>
-              </HairPin>
-            <next>
-              <location>
-                <measures>1</measures>
-                </location>
-              </next>
-            </Spanner>
           <Chord>
-            <eid>2456721293427</eid>
+            <eid>MwOaiYSHrvI_VrPrYao6xmI</eid>
             <durationType>whole</durationType>
             <Note>
-              <eid>2452426326036</eid>
-              <Spanner type="Tie">
-                <Tie>
-                  <eid>11166914969631</eid>
-                  </Tie>
-                <next>
-                  <location>
-                    <measures>1</measures>
-                    </location>
-                  </next>
-                </Spanner>
+              <eid>jG9l8ZvO05F_gmeh94r7t4I</eid>
               <pitch>74</pitch>
               <tpc>16</tpc>
               </Note>
@@ -172,31 +155,24 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>CjWQhX05y5D_1kiUKj5iyMK</eid>
         <voice>
           <Dynamic>
             <subtype>n</subtype>
             <velocity>49</velocity>
-            <eid>2585570312228</eid>
+            <eid>8OidKlwFUiM_F18EulQBEDB</eid>
             </Dynamic>
-          <Spanner type="HairPin">
-            <prev>
-              <location>
-                <measures>-1</measures>
-                </location>
-              </prev>
-            </Spanner>
           <Chord>
-            <eid>11154030067827</eid>
+            <eid>Gxd23u2fCYH_RUZsS5h2vIG</eid>
             <durationType>whole</durationType>
             <Note>
-              <eid>11149735100436</eid>
-              <Spanner type="Tie">
-                <prev>
-                  <location>
-                    <measures>-1</measures>
-                    </location>
-                  </prev>
-                </Spanner>
+              <eid>1dk37cwojqP_hGZAsrmjRCI</eid>
+              <Tie>
+                <startElement>jG9l8ZvO05F_gmeh94r7t4I</startElement>
+                <endElement>1dk37cwojqP_hGZAsrmjRCI</endElement>
+                <eid>wn2VFUP+6S_eZGErxYmW8F</eid>
+                <track>0</track>
+                </Tie>
               <pitch>74</pitch>
               <tpc>16</tpc>
               </Note>
@@ -204,39 +180,18 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>wl2p1t221BG_OGzkc8hJ99P</eid>
         <voice>
           <Dynamic>
             <subtype>f</subtype>
             <velocity>96</velocity>
-            <eid>7348689043492</eid>
+            <eid>B79qUTFffZO_XTz/oNjaWmC</eid>
             </Dynamic>
-          <Spanner type="HairPin">
-            <HairPin>
-              <subtype>1</subtype>
-              <hairpinCircledTip>1</hairpinCircledTip>
-              <eid>2589865279582</eid>
-              </HairPin>
-            <next>
-              <location>
-                <measures>1</measures>
-                </location>
-              </next>
-            </Spanner>
           <Chord>
-            <eid>2456721293427</eid>
+            <eid>Rtw3zB1I/lD_GMNSOls2EPC</eid>
             <durationType>whole</durationType>
             <Note>
-              <eid>2452426326036</eid>
-              <Spanner type="Tie">
-                <Tie>
-                  <eid>11222749544479</eid>
-                  </Tie>
-                <next>
-                  <location>
-                    <measures>1</measures>
-                    </location>
-                  </next>
-                </Spanner>
+              <eid>bvtyy6qnnRO_DCHERf8Zx8E</eid>
               <pitch>74</pitch>
               <tpc>16</tpc>
               </Note>
@@ -244,26 +199,19 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>7ZEOILQJe6D_gg0zFXXR+bD</eid>
         <voice>
-          <Spanner type="HairPin">
-            <prev>
-              <location>
-                <measures>-1</measures>
-                </location>
-              </prev>
-            </Spanner>
           <Chord>
-            <eid>11209864642675</eid>
+            <eid>3OKbjfCeBl_hOe/+N6W6nO</eid>
             <durationType>whole</durationType>
             <Note>
-              <eid>11205569675284</eid>
-              <Spanner type="Tie">
-                <prev>
-                  <location>
-                    <measures>-1</measures>
-                    </location>
-                  </prev>
-                </Spanner>
+              <eid>peuhygNGmbJ_tJfD7XLxCML</eid>
+              <Tie>
+                <startElement>bvtyy6qnnRO_DCHERf8Zx8E</startElement>
+                <endElement>peuhygNGmbJ_tJfD7XLxCML</endElement>
+                <eid>0OQurIzzYh_9mMwFWxna0K</eid>
+                <track>0</track>
+                </Tie>
               <pitch>74</pitch>
               <tpc>16</tpc>
               </Note>
@@ -271,38 +219,18 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>DkLQn5YoQTO_jvq5D3I0iuO</eid>
         <voice>
           <Dynamic>
             <subtype>n</subtype>
             <velocity>49</velocity>
-            <eid>2100239007780</eid>
+            <eid>lClgueqHITL_vnzCcjBXcJG</eid>
             </Dynamic>
-          <Spanner type="HairPin">
-            <HairPin>
-              <subtype>0</subtype>
-              <eid>1743756722270</eid>
-              </HairPin>
-            <next>
-              <location>
-                <measures>1</measures>
-                </location>
-              </next>
-            </Spanner>
           <Chord>
-            <eid>1636382539891</eid>
+            <eid>u86Cev2jz5I_+F5wlLAVz0E</eid>
             <durationType>whole</durationType>
             <Note>
-              <eid>1632087572500</eid>
-              <Spanner type="Tie">
-                <Tie>
-                  <eid>1653562408991</eid>
-                  </Tie>
-                <next>
-                  <location>
-                    <measures>1</measures>
-                    </location>
-                  </next>
-                </Spanner>
+              <eid>FUyh/XjLtiO_BPaiD33l0aJ</eid>
               <pitch>74</pitch>
               <tpc>16</tpc>
               </Note>
@@ -310,31 +238,24 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>Tm9EVOysQaP_iTjxCgGULiM</eid>
         <voice>
           <Dynamic>
             <subtype>f</subtype>
             <velocity>96</velocity>
-            <eid>2104533975076</eid>
+            <eid>WXOn0AYq0cF_WrgDKL1+C1</eid>
             </Dynamic>
-          <Spanner type="HairPin">
-            <prev>
-              <location>
-                <measures>-1</measures>
-                </location>
-              </prev>
-            </Spanner>
           <Chord>
-            <eid>1662152343667</eid>
+            <eid>fLSZ1k6zFRE_FSttdYKyjcB</eid>
             <durationType>whole</durationType>
             <Note>
-              <eid>1657857376276</eid>
-              <Spanner type="Tie">
-                <prev>
-                  <location>
-                    <measures>-1</measures>
-                    </location>
-                  </prev>
-                </Spanner>
+              <eid>VzuuLVFbhaC_WyeavN+JNf</eid>
+              <Tie>
+                <startElement>FUyh/XjLtiO_BPaiD33l0aJ</startElement>
+                <endElement>VzuuLVFbhaC_WyeavN+JNf</endElement>
+                <eid>KwQd16RDO2D_a2WI7+YT80J</eid>
+                <track>0</track>
+                </Tie>
               <pitch>74</pitch>
               <tpc>16</tpc>
               </Note>
@@ -342,34 +263,13 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>5IQ1IqlA3UP_5MpXIdXoySE</eid>
         <voice>
-          <Spanner type="HairPin">
-            <HairPin>
-              <subtype>0</subtype>
-              <hairpinCircledTip>1</hairpinCircledTip>
-              <eid>2070174236766</eid>
-              </HairPin>
-            <next>
-              <location>
-                <measures>1</measures>
-                </location>
-              </next>
-            </Spanner>
           <Chord>
-            <eid>1692217114739</eid>
+            <eid>PDPJ4tDIItC_QcR7IvnIdz</eid>
             <durationType>whole</durationType>
             <Note>
-              <eid>1687922147348</eid>
-              <Spanner type="Tie">
-                <Tie>
-                  <eid>1709396983839</eid>
-                  </Tie>
-                <next>
-                  <location>
-                    <measures>1</measures>
-                    </location>
-                  </next>
-                </Spanner>
+              <eid>W6bK2uuzp9L_/SkXxs7bMPH</eid>
               <pitch>74</pitch>
               <tpc>16</tpc>
               </Note>
@@ -377,31 +277,24 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>gnBQojTYMgI_QgSQCPQy7XD</eid>
         <voice>
           <Dynamic>
             <subtype>f</subtype>
             <velocity>96</velocity>
-            <eid>2108828942372</eid>
+            <eid>y3hmAPtIchM_twHk/J7w/wO</eid>
             </Dynamic>
-          <Spanner type="HairPin">
-            <prev>
-              <location>
-                <measures>-1</measures>
-                </location>
-              </prev>
-            </Spanner>
           <Chord>
-            <eid>1717986918515</eid>
+            <eid>aNIoKicU6MO_BBcBWptofuB</eid>
             <durationType>whole</durationType>
             <Note>
-              <eid>1713691951124</eid>
-              <Spanner type="Tie">
-                <prev>
-                  <location>
-                    <measures>-1</measures>
-                    </location>
-                  </prev>
-                </Spanner>
+              <eid>3GERIFgRb8F_iVtOEPNiyaF</eid>
+              <Tie>
+                <startElement>W6bK2uuzp9L_/SkXxs7bMPH</startElement>
+                <endElement>3GERIFgRb8F_iVtOEPNiyaF</endElement>
+                <eid>eaKbd3jxfMF_RL7z7BQL8ZH</eid>
+                <track>0</track>
+                </Tie>
               <pitch>74</pitch>
               <tpc>16</tpc>
               </Note>
@@ -409,5 +302,49 @@
           </voice>
         </Measure>
       </Staff>
+    <SpannerMap>
+      <HairPin>
+        <subtype>1</subtype>
+        <beginHookHeight>-1.9</beginHookHeight>
+        <endHookHeight>-1.9</endHookHeight>
+        <track2>0</track2>
+        <startTick>0/1</startTick>
+        <ticks>1/1</ticks>
+        <eid>lMzwWAZSfvH_jFG5i3/7FIB</eid>
+        <track>0</track>
+        </HairPin>
+      <HairPin>
+        <subtype>1</subtype>
+        <hairpinCircledTip>1</hairpinCircledTip>
+        <beginHookHeight>-1.9</beginHookHeight>
+        <endHookHeight>-1.9</endHookHeight>
+        <track2>0</track2>
+        <startTick>2/1</startTick>
+        <ticks>1/1</ticks>
+        <eid>uhh5xIO8QvI_cRTbfeO7MCO</eid>
+        <track>0</track>
+        </HairPin>
+      <HairPin>
+        <subtype>0</subtype>
+        <beginHookHeight>-1.9</beginHookHeight>
+        <endHookHeight>-1.9</endHookHeight>
+        <track2>0</track2>
+        <startTick>4/1</startTick>
+        <ticks>1/1</ticks>
+        <eid>V4cCVr4g5g_L9t3L0zmwwL</eid>
+        <track>0</track>
+        </HairPin>
+      <HairPin>
+        <subtype>0</subtype>
+        <hairpinCircledTip>1</hairpinCircledTip>
+        <beginHookHeight>-1.9</beginHookHeight>
+        <endHookHeight>-1.9</endHookHeight>
+        <track2>0</track2>
+        <startTick>6/1</startTick>
+        <ticks>1/1</ticks>
+        <eid>NOWZyhSYnSH_XTl3GV0L/kG</eid>
+        <track>0</track>
+        </HairPin>
+      </SpannerMap>
     </Score>
   </museScore>

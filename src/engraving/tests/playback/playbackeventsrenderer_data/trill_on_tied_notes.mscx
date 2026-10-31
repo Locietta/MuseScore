@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="4.50">
-  <programVersion>4.5.0</programVersion>
-  <programRevision>28c68b6</programRevision>
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
     <eid>d/zKVaX9Od_iVFONImJoVO</eid>
     <Division>480</Division>
@@ -74,15 +74,18 @@
         </section>
       </Order>
     <Part id="1">
-      <Staff id="1">
+      <eid>WfgXwrJIC4D_KFzAmvpY+uJ</eid>
+      <Staff>
+        <eid>cbvLPBXM7aI_GWWmJ2y6YiN</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
-      <trackName>Violin</trackName>
       <Instrument id="violin">
-        <longName>Violin</longName>
-        <shortName>Vln.</shortName>
+        <InstrumentLabel>
+          <longName>Violin</longName>
+          <shortName>Vln.</shortName>
+          </InstrumentLabel>
         <trackName>Violin</trackName>
         <minPitchP>55</minPitchP>
         <maxPitchP>103</maxPitchP>
@@ -125,16 +128,6 @@
               </Ornament>
             <Note>
               <eid>P1CsaWjLg6D_KnkYblBx4TE</eid>
-              <Spanner type="Tie">
-                <Tie>
-                  <eid>PXV7N9mVbvD_cgdd70c67AH</eid>
-                  </Tie>
-                <next>
-                  <location>
-                    <measures>1</measures>
-                    </location>
-                  </next>
-                </Spanner>
               <pitch>69</pitch>
               <tpc>17</tpc>
               </Note>
@@ -150,13 +143,12 @@
             <durationType>whole</durationType>
             <Note>
               <eid>uwCtNt95V/C_99GhPUUDkKD</eid>
-              <Spanner type="Tie">
-                <prev>
-                  <location>
-                    <measures>-1</measures>
-                    </location>
-                  </prev>
-                </Spanner>
+              <Tie>
+                <startElement>P1CsaWjLg6D_KnkYblBx4TE</startElement>
+                <endElement>uwCtNt95V/C_99GhPUUDkKD</endElement>
+                <eid>PXV7N9mVbvD_cgdd70c67AH</eid>
+                <track>0</track>
+                </Tie>
               <pitch>69</pitch>
               <tpc>17</tpc>
               </Note>

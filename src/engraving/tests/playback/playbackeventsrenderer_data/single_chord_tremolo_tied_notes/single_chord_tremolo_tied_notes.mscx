@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="4.40">
-  <programVersion>4.4.2</programVersion>
-  <programRevision></programRevision>
-  <LastEID>1004</LastEID>
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>jy5wRCVwUvI_bAcpSJaTBKM</eid>
     <Division>480</Division>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
@@ -74,17 +74,24 @@
       <unsorted/>
       </Order>
     <Part id="1">
-      <Staff id="1">
+      <eid>Wr7I2cavCNH_vsAgGLwL0zN</eid>
+      <Staff>
+        <eid>USYxCq5NjYN_15Tw1GPQeXI</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
-        <bracket type="1" span="2" col="2" visible="1"/>
+        <BracketItem>
+          <type>Brace</type>
+          <bracketSpan>2</bracketSpan>
+          <level>2</level>
+          </BracketItem>
         <barLineSpan>1</barLineSpan>
         </Staff>
-      <trackName>Violin</trackName>
       <Instrument id="violin">
-        <longName>Violin</longName>
-        <shortName>Vln.</shortName>
+        <InstrumentLabel>
+          <longName>Violin</longName>
+          <shortName>Vln.</shortName>
+          </InstrumentLabel>
         <trackName>Violin</trackName>
         <minPitchP>55</minPitchP>
         <maxPitchP>103</maxPitchP>
@@ -107,69 +114,61 @@
       </Part>
     <Staff id="1">
       <Measure>
+        <eid>CLr87a8Ba1L_/SJ2TN+qRGD</eid>
         <voice>
           <KeySig>
-            <eid>1554778161175</eid>
+            <eid>rn/DCjHslbD_OgKwRvdwP5D</eid>
             <concertKey>0</concertKey>
             </KeySig>
           <TimeSig>
-            <eid>1546188226585</eid>
+            <eid>7UTiNE7xREN_JF29Ep+SyHO</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Rest>
-            <eid>4299262263322</eid>
+            <eid>QYvr4nzI0bL_tjiHuuXTamJ</eid>
             <durationType>whole</durationType>
             </Rest>
           </voice>
         </Measure>
       <Measure>
+        <eid>CMRqv9whpDF_8K1BadH6sHE</eid>
         <voice>
           <Chord>
-            <eid>3083786518643</eid>
+            <eid>joHgaePaMJL_eIQpYchbNWP</eid>
             <durationType>whole</durationType>
             <Note>
-              <eid>3079491551252</eid>
-              <Spanner type="Tie">
-                <Tie>
-                  <eid>4260607557663</eid>
-                  </Tie>
-                <next>
-                  <location>
-                    <measures>1</measures>
-                    </location>
-                  </next>
-                </Spanner>
+              <eid>+z4T68ENWKC_qYQSxg3NiyD</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             <TremoloSingleChord>
               <subtype>r32</subtype>
-              <eid>3423088935049</eid>
+              <eid>jMfbC7/B+kE_yVMuWblnXUC</eid>
               </TremoloSingleChord>
             </Chord>
           </voice>
         </Measure>
       <Measure>
+        <eid>tfXklA2CUSL_i7O3TjXLDbH</eid>
         <voice>
           <Chord>
-            <eid>3083786518643</eid>
+            <eid>Tl9SmvsGwIF_QqBuTFr1fbC</eid>
             <durationType>whole</durationType>
             <Note>
-              <eid>3079491551252</eid>
-              <Spanner type="Tie">
-                <prev>
-                  <location>
-                    <measures>-1</measures>
-                    </location>
-                  </prev>
-                </Spanner>
+              <eid>yJ7F9TXbFPF_8q1RWF5Dc8D</eid>
+              <Tie>
+                <startElement>+z4T68ENWKC_qYQSxg3NiyD</startElement>
+                <endElement>yJ7F9TXbFPF_8q1RWF5Dc8D</endElement>
+                <eid>pw6vIEL6ZdM_vuJi6uGKgTL</eid>
+                <track>0</track>
+                </Tie>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             <TremoloSingleChord>
               <subtype>r32</subtype>
-              <eid>3423088935049</eid>
+              <eid>m6OiPgIb3TB_5JmNz9gwrjH</eid>
               </TremoloSingleChord>
             </Chord>
           </voice>

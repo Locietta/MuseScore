@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="4.00">
-  <programVersion>4.0.0</programVersion>
-  <programRevision></programRevision>
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>dLicvNWrhAP_n4zCjOBcFuE</eid>
     <Division>480</Division>
-    <Style>
-      <Spatium>1.74978</Spatium>
-      </Style>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
     <showFrames>1</showFrames>
@@ -29,7 +27,7 @@
       <instrument id="piano">
         <family id="keyboards">Keyboards</family>
         </instrument>
-      <section id="woodwind" brackets="true" showSystemMarkings="true" barLineSpan="true" thinBrackets="true">
+      <section id="woodwind" brackets="true" barLineSpan="true" thinBrackets="true">
         <family>flutes</family>
         <family>oboes</family>
         <family>clarinets</family>
@@ -37,7 +35,7 @@
         <family>bassoons</family>
         <unsorted group="woodwinds"/>
         </section>
-      <section id="brass" brackets="true" showSystemMarkings="false" barLineSpan="true" thinBrackets="true">
+      <section id="brass" brackets="true" barLineSpan="true" thinBrackets="true">
         <family>horns</family>
         <family>trumpets</family>
         <family>cornets</family>
@@ -45,10 +43,10 @@
         <family>trombones</family>
         <family>tubas</family>
         </section>
-      <section id="timpani" brackets="true" showSystemMarkings="false" barLineSpan="true" thinBrackets="true">
+      <section id="timpani" brackets="true" barLineSpan="true" thinBrackets="true">
         <family>timpani</family>
         </section>
-      <section id="percussion" brackets="true" showSystemMarkings="false" barLineSpan="true" thinBrackets="true">
+      <section id="percussion" brackets="true" barLineSpan="true" thinBrackets="true">
         <family>keyboard-percussion</family>
         <family>drums</family>
         <family>unpitched-metal-percussion</family>
@@ -59,36 +57,44 @@
       <family>harps</family>
       <family>organs</family>
       <family>synths</family>
-      <section id="plucked-strings" brackets="true" showSystemMarkings="false" barLineSpan="true" thinBrackets="true">
+      <section id="plucked-strings" brackets="true" barLineSpan="true" thinBrackets="true">
         <family>plucked-strings</family>
         </section>
       <soloists/>
-      <section id="voices" brackets="true" showSystemMarkings="false" barLineSpan="false" thinBrackets="true">
+      <section id="voices" brackets="true" barLineSpan="false" thinBrackets="true">
         <family>voices</family>
         </section>
-      <section id="strings" brackets="true" showSystemMarkings="true" barLineSpan="true" thinBrackets="true">
+      <section id="strings" brackets="true" barLineSpan="true" thinBrackets="true">
         <family>orchestral-strings</family>
         </section>
       <unsorted/>
       </Order>
-    <Part>
-      <Staff id="1">
+    <Part id="1">
+      <eid>WV2Pkck5CdL_rlPJiEnxRLH</eid>
+      <Staff>
+        <eid>jN58nHZ5iGF_AMmMlDJBO9</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
-        <bracket type="1" span="2" col="0" visible="1"/>
+        <BracketItem>
+          <type>Brace</type>
+          <bracketSpan>2</bracketSpan>
+          <level>0</level>
+          </BracketItem>
         <barLineSpan>1</barLineSpan>
         </Staff>
-      <Staff id="2">
+      <Staff>
+        <eid>x7b/UVqG0OP_pt9hu7AHhmL</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         <defaultClef>F</defaultClef>
         </Staff>
-      <trackName>Piano</trackName>
       <Instrument id="piano">
-        <longName>Piano</longName>
-        <shortName>Pno.</shortName>
+        <InstrumentLabel>
+          <longName>Piano</longName>
+          <shortName>Pno.</shortName>
+          </InstrumentLabel>
         <trackName>Piano</trackName>
         <minPitchP>21</minPitchP>
         <maxPitchP>108</maxPitchP>
@@ -104,27 +110,36 @@
       </Part>
     <Staff id="1">
       <Measure>
+        <eid>4GWuxU1e8VL_4P+uYzHnJrE</eid>
         <voice>
           <TimeSig>
+            <eid>hCWfSqR1BML_BHQrj70BdhG</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Chord>
+            <eid>h6zghRf5JNK_exsTFfqiId</eid>
             <durationType>quarter</durationType>
             <Articulation>
-              <subtype>articTenutoAccentBelow</subtype>
-              <minDistance>-999</minDistance>
-              <offset x="0.488417" y="-6.19674"/>
+              <subtype>articTenutoBelow</subtype>
+              <eid>lo/NI6zRdvN_vFtUWTurcTK</eid>
+              </Articulation>
+            <Articulation>
+              <subtype>articAccentBelow</subtype>
+              <eid>E/zBGPLj/lN_RkLOTtZqcpL</eid>
               </Articulation>
             <Note>
+              <eid>mBgLF9Io6oD_QGAMw0BCFsJ</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Rest>
+            <eid>eSjJpJ2ldVC_YXLkq1MkeDF</eid>
             <durationType>quarter</durationType>
             </Rest>
           <Rest>
+            <eid>M6CpR/SVqyG_kVCuoptR8dM</eid>
             <durationType>half</durationType>
             </Rest>
           </voice>
@@ -134,10 +149,12 @@
       <Measure>
         <voice>
           <TimeSig>
+            <eid>tvvg6BXYaPM_hDM8S0UQRtO</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Rest>
+            <eid>+2YkSqcwzBN_6mT8cG4SKKH</eid>
             <durationType>measure</durationType>
             <duration>4/4</duration>
             </Rest>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="4.50">
-  <programVersion>4.5.0</programVersion>
-  <programRevision>28c68b6</programRevision>
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
     <eid>oxn05dzZ8PC_nOOSaSjd5/C</eid>
     <Division>480</Division>
@@ -74,18 +74,21 @@
         </section>
       </Order>
     <SystemObjects>
-      <Instance staffId="2" barNumbers="false"/>
+      <Instance staffId="2"/>
       </SystemObjects>
     <Part id="1">
-      <Staff id="1">
+      <eid>HAOc1eQfUdB_VNdKMYVj7aM</eid>
+      <Staff>
+        <eid>Yu1QSLbT0/I_sY2ypke6l+B</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
-      <trackName>Piano 1</trackName>
       <Instrument id="piano">
-        <longName>Piano 1</longName>
-        <shortName>Pno. 1</shortName>
+        <InstrumentLabel>
+          <longName>Piano 1</longName>
+          <shortName>Pno. 1</shortName>
+          </InstrumentLabel>
         <trackName>Piano</trackName>
         <minPitchP>21</minPitchP>
         <maxPitchP>108</maxPitchP>
@@ -100,15 +103,18 @@
         </Instrument>
       </Part>
     <Part id="2">
-      <Staff id="2">
+      <eid>IfpMcHV00aB_suw/qjY4peD</eid>
+      <Staff>
+        <eid>7IbubjoIXMD_NEw8tAk+jhL</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
-      <trackName>Piano 2</trackName>
       <Instrument id="piano">
-        <longName>Piano 2</longName>
-        <shortName>Pno. 2</shortName>
+        <InstrumentLabel>
+          <longName>Piano 2</longName>
+          <shortName>Pno. 2</shortName>
+          </InstrumentLabel>
         <trackName>Piano</trackName>
         <minPitchP>21</minPitchP>
         <maxPitchP>108</maxPitchP>
@@ -145,11 +151,11 @@
       <Measure>
         <eid>htTtc3WFVjH_P5ZQPxrgTsL</eid>
         <Marker>
-          <eid>q2M2iTUB6wL_290rz0f0olG</eid>
-          <linkedMain/>
           <style>repeat_left</style>
+          <eid>q2M2iTUB6wL_290rz0f0olG</eid>
           <text><sym>segno</sym></text>
           <label>segno</label>
+          <markerType>segno</markerType>
           </Marker>
         <voice>
           <Rest>
@@ -162,9 +168,8 @@
       <Measure>
         <eid>GdL9ms4bLUL_SQRmgOZ9QVK</eid>
         <Jump>
-          <eid>f2nKMXWo2MG_zcaxaK+kkhH</eid>
-          <linkedMain/>
           <style>repeat_right</style>
+          <eid>f2nKMXWo2MG_zcaxaK+kkhH</eid>
           <text>D.S.</text>
           <jumpTo>segno</jumpTo>
           <playUntil>end</playUntil>
@@ -210,15 +215,12 @@
         </Measure>
       <Measure>
         <Marker>
-          <eid>Ha8D6mVn/3L_Qv25i9LefSP</eid>
-          <linked>
-            <location>
-              <staves>-1</staves>
-              </location>
-            </linked>
           <style>repeat_left</style>
+          <eid>Ha8D6mVn/3L_Qv25i9LefSP</eid>
+          <linkedTo>q2M2iTUB6wL_290rz0f0olG</linkedTo>
           <text><sym>segno</sym></text>
           <label>segno</label>
+          <markerType>segno</markerType>
           </Marker>
         <voice>
           <Rest>
@@ -230,13 +232,9 @@
         </Measure>
       <Measure>
         <Jump>
-          <eid>FeKdW6j9lUN_lhPhS0dl27I</eid>
-          <linked>
-            <location>
-              <staves>-1</staves>
-              </location>
-            </linked>
           <style>repeat_right</style>
+          <eid>FeKdW6j9lUN_lhPhS0dl27I</eid>
+          <linkedTo>f2nKMXWo2MG_zcaxaK+kkhH</linkedTo>
           <text>D.S.</text>
           <jumpTo>segno</jumpTo>
           <playUntil>end</playUntil>

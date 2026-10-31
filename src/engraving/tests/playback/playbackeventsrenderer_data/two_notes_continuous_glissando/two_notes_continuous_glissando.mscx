@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="4.50">
-  <programVersion>4.5.0</programVersion>
-  <programRevision>28c68b6</programRevision>
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
     <eid>LHw7Fa2dFiK_ueJ5iT1vJiC</eid>
     <Division>480</Division>
@@ -74,15 +74,18 @@
       <unsorted/>
       </Order>
     <Part id="1">
-      <Staff id="1">
+      <eid>OzyYFBPPuuK_ajq+7UdIiPO</eid>
+      <Staff>
+        <eid>EaEzEeMdv5N_uTY5+CuaEr</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
-      <trackName>Piano</trackName>
       <Instrument id="piano">
-        <longName>Piano</longName>
-        <shortName>Pno.</shortName>
+        <InstrumentLabel>
+          <longName>Piano</longName>
+          <shortName>Pno.</shortName>
+          </InstrumentLabel>
         <trackName>Piano</trackName>
         <minPitchP>21</minPitchP>
         <maxPitchP>108</maxPitchP>
@@ -113,18 +116,6 @@
               <eid>75yZLSun/hC_miMSKaoLU6E</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
-              <Spanner type="Glissando">
-                <Glissando>
-                  <glissandoStyle>portamento</glissandoStyle>
-                  <eid>04FyP0OSnjK_pMP0cr0EzNI</eid>
-                  <diagonal>1</diagonal>
-                  </Glissando>
-                <next>
-                  <location>
-                    <fractions>1/4</fractions>
-                    </location>
-                  </next>
-                </Spanner>
               </Note>
             </Chord>
           <Chord>
@@ -134,13 +125,14 @@
               <eid>8pX3wxdQndB_lT/mZdOyBjH</eid>
               <pitch>71</pitch>
               <tpc>19</tpc>
-              <Spanner type="Glissando">
-                <prev>
-                  <location>
-                    <fractions>-1/4</fractions>
-                    </location>
-                  </prev>
-                </Spanner>
+              <Glissando>
+                <startElement>75yZLSun/hC_miMSKaoLU6E</startElement>
+                <endElement>8pX3wxdQndB_lT/mZdOyBjH</endElement>
+                <eid>04FyP0OSnjK_pMP0cr0EzNI</eid>
+                <track>0</track>
+                <diagonal>1</diagonal>
+                <glissandoStyle>portamento</glissandoStyle>
+                </Glissando>
               </Note>
             </Chord>
           <Rest>

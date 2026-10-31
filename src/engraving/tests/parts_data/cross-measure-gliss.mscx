@@ -1,95 +1,117 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="4.40">
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>8/GK4qF/zFL_TfOuDLjDz9M</eid>
     <Division>480</Division>
+    <showInvisible>1</showInvisible>
+    <showUnprintable>1</showUnprintable>
+    <showFrames>1</showFrames>
+    <showMargins>0</showMargins>
+    <metaTag name="arranger"></metaTag>
+    <metaTag name="composer"></metaTag>
+    <metaTag name="copyright"></metaTag>
+    <metaTag name="creationDate">2026-10-31</metaTag>
+    <metaTag name="lyricist"></metaTag>
+    <metaTag name="movementNumber"></metaTag>
+    <metaTag name="movementTitle"></metaTag>
+    <metaTag name="platform">Microsoft Windows</metaTag>
+    <metaTag name="source"></metaTag>
+    <metaTag name="translator"></metaTag>
+    <metaTag name="workNumber"></metaTag>
+    <metaTag name="workTitle"></metaTag>
     <Part id="1">
-      <Staff id="1">
+      <eid>VFsphJnqKHO_kpji+18sC3G</eid>
+      <Staff>
+        <eid>dynDUj4v9nO_KnE7OTEhF1M</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
-        </StaffType>
-      </Staff>
-      <Staff id="2">
+          </StaffType>
+        </Staff>
+      <Staff>
+        <eid>V6r0TMowzb_PkkYNRpPqVF</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
-        </StaffType>
+          </StaffType>
         <defaultClef>F</defaultClef>
-      </Staff>
+        </Staff>
       <Instrument id="harp">
         <trackName>Harp</trackName>
         <instrumentId>pluck.harp</instrumentId>
         <clef staff="2">F</clef>
-      </Instrument>
-    </Part>
+        <Channel>
+          <program value="46"/>
+          <synti>Fluid</synti>
+          </Channel>
+        </Instrument>
+      </Part>
     <Staff id="1">
       <Measure>
+        <eid>yGfFNBoxQCL_kzSPf+nieuK</eid>
         <voice>
           <TimeSig>
+            <eid>SBjqcn/BbfK_UzQ7GA7bNAH</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
-          </TimeSig>
+            </TimeSig>
           <Rest>
+            <eid>ZUSWN4ZK23H_X0M+xlP1DvF</eid>
             <durationType>measure</durationType>
             <duration>4/4</duration>
-          </Rest>
-        </voice>
-      </Measure>
+            </Rest>
+          </voice>
+        </Measure>
       <Measure>
+        <eid>mcMgtCDNybB_0MSXtj9iQPJ</eid>
         <voice>
           <Chord>
+            <eid>J/vbA6aGFxN_PDH6ZboDcaH</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>C1I9Ze9KBdD_n/8gjnwgOmH</eid>
               <pitch>84</pitch>
               <tpc>14</tpc>
-              <Spanner type="Glissando">
-                <prev>
-                  <location>
-                    <staves>1</staves>
-                    <measures>-1</measures>
-                  </location>
-                </prev>
-              </Spanner>
-            </Note>
-          </Chord>
-        </voice>
-      </Measure>
-    </Staff>
+              <Glissando>
+                <startElement>z0Bz4LoptHO_7bZi7ppOCxD</startElement>
+                <endElement>C1I9Ze9KBdD_n/8gjnwgOmH</endElement>
+                <eid>dd8/HJGPzTP_V0c2sLwTrhC</eid>
+                <track>4</track>
+                <diagonal>1</diagonal>
+                </Glissando>
+              </Note>
+            </Chord>
+          </voice>
+        </Measure>
+      </Staff>
     <Staff id="2">
       <Measure>
         <voice>
           <TimeSig>
+            <eid>fffrhi9hU8H_TKXK1/sAYlL</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
-          </TimeSig>
+            </TimeSig>
           <Chord>
+            <eid>tj31Jb5m5PH_9JkuGKgHxwH</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>z0Bz4LoptHO_7bZi7ppOCxD</eid>
               <pitch>48</pitch>
               <tpc>14</tpc>
-              <Spanner type="Glissando">
-                <Glissando>
-                  <text>gliss.</text>
-                  <diagonal>1</diagonal>
-                  <anchor>3</anchor>
-                </Glissando>
-                <next>
-                  <location>
-                    <staves>-1</staves>
-                    <measures>1</measures>
-                  </location>
-                </next>
-              </Spanner>
-            </Note>
-          </Chord>
-        </voice>
-      </Measure>
+              </Note>
+            </Chord>
+          </voice>
+        </Measure>
       <Measure>
         <voice>
           <Rest>
+            <eid>giu2cUZeg9K_6DmTtkcfuzN</eid>
             <durationType>measure</durationType>
             <duration>4/4</duration>
-          </Rest>
-        </voice>
-      </Measure>
-    </Staff>
-  </Score>
-</museScore>
+            </Rest>
+          </voice>
+        </Measure>
+      </Staff>
+    </Score>
+  </museScore>

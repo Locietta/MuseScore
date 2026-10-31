@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="4.20">
-  <programVersion>4.2.0</programVersion>
-  <programRevision></programRevision>
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>l+RM77fmZk_3WkyWEBUQ/L</eid>
     <Division>480</Division>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
@@ -68,15 +69,18 @@
       <unsorted/>
       </Order>
     <Part id="1">
-      <Staff id="1">
+      <eid>ruJO0rFyrTH_bpOsEMMCvqE</eid>
+      <Staff>
+        <eid>jVsBdqLvlLJ_qyQripIOxEK</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
-      <trackName>Flute</trackName>
       <Instrument id="flute">
-        <longName>Flute</longName>
-        <shortName>Fl.</shortName>
+        <InstrumentLabel>
+          <longName>Flute</longName>
+          <shortName>Fl.</shortName>
+          </InstrumentLabel>
         <trackName>Flute</trackName>
         <minPitchP>59</minPitchP>
         <maxPitchP>98</maxPitchP>
@@ -91,44 +95,57 @@
       </Part>
     <Staff id="1">
       <Measure>
+        <eid>+jc6kR507OI_1QeK+2VDfFK</eid>
         <voice>
           <KeySig>
+            <eid>VfbCwOItblF_dr1dBUewYdG</eid>
             <concertKey>0</concertKey>
             </KeySig>
           <TimeSig>
+            <eid>Nz3kw4KBOzH_wSfw170b0nI</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <StaffText>
+            <eid>I4gbhc3DpLB_DfWnPj6OMnH</eid>
             <text>Staff text</text>
             </StaffText>
           <Chord>
+            <eid>ZSL0Y/T7CSF_N0j6jS2YevI</eid>
             <durationType>quarter</durationType>
             <Note>
+              <eid>Nj4Ijcqf2nP_9IeQTauj8kN</eid>
               <pitch>60</pitch>
               <tpc>14</tpc>
               </Note>
             </Chord>
           <Chord>
+            <eid>x7sbl/JEzMG_kFba6txIiJK</eid>
             <durationType>quarter</durationType>
             <Note>
+              <eid>AQPmKSxzy0K_qSuClys5MjI</eid>
               <pitch>60</pitch>
               <tpc>14</tpc>
               </Note>
             </Chord>
           <SystemText>
+            <eid>rhZj/luH1PG_lvVVXvYZ4cJ</eid>
             <text>System text</text>
             </SystemText>
           <Chord>
+            <eid>0rpDxTLDNdC_PlP0iSQHKRF</eid>
             <durationType>quarter</durationType>
             <Note>
+              <eid>zelL7mzm1HL_IInX2tqxQ7</eid>
               <pitch>60</pitch>
               <tpc>14</tpc>
               </Note>
             </Chord>
           <Chord>
+            <eid>LIniN8AAUBF_uk2R7JzWjyP</eid>
             <durationType>quarter</durationType>
             <Note>
+              <eid>LoUYxbxujvC_I7Cwn/fHOnG</eid>
               <pitch>60</pitch>
               <tpc>14</tpc>
               </Note>
@@ -137,19 +154,25 @@
         </Measure>
       <HBox>
         <width>5</width>
+        <eid>DrDtc7qczMN_gnKbyEdc6wH</eid>
         </HBox>
       <Measure>
+        <eid>aBiIRNP9g+M_xw+dpmDQ2KE</eid>
         <voice>
           <Chord>
+            <eid>b7CGYjOEB5D_nfAK+8oCToK</eid>
             <durationType>quarter</durationType>
             <Note>
+              <eid>9J+i9BIQ2vK_pYlRR1oYvBE</eid>
               <pitch>60</pitch>
               <tpc>14</tpc>
               </Note>
             </Chord>
           <Chord>
+            <eid>ie1SyKNVdTN_PMoFpM0DR4N</eid>
             <durationType>quarter</durationType>
             <Note>
+              <eid>x2pWneL6QwF_GnhOBh7IZgG</eid>
               <pitch>60</pitch>
               <tpc>14</tpc>
               </Note>
@@ -157,17 +180,22 @@
           <Clef>
             <concertClefType>F</concertClefType>
             <transposingClefType>F</transposingClefType>
+            <eid>TDlSlHirBwE_zx+XM7PXTRB</eid>
             </Clef>
           <Chord>
+            <eid>VRksE7PMLzF_TUkH0eNFyMH</eid>
             <durationType>quarter</durationType>
             <Note>
+              <eid>kwrB3iwTuVE_zJebQIhoL6D</eid>
               <pitch>60</pitch>
               <tpc>14</tpc>
               </Note>
             </Chord>
           <Chord>
+            <eid>GwBUfKVTPKN_yNXmQJxq5FE</eid>
             <durationType>quarter</durationType>
             <Note>
+              <eid>IkTR5ASaJm_mdXKYWs+WlG</eid>
               <pitch>60</pitch>
               <tpc>14</tpc>
               </Note>
@@ -175,54 +203,56 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>zjTUbim4N2F_c2qGR1dZcnI</eid>
         <voice>
-          <Spanner type="Ottava">
-            <Ottava>
-              <subtype>8va</subtype>
-              </Ottava>
-            <next>
-              <location>
-                <fractions>1/1</fractions>
-                </location>
-              </next>
-            </Spanner>
           <Chord>
+            <eid>Q+TfuT4UIoC_7f4J+CJSQJP</eid>
             <durationType>quarter</durationType>
             <Note>
+              <eid>pohecBtcktM_+cfuazDHpgC</eid>
               <pitch>48</pitch>
               <tpc>14</tpc>
               </Note>
             </Chord>
           <Chord>
+            <eid>2b4NnLOQphN_IOGPMRkq5kG</eid>
             <durationType>quarter</durationType>
             <Note>
+              <eid>q0XdwkCNCeD_/GMNMIPA1YB</eid>
               <pitch>48</pitch>
               <tpc>14</tpc>
               </Note>
             </Chord>
           <Chord>
+            <eid>acpZ78T0LMD_PJK2YIRjk3F</eid>
             <durationType>quarter</durationType>
             <Note>
+              <eid>xKWAw8QZxRM_9ALXM6oH0mK</eid>
               <pitch>48</pitch>
               <tpc>14</tpc>
               </Note>
             </Chord>
           <Chord>
+            <eid>kJZwPImn06P_mwkQV35uVcB</eid>
             <durationType>quarter</durationType>
             <Note>
+              <eid>SFk/fKrV7XH_vv2XPxVSxOI</eid>
               <pitch>48</pitch>
               <tpc>14</tpc>
               </Note>
             </Chord>
-          <Spanner type="Ottava">
-            <prev>
-              <location>
-                <fractions>-1/1</fractions>
-                </location>
-              </prev>
-            </Spanner>
           </voice>
         </Measure>
       </Staff>
+    <SpannerMap>
+      <Ottava>
+        <subtype>8va</subtype>
+        <track2>0</track2>
+        <startTick>2/1</startTick>
+        <ticks>1/1</ticks>
+        <eid>ndVom8Kzx8I_zTilhiDPP6J</eid>
+        <track>0</track>
+        </Ottava>
+      </SpannerMap>
     </Score>
   </museScore>

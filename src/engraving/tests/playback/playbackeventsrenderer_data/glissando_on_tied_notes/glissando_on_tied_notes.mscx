@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="4.20">
-  <programVersion>4.2.0</programVersion>
-  <programRevision></programRevision>
-  <LastEID>1126</LastEID>
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>2AOzj4FhnbP_Zjt6/mXYRzN</eid>
     <Division>480</Division>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
@@ -72,17 +72,24 @@
       <unsorted/>
       </Order>
     <Part id="1">
-      <Staff id="1">
+      <eid>ysJSDwu8ynE_6q5S5/50+PH</eid>
+      <Staff>
+        <eid>NxHCBtLrgzE_VFq+KiySskK</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
-        <bracket type="1" span="2" col="2" visible="1"/>
+        <BracketItem>
+          <type>Brace</type>
+          <bracketSpan>2</bracketSpan>
+          <level>2</level>
+          </BracketItem>
         <barLineSpan>1</barLineSpan>
         </Staff>
-      <trackName>Piano</trackName>
       <Instrument id="piano">
-        <longName>Piano</longName>
-        <shortName>Pno.</shortName>
+        <InstrumentLabel>
+          <longName>Piano</longName>
+          <shortName>Pno.</shortName>
+          </InstrumentLabel>
         <trackName>Piano</trackName>
         <minPitchP>21</minPitchP>
         <maxPitchP>108</maxPitchP>
@@ -138,178 +145,128 @@
       </Part>
     <Staff id="1">
       <Measure>
+        <eid>a73V7ogt2jE_z6R3bCHbddC</eid>
         <voice>
           <KeySig>
-            <eid>1546188226583</eid>
+            <eid>JOcRpKrfmKO_Lky+r/9vhWE</eid>
             <concertKey>0</concertKey>
             </KeySig>
           <TimeSig>
-            <eid>1537598291993</eid>
+            <eid>pp3cqLTU8aD_Kt72pSxlvKJ</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Rest>
-            <eid>2903397892122</eid>
+            <eid>oEs5bOHuPNI_QsSF01hnzfK</eid>
             <durationType>quarter</durationType>
             </Rest>
           <Rest>
-            <eid>2899102924826</eid>
+            <eid>dYom51Ug8oI_dbPs+EU/DvD</eid>
             <durationType>quarter</durationType>
             </Rest>
           <Chord>
-            <eid>2826088480883</eid>
+            <eid>wi5EKOKD2hG_xEA/D3pmc+F</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>2821793513493</eid>
-              <Spanner type="Tie">
-                <Tie>
-                  <eid>2890512990239</eid>
-                  </Tie>
-                <next>
-                  <location>
-                    <fractions>1/4</fractions>
-                    </location>
-                  </next>
-                </Spanner>
+              <eid>U/PCYr2XebP_4X4XLPTXr0</eid>
               <pitch>69</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>2860448219251</eid>
+            <eid>neu3ir5mMDI_eqJI9JxVdIJ</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>2856153251861</eid>
-              <Spanner type="Tie">
-                <prev>
-                  <location>
-                    <fractions>-1/4</fractions>
-                    </location>
-                  </prev>
-                </Spanner>
+              <eid>lxCeRpoba6K_crEKvvnkuvH</eid>
+              <Tie>
+                <startElement>U/PCYr2XebP_4X4XLPTXr0</startElement>
+                <endElement>lxCeRpoba6K_crEKvvnkuvH</endElement>
+                <eid>kRZgjftJEZO_MzxWrRuiRTN</eid>
+                <track>0</track>
+                </Tie>
               <pitch>69</pitch>
               <tpc>17</tpc>
-              <Spanner type="Glissando">
-                <Glissando>
-                  <text>gliss.</text>
-                  <subtype>1</subtype>
-                  <eid>2881923055726</eid>
-                  <diagonal>1</diagonal>
-                  <anchor>3</anchor>
-                  </Glissando>
-                <next>
-                  <location>
-                    <measures>1</measures>
-                    <fractions>-3/4</fractions>
-                    </location>
-                  </next>
-                </Spanner>
               </Note>
             </Chord>
           </voice>
         </Measure>
       <Measure>
+        <eid>7VYdZ8kSVQE_8uT6XIqQ6fN</eid>
         <voice>
           <Chord>
-            <eid>2710124363891</eid>
+            <eid>pkSzTt81kaE_2WUy9qVnFzG</eid>
             <durationType>whole</durationType>
             <Note>
-              <eid>2705829396501</eid>
+              <eid>m/sbJ8sBceK_Yj7r7IN6DjK</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
-              <Spanner type="Glissando">
-                <prev>
-                  <location>
-                    <measures>-1</measures>
-                    <fractions>3/4</fractions>
-                    </location>
-                  </prev>
-                </Spanner>
+              <Glissando>
+                <startElement>lxCeRpoba6K_crEKvvnkuvH</startElement>
+                <endElement>m/sbJ8sBceK_Yj7r7IN6DjK</endElement>
+                <eid>jnVV7OFGPJF_ZOetUIqfGpO</eid>
+                <track>0</track>
+                <diagonal>1</diagonal>
+                <subtype>1</subtype>
+                </Glissando>
               </Note>
             </Chord>
           </voice>
         </Measure>
       <Measure>
+        <eid>opEYPlJ7B3L_qVCHWVQwmdC</eid>
         <voice>
           <Rest>
-            <eid>4458176053274</eid>
+            <eid>hHGd37f6zyN_YlVIY8BC7xB</eid>
             <durationType>quarter</durationType>
             </Rest>
           <Rest>
-            <eid>4453881085978</eid>
+            <eid>PoK7xLcaiJL_eojubCOWIVO</eid>
             <durationType>quarter</durationType>
             </Rest>
           <Chord>
-            <eid>4312147165299</eid>
+            <eid>VYGjUqNWCqB_CVYAxE+ZRmN</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>4307852197909</eid>
-              <Spanner type="Tie">
-                <Tie>
-                  <eid>4462471020575</eid>
-                  </Tie>
-                <next>
-                  <location>
-                    <fractions>1/4</fractions>
-                    </location>
-                  </next>
-                </Spanner>
+              <eid>h00MWNVCauP_QokhbSqFbeI</eid>
               <pitch>69</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>4432406249587</eid>
+            <eid>WlYlipkUBgB_Swx/3Vx6jkO</eid>
             <durationType>quarter</durationType>
             <Note>
-              <eid>4428111282197</eid>
-              <Spanner type="Tie">
-                <prev>
-                  <location>
-                    <fractions>-1/4</fractions>
-                    </location>
-                  </prev>
-                </Spanner>
+              <eid>84gdQ1YEFdE_2Vkzi2c5XnN</eid>
+              <Tie>
+                <startElement>h00MWNVCauP_QokhbSqFbeI</startElement>
+                <endElement>84gdQ1YEFdE_2Vkzi2c5XnN</endElement>
+                <eid>z5E8En30DWJ_UxFkk+GsrwJ</eid>
+                <track>0</track>
+                </Tie>
               <pitch>69</pitch>
               <tpc>17</tpc>
-              <Spanner type="Glissando">
-                <Glissando>
-                  <text>gliss.</text>
-                  <glissandoStyle>portamento</glissandoStyle>
-                  <glissandoStyle>portamento</glissandoStyle>
-                  <glissandoStyle>portamento</glissandoStyle>
-                  <eid>4492535791726</eid>
-                  <diagonal>1</diagonal>
-                  <anchor>3</anchor>
-                  </Glissando>
-                <next>
-                  <location>
-                    <measures>1</measures>
-                    <fractions>-3/4</fractions>
-                    </location>
-                  </next>
-                </Spanner>
               </Note>
             </Chord>
           </voice>
         </Measure>
       <Measure>
+        <eid>2DPULc5dkbH_n1tGEtLSTkM</eid>
         <voice>
           <Chord>
-            <eid>4475355922547</eid>
+            <eid>aqhsXB3NvdD_kzVHiVlW5UL</eid>
             <durationType>whole</durationType>
             <Note>
-              <eid>4471060955157</eid>
+              <eid>NExS7tn6XLD_5XJsd2hagIO</eid>
               <pitch>71</pitch>
               <tpc>19</tpc>
-              <Spanner type="Glissando">
-                <prev>
-                  <location>
-                    <measures>-1</measures>
-                    <fractions>3/4</fractions>
-                    </location>
-                  </prev>
-                </Spanner>
+              <Glissando>
+                <startElement>84gdQ1YEFdE_2Vkzi2c5XnN</startElement>
+                <endElement>NExS7tn6XLD_5XJsd2hagIO</endElement>
+                <eid>rclFB0dUZlB_t+PS5lLkKAH</eid>
+                <track>0</track>
+                <diagonal>1</diagonal>
+                <glissandoStyle>portamento</glissandoStyle>
+                </Glissando>
               </Note>
             </Chord>
           </voice>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="4.20">
-  <programVersion>4.2.0</programVersion>
-  <programRevision></programRevision>
-  <LastEID>609</LastEID>
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>ISHeebFbJIG_l8Vcd5onXmL</eid>
     <Division>480</Division>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
@@ -72,17 +72,24 @@
       <unsorted/>
       </Order>
     <Part id="1">
-      <Staff id="1">
+      <eid>cFFreNyD/BG_OSROXA9uScO</eid>
+      <Staff>
+        <eid>QrV40p1wT1K_sayJEUUDMQL</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
-        <bracket type="1" span="2" col="2" visible="1"/>
+        <BracketItem>
+          <type>Brace</type>
+          <bracketSpan>2</bracketSpan>
+          <level>2</level>
+          </BracketItem>
         <barLineSpan>1</barLineSpan>
         </Staff>
-      <trackName>Piano</trackName>
       <Instrument id="piano">
-        <longName>Piano</longName>
-        <shortName>Pno.</shortName>
+        <InstrumentLabel>
+          <longName>Piano</longName>
+          <shortName>Pno.</shortName>
+          </InstrumentLabel>
         <trackName>Piano</trackName>
         <minPitchP>21</minPitchP>
         <maxPitchP>108</maxPitchP>
@@ -138,100 +145,57 @@
       </Part>
     <Staff id="1">
       <Measure>
+        <eid>60qsHMM9EVB_xbugRfLBo7G</eid>
         <voice>
           <KeySig>
-            <eid>1546188226582</eid>
+            <eid>BU8u/EU4rIH_QSpm5PdjKhP</eid>
             <concertKey>0</concertKey>
             </KeySig>
           <TimeSig>
-            <eid>1537598291992</eid>
+            <eid>CkFLoyBgO0B_Y4CWO2dFhKM</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Chord>
-            <eid>2465311228019</eid>
+            <eid>dVOV18D2WK_/RA6ZuXNvjK</eid>
             <durationType>half</durationType>
             <Note>
-              <eid>2486786064404</eid>
-              <Spanner type="Tie">
-                <Tie>
-                  <eid>2559800508446</eid>
-                  </Tie>
-                <next>
-                  <location>
-                    <fractions>1/2</fractions>
-                    </location>
-                  </next>
-                </Spanner>
+              <eid>/usy5xKwGxE_zTFYzzU1gGN</eid>
               <pitch>71</pitch>
               <tpc>19</tpc>
               </Note>
             <Note>
-              <eid>2461016260628</eid>
-              <Spanner type="Tie">
-                <Tie>
-                  <eid>2564095475742</eid>
-                  </Tie>
-                <next>
-                  <location>
-                    <fractions>1/2</fractions>
-                    </location>
-                  </next>
-                </Spanner>
+              <eid>K7VvFemo7QN_YpElszTTKPE</eid>
               <pitch>74</pitch>
               <tpc>16</tpc>
               </Note>
             <Arpeggio>
-              <eid>2615635083280</eid>
               <subtype>1</subtype>
+              <eid>UlTu5wwdWBO_RC172hA9PJF</eid>
               </Arpeggio>
             </Chord>
           <Chord>
-            <eid>2495375999091</eid>
+            <eid>IM3qsTj6u+P_w4darUYK1+K</eid>
             <durationType>half</durationType>
             <Note>
-              <eid>2516850835476</eid>
-              <Spanner type="Tie">
-                <Tie>
-                  <eid>2568390443038</eid>
-                  </Tie>
-                <next>
-                  <location>
-                    <measures>1</measures>
-                    <fractions>-1/2</fractions>
-                    </location>
-                  </next>
-                </Spanner>
-              <Spanner type="Tie">
-                <prev>
-                  <location>
-                    <fractions>-1/2</fractions>
-                    </location>
-                  </prev>
-                </Spanner>
+              <eid>P8a784hjzQK_EoEZ4P3VKQK</eid>
+              <Tie>
+                <startElement>/usy5xKwGxE_zTFYzzU1gGN</startElement>
+                <endElement>P8a784hjzQK_EoEZ4P3VKQK</endElement>
+                <eid>L1VQFyERZoH_XI5AOkzmsqO</eid>
+                <track>0</track>
+                </Tie>
               <pitch>71</pitch>
               <tpc>19</tpc>
               </Note>
             <Note>
-              <eid>2491081031700</eid>
-              <Spanner type="Tie">
-                <Tie>
-                  <eid>2572685410334</eid>
-                  </Tie>
-                <next>
-                  <location>
-                    <measures>1</measures>
-                    <fractions>-1/2</fractions>
-                    </location>
-                  </next>
-                </Spanner>
-              <Spanner type="Tie">
-                <prev>
-                  <location>
-                    <fractions>-1/2</fractions>
-                    </location>
-                  </prev>
-                </Spanner>
+              <eid>LJP3NDVmzFH_cJSvPgp0SbJ</eid>
+              <Tie>
+                <startElement>K7VvFemo7QN_YpElszTTKPE</startElement>
+                <endElement>LJP3NDVmzFH_cJSvPgp0SbJ</endElement>
+                <eid>gsHiFhrju1B_I20pwRBZikD</eid>
+                <track>0</track>
+                </Tie>
               <pitch>74</pitch>
               <tpc>16</tpc>
               </Note>
@@ -239,47 +203,45 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>B+/HSQefq7K_uVS46JITuTD</eid>
         <voice>
           <Chord>
-            <eid>2534030704755</eid>
+            <eid>dywTsgjc1RF_K9CrB+wFvFG</eid>
             <durationType>half</durationType>
             <Note>
-              <eid>2555505541140</eid>
-              <Spanner type="Tie">
-                <prev>
-                  <location>
-                    <measures>-1</measures>
-                    <fractions>1/2</fractions>
-                    </location>
-                  </prev>
-                </Spanner>
+              <eid>Zc8kNpLOejE_FhvOu1L9k4F</eid>
+              <Tie>
+                <startElement>P8a784hjzQK_EoEZ4P3VKQK</startElement>
+                <endElement>Zc8kNpLOejE_FhvOu1L9k4F</endElement>
+                <eid>C/7Si43s0iN_NU8fxoHPT0H</eid>
+                <track>0</track>
+                </Tie>
               <pitch>71</pitch>
               <tpc>19</tpc>
               </Note>
             <Note>
-              <eid>2529735737364</eid>
-              <Spanner type="Tie">
-                <prev>
-                  <location>
-                    <measures>-1</measures>
-                    <fractions>1/2</fractions>
-                    </location>
-                  </prev>
-                </Spanner>
+              <eid>VBKw04zNWZE_Q89g1+LrsCB</eid>
+              <Tie>
+                <startElement>LJP3NDVmzFH_cJSvPgp0SbJ</startElement>
+                <endElement>VBKw04zNWZE_Q89g1+LrsCB</endElement>
+                <eid>rZA/Fgp8GjK_kpFhL5v+M7E</eid>
+                <track>0</track>
+                </Tie>
               <pitch>74</pitch>
               <tpc>16</tpc>
               </Note>
             </Chord>
           <Rest>
-            <eid>2521145802777</eid>
+            <eid>bKEq6qMsHkM_f5FYMEUQl4L</eid>
             <durationType>half</durationType>
             </Rest>
           </voice>
         </Measure>
       <Measure>
+        <eid>dle2cIDM9cF_W60K1umMuCP</eid>
         <voice>
           <Rest>
-            <eid>1589137899545</eid>
+            <eid>DGtqWOVd+MB_1pI2VlOsHZB</eid>
             <durationType>measure</durationType>
             <duration>4/4</duration>
             </Rest>

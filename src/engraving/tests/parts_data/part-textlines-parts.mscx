@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="4.10">
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>4oVeSg7NlwL_WhRnacOBjtP</eid>
     <Division>480</Division>
-    <Style>
-      <Spatium>1.76389</Spatium>
-      </Style>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
     <showFrames>1</showFrames>
@@ -12,23 +12,28 @@
     <metaTag name="arranger"></metaTag>
     <metaTag name="composer"></metaTag>
     <metaTag name="copyright"></metaTag>
+    <metaTag name="creationDate">2026-10-31</metaTag>
     <metaTag name="lyricist"></metaTag>
     <metaTag name="movementNumber"></metaTag>
     <metaTag name="movementTitle"></metaTag>
+    <metaTag name="platform">Microsoft Windows</metaTag>
     <metaTag name="source"></metaTag>
     <metaTag name="translator"></metaTag>
     <metaTag name="workNumber"></metaTag>
     <metaTag name="workTitle"></metaTag>
-    <Part>
-      <Staff id="1">
+    <Part id="1">
+      <eid>MeG9LWQXDMM_QBa8vPnmTtO</eid>
+      <Staff>
+        <eid>Z7yjs+EG1WL_mg8UxcxWGYN</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
-      <trackName>Flute</trackName>
       <Instrument id="flute">
-        <longName>Flute</longName>
-        <shortName>Fl.</shortName>
+        <InstrumentLabel>
+          <longName>Flute</longName>
+          <shortName>Fl.</shortName>
+          </InstrumentLabel>
         <trackName>Flute</trackName>
         <minPitchP>59</minPitchP>
         <maxPitchP>98</maxPitchP>
@@ -79,19 +84,23 @@
           <controller ctrl="0" value="0"/>
           <controller ctrl="32" value="17"/>
           <program value="73"/>
+          <synti>Fluid</synti>
           </Channel>
         </Instrument>
       </Part>
-    <Part>
-      <Staff id="2">
+    <Part id="2">
+      <eid>h4GqU4ZCMrE_qzgmRhfM3AE</eid>
+      <Staff>
+        <eid>lLJjwrzpamB_Irznlmy0SCE</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
-      <trackName>B♭ Clarinet</trackName>
       <Instrument id="bb-clarinet">
-        <longName>B♭ Clarinet</longName>
-        <shortName>B♭ Cl.</shortName>
+        <InstrumentLabel>
+          <longName>B♭ Clarinet</longName>
+          <shortName>B♭ Cl.</shortName>
+          </InstrumentLabel>
         <trackName>B♭ Clarinet</trackName>
         <minPitchP>50</minPitchP>
         <maxPitchP>94</maxPitchP>
@@ -144,55 +153,35 @@
           <controller ctrl="0" value="0"/>
           <controller ctrl="32" value="17"/>
           <program value="71"/>
+          <synti>Fluid</synti>
           </Channel>
         </Instrument>
       </Part>
     <Staff id="1">
       <VBox>
         <height>10</height>
-        <linkedMain/>
+        <sizeIsSpatiumDependent>1</sizeIsSpatiumDependent>
+        <eid>DWv/Kt27UzJ_KdzXn+go56F</eid>
         <Text>
-          <linkedMain/>
           <style>title</style>
+          <eid>QSwvvoK+ISI_xFAuejl5OXJ</eid>
           <text>testlines</text>
           </Text>
         </VBox>
       <Measure>
+        <eid>MOwTfvNhX/C_j8tqfBIFUZF</eid>
         <startRepeat/>
         <voice>
           <TimeSig>
-            <linkedMain/>
+            <eid>3CufCdkzl5N_gX2QjiyotAP</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
-          <Spanner type="HairPin">
-            <HairPin>
-              <subtype>0</subtype>
-              <linkedMain/>
-              </HairPin>
-            <next>
-              <location>
-                <measures>2</measures>
-                </location>
-              </next>
-            </Spanner>
-          <Spanner type="TextLine">
-            <TextLine>
-              <endHookType>1</endHookType>
-              <beginText>Staff/1</beginText>
-              <linkedMain/>
-              </TextLine>
-            <next>
-              <location>
-                <measures>2</measures>
-                </location>
-              </next>
-            </Spanner>
           <Chord>
-            <linkedMain/>
+            <eid>H+CJFKWCMkC_ffSfUCJGPvN</eid>
             <durationType>whole</durationType>
             <Note>
-              <linkedMain/>
+              <eid>QGIqKC1ATyN_KM9CTTNnm7I</eid>
               <pitch>64</pitch>
               <tpc>18</tpc>
               </Note>
@@ -200,12 +189,13 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>dfDhwRegXoF_hhiyMM4/sYI</eid>
         <voice>
           <Chord>
-            <linkedMain/>
+            <eid>TYliYWmc3hJ_phsWUShTm+</eid>
             <durationType>whole</durationType>
             <Note>
-              <linkedMain/>
+              <eid>eQlWIcs/udE_s5O/ou0cFyI</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
@@ -213,26 +203,13 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>Ok6IjRESefF_2iyY9UHzrP</eid>
         <voice>
-          <Spanner type="HairPin">
-            <prev>
-              <location>
-                <measures>-2</measures>
-                </location>
-              </prev>
-            </Spanner>
-          <Spanner type="TextLine">
-            <prev>
-              <location>
-                <measures>-2</measures>
-                </location>
-              </prev>
-            </Spanner>
           <Chord>
-            <linkedMain/>
+            <eid>NzUEInmx8TO_py9ICXgmQKC</eid>
             <durationType>whole</durationType>
             <Note>
-              <linkedMain/>
+              <eid>qr90G0keroI_lQkzTqwk2FN</eid>
               <pitch>69</pitch>
               <tpc>17</tpc>
               </Note>
@@ -240,12 +217,13 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>tNE92E2BLNB_8vloRcdFf+F</eid>
         <voice>
           <Chord>
-            <linkedMain/>
+            <eid>kftLQi5l9QC_FRQq+vk42mJ</eid>
             <durationType>whole</durationType>
             <Note>
-              <linkedMain/>
+              <eid>Avz+RD0V3kN_p87amQpoZOC</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
@@ -253,24 +231,13 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>Td/3HxiODwE_IDZFVLC7MKO</eid>
         <voice>
-          <Spanner type="TextLine">
-            <TextLine system="1">
-              <endHookType>1</endHookType>
-              <beginText>System</beginText>
-              <linkedMain/>
-              </TextLine>
-            <next>
-              <location>
-                <measures>2</measures>
-                </location>
-              </next>
-            </Spanner>
           <Chord>
-            <linkedMain/>
+            <eid>ObF34d3o13L_SvZNjSmWjEN</eid>
             <durationType>whole</durationType>
             <Note>
-              <linkedMain/>
+              <eid>H2orRk4izEH_yqU7EByUGIH</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
@@ -278,12 +245,13 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>MU0wAqotJ9O_pumD505IPN</eid>
         <voice>
           <Chord>
-            <linkedMain/>
+            <eid>lXm4ZqUp3zB_d5bqOA4Q5eJ</eid>
             <durationType>whole</durationType>
             <Note>
-              <linkedMain/>
+              <eid>vkvbQEvoyRL_R/CNYWSD+PD</eid>
               <pitch>62</pitch>
               <tpc>16</tpc>
               </Note>
@@ -291,33 +259,14 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>ut29NBySeS_JAsP4vGStJD</eid>
         <endRepeat>2</endRepeat>
         <voice>
-          <Spanner type="TextLine">
-            <prev>
-              <location>
-                <measures>-2</measures>
-                </location>
-              </prev>
-            </Spanner>
-          <Spanner type="Volta">
-            <Volta>
-              <endHookType>1</endHookType>
-              <beginText>1.</beginText>
-              <linkedMain/>
-              <endings>1</endings>
-              </Volta>
-            <next>
-              <location>
-                <measures>1</measures>
-                </location>
-              </next>
-            </Spanner>
           <Chord>
-            <linkedMain/>
+            <eid>TBWudemAQxC_z8DDSoG2XTH</eid>
             <durationType>whole</durationType>
             <Note>
-              <linkedMain/>
+              <eid>0rTaILEfbWC_pVVAs00Y60M</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
@@ -325,42 +274,17 @@
           </voice>
         </Measure>
       <Measure>
+        <eid>qZTPdIVq5aM_/TVQC0eRccF</eid>
         <voice>
-          <Spanner type="Volta">
-            <prev>
-              <location>
-                <measures>-1</measures>
-                </location>
-              </prev>
-            </Spanner>
-          <Spanner type="Volta">
-            <Volta>
-              <beginText>2.</beginText>
-              <linkedMain/>
-              <endings>2</endings>
-              </Volta>
-            <next>
-              <location>
-                <fractions>1/1</fractions>
-                </location>
-              </next>
-            </Spanner>
           <Chord>
-            <linkedMain/>
+            <eid>6skC9C7qQNL_LXLoeGPxm+L</eid>
             <durationType>whole</durationType>
             <Note>
-              <linkedMain/>
+              <eid>JWhQKH6rZeB_DP5QMpr9J6G</eid>
               <pitch>71</pitch>
               <tpc>19</tpc>
               </Note>
             </Chord>
-          <Spanner type="Volta">
-            <prev>
-              <location>
-                <fractions>-1/1</fractions>
-                </location>
-              </prev>
-            </Spanner>
           </voice>
         </Measure>
       </Staff>
@@ -368,19 +292,20 @@
       <Measure>
         <voice>
           <KeySig>
-            <linkedMain/>
-            <accidental>2</accidental>
+            <eid>YYqPPy0B0rE_ni8XBH2Z+uE</eid>
+            <concertKey>0</concertKey>
+            <actualKey>2</actualKey>
             </KeySig>
           <TimeSig>
-            <linkedMain/>
+            <eid>BDhAlA7l9SF_lDJXESq70CM</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Chord>
-            <linkedMain/>
+            <eid>0KHcKyrnsGM_/ZEpXLc+B4I</eid>
             <durationType>whole</durationType>
             <Note>
-              <linkedMain/>
+              <eid>pc/EO7O/qiN_k4brTC8bsSH</eid>
               <pitch>69</pitch>
               <tpc>17</tpc>
               <tpc2>19</tpc2>
@@ -391,10 +316,10 @@
       <Measure>
         <voice>
           <Chord>
-            <linkedMain/>
+            <eid>qZMvGOCvBIG_rn2RriQUgiM</eid>
             <durationType>whole</durationType>
             <Note>
-              <linkedMain/>
+              <eid>NX2gSn4Ag8G_Vfw7cVlYpNM</eid>
               <pitch>62</pitch>
               <tpc>16</tpc>
               <tpc2>18</tpc2>
@@ -404,34 +329,11 @@
         </Measure>
       <Measure>
         <voice>
-          <Spanner type="HairPin">
-            <HairPin>
-              <subtype>1</subtype>
-              <linkedMain/>
-              </HairPin>
-            <next>
-              <location>
-                <measures>2</measures>
-                </location>
-              </next>
-            </Spanner>
-          <Spanner type="TextLine">
-            <TextLine>
-              <endHookType>1</endHookType>
-              <beginText>Staff/2</beginText>
-              <linkedMain/>
-              </TextLine>
-            <next>
-              <location>
-                <measures>2</measures>
-                </location>
-              </next>
-            </Spanner>
           <Chord>
-            <linkedMain/>
+            <eid>A28SrN/IeCO_uY464Zs6jRI</eid>
             <durationType>whole</durationType>
             <Note>
-              <linkedMain/>
+              <eid>OCmReXFp4FJ_CY4BnQ0nxBE</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               <tpc2>15</tpc2>
@@ -442,10 +344,10 @@
       <Measure>
         <voice>
           <Chord>
-            <linkedMain/>
+            <eid>76kWxrIHspI_aTL8I2IwnvP</eid>
             <durationType>whole</durationType>
             <Note>
-              <linkedMain/>
+              <eid>NOrFI2Z7VWL_F4SVsN+uvYM</eid>
               <pitch>62</pitch>
               <tpc>16</tpc>
               <tpc2>18</tpc2>
@@ -455,25 +357,11 @@
         </Measure>
       <Measure>
         <voice>
-          <Spanner type="HairPin">
-            <prev>
-              <location>
-                <measures>-2</measures>
-                </location>
-              </prev>
-            </Spanner>
-          <Spanner type="TextLine">
-            <prev>
-              <location>
-                <measures>-2</measures>
-                </location>
-              </prev>
-            </Spanner>
           <Chord>
-            <linkedMain/>
+            <eid>Uq9wBw8IEdP_4Pfa14AFZFK</eid>
             <durationType>whole</durationType>
             <Note>
-              <linkedMain/>
+              <eid>dgxdyu0mmdH_KhGfbawUkBK</eid>
               <pitch>64</pitch>
               <tpc>18</tpc>
               <tpc2>20</tpc2>
@@ -484,10 +372,10 @@
       <Measure>
         <voice>
           <Chord>
-            <linkedMain/>
+            <eid>j2AqFpq6WEE_WGdNHxPXW2F</eid>
             <durationType>whole</durationType>
             <Note>
-              <linkedMain/>
+              <eid>mSH6blbNyqL_BYBxmRKuwxN</eid>
               <pitch>69</pitch>
               <tpc>17</tpc>
               <tpc2>19</tpc2>
@@ -498,10 +386,10 @@
       <Measure>
         <voice>
           <Chord>
-            <linkedMain/>
+            <eid>PqL1mR7ukiI_x9C57l1+onO</eid>
             <durationType>whole</durationType>
             <Note>
-              <linkedMain/>
+              <eid>GDiMGdfY6iE_vJDRWOA2HCD</eid>
               <pitch>64</pitch>
               <tpc>18</tpc>
               <tpc2>20</tpc2>
@@ -512,10 +400,10 @@
       <Measure>
         <voice>
           <Chord>
-            <linkedMain/>
+            <eid>DP7lBI7BtTP_W+QyevY3KYN</eid>
             <durationType>whole</durationType>
             <Note>
-              <linkedMain/>
+              <eid>4cc+5fsfF+B_mb+pKtCvnFE</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               <tpc2>15</tpc2>
@@ -524,683 +412,82 @@
           </voice>
         </Measure>
       </Staff>
-    <Score>
-      <Division>480</Division>
-      <Style>
-        <createMultiMeasureRests>1</createMultiMeasureRests>
-        <Spatium>1.74978</Spatium>
-        </Style>
-      <showInvisible>1</showInvisible>
-      <showUnprintable>1</showUnprintable>
-      <showFrames>1</showFrames>
-      <showMargins>0</showMargins>
-      <metaTag name="partName">Flute</metaTag>
-      <Part>
-        <Staff id="1">
-          <linkedTo>1</linkedTo>
-          <StaffType group="pitched">
-            <name>stdNormal</name>
-            </StaffType>
-          </Staff>
-        <trackName>Flute</trackName>
-        <Instrument id="flute">
-          <longName>Flute</longName>
-          <shortName>Fl.</shortName>
-          <trackName>Flute</trackName>
-          <minPitchP>59</minPitchP>
-          <maxPitchP>98</maxPitchP>
-          <minPitchA>60</minPitchA>
-          <maxPitchA>93</maxPitchA>
-          <instrumentId>wind.flutes.flute</instrumentId>
-          <Articulation>
-            <velocity>100</velocity>
-            <gateTime>95</gateTime>
-            </Articulation>
-          <Articulation name="staccatissimo">
-            <velocity>100</velocity>
-            <gateTime>33</gateTime>
-            </Articulation>
-          <Articulation name="staccato">
-            <velocity>100</velocity>
-            <gateTime>50</gateTime>
-            </Articulation>
-          <Articulation name="portato">
-            <velocity>100</velocity>
-            <gateTime>67</gateTime>
-            </Articulation>
-          <Articulation name="tenuto">
-            <velocity>100</velocity>
-            <gateTime>100</gateTime>
-            </Articulation>
-          <Articulation name="marcato">
-            <velocity>120</velocity>
-            <gateTime>67</gateTime>
-            </Articulation>
-          <Articulation name="sforzato">
-            <velocity>150</velocity>
-            <gateTime>100</gateTime>
-            </Articulation>
-          <Articulation name="sforzatoStaccato">
-            <velocity>150</velocity>
-            <gateTime>50</gateTime>
-            </Articulation>
-          <Articulation name="marcatoStaccato">
-            <velocity>120</velocity>
-            <gateTime>50</gateTime>
-            </Articulation>
-          <Articulation name="marcatoTenuto">
-            <velocity>120</velocity>
-            <gateTime>100</gateTime>
-            </Articulation>
-          <Channel>
-            <controller ctrl="0" value="0"/>
-            <controller ctrl="32" value="17"/>
-            <program value="73"/>
-            </Channel>
-          </Instrument>
-        </Part>
-      <Staff id="1">
-        <VBox>
-          <height>10</height>
-          <linked>
-            </linked>
-          <Text>
-            <linked>
-              </linked>
-            <style>title</style>
-            <text>testlines</text>
-            </Text>
-          <Text>
-            <style>instrument_excerpt</style>
-            <text>Flute</text>
-            </Text>
-          </VBox>
-        <Measure>
-          <startRepeat/>
-          <voice>
-            <TimeSig>
-              <linked>
-                </linked>
-              <sigN>4</sigN>
-              <sigD>4</sigD>
-              </TimeSig>
-            <Spanner type="HairPin">
-              <HairPin>
-                <subtype>0</subtype>
-                <linked>
-                  </linked>
-                </HairPin>
-              <next>
-                <location>
-                  <measures>2</measures>
-                  </location>
-                </next>
-              </Spanner>
-            <Spanner type="TextLine">
-              <TextLine>
-                <endHookType>1</endHookType>
-                <beginText>Staff/1</beginText>
-                <linked>
-                  </linked>
-                <lineWidth>0.15121</lineWidth>
-                </TextLine>
-              <next>
-                <location>
-                  <measures>2</measures>
-                  </location>
-                </next>
-              </Spanner>
-            <Chord>
-              <linked>
-                </linked>
-              <durationType>whole</durationType>
-              <Note>
-                <linked>
-                  </linked>
-                <pitch>64</pitch>
-                <tpc>18</tpc>
-                </Note>
-              </Chord>
-            </voice>
-          </Measure>
-        <Measure>
-          <voice>
-            <Chord>
-              <linked>
-                </linked>
-              <durationType>whole</durationType>
-              <Note>
-                <linked>
-                  </linked>
-                <pitch>67</pitch>
-                <tpc>15</tpc>
-                </Note>
-              </Chord>
-            </voice>
-          </Measure>
-        <Measure>
-          <voice>
-            <Spanner type="HairPin">
-              <prev>
-                <location>
-                  <measures>-2</measures>
-                  </location>
-                </prev>
-              </Spanner>
-            <Spanner type="TextLine">
-              <prev>
-                <location>
-                  <measures>-2</measures>
-                  </location>
-                </prev>
-              </Spanner>
-            <Chord>
-              <linked>
-                </linked>
-              <durationType>whole</durationType>
-              <Note>
-                <linked>
-                  </linked>
-                <pitch>69</pitch>
-                <tpc>17</tpc>
-                </Note>
-              </Chord>
-            </voice>
-          </Measure>
-        <Measure>
-          <voice>
-            <Chord>
-              <linked>
-                </linked>
-              <durationType>whole</durationType>
-              <Note>
-                <linked>
-                  </linked>
-                <pitch>65</pitch>
-                <tpc>13</tpc>
-                </Note>
-              </Chord>
-            </voice>
-          </Measure>
-        <Measure>
-          <voice>
-            <Spanner type="TextLine">
-              <TextLine system="1">
-                <endHookType>1</endHookType>
-                <beginText>System</beginText>
-                <linked>
-                  </linked>
-                <lineWidth>0.15121</lineWidth>
-                </TextLine>
-              <next>
-                <location>
-                  <measures>2</measures>
-                  </location>
-                </next>
-              </Spanner>
-            <Chord>
-              <linked>
-                </linked>
-              <durationType>whole</durationType>
-              <Note>
-                <linked>
-                  </linked>
-                <pitch>67</pitch>
-                <tpc>15</tpc>
-                </Note>
-              </Chord>
-            </voice>
-          </Measure>
-        <Measure>
-          <voice>
-            <Chord>
-              <linked>
-                </linked>
-              <durationType>whole</durationType>
-              <Note>
-                <linked>
-                  </linked>
-                <pitch>62</pitch>
-                <tpc>16</tpc>
-                </Note>
-              </Chord>
-            </voice>
-          </Measure>
-        <Measure>
-          <endRepeat>2</endRepeat>
-          <voice>
-            <Spanner type="TextLine">
-              <prev>
-                <location>
-                  <measures>-2</measures>
-                  </location>
-                </prev>
-              </Spanner>
-            <Spanner type="Volta">
-              <Volta>
-                <endHookType>1</endHookType>
-                <beginText>1.</beginText>
-                <linked>
-                  </linked>
-                <endings>1</endings>
-                </Volta>
-              <next>
-                <location>
-                  <measures>1</measures>
-                  </location>
-                </next>
-              </Spanner>
-            <Chord>
-              <linked>
-                </linked>
-              <durationType>whole</durationType>
-              <Note>
-                <linked>
-                  </linked>
-                <pitch>67</pitch>
-                <tpc>15</tpc>
-                </Note>
-              </Chord>
-            </voice>
-          </Measure>
-        <Measure>
-          <voice>
-            <Spanner type="Volta">
-              <prev>
-                <location>
-                  <measures>-1</measures>
-                  </location>
-                </prev>
-              </Spanner>
-            <Spanner type="Volta">
-              <Volta>
-                <beginText>2.</beginText>
-                <linked>
-                  </linked>
-                <endings>2</endings>
-                </Volta>
-              <next>
-                <location>
-                  <fractions>1/1</fractions>
-                  </location>
-                </next>
-              </Spanner>
-            <Chord>
-              <linked>
-                </linked>
-              <durationType>whole</durationType>
-              <Note>
-                <linked>
-                  </linked>
-                <pitch>71</pitch>
-                <tpc>19</tpc>
-                </Note>
-              </Chord>
-            <Spanner type="Volta">
-              <prev>
-                <location>
-                  <fractions>-1/1</fractions>
-                  </location>
-                </prev>
-              </Spanner>
-            </voice>
-          </Measure>
-        </Staff>
-      <name>Flute</name>
-      </Score>
-    <Score>
-      <Division>480</Division>
-      <Style>
-        <createMultiMeasureRests>1</createMultiMeasureRests>
-        <Spatium>1.74978</Spatium>
-        </Style>
-      <showInvisible>1</showInvisible>
-      <showUnprintable>1</showUnprintable>
-      <showFrames>1</showFrames>
-      <showMargins>0</showMargins>
-      <metaTag name="partName">B♭ Clarinet</metaTag>
-      <Part>
-        <Staff id="1">
-          <linkedTo>2</linkedTo>
-          <StaffType group="pitched">
-            <name>stdNormal</name>
-            </StaffType>
-          </Staff>
-        <trackName>B♭ Clarinet</trackName>
-        <Instrument id="bb-clarinet">
-          <longName>B♭ Clarinet</longName>
-          <shortName>B♭ Cl.</shortName>
-          <trackName>B♭ Clarinet</trackName>
-          <minPitchP>50</minPitchP>
-          <maxPitchP>94</maxPitchP>
-          <minPitchA>50</minPitchA>
-          <maxPitchA>89</maxPitchA>
-          <transposeDiatonic>-1</transposeDiatonic>
-          <transposeChromatic>-2</transposeChromatic>
-          <instrumentId>wind.reed.clarinet.bflat</instrumentId>
-          <Articulation>
-            <velocity>100</velocity>
-            <gateTime>100</gateTime>
-            </Articulation>
-          <Articulation name="staccatissimo">
-            <velocity>100</velocity>
-            <gateTime>33</gateTime>
-            </Articulation>
-          <Articulation name="staccato">
-            <velocity>100</velocity>
-            <gateTime>50</gateTime>
-            </Articulation>
-          <Articulation name="portato">
-            <velocity>100</velocity>
-            <gateTime>67</gateTime>
-            </Articulation>
-          <Articulation name="tenuto">
-            <velocity>100</velocity>
-            <gateTime>100</gateTime>
-            </Articulation>
-          <Articulation name="marcato">
-            <velocity>120</velocity>
-            <gateTime>67</gateTime>
-            </Articulation>
-          <Articulation name="sforzato">
-            <velocity>150</velocity>
-            <gateTime>100</gateTime>
-            </Articulation>
-          <Articulation name="sforzatoStaccato">
-            <velocity>150</velocity>
-            <gateTime>50</gateTime>
-            </Articulation>
-          <Articulation name="marcatoStaccato">
-            <velocity>120</velocity>
-            <gateTime>50</gateTime>
-            </Articulation>
-          <Articulation name="marcatoTenuto">
-            <velocity>120</velocity>
-            <gateTime>100</gateTime>
-            </Articulation>
-          <Channel>
-            <controller ctrl="0" value="0"/>
-            <controller ctrl="32" value="17"/>
-            <program value="71"/>
-            </Channel>
-          </Instrument>
-        </Part>
-      <Staff id="1">
-        <VBox>
-          <height>10</height>
-          <linked>
-            <location>
-              <staves>-1</staves>
-              </location>
-            </linked>
-          <Text>
-            <linked>
-              <location>
-                <staves>-1</staves>
-                </location>
-              </linked>
-            <style>title</style>
-            <text>testlines</text>
-            </Text>
-          <Text>
-            <style>instrument_excerpt</style>
-            <text>B♭ Clarinet</text>
-            </Text>
-          </VBox>
-        <Measure>
-          <startRepeat/>
-          <voice>
-            <KeySig>
-              <linked>
-                </linked>
-              <accidental>2</accidental>
-              </KeySig>
-            <TimeSig>
-              <linked>
-                </linked>
-              <sigN>4</sigN>
-              <sigD>4</sigD>
-              </TimeSig>
-            <Chord>
-              <linked>
-                </linked>
-              <durationType>whole</durationType>
-              <Note>
-                <linked>
-                  </linked>
-                <pitch>69</pitch>
-                <tpc>17</tpc>
-                <tpc2>19</tpc2>
-                </Note>
-              </Chord>
-            </voice>
-          </Measure>
-        <Measure>
-          <voice>
-            <Chord>
-              <linked>
-                </linked>
-              <durationType>whole</durationType>
-              <Note>
-                <linked>
-                  </linked>
-                <pitch>62</pitch>
-                <tpc>16</tpc>
-                <tpc2>18</tpc2>
-                </Note>
-              </Chord>
-            </voice>
-          </Measure>
-        <Measure>
-          <voice>
-            <Spanner type="HairPin">
-              <HairPin>
-                <subtype>1</subtype>
-                <linked>
-                  </linked>
-                </HairPin>
-              <next>
-                <location>
-                  <measures>2</measures>
-                  </location>
-                </next>
-              </Spanner>
-            <Spanner type="TextLine">
-              <TextLine>
-                <endHookType>1</endHookType>
-                <beginText>Staff/2</beginText>
-                <linked>
-                  </linked>
-                <lineWidth>0.15121</lineWidth>
-                </TextLine>
-              <next>
-                <location>
-                  <measures>2</measures>
-                  </location>
-                </next>
-              </Spanner>
-            <Chord>
-              <linked>
-                </linked>
-              <durationType>whole</durationType>
-              <Note>
-                <linked>
-                  </linked>
-                <pitch>65</pitch>
-                <tpc>13</tpc>
-                <tpc2>15</tpc2>
-                </Note>
-              </Chord>
-            </voice>
-          </Measure>
-        <Measure>
-          <voice>
-            <Chord>
-              <linked>
-                </linked>
-              <durationType>whole</durationType>
-              <Note>
-                <linked>
-                  </linked>
-                <pitch>62</pitch>
-                <tpc>16</tpc>
-                <tpc2>18</tpc2>
-                </Note>
-              </Chord>
-            </voice>
-          </Measure>
-        <Measure>
-          <voice>
-            <Spanner type="HairPin">
-              <prev>
-                <location>
-                  <measures>-2</measures>
-                  </location>
-                </prev>
-              </Spanner>
-            <Spanner type="TextLine">
-              <prev>
-                <location>
-                  <measures>-2</measures>
-                  </location>
-                </prev>
-              </Spanner>
-            <Spanner type="TextLine">
-              <TextLine system="1">
-                <endHookType>1</endHookType>
-                <beginText>System</beginText>
-                <linked>
-                  <location>
-                    <staves>-1</staves>
-                    </location>
-                  </linked>
-                <lineWidth>0.15121</lineWidth>
-                </TextLine>
-              <next>
-                <location>
-                  <measures>2</measures>
-                  </location>
-                </next>
-              </Spanner>
-            <Chord>
-              <linked>
-                </linked>
-              <durationType>whole</durationType>
-              <Note>
-                <linked>
-                  </linked>
-                <pitch>64</pitch>
-                <tpc>18</tpc>
-                <tpc2>20</tpc2>
-                </Note>
-              </Chord>
-            </voice>
-          </Measure>
-        <Measure>
-          <voice>
-            <Chord>
-              <linked>
-                </linked>
-              <durationType>whole</durationType>
-              <Note>
-                <linked>
-                  </linked>
-                <pitch>69</pitch>
-                <tpc>17</tpc>
-                <tpc2>19</tpc2>
-                </Note>
-              </Chord>
-            </voice>
-          </Measure>
-        <Measure>
-          <endRepeat>2</endRepeat>
-          <voice>
-            <Spanner type="TextLine">
-              <prev>
-                <location>
-                  <measures>-2</measures>
-                  </location>
-                </prev>
-              </Spanner>
-            <Spanner type="Volta">
-              <Volta>
-                <endHookType>1</endHookType>
-                <beginText>1.</beginText>
-                <linked>
-                  <location>
-                    <staves>-1</staves>
-                    </location>
-                  </linked>
-                <endings>1</endings>
-                </Volta>
-              <next>
-                <location>
-                  <measures>1</measures>
-                  </location>
-                </next>
-              </Spanner>
-            <Chord>
-              <linked>
-                </linked>
-              <durationType>whole</durationType>
-              <Note>
-                <linked>
-                  </linked>
-                <pitch>64</pitch>
-                <tpc>18</tpc>
-                <tpc2>20</tpc2>
-                </Note>
-              </Chord>
-            </voice>
-          </Measure>
-        <Measure>
-          <voice>
-            <Spanner type="Volta">
-              <prev>
-                <location>
-                  <measures>-1</measures>
-                  </location>
-                </prev>
-              </Spanner>
-            <Spanner type="Volta">
-              <Volta>
-                <beginText>2.</beginText>
-                <linked>
-                  <location>
-                    <staves>-1</staves>
-                    </location>
-                  </linked>
-                <endings>2</endings>
-                </Volta>
-              <next>
-                <location>
-                  <fractions>1/1</fractions>
-                  </location>
-                </next>
-              </Spanner>
-            <Chord>
-              <linked>
-                </linked>
-              <durationType>whole</durationType>
-              <Note>
-                <linked>
-                  </linked>
-                <pitch>65</pitch>
-                <tpc>13</tpc>
-                <tpc2>15</tpc2>
-                </Note>
-              </Chord>
-            <Spanner type="Volta">
-              <prev>
-                <location>
-                  <fractions>-1/1</fractions>
-                  </location>
-                </prev>
-              </Spanner>
-            </voice>
-          </Measure>
-        </Staff>
-      <name>B♭ Clarinet</name>
-      </Score>
+    <SpannerMap>
+      <HairPin>
+        <subtype>0</subtype>
+        <beginHookHeight>-1.9</beginHookHeight>
+        <endHookHeight>-1.9</endHookHeight>
+        <track2>0</track2>
+        <startTick>0/1</startTick>
+        <ticks>2/1</ticks>
+        <eid>RROL1o3slgD_kE0Rs+AGwdE</eid>
+        <track>0</track>
+        </HairPin>
+      <TextLine>
+        <endHookType>1</endHookType>
+        <beginText>Staff/1</beginText>
+        <track2>0</track2>
+        <startTick>0/1</startTick>
+        <ticks>2/1</ticks>
+        <eid>4ZToSFh5OoC_ezPspyysPkK</eid>
+        <track>0</track>
+        </TextLine>
+      <HairPin>
+        <subtype>1</subtype>
+        <beginHookHeight>-1.9</beginHookHeight>
+        <endHookHeight>-1.9</endHookHeight>
+        <track2>4</track2>
+        <startTick>2/1</startTick>
+        <ticks>2/1</ticks>
+        <eid>GKzqFFPzeZH_Nbq7YysgNbM</eid>
+        <track>4</track>
+        </HairPin>
+      <TextLine>
+        <endHookType>1</endHookType>
+        <beginText>Staff/2</beginText>
+        <track2>4</track2>
+        <startTick>2/1</startTick>
+        <ticks>2/1</ticks>
+        <eid>1HlspecuX5O_6MD+i/rrhDP</eid>
+        <track>4</track>
+        </TextLine>
+      <TextLine system="1">
+        <beginLineArrowHeight>1</beginLineArrowHeight>
+        <beginLineArrowWidth>0.5</beginLineArrowWidth>
+        <beginFilledArrowHeight>1</beginFilledArrowHeight>
+        <beginFilledArrowWidth>0.85</beginFilledArrowWidth>
+        <endHookType>1</endHookType>
+        <endLineArrowHeight>1</endLineArrowHeight>
+        <endLineArrowWidth>0.5</endLineArrowWidth>
+        <endFilledArrowHeight>1</endFilledArrowHeight>
+        <endFilledArrowWidth>0.85</endFilledArrowWidth>
+        <beginText>System</beginText>
+        <beginTextPosition>left</beginTextPosition>
+        <continueTextPosition>left</continueTextPosition>
+        <endTextPosition>left</endTextPosition>
+        <track2>0</track2>
+        <startTick>4/1</startTick>
+        <ticks>2/1</ticks>
+        <eid>z9Zhv2lO3PJ_kyKE4PuCKcI</eid>
+        <track>0</track>
+        </TextLine>
+      <Volta>
+        <endHookType>1</endHookType>
+        <beginText>1.</beginText>
+        <startElement>ut29NBySeS_JAsP4vGStJD</startElement>
+        <endElement>ut29NBySeS_JAsP4vGStJD</endElement>
+        <eid>9l70FDfnTEK_77FiqmdVNuB</eid>
+        <track>0</track>
+        <endings>1</endings>
+        </Volta>
+      <Volta>
+        <beginText>2.</beginText>
+        <startElement>qZTPdIVq5aM_/TVQC0eRccF</startElement>
+        <endElement>qZTPdIVq5aM_/TVQC0eRccF</endElement>
+        <eid>dIgLplxjCcM_jJFA6FG+vlK</eid>
+        <track>0</track>
+        <endings>2</endings>
+        </Volta>
+      </SpannerMap>
     </Score>
   </museScore>

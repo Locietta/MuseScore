@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="4.20">
-  <programVersion>4.2.0</programVersion>
-  <programRevision></programRevision>
-  <LastEID>644</LastEID>
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>tQZwp2SzfQM_UV/sF+UGG3G</eid>
     <Division>480</Division>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
@@ -72,17 +72,24 @@
       <unsorted/>
       </Order>
     <Part id="1">
-      <Staff id="1">
+      <eid>jzpBUm78XKB_0u0wG3VhyQF</eid>
+      <Staff>
+        <eid>JlIcd/WX0NB_O0hp6nhqDCN</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
-        <bracket type="1" span="2" col="2" visible="1"/>
+        <BracketItem>
+          <type>Brace</type>
+          <bracketSpan>2</bracketSpan>
+          <level>2</level>
+          </BracketItem>
         <barLineSpan>1</barLineSpan>
         </Staff>
-      <trackName>Piano</trackName>
       <Instrument id="piano">
-        <longName>Piano</longName>
-        <shortName>Pno.</shortName>
+        <InstrumentLabel>
+          <longName>Piano</longName>
+          <shortName>Pno.</shortName>
+          </InstrumentLabel>
         <trackName>Piano</trackName>
         <minPitchP>21</minPitchP>
         <maxPitchP>108</maxPitchP>
@@ -139,76 +146,66 @@
     <Staff id="1">
       <VBox>
         <height>10</height>
-        <eid>1520418422906</eid>
-        <excludeFromParts>0</excludeFromParts>
+        <sizeIsSpatiumDependent>1</sizeIsSpatiumDependent>
+        <eid>eiXJ62Tk7kB_jtNsVXaoNpH</eid>
         <Text>
-          <eid>2091649073158</eid>
           <style>title</style>
+          <eid>UzZqEwNEeFF_4DlPG30fwcN</eid>
           <text>Untitled score</text>
           </Text>
         <Text>
-          <eid>2095944040454</eid>
           <style>subtitle</style>
+          <eid>ew8/MNWIwHP_Z+xednkgGqD</eid>
           <text>Subtitle</text>
           </Text>
         <Text>
-          <eid>2100239007750</eid>
           <style>composer</style>
+          <eid>PmAB48wPfGD_3aecLO9rYeI</eid>
           <text>Composer / arranger</text>
           </Text>
         </VBox>
       <Measure>
+        <eid>QFCjoOEE6BI_iJJqKDP/YZI</eid>
         <voice>
           <KeySig>
-            <eid>1546188226582</eid>
+            <eid>wKqlX+1Sx+I_ezrdZigWPHM</eid>
             <concertKey>0</concertKey>
             </KeySig>
           <TimeSig>
-            <eid>1537598291992</eid>
+            <eid>jkwOtt+ZNCJ_HP8iPQJUDdC</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Chord>
-            <eid>2564095475827</eid>
+            <eid>VtsUezgvpkC_5vtJOzYb2fM</eid>
             <durationType>quarter</durationType>
             <grace4/>
             <Note>
-              <eid>2576980377620</eid>
+              <eid>1p6GejwXdgH_Zhu4u7CsxcF</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>2512555868275</eid>
+            <eid>g7WqicTyz0D_HClIFSzdUMD</eid>
             <durationType>half</durationType>
             <Note>
-              <eid>2508260900884</eid>
-              <Spanner type="Tie">
-                <Tie>
-                  <eid>2585570312222</eid>
-                  </Tie>
-                <next>
-                  <location>
-                    <fractions>1/2</fractions>
-                    </location>
-                  </next>
-                </Spanner>
+              <eid>x4l1pVRwVaF_YqgyZp1qVdE</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
             </Chord>
           <Chord>
-            <eid>2538325672051</eid>
+            <eid>4P1g9RglxZI_kWyUCMfiTYO</eid>
             <durationType>half</durationType>
             <Note>
-              <eid>2534030704660</eid>
-              <Spanner type="Tie">
-                <prev>
-                  <location>
-                    <fractions>-1/2</fractions>
-                    </location>
-                  </prev>
-                </Spanner>
+              <eid>lcvOjDqCV5C_/WZyV/p+SXI</eid>
+              <Tie>
+                <startElement>x4l1pVRwVaF_YqgyZp1qVdE</startElement>
+                <endElement>lcvOjDqCV5C_/WZyV/p+SXI</endElement>
+                <eid>f79cZEc0R/L_Wnety3jieuM</eid>
+                <track>0</track>
+                </Tie>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>

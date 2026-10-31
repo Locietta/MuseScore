@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="4.40">
-  <programVersion>4.4.0</programVersion>
-  <programRevision></programRevision>
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>IQ4bkukiWMB_NlsEKaDJ24P</eid>
     <Division>480</Division>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
@@ -71,15 +72,18 @@
         </section>
       </Order>
     <Part id="1">
-      <Staff id="1">
+      <eid>q/8RGs1kThF_M7phG+sQBSP</eid>
+      <Staff>
+        <eid>clOkxBHp3II_wyOnb8y/+XL</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
-      <trackName>Flute</trackName>
       <Instrument id="flute">
-        <longName>Flute</longName>
-        <shortName>Fl.</shortName>
+        <InstrumentLabel>
+          <longName>Flute</longName>
+          <shortName>Fl.</shortName>
+          </InstrumentLabel>
         <trackName>Flute</trackName>
         <minPitchP>59</minPitchP>
         <maxPitchP>98</maxPitchP>
@@ -94,76 +98,97 @@
       </Part>
     <Staff id="1">
       <Measure>
+        <eid>xe0bTuw8/wP_Q4SOBT2kauL</eid>
         <voice>
           <KeySig>
+            <eid>+CzEmbX+uO_aN1NA9B8VQJ</eid>
             <concertKey>0</concertKey>
             </KeySig>
           <TimeSig>
+            <eid>zHD+psVk+PN_5CCYMfLhScK</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Chord>
+            <eid>GcbYbNQ452D_ijcBg4V7DoJ</eid>
             <durationType>eighth</durationType>
             <Note>
+              <eid>NTk7rl5orpJ_o8zcpMpsReO</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>
             </Chord>
           <Chord>
+            <eid>P3aaP+VJXyH_eaZJmAycT0E</eid>
             <durationType>eighth</durationType>
             <Note>
+              <eid>h4QLbu7GQ3E_NeCh7n/EXlI</eid>
               <pitch>74</pitch>
               <tpc>16</tpc>
               </Note>
             </Chord>
           <Chord>
+            <eid>moGtLdrR0kI_g8y12XRWXmO</eid>
             <durationType>eighth</durationType>
             <Note>
+              <eid>0WnIvk60U0D_8Nh/NwGwttD</eid>
               <pitch>76</pitch>
               <tpc>18</tpc>
               </Note>
             </Chord>
           <Chord>
+            <eid>20hzAt2o1sP_zwOIz+uaeSJ</eid>
             <durationType>eighth</durationType>
             <Note>
+              <eid>ovFm37oIzfE_8z75K9FouBP</eid>
               <pitch>77</pitch>
               <tpc>13</tpc>
               </Note>
             </Chord>
           <Rest>
+            <eid>zQdPS3ZdzKB_8Aceg/9wPpK</eid>
             <durationType>half</durationType>
             </Rest>
           </voice>
         <voice>
           <Chord>
+            <eid>2PIZXZoFPrD_Hb95z98qvLL</eid>
             <durationType>eighth</durationType>
             <Note>
+              <eid>x/nWmHYY2hM_+bdl+0r7XT</eid>
               <pitch>67</pitch>
               <tpc>15</tpc>
               </Note>
             </Chord>
           <Chord>
+            <eid>I4PQLkvCnVO_FO6AD0bZsKH</eid>
             <durationType>eighth</durationType>
             <Note>
+              <eid>AaVNbX4tmfB_ehZS2336NxO</eid>
               <pitch>69</pitch>
               <tpc>17</tpc>
               </Note>
             </Chord>
           <Chord>
+            <eid>wK7wwdjImQO_vcAVuE2EdKE</eid>
             <durationType>eighth</durationType>
             <Note>
+              <eid>fQyBwq1lXtG_W8RpcVEQmpD</eid>
               <pitch>71</pitch>
               <tpc>19</tpc>
               </Note>
             </Chord>
           <Chord>
+            <eid>m/cD4+JcFjO_zFWk9l6d+nH</eid>
             <durationType>eighth</durationType>
             <Note>
+              <eid>pCnNlE/FXwH_TMiaYsFw+IJ</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>
             </Chord>
           <Rest>
+            <eid>fjOb2a/VYAO_BgqkurUlU4H</eid>
             <durationType>half</durationType>
             </Rest>
           </voice>

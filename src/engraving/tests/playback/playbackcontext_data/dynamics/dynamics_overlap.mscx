@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="4.40">
-  <programVersion>4.4.0</programVersion>
-  <programRevision></programRevision>
-  <LastEID>658</LastEID>
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>iY5upF7DnQG_90iLCHrSd4I</eid>
     <Division>480</Division>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
@@ -74,15 +74,18 @@
         </section>
       </Order>
     <Part id="1">
-      <Staff id="1">
+      <eid>M3ODhaRpmfH_mHqQY/i+xLH</eid>
+      <Staff>
+        <eid>KyG1cmnrh9C_e0RA7xPhZEJ</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
-      <trackName>Flute</trackName>
       <Instrument id="flute">
-        <longName>Flute</longName>
-        <shortName>Fl.</shortName>
+        <InstrumentLabel>
+          <longName>Flute</longName>
+          <shortName>Fl.</shortName>
+          </InstrumentLabel>
         <trackName>Flute</trackName>
         <minPitchP>59</minPitchP>
         <maxPitchP>98</maxPitchP>
@@ -97,37 +100,27 @@
       </Part>
     <Staff id="1">
       <Measure>
+        <eid>Pzv7jYYRv7O_AcrLzCEELZC</eid>
         <voice>
           <KeySig>
-            <eid>47244640279</eid>
+            <eid>mHNjvJ8NbgL_GHqLV1mbSRP</eid>
             <concertKey>0</concertKey>
             </KeySig>
           <TimeSig>
-            <eid>38654705689</eid>
+            <eid>Uv/pmMlJX7M_omQSp7OX/b</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Dynamic>
             <subtype>ff</subtype>
             <velocity>112</velocity>
-            <eid>1000727380004</eid>
+            <eid>cr1rXWWrfm_CBt978AqUk</eid>
             </Dynamic>
-          <Spanner type="HairPin">
-            <HairPin>
-              <subtype>1</subtype>
-              <eid>1082331758686</eid>
-              </HairPin>
-            <next>
-              <location>
-                <measures>1</measures>
-                </location>
-              </next>
-            </Spanner>
           <Chord>
-            <eid>962072674419</eid>
+            <eid>C2MV+gjcGDP_UnPqn/ZTKNK</eid>
             <durationType>whole</durationType>
             <Note>
-              <eid>957777707028</eid>
+              <eid>eh8Uyg/CupJ_JbaM79fe1VE</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>
@@ -136,29 +129,23 @@
             <subtype>pp</subtype>
             <velocity>33</velocity>
             <anchorToEndOfPrevious>1</anchorToEndOfPrevious>
-            <eid>1099511627812</eid>
+            <eid>dZzUc7J9x0P_xBEsJKjUOkD</eid>
             </Dynamic>
           </voice>
         </Measure>
       <Measure>
+        <eid>7ZllPDXopuE_rtw3egIHXmP</eid>
         <voice>
           <Dynamic>
             <subtype>ff</subtype>
             <velocity>112</velocity>
-            <eid>1185410973732</eid>
+            <eid>b06yP/MBq4D_3jxMc4fpsjB</eid>
             </Dynamic>
-          <Spanner type="HairPin">
-            <prev>
-              <location>
-                <measures>-1</measures>
-                </location>
-              </prev>
-            </Spanner>
           <Chord>
-            <eid>983547510899</eid>
+            <eid>d+GLV2jqifK_U47Yu2m3fHG</eid>
             <durationType>whole</durationType>
             <Note>
-              <eid>979252543508</eid>
+              <eid>TehxzGqEkfJ_r1NvAkiqTGD</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>
@@ -166,5 +153,17 @@
           </voice>
         </Measure>
       </Staff>
+    <SpannerMap>
+      <HairPin>
+        <subtype>1</subtype>
+        <beginHookHeight>-1.9</beginHookHeight>
+        <endHookHeight>-1.9</endHookHeight>
+        <track2>0</track2>
+        <startTick>0/1</startTick>
+        <ticks>1/1</ticks>
+        <eid>Q5ybyc/bEfB_WfBSj7+P3fE</eid>
+        <track>0</track>
+        </HairPin>
+      </SpannerMap>
     </Score>
   </museScore>

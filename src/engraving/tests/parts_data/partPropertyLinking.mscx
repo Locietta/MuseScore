@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="4.20">
-  <programVersion>4.2.0</programVersion>
-  <programRevision></programRevision>
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>MAPWTLa0h6F_71pJYCTauLE</eid>
     <Division>480</Division>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
@@ -68,15 +69,18 @@
       <unsorted/>
       </Order>
     <Part id="1">
-      <Staff id="1">
+      <eid>N4rVVxZ/oHD_37VZiLkwm6G</eid>
+      <Staff>
+        <eid>IvZZHFzSKgO_om1CRoYRByM</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         </Staff>
-      <trackName>Flute</trackName>
       <Instrument id="flute">
-        <longName>Flute</longName>
-        <shortName>Fl.</shortName>
+        <InstrumentLabel>
+          <longName>Flute</longName>
+          <shortName>Fl.</shortName>
+          </InstrumentLabel>
         <trackName>Flute</trackName>
         <minPitchP>59</minPitchP>
         <maxPitchP>98</maxPitchP>
@@ -91,21 +95,27 @@
       </Part>
     <Staff id="1">
       <Measure>
+        <eid>VOfriZUwXHC_ytTBA8FlLjM</eid>
         <voice>
           <KeySig>
+            <eid>oMnycG9bG0_ymfiMXeTPLC</eid>
             <concertKey>0</concertKey>
             </KeySig>
           <TimeSig>
+            <eid>oL1fsuF02dM_CSQi1/JxHqG</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Dynamic>
             <subtype>mf</subtype>
             <velocity>80</velocity>
+            <eid>XYO4+3NnUlD_q7O2ZuMNfsH</eid>
             </Dynamic>
           <Chord>
+            <eid>6ofxKW6zS2M_ccWMw45ojWP</eid>
             <durationType>whole</durationType>
             <Note>
+              <eid>Zuj+/mEgSmL_1FKt4bJOCGK</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>

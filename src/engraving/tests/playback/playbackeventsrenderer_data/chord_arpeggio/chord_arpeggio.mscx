@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<museScore version="4.20">
-  <programVersion>4.4.0</programVersion>
-  <programRevision></programRevision>
-  <LastEID>100</LastEID>
+<museScore version="5.00">
+  <programVersion>5.0.0</programVersion>
+  <programRevision>804d836</programRevision>
   <Score>
+    <eid>EdUohyQuALE_BFZEijteu6L</eid>
     <Division>480</Division>
     <showInvisible>1</showInvisible>
     <showUnprintable>1</showUnprintable>
@@ -74,23 +74,31 @@
       <unsorted/>
       </Order>
     <Part id="1">
-      <Staff id="1">
+      <eid>2nebXS6zJnD_UJNjptTY9RM</eid>
+      <Staff>
+        <eid>/s9iAXc1gFN_dAXnC2Ka7LK</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
-        <bracket type="1" span="2" col="0" visible="1"/>
+        <BracketItem>
+          <type>Brace</type>
+          <bracketSpan>2</bracketSpan>
+          <level>0</level>
+          </BracketItem>
         <barLineSpan>1</barLineSpan>
         </Staff>
-      <Staff id="2">
+      <Staff>
+        <eid>PpEdaKJio6_553Dw/T85FC</eid>
         <StaffType group="pitched">
           <name>stdNormal</name>
           </StaffType>
         <defaultClef>F</defaultClef>
         </Staff>
-      <trackName>Piano</trackName>
       <Instrument id="piano">
-        <longName>Piano</longName>
-        <shortName>Pno.</shortName>
+        <InstrumentLabel>
+          <longName>Piano</longName>
+          <shortName>Pno.</shortName>
+          </InstrumentLabel>
         <trackName>Piano</trackName>
         <minPitchP>21</minPitchP>
         <maxPitchP>108</maxPitchP>
@@ -107,67 +115,69 @@
     <Staff id="1">
       <VBox>
         <height>10</height>
-        <eid>21474836603</eid>
+        <sizeIsSpatiumDependent>1</sizeIsSpatiumDependent>
+        <eid>Sp29GMA5qSM_qdk8k8/gXOE</eid>
         <Text>
-          <eid>25769803781</eid>
           <style>title</style>
+          <eid>gDd7/m9OQ1K_KDKVCnkljuO</eid>
           <text>Untitled Score</text>
           </Text>
         <Text>
-          <eid>30064771077</eid>
           <style>subtitle</style>
+          <eid>kgIvwnRkTSH_xeNvmizqx1M</eid>
           <text>Subtitle</text>
           </Text>
         <Text>
-          <eid>34359738373</eid>
           <style>composer</style>
+          <eid>xUWpgkV8f3K_mmrZ9fsijAM</eid>
           <text>Composer / arranger</text>
           </Text>
         </VBox>
       <Measure>
+        <eid>bEIGG2xcPWJ_XfZaLNM68FC</eid>
         <voice>
           <TimeSig>
-            <eid>51539607577</eid>
+            <eid>bi6f8etlOpM_A1ppdAMPCUL</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Chord>
-            <eid>60129542260</eid>
+            <eid>Z4T8eI/jTON_VB9YoSW9S3F</eid>
             <durationType>16th</durationType>
             <Note>
-              <eid>73014444052</eid>
+              <eid>0aSxiH7unyD_OMlU80HR0eK</eid>
               <pitch>65</pitch>
               <tpc>13</tpc>
               </Note>
             <Note>
-              <eid>77309411348</eid>
+              <eid>IonR49kpAhC_2RX3PpSG+OB</eid>
               <pitch>69</pitch>
               <tpc>17</tpc>
               </Note>
             <Note>
-              <eid>81604378644</eid>
+              <eid>P0S9gUb2LCI_4yEnOncS4IN</eid>
               <pitch>72</pitch>
               <tpc>14</tpc>
               </Note>
             <Arpeggio>
-              <eid>85899345935</eid>
               <subtype>0</subtype>
+              <eid>UoS91UqoO2F_Wvb4LyZGCbJ</eid>
               </Arpeggio>
             </Chord>
           <Rest>
-            <eid>420906795034</eid>
+            <eid>xbIZSCbyqIL_16p/g5N5V2K</eid>
             <durationType>16th</durationType>
             </Rest>
           <Rest>
-            <eid>197568495642</eid>
+            <eid>EFz1Sw5pLcF_k9qv6Zns4II</eid>
             <durationType>eighth</durationType>
             </Rest>
           <Rest>
-            <eid>98784247834</eid>
+            <eid>Aljw8hmwitE_sjyMzb1Q0GD</eid>
             <durationType>quarter</durationType>
             </Rest>
           <Rest>
-            <eid>107374182426</eid>
+            <eid>518juV9Nt5B_Z950sC/ykXI</eid>
             <durationType>half</durationType>
             </Rest>
           </voice>
@@ -177,12 +187,12 @@
       <Measure>
         <voice>
           <TimeSig>
-            <eid>111669149721</eid>
+            <eid>dVZqnzxrdgE_KJbxxJnWCiP</eid>
             <sigN>4</sigN>
             <sigD>4</sigD>
             </TimeSig>
           <Rest>
-            <eid>115964117018</eid>
+            <eid>v0Qi56f959O_NtAPYjzIiSC</eid>
             <durationType>measure</durationType>
             <duration>4/4</duration>
             </Rest>
